@@ -1,0 +1,30 @@
+dn: uid=test,ou=users,dc=compare,dc=vo,dc=elte,dc=hu
+objectClass: simpleSecurityObject
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: test
+sn: Test
+givenName: Testing
+cn: Test Testing
+displayName: Test Testing
+uidNumber: 10001
+gidNumber: 10001
+userPassword: alma
+gecos: Test Testing
+loginShell: /bin/bash
+homeDirectory: /home/test
+mail: test@complex.elte.hu
+telephoneNumber: 000-000-0000
+st: BP
+manager: uid=test,ou=users,dc=compare,dc=vo,dc=elte,dc=hu
+shadowExpire: -1
+shadowFlag: 0
+shadowWarning: 7
+shadowMin: 8
+shadowMax: 999999
+shadowLastChange: 10877
+title: Test User

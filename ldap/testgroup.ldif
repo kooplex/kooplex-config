@@ -1,0 +1,5 @@
+dn: cn=test,ou=groups,dc=compare,dc=vo,dc=elte,dc=hu
+objectClass: top
+objectClass: posixGroup
+cn: test
+gidNumber: 10001
