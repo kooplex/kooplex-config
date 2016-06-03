@@ -2,13 +2,14 @@
 
 # Init script
 
-ROOT=$1
-PROJECT=$2
-SUBNET=$3
-DUMMYPASS=$4
+source ./config.sh
 
+ROOT=$1
+IMG=0
 SRV=$ROOT/$PROJECT/srv
 SECRETS=$SRV/.secrets
+
+LDAPORG="dc=$PROJECT,dc=vo,dc=elte,dc=hu"
 
 # Primary setup
 
@@ -29,7 +30,10 @@ cd nginx
 cd ..
 
 # 2. LDAP
-#cd ldap
-#./init.sh
-#cd ..
+
+IP=`./ipadd.sh "$SUBNET" 3`
+
+cd ldap
+. ./install.sh $IP $DOMAIN
+cd ..
 

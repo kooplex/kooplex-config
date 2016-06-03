@@ -1,10 +1,15 @@
 #!/bin/bash
 
+source ./config.sh
+
 ROOT=$1
-PROJECT=$2
 
 SRV=$ROOT/$PROJECT/srv
 SECRETS=$SRV/.secrets
+
+cd ldap
+. ./remove.sh
+cd ..
 
 cd nginx
 . ./remove.sh

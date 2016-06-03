@@ -4,11 +4,12 @@ IP=$1
 
 echo "Installing nginx $PROJECT-nginx [$IP]"
 
+# Initialize nginx directory with necessary config files
+
 mkdir -p $SRV/nginx/etc/
 cp nginx.conf $SRV/nginx/etc/
 
 # Install and execute docker image
-docker pull nginx
 
 docker run -d \
   --name $PROJECT-nginx \
