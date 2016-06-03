@@ -5,7 +5,10 @@ source ./config.sh
 ROOT=$1
 
 SRV=$ROOT/$PROJECT/srv
-SECRETS=$SRV/.secrets
+
+cd home
+. ./remove.sh
+cd ..
 
 cd ldap
 . ./remove.sh

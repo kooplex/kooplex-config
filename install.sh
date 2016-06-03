@@ -21,19 +21,40 @@ echo Creating docker network $PROJECT-net [$SUBNET]
 
 docker network create --driver bridge --subnet $SUBNET $PROJECT-net
 
-# 1. NGINX
+# 1. ADMIN
 
-IP=`./ipadd.sh "$SUBNET" 2`
+# TODO
+
+# 2. NGINX
+
+IP=`./ipadd.sh "$SUBNET" 3`
 
 cd nginx
 . ./install.sh $IP
 cd ..
 
-# 2. LDAP
+# 3. LDAP
 
-IP=`./ipadd.sh "$SUBNET" 3`
+IP=`./ipadd.sh "$SUBNET" 4`
 
 cd ldap
 . ./install.sh $IP $DOMAIN
 cd ..
 
+# 4. NFS home
+
+IP=`./ipadd.sh "$SUBNET" 5`
+
+cd home
+. ./install.sh $IP
+cd ..
+
+# 5. Gitlab
+
+IP=`./ipadd.sh "$SUBNET" 6`
+
+cd gitlab
+. ./install.sh $IP
+cd ..
+
+echo "Install complete"
