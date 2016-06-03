@@ -6,6 +6,10 @@ ROOT=$1
 
 SRV=$ROOT/$PROJECT/srv
 
+cd gitlab
+. ./remove.sh
+cd ..
+
 cd home
 . ./remove.sh
 cd ..
