@@ -1,8 +1,6 @@
 #!/bin/bash
 
-IP=$1
-
-echo "Installing gitlab $PROJECT-gitlab [$IP]"
+echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
 
 # Initialize gitlab directories and preparing config files
 
@@ -15,7 +13,7 @@ mkdir -p $SRV/gitlab/opt
 docker run -d \
   --name $PROJECT-gitlab \
   --net $PROJECT-net \
-  --ip $IP \
+  --ip $GITLABIP \
   -v $SRV/gitlab/etc:/etc/gitlab \
   -v $SRV/gitlab/log:/var/log/gitlab \
   -v $SRV/gitlab/opt:/var/opt/gitlab \
@@ -23,11 +21,4 @@ docker run -d \
 
 sleep 5
 
-GITLABRB=$SRV/gitlab/etc/gitlab.rb
-
-echo "external_url 'http://$DOMAIN/gitlab'" >> $GITLABRB
-echo "gitlab_rails['gitlab_email_from'] = '$EMAIL'" >> $GITLABRB
-echo "gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'" >> $GITLABRB
-echo "gitlab_rails['gitlab_email_reply_to'] = '$EMAIL'" >> $GITLABRB
-echo "gitlab_rails['smtp_enable'] = true" >> $GITLABRB
-echo "gitlab_rails['smtp_address'] = ''$SMTP" >> $GITLABRB
+. ./configure.sh

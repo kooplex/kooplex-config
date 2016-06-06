@@ -2,12 +2,8 @@
 
 # Init script
 
+source ./lib.sh
 source ./config.sh
-
-ROOT=$1
-IMG=0
-SRV=$ROOT/$PROJECT/srv
-SECRETS=$SRV/.secrets
 
 LDAPORG="dc=$PROJECT,dc=vo,dc=elte,dc=hu"
 
@@ -21,40 +17,22 @@ echo Creating docker network $PROJECT-net [$SUBNET]
 
 docker network create --driver bridge --subnet $SUBNET $PROJECT-net
 
-# 1. ADMIN
-
-# TODO
-
-# 2. NGINX
-
-IP=`./ipadd.sh "$SUBNET" 3`
-
-cd nginx
-. ./install.sh $IP
-cd ..
-
-# 3. LDAP
-
-IP=`./ipadd.sh "$SUBNET" 4`
+# TODO: install admin docker
 
 cd ldap
-. ./install.sh $IP $DOMAIN
+. ./install.sh
 cd ..
-
-# 4. NFS home
-
-IP=`./ipadd.sh "$SUBNET" 5`
 
 cd home
-. ./install.sh $IP
+. ./install.sh
 cd ..
 
-# 5. Gitlab
-
-IP=`./ipadd.sh "$SUBNET" 6`
-
 cd gitlab
-. ./install.sh $IP
+. ./install.sh
+cd ..
+
+cd nginx
+. ./install.sh
 cd ..
 
 echo "Install complete"

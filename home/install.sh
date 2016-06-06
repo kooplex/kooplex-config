@@ -1,8 +1,6 @@
 #!/bin/bash
 
-IP=$1
-
-echo "Installing nfs home $PROJECT-home [$IP]"
+echo "Installing nfs home $PROJECT-home [$HOMEIP]"
 
 # Initialize nginx directory with necessary config files
 
@@ -13,7 +11,7 @@ mkdir -p $SRV/home
 docker run -d \
   --name $PROJECT-home \
   --net $PROJECT-net \
-  --ip $IP \
+  --ip $HOMEIP \
   --privileged \
   -v $SRV/home:/home \
   cpuguy83/nfs-server /home

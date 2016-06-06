@@ -1,20 +1,32 @@
 #!/bin/bash
 
-IP=$1
-
-echo "Installing nginx $PROJECT-nginx [$IP]"
+echo "Installing nginx $PROJECT-nginx [$NGINXIP]"
 
 # Initialize nginx directory with necessary config files
 
 mkdir -p $SRV/nginx/etc/
 cp nginx.conf $SRV/nginx/etc/
 
+# Prepare configuration
+
+echo "
+server {
+  listen 80;
+  server_name $DOMAIN;
+
+  location /gitlab {
+    proxy_pass http://$PROJECT-gitlab;
+  }
+}
+" > $SRV/nginx/etc/sites.conf
+
 # Install and execute docker image
 
 docker run -d \
   --name $PROJECT-nginx \
   --net $PROJECT-net \
-  --ip $IP \
+  --ip $NGINXIP \
   -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
-  -v $SRV/nginx/etc/sites-enabled/:/etc/nginx/sites-enabled/ \
+  -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
   nginx
+

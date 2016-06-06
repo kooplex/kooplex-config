@@ -2,8 +2,6 @@
 
 source ./config.sh
 
-ROOT=$1
-
 SRV=$ROOT/$PROJECT/srv
 
 cd gitlab
