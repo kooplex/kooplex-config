@@ -1,24 +1,13 @@
 #!/bin/bash
 
-source ./config.sh
+source ./lib.sh
 
-SRV=$ROOT/$PROJECT/srv
-
-cd gitlab
-. ./remove.sh
-cd ..
-
-cd home
-. ./remove.sh
-cd ..
-
-cd ldap
-. ./remove.sh
-cd ..
-
-cd nginx
-. ./remove.sh
-cd ..
+for svc in jupyterhub gitlab home ldap nginx 
+do
+  cd $svc
+  . ./remove.sh
+  cd ..
+done
 
 docker network rm $PROJECT-net
 

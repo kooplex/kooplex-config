@@ -18,7 +18,7 @@ docker network create --driver bridge --subnet $SUBNET $PROJECT-net
 
 # TODO: install admin docker
 
-for svc in ldap home gitlab nginx
+for svc in ldap home gitlab nginx jupyterhub
 do
   cd $svc
   . ./install.sh

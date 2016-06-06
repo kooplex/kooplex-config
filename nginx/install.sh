@@ -7,19 +7,6 @@ echo "Installing nginx $PROJECT-nginx [$NGINXIP]"
 mkdir -p $SRV/nginx/etc/
 cp nginx.conf $SRV/nginx/etc/
 
-# Prepare configuration
-
-echo "
-server {
-  listen 80;
-  server_name $DOMAIN;
-
-  location /gitlab {
-    proxy_pass http://$PROJECT-gitlab;
-  }
-}
-" > $SRV/nginx/etc/sites.conf
-
 # Install and execute docker image
 
 docker run -d \

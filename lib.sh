@@ -276,9 +276,11 @@ config() {
   LDAPPORT=389
 
   HOMEIP=$(ip_addip "$SUBNET" 3)
-
+  
   GITLABIP=$(ip_addip "$SUBNET" 4)
-
+  
+  JUPYTERHUBIP=$(ip_addip "$SUBNET" 5)
+  
   NGINXIP=$(ip_addip "$SUBNET" 16)
 }
 
