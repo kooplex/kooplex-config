@@ -44,6 +44,9 @@ EOS
 
 " > $GITLABRB
 
-echo "Creating admin user in LDAP"
+echo "Creating Gitlab admin user..."
 
-ldap_adduser gitlabadmin Gitlab Admin 10004 $GITLABPASS
+adduser gitlabadmin Gitlab Admin "admin@$DOMAIN" 10004 "$GITLABPASS"
+
+# TODO: promote ldap user to admin
+# TODO: disable standard login and self-registration via Gitlab

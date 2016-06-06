@@ -19,6 +19,8 @@ docker run -d \
   -v $SRV/gitlab/opt:/var/opt/gitlab \
   gitlab/gitlab-ce:latest
 
-sleep 5
+echo "Waiting 30 seconds for the Gitlab application to start..."
+  
+sleep 30
 
 . ./configure.sh

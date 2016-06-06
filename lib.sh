@@ -50,9 +50,9 @@ ldap_fdqn2cn () {
   done
 }
 
-ldap_exe() {
+ldap_exec() {
   local ldappass=$(getsecret ldap)
-  echo $1 | ldapadd -h $LDAPIP -p $LDAPPORT -D cn=admin,$LDAPORG -w "$ldappass"
+  printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
 }
 
 ldap_adduser() {
@@ -65,7 +65,7 @@ ldap_adduser() {
   
   echo "Adding LDAP user $firstname $lastname ($username)..."
 
-  ldif="dn: uid=$username,ou=users,$LDAPORG
+  ldap_exec "dn: uid=$username,ou=users,$LDAPORG
 objectClass: simpleSecurityObject
 objectClass: organizationalPerson
 objectClass: person
@@ -90,8 +90,6 @@ shadowMin: 8
 shadowMax: 999999
 shadowLastChange: 10877
 "
-
-  ldap_exec "$ldif"
 }
 
 ldap_addgroup() {
@@ -109,7 +107,7 @@ objectClass: posixGroup
 cn: $name
 gidNumber: $uid
 " | \
-  ldapadd -h $LDAPIP -p $LDAPPORT -D cn=admin,$LDAPORG -w "$ldappass"
+  ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
   
 }
 
@@ -197,8 +195,8 @@ adduser() {
   local uid=$5
   local pass=$6
   
-  ldap_adduser $username $firstname $lastname $email $uid $pass
-  gitlab_adduser $username $firstname $lastname $email $uid $pass
+  ldap_adduser "$username" "$firstname" "$lastname" "$email" "$uid" "$pass"
+  gitlab_adduser "$username" "$firstname" "$lastname" "$email" "$uid" "$pass"
 }
 
 modifyuser() {
