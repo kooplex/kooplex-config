@@ -50,9 +50,22 @@ ldap_fdqn2cn () {
   done
 }
 
-ldap_exec() {
+ldap_add() {
   local ldappass=$(getsecret ldap)
   printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
+}
+
+ldap_nextuid() {
+
+  local ldappass=$(getsecret ldap)
+
+  local maxid=`ldapsearch -h $LDAPIP -p $LDAPPORT \
+    -D "cn=admin,$LDAPORG" -w "$ldappass" \
+    -b "ou=users,$LDAPORG" -s one \
+    "objectclass=posixAccount" uidnumber | \
+    grep uidNumber | awk '{ if ($1 != "#") print $2 }' | sort | tail -n 1`
+
+  printf "%d" $((maxid + 1))
 }
 
 ldap_adduser() {
@@ -60,12 +73,12 @@ ldap_adduser() {
   local firstname=$2
   local lastname=$3
   local email=$4
-  local uid=$5
-  local pass=$6
+  local pass=$5
+  local uid=$6
   
   echo "Adding LDAP user $firstname $lastname ($username)..."
 
-  ldap_exec "dn: uid=$username,ou=users,$LDAPORG
+  ldap_add "dn: uid=$username,ou=users,$LDAPORG
 objectClass: simpleSecurityObject
 objectClass: organizationalPerson
 objectClass: person
@@ -117,24 +130,12 @@ gitlab_exec() {
   docker exec compare-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
 }
 
-gitlab_resetpass() {
-  local username=$1
-  local pass=$2
-  
-  gitlab_exec "
-u = User.find_by_username(\"$username\")
-u.password = \"$pass\"
-u.save!
-"
-}
-
 gitlab_adduser() {
   local username=$1
   local firstname=$2
   local lastname=$3
   local email=$4
-  local uid=$5
-  local pass=$6
+  local pass=$5
   
   echo "Adding Gitlab user $firstname $lastname ($username)..."
   
@@ -157,6 +158,48 @@ i.save!
 "
 }
 
+gitlab_resetpass() {
+  local username=$1
+  local pass=$2
+  
+  gitlab_exec "
+u = User.find_by_username(\"$username\")
+u.password = \"$pass\"
+u.save!
+"
+}
+
+gitlab_makeadmin() {
+  local username=$1
+  
+  gitlab_exec "
+u = User.find_by_username(\"$username\")
+u.admin = true
+u.save!
+"
+}
+
+gitlab_session() {
+  local username=$1
+  local pass=$2
+  
+  curl -X POST \
+    "http://$GITLABIP/gitlab/api/v3/session?login=$username&password=$pass" | \
+    grep -oEi '"private_token":"([^"])*"' | cut -d':' -f 2 | cut -d'"' -f 2
+}
+
+gitlab_addsshkey() {
+  local username=$1
+  local pass=$2
+  
+  local token=$(gitlab_session $username $pass)
+  
+  curl -X POST -G \
+    -H "private-token: $token" \
+    --data-urlencode key@$SRV/home/$username/.ssh/gitlab.key.pub \
+    "http://$GITLABIP/gitlab/api/v3/user/keys?title=gitlabkey"
+}
+
 createsecret() {
   local name=$1
   #openssl rand -base64 32 > $SECRETS/$name.secret
@@ -174,11 +217,30 @@ adduser() {
   local firstname=$2
   local lastname=$3
   local email=$4
-  local uid=$5
-  local pass=$6
+  local pass=$5
+  local uid=$6
   
-  ldap_adduser "$username" "$firstname" "$lastname" "$email" "$uid" "$pass"
-  gitlab_adduser "$username" "$firstname" "$lastname" "$email" "$uid" "$pass"
+  if [ -z $uid ]; then
+    uid=$(ldap_nextuid)
+  fi
+  
+  echo "Adding new user $username with uid $uid..."
+  
+  ldap_adduser "$username" "$firstname" "$lastname" "$email" "$pass" "$uid"
+  gitlab_adduser "$username" "$firstname" "$lastname" "$email" "$pass"
+  
+  # Create home directory and generate private key
+
+  SSHKEYPASS=$(getsecret sshkey)
+  
+  mkdir -p $SRV/home/$username
+  mkdir -p $SRV/home/$username/.ssh
+  ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
+
+  # Register key in Gitlab
+  gitlab_addsshkey $username $pass
+  
+  echo "New user created: $uid $username"
 }
 
 modifyuser() {

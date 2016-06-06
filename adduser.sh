@@ -1,13 +1,6 @@
 #! /bin/bash
 
 source lib.sh
+adduser $1 $2 $3 $4 $5 $6
 
-USERNAME=$1
-FIRSTNAME=$2
-LASTNAME=$3
-EMAIL=$4
-UID=$5
-PASS=$6
 
-ldap_adduser $USERNAME $FIRSTNAME $LASTNAME $EMAIL $UID $PASS
-gitlab_adduser $USERNAME $FIRSTNAME $LASTNAME $EMAIL $UID $PASS
