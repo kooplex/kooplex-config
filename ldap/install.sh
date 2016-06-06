@@ -27,9 +27,3 @@ docker run -d \
 echo "Waiting for slapd to start"
   
 sleep 3
-
-# Create basic configuration
-
-ldapadd -h $LDAPIP -p $LDAPPORT \
-  -D cn=admin,$LDAPORG -w "$LDAPPASS" \
-  -f units.ldif

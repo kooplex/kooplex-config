@@ -3,9 +3,6 @@
 # Init script
 
 source ./lib.sh
-source ./config.sh
-
-LDAPORG="dc=$PROJECT,dc=vo,dc=elte,dc=hu"
 
 # Primary setup
 
@@ -17,22 +14,15 @@ echo Creating docker network $PROJECT-net [$SUBNET]
 
 docker network create --driver bridge --subnet $SUBNET $PROJECT-net
 
+# Install services
+
 # TODO: install admin docker
 
-cd ldap
-. ./install.sh
-cd ..
-
-cd home
-. ./install.sh
-cd ..
-
-cd gitlab
-. ./install.sh
-cd ..
-
-cd nginx
-. ./install.sh
-cd ..
+for svc in ldap home gitlab nginx
+do
+  cd $svc
+  . ./install.sh
+  cd ..
+done
 
 echo "Install complete"

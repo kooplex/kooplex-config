@@ -157,24 +157,6 @@ i.save!
 "
 }
 
-configure() {
-  source config.sh
-  
-  SRV=$ROOT/$PROJECT/srv
-  SECRETS=$SRV/.secrets
-
-  LDAPIP=$(ip_addip "$SUBNET" 2)
-  LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
-  LDAPSERV=$PROJECT-ldap
-  LDAPPORT=389
-
-  HOMEIP=$(ip_addip "$SUBNET" 3)
-
-  GITLABIP=$(ip_addip "$SUBNET" 4)
-
-  NGINXIP=$(ip_addip "$SUBNET" 16)
-}
-
 createsecret() {
   local name=$1
   #openssl rand -base64 32 > $SECRETS/$name.secret
@@ -220,4 +202,22 @@ resetpass() {
   exit 2
 }
 
-configure
+config() {
+  source config.sh
+  
+  SRV=$ROOT/$PROJECT/srv
+  SECRETS=$SRV/.secrets
+
+  LDAPIP=$(ip_addip "$SUBNET" 2)
+  LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
+  LDAPSERV=$PROJECT-ldap
+  LDAPPORT=389
+
+  HOMEIP=$(ip_addip "$SUBNET" 3)
+
+  GITLABIP=$(ip_addip "$SUBNET" 4)
+
+  NGINXIP=$(ip_addip "$SUBNET" 16)
+}
+
+config
