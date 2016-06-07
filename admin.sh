@@ -21,8 +21,8 @@ select opt in $OPTIONS; do
 done
 
 echo "Downloading Dockerfile and config.sh..."
-wget https://github.com/eltevo/compare-config/blob/$BRANCHVAR/Dockerfile
-wget https://github.com/eltevo/compare-config/blob/$BRANCHVAR/config.sh
+wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/Dockerfile
+wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/config.sh
 echo "Done"
 
 source config.sh
