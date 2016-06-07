@@ -5,7 +5,4 @@ RUN apt-get update && \
 
 ADD wrapper.sh /
 
-ADD etc/* /etc/
-RUN chmod 0700 /etc/nslcd.conf
-
 CMD ["/bin/bash", "/wrapper.sh"]

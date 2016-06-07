@@ -438,7 +438,9 @@
 # It can be disabled with::
 # 
 #     c.PAMAuthenticator.open_sessions = False
-# c.PAMAuthenticator.open_sessions = True
+
+c.PAMAuthenticator.open_sessions = True
 
 # The PAM service to use for authentication.
-# c.PAMAuthenticator.service = 'login'
+
+c.PAMAuthenticator.service = 'login'
