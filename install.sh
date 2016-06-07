@@ -9,10 +9,6 @@ source ./lib.sh
 mkdir -p $SRV
 mkdir -p $SECRETS
 
-# Install services
-
-# TODO: install admin docker
-
 svcs=$(getservices "$@")
 
 for svc in $svcs
