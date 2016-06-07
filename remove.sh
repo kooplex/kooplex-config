@@ -2,13 +2,15 @@
 
 source ./lib.sh
 
-for svc in jupyterhub gitlab home ldap nginx 
+svcs=$(getservices "$@")
+svcs=$(reverse "$svcs")
+
+for svc in $svcs
 do
+  echo "Removing $PROJECT-$svc"
   cd $svc
   . ./remove.sh
   cd ..
 done
-
-docker network rm $PROJECT-net
 
 rm -R $SRV

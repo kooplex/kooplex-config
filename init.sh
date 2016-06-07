@@ -6,8 +6,11 @@ source ./lib.sh
 
 # Initialize services
 
-for svc in ldap home gitlab nginx
+svcs=$(getservices "$@")
+
+for svc in $svcs
 do
+  echo "Initializing $PROJECT-$svc"
   cd $svc
   . ./init.sh
   cd ..

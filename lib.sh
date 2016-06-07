@@ -200,6 +200,32 @@ gitlab_addsshkey() {
     "http://$GITLABIP/gitlab/api/v3/user/keys?title=gitlabkey"
 }
 
+gitlab_addoauthclient() {
+  local name=$1
+  local uri=$2
+  
+  gitlab_exec "
+a = Doorkeeper::Application.new
+a.name = \"$name\"
+a.redirect_uri = \"$uri\"
+a.save!
+
+print(a.uid, \" \", a.secret, \"\\n\")
+"
+}
+
+getservices() {
+  if [ $# -lt 1 ] || [ "$1" = "all" ]; then
+    echo "net ldap home gitlab jupyterhub nginx"
+  else
+    echo "$@"
+  fi
+}
+
+reverse() {
+  echo "$@" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }'
+}
+
 createsecret() {
   local name=$1
   #openssl rand -base64 32 > $SECRETS/$name.secret

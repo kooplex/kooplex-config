@@ -30,12 +30,13 @@ chmod 0600 $SRV/jupyterhub/etc/nslcd.conf
 
 # Install and execute docker image
 
-docker build -t jupyterhub-compare .
+docker build -t jupyterhub-compare --no-cache=true .
 
 docker run -d \
   --name $PROJECT-jupyterhub \
   --net $PROJECT-net \
   --ip $JUPYTERHUBIP \
+  -e "GITLAB_HOST=http://$DOMAIN/gitlab" \
   -v $SRV/jupyterhub:/srv/jupyterhub \
   -v $SRV/jupyterhub/etc/nslcd.conf:/etc/nslcd.conf:ro \
   -v $SRV/jupyterhub/etc/nsswitch.conf:/etc/nsswitch.conf:ro \
