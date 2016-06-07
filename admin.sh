@@ -5,17 +5,17 @@ docker pull debian
 mkdir compare_admin_image
 cd compare_admin_image
 
-echo "Select the branch which should be used for deployment"
+echo "Select the branch which should be used for deployment:"
 OPTIONS="master branch"
-BRANCHVAR="" 
 select opt in $OPTIONS; do
     if [ "$opt" = "master" ]; then
-     BRANCHVAR = "master"
+     BRANCHVAR="master"
      echo "master branch is selected"
-     exit
+     break
     elif [ "$opt" = "branch" ]; then
-     BRANCHVAR = "all-in-admin-branch"
+     BRANCHVAR="all-in-admin-branch"
      echo "all-in-admin-branch branch is selected"
+     break
     else
      echo "Bad option"
 	 exit 1
