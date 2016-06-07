@@ -439,8 +439,15 @@
 # 
 #     c.PAMAuthenticator.open_sessions = False
 
-c.PAMAuthenticator.open_sessions = True
+
 
 # The PAM service to use for authentication.
 
+#c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
+
+#c.GitHubOAuthenticator.oauth_callback_url = 'http://compare.vo.elte.hu/hub/oauth_callback'
+#c.GitHubOAuthenticator.client_id = 'a0f4a9d50d34e0a9754f0d144b7eddaf64bc69dc0526bcad862f404aaf96f088'
+#c.GitHubOAuthenticator.client_secret = '83e2ae8fec192809db541ec15448812f968b0c3d2156770158a9a9cea9749b24'
+
+c.PAMAuthenticator.open_sessions = True
 c.PAMAuthenticator.service = 'login'

@@ -6,6 +6,7 @@ echo "Installing jupyterhub $PROJECT-jupyterhub [$JUPYTERHUBIP]"
 
 mkdir -p $SRV/jupyterhub
 mkdir -p $SRV/jupyterhub/etc
+cp jupyterhub_config.py $SRV/jupyterhub/
 cp etc/nsswitch.conf $SRV/jupyterhub/etc
 
 # Prepare config file
