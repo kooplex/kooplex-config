@@ -5,7 +5,9 @@ docker pull debian
 mkdir compare_admin_image
 cd compare_admin_image
 
+echo "Select the branch which should be used for deployment"
 OPTIONS="master branch"
+BRANCHVAR="" 
 select opt in $OPTIONS; do
     if [ "$opt" = "master" ]; then
      BRANCHVAR = "master"
