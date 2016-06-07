@@ -18,4 +18,4 @@ c.GitlabOAuthenticator.client_secret = '$secret'
 
 c.PAMAuthenticator.open_sessions = True
 c.PAMAuthenticator.service = 'login'
-" > $SRV/jupyterhub/
+" > $SRV/jupyterhub/jupyterhub_config.py
