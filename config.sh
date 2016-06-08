@@ -1,8 +1,7 @@
-PROJECT="comparetest"
+PROJECT="compare"
 ROOT="/data/data1"
-SUBNET="173.40.0.0/16"
-DOMAIN="test.compare.vo.elte.hu"
+SUBNET="173.20.0.0/16"
+DOMAIN="compare.vo.elte.hu"
 SMTP=mail.elte.hu
-EMAIL=szalai@complex.elte.hu
-DUMMYPASS="alma"
-HOSTLDAPPORT=667
+EMAIL=dobos@complex.elte.hu
+DUMMYPASS="almafa137"

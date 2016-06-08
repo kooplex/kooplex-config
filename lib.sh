@@ -296,18 +296,18 @@ config() {
   SRV=$ROOT/$PROJECT/srv
   SECRETS=$SRV/.secrets
 
-  ADMINIP=$(ip_addip "$SUBNET" 6)
+  ADMINIP=$(ip_addip "$SUBNET" 2)
   
-  LDAPIP=$(ip_addip "$SUBNET" 2)
+  LDAPIP=$(ip_addip "$SUBNET" 3)
   LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
   LDAPSERV=$PROJECT-ldap
   LDAPPORT=389
 
-  HOMEIP=$(ip_addip "$SUBNET" 3)
+  HOMEIP=$(ip_addip "$SUBNET" 4)
   
-  GITLABIP=$(ip_addip "$SUBNET" 4)
+  GITLABIP=$(ip_addip "$SUBNET" 5)
   
-  JUPYTERHUBIP=$(ip_addip "$SUBNET" 5)
+  JUPYTERHUBIP=$(ip_addip "$SUBNET" 6)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
 }

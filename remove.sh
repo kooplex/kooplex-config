@@ -13,4 +13,3 @@ do
   cd ..
 done
 
-rm -R $SRV
