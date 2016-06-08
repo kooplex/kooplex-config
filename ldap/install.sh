@@ -16,7 +16,7 @@ docker run -d \
   --name $PROJECT-ldap \
   --net $PROJECT-net \
   --ip $LDAPIP \
-  -p 666:$LDAPPORT \
+  -p $HOSTLDAPPORT:$LDAPPORT \
   -v $SRV/ldap/etc:/etc/ldap \
   -v $SRV/srv/ldap/var:/var/lib/ldap \
   -e SLAPD_PASSWORD="$LDAPPASS" \

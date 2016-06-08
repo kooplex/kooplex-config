@@ -5,3 +5,4 @@ DOMAIN="test.compare.vo.elte.hu"
 SMTP=mail.elte.hu
 EMAIL=szalai@complex.elte.hu
 DUMMYPASS="alma"
+HOSTLDAPPORT=667
