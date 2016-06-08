@@ -36,7 +36,7 @@ source ./compare-config/config.sh
 . ./compare-config/net/install.sh
 . ./compare-config/net/init.sh
 
-docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR .
+docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR ./compare-config
 docker run -d -p 32778:22 -v /var/run/docker.sock:/run/docker.sock -v /usr/bin/docker:/bin/docker --name compare-admin --net $PROJECT-net compare_admin_image
 docker exec -d compare-admin /bin/bash /tmp/compare-config/install.sh
 docker exec -d compare-admin /bin/bash /tmp/compare-config/init.sh
