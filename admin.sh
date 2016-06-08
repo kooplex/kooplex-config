@@ -13,7 +13,7 @@ select opt in $OPTIONS; do
      BRANCHVAR="master"
      echo "master branch is selected"
      break
-    elif [ "$opt" = "all-in-admin" ]; then
+    elif [ "$opt" = "all-in-admin-branch" ]; then
      BRANCHVAR="all-in-admin-branch"
      echo "all-in-admin-branch branch is selected"
      break
