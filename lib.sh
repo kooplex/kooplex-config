@@ -293,7 +293,7 @@ resetpass() {
 isindocker() {
   local d=`cat /proc/1/cgroup | grep -e "systemd:/.+"`
   
-  if [ "$d" = "" ]; then
+  if [ -z "$d" ]; then
     echo 0
   else
     echo 1
@@ -303,16 +303,7 @@ isindocker() {
 config() {
   source config.sh
   
-  # if running inside the container, root is different
-  if [ $(isindocker) -eq 1 ]; then
-    ROOT=/opt/kooplex
-    SRV=$ROOT/srv
-    echo "Process is running inside a docker container, using $ROOT as kooplex root."
-  else
-    SRV=$ROOT/$PROJECT/srv
-    echo "Process is running on the host, using $ROOT as kooplex root."
-  fi
-  
+  SRV=$ROOT/$PROJECT/srv 
   SECRETS=$SRV/.secrets
 
   ADMINIP=$(ip_addip "$SUBNET" 2)
@@ -329,6 +320,12 @@ config() {
   JUPYTERHUBIP=$(ip_addip "$SUBNET" 6)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
+  
+  if [ $(isindocker) -eq 1 ]; then
+    echo "Process is running inside a docker container."
+  else
+    echo "Process is running on the host."
+  fi
 }
 
 config

@@ -23,7 +23,7 @@ docker run -d --ip $ADMINIP \
   --net $PROJECT-net \
   -v /var/run/docker.sock:/run/docker.sock \
   -v /usr/bin/docker:/bin/docker \
-  -v $SRV:/opt/kooplex \
+  -v $SRV:$SRV \
   $PROJECT-admin
   
 echo "Admin container is running. SSH to $ADMINIP or execute "

@@ -1,6 +1,7 @@
 # Kooplex configuration scripts
 
-To install a kooplex instance, follow steps below. Substitute $PROJECT with your project name.
+To install a kooplex instance, follow steps below. Substitute $PROJECT with your project name and
+$SRV with the kooplex root directory on your host machine.
 
 ## Installation
 
@@ -19,7 +20,7 @@ To install a kooplex instance, follow steps below. Substitute $PROJECT with your
 
 * inside the admin container, execute
 
-	cd /opt/kooplex/src/kooplex-config
+	cd $SRV/src/kooplex-config
 	./install.sh
 
 ## Proxy configuration
@@ -30,7 +31,7 @@ nginx host setup will come here
 
 * inside the admin container, execute
 
-	cd /opt/kooplex/src/kooplex-config
+	cd $SRV/src/kooplex-config
 	./remove.sh
 
 * on the host, execute
