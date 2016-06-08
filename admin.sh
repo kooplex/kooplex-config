@@ -5,29 +5,12 @@ docker pull debian
 mkdir compare_admin_image
 cd compare_admin_image
 
-echo "Select the branch which should be used for deployment:"
-OPTIONS="master branch"
-select opt in $OPTIONS; do
-    if [ "$opt" = "master" ]; then
-     BRANCHVAR="master"
-     echo "master branch is selected"
-     break
-    elif [ "$opt" = "branch" ]; then
-     BRANCHVAR="all-in-admin-branch"
-     echo "all-in-admin-branch branch is selected"
-     break
-    else
-     echo "Bad option"
-	 exit 1
-    fi
-done
+source config.sh
 
 echo "Downloading Dockerfile and config.sh..."
 wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/Dockerfile
 wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/config.sh
 echo "Done"
-
-source config.sh
 
 # Initialize docker network
 echo Creating docker network $PROJECT-net [$SUBNET]
