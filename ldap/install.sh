@@ -14,6 +14,7 @@ LDAPPASS=$(createsecret ldap)
 
 docker run -d \
   --name $PROJECT-ldap \
+  --hostname $PROJECT-ldap \
   --net $PROJECT-net \
   --ip $LDAPIP \
   -p $HOSTLDAPPORT:$LDAPPORT \

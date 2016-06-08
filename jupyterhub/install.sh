@@ -34,6 +34,7 @@ docker build -t jupyterhub-$PROJECT --no-cache=true .
 
 docker run -d \
   --name $PROJECT-jupyterhub \
+  --hostname $PROJECT-jupyterhub \
   --net $PROJECT-net \
   --ip $JUPYTERHUBIP \
   -e "GITLAB_HOST=http://$DOMAIN/gitlab" \

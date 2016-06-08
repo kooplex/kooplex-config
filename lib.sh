@@ -229,7 +229,7 @@ reverse() {
 createsecret() {
   local name=$1
   #openssl rand -base64 32 > $SECRETS/$name.secret
-  echo "almafa137" > $SECRETS/$name.secret
+  echo "$DUMMYPASS" > $SECRETS/$name.secret
   cat $SECRETS/$name.secret
 }
 
@@ -290,10 +290,29 @@ resetpass() {
   exit 2
 }
 
+isindocker() {
+  local d=`cat /proc/1/cgroup | grep -e "systemd:/.+"`
+  
+  if [ "$d" = "" ]; then
+    echo 0
+  else
+    echo 1
+  fi
+}
+
 config() {
   source config.sh
   
-  SRV=$ROOT/$PROJECT/srv
+  # if running inside the container, root is different
+  if [ $(isindocker) -eq 1 ]; then
+    ROOT=/opt/kooplex
+    SRV=$ROOT/srv
+    echo "Process is running inside a docker container, using $ROOT as kooplex root."
+  else
+    SRV=$ROOT/$PROJECT/srv
+    echo "Process is running on the host, using $ROOT as kooplex root."
+  fi
+  
   SECRETS=$SRV/.secrets
 
   ADMINIP=$(ip_addip "$SUBNET" 2)

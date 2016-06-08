@@ -14,6 +14,7 @@ mkdir -p $SRV/gitlab/opt
 
 docker run -d \
   --name $PROJECT-gitlab \
+  --hostname $PROJECT-gitlab \
   --net $PROJECT-net \
   --ip $GITLABIP \
   -v $SRV/gitlab/etc:/etc/gitlab \

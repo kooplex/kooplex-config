@@ -10,6 +10,7 @@ mkdir -p $SRV/home
 
 docker run -d \
   --name $PROJECT-home \
+  --hostname $PROJECT-home \
   --net $PROJECT-net \
   --ip $HOMEIP \
   --privileged \

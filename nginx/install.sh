@@ -28,6 +28,7 @@ server {
 
 docker run -d \
   --name $PROJECT-nginx \
+  --hostname $PROJECT-nginx \
   --net $PROJECT-net \
   --ip $NGINXIP \
   -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
