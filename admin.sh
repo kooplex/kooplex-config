@@ -28,6 +28,7 @@ git clone --branch $BRANCHVAR https://github.com/kooplex/kooplex-config.git ./ko
 echo "Done"
 
 source ./kooplex-config/config.sh
+source ./kooplex-config/lib.sh
 
 cd kooplex-config
 # Remove previously installed components
@@ -41,10 +42,10 @@ cd net
 
 cd ..
 
-DATE=$(date +%y-%m-%d) 
+DATE=$(date +%y-%m-%d)
 
 docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR --build-arg PROJECT=$PROJECT --build-arg CACHE_DATE=$DATE .
-docker run -d -p 32778:22 -v /var/run/docker.sock:/run/docker.sock -v /usr/bin/docker:/bin/docker -v $ROOT:$ROOT --name compare-admin --net $PROJECT-net compare_admin_image
+docker run -d --ip $ADMINIP -p 32778:22 -v /var/run/docker.sock:/run/docker.sock -v /usr/bin/docker:/bin/docker -v $ROOT:$ROOT --name compare-admin --net $PROJECT-net compare_admin_image
 echo "Admin container is running..."
 docker exec -it compare-admin /bin/bash -c 'cd /tmp/kooplex-config ; ./install.sh'
 docker exec -it compare-admin /bin/bash -c 'cd /tmp/kooplex-config ; ./init.sh'

@@ -296,6 +296,8 @@ config() {
   SRV=$ROOT/$PROJECT/srv
   SECRETS=$SRV/.secrets
 
+  ADMINIP=$(ip_addip "$SUBNET" 6)
+  
   LDAPIP=$(ip_addip "$SUBNET" 2)
   LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
   LDAPSERV=$PROJECT-ldap
