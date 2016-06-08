@@ -35,6 +35,7 @@ cd compare-config
 
 cd net
 # Initialize docker network
+. ./remove.sh
 . ./install.sh
 . ./init.sh
 
