@@ -22,6 +22,9 @@ RUN sed -i 's/#BASE.*/BASE dc=compare,dc=vo,dc=elte,dc=hu/' /etc/ldap/ldap.conf
 RUN sed -i 's/#URI.*/URI ldap:\/\/$PROJECT-ldap:389/' /etc/ldap/ldap.conf
 #RUN mount -t nfs -o proto=tcp,port=2049 172.18.0.4:/home /home
 
+# It is very important that the following command 'git clone...' cannot be cached
+# (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
+ARG CACHE_DATE=2016-01-01
 RUN git clone --branch $BRANCHVAR https://github.com/kooplex/kooplex-config.git /tmp/kooplex-config
 RUN find . -name "*.sh" -exec chmod 744 {} \;
 
