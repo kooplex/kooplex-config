@@ -41,7 +41,7 @@ cd net
 
 cd ..
 
-docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR --build-arg PROJECT=$PROJECT.
+docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR --build-arg PROJECT=$PROJECT .
 docker run -d -p 32778:22 -v /var/run/docker.sock:/run/docker.sock -v /usr/bin/docker:/bin/docker -v $ROOT:$ROOT --name compare-admin --net $PROJECT-net compare_admin_image
 echo "Admin container is running..."
 docker exec -it compare-admin /bin/bash -c 'cd /tmp/kooplex-config ; ./install.sh'
