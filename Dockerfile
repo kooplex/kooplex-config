@@ -23,7 +23,7 @@ ARG BRANCHVAR
 
 RUN git clone --branch $BRANCHVAR https://github.com/eltevo/compare-config.git /tmp/compare-config
 RUN find . -name "*.sh" -exec chmod 744 {} \;
-RUN cd /tmp/compare-config && ./init.sh && ./install.sh
+RUN cd /tmp/compare-config && ./install.sh && ./init.sh
 RUN rm -r /tmp/compare-config
 
 EXPOSE 22
