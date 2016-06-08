@@ -19,7 +19,7 @@ To install a kooplex instance, follow steps below. Substitute $PROJECT with your
 
 * inside the admin container, execute
 
-	cd /opt/kooplex/config
+	cd /opt/kooplex/src/kooplex-config
 	./install.sh
 
 ## Proxy configuration
@@ -30,7 +30,7 @@ nginx host setup will come here
 
 * inside the admin container, execute
 
-	cd /opt/kooplex/config
+	cd /opt/kooplex/src/kooplex-config
 	./remove.sh
 
 * on the host, execute
