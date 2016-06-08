@@ -21,12 +21,8 @@ RUN sed -i 's/#URI.*/URI ldap:\/\/compare-ldap:389/' /etc/ldap/ldap.conf
 
 ARG BRANCHVAR
 
-RUN docker ps -a
-
 RUN git clone --branch $BRANCHVAR https://github.com/eltevo/compare-config.git /tmp/compare-config
 RUN find . -name "*.sh" -exec chmod 744 {} \;
-RUN cd /tmp/compare-config && ./install.sh && ./init.sh
-RUN rm -r /tmp/compare-config
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]

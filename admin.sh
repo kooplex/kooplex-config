@@ -23,18 +23,20 @@ select opt in $OPTIONS; do
     fi
 done
 
-echo "Downloading Dockerfile and config.sh..."
-wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/Dockerfile
-wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/config.sh
-wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/net/install.sh
-wget https://raw.githubusercontent.com/eltevo/compare-config/$BRANCHVAR/net/init.sh
+echo "Cloning git repository of compare-config..."
+git clone --branch $BRANCHVAR https://github.com/eltevo/compare-config.git ./compare-config
 echo "Done"
 
-source config.sh
+source ./compare-config/config.sh
+
+# Remove previously installed components
+. ./compare-config/remove.sh
 
 # Initialize docker network
-. ./init.sh
-. ./install.sh
+. ./compare-config/net/install.sh
+. ./compare-config/net/init.sh
 
 docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR .
 docker run -d -p 32778:22 -v /var/run/docker.sock:/run/docker.sock -v /usr/bin/docker:/bin/docker --name compare-admin --net $PROJECT-net compare_admin_image
+docker exec -d compare-admin /bin/bash /tmp/compare-config/install.sh
+docker exec -d compare-admin /bin/bash /tmp/compare-config/init.sh
