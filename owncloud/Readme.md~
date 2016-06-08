@@ -1,7 +1,0 @@
-#Owncloud to share files and data with each other
-There is a dockerized version on docker-hub, which is complete except for the LDAP libraries for php. So we take the Dockerfile from the 9.0 version and add some extra lines.
-See Dockerfile for further details
-
-```bash
-docker build -f Dockerfile -t owncloud-ldap .
-
