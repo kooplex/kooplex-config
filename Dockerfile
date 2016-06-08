@@ -20,15 +20,11 @@ RUN sed -i 's/#URI.*/URI ldap:\/\/compare-ldap:389/' /etc/ldap/ldap.conf
 #RUN mount -t nfs -o proto=tcp,port=2049 172.18.0.4:/home /home
 
 ARG BRANCHVAR
-ARG PROJECT
-ARG ROOT
-ARG SUBNET
-ARG DOMAIN
-ARG SMTP
-ARG EMAIL
-ARG DUMMYPASS
 
 RUN git clone --branch $BRANCHVAR https://github.com/eltevo/compare-config.git /tmp/compare-config
+RUN find . -name "*.sh" -exec chmod 744 {} \;
+RUN cd /tmp/compare-config && ./init.sh && ./install.sh
+RUN rm -r /tmp/compare-config
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]

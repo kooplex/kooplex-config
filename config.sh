@@ -5,4 +5,3 @@ DOMAIN="compare.vo.elte.hu"
 SMTP=mail.elte.hu
 EMAIL=dobos@complex.elte.hu
 DUMMYPASS="alma"
-BRANCHVAR=all-in-admin-branch

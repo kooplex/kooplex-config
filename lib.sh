@@ -216,7 +216,7 @@ print(a.uid, \" \", a.secret, \"\\n\")
 
 getservices() {
   if [ $# -lt 1 ] || [ "$1" = "all" ]; then
-    echo "net ldap home gitlab jupyterhub nginx"
+    echo "ldap home gitlab jupyterhub nginx"
   else
     echo "$@"
   fi
