@@ -12,9 +12,7 @@ RUN apt-get update && apt-get install -y \
 	libpq-dev \
 	libxml2-dev \
 	php5-ldap 
-#	openldap-utils \
-#	ldap-client 
-#	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/*
 
 
 
@@ -63,7 +61,7 @@ RUN curl -fsSL -o owncloud.tar.bz2 \
 
 #ADD LDAP
 RUN apt-get install libldap2-dev
-#	libapache2-mod-webauthldap
+
 RUN a2enmod authnz_ldap
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
