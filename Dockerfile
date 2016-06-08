@@ -3,6 +3,9 @@ FROM debian:jessie
 
 MAINTAINER COMPARE-WIGNER-NODE
 
+ARG BRANCHVAR
+ARG PROJECT
+
 RUN apt-get update
 RUN apt-get install -y sudo ldap-utils git openssh-server python-dev python-pip vim nfs-common curl wget
 RUN apt-get install -y apt-transport-https ca-certificates
@@ -16,12 +19,10 @@ RUN mkdir /var/run/sshd
 RUN echo 'root:c0mp4r3' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#BASE.*/BASE dc=compare,dc=vo,dc=elte,dc=hu/' /etc/ldap/ldap.conf
-RUN sed -i 's/#URI.*/URI ldap:\/\/compare-ldap:389/' /etc/ldap/ldap.conf
+RUN sed -i 's/#URI.*/URI ldap:\/\/$PROJECT-ldap:389/' /etc/ldap/ldap.conf
 #RUN mount -t nfs -o proto=tcp,port=2049 172.18.0.4:/home /home
 
-ARG BRANCHVAR
-
-RUN git clone --branch $BRANCHVAR https://github.com/eltevo/compare-config.git /tmp/compare-config
+RUN git clone --branch $BRANCHVAR https://github.com/kooplex/kooplex-config.git /tmp/kooplex-config
 RUN find . -name "*.sh" -exec chmod 744 {} \;
 
 EXPOSE 22

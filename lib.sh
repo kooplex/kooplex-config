@@ -127,7 +127,7 @@ gidNumber: $uid
 # Gitlab functions
 
 gitlab_exec() {
-  docker exec compare-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
+  docker exec $PROJECT-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
 }
 
 gitlab_adduser() {
