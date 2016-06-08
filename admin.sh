@@ -43,5 +43,7 @@ cd ..
 
 docker build -t compare_admin_image --build-arg BRANCHVAR=$BRANCHVAR .
 docker run -d -p 32778:22 -v /var/run/docker.sock:/run/docker.sock -v /usr/bin/docker:/bin/docker -v $ROOT:$ROOT --name compare-admin --net $PROJECT-net compare_admin_image
+echo "Admin container is running..."
 docker exec -d compare-admin /bin/bash /tmp/compare-config/install.sh
 docker exec -d compare-admin /bin/bash /tmp/compare-config/init.sh
+echo "Installation and initialization is running in the admin container."
