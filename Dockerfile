@@ -4,7 +4,7 @@ FROM debian:jessie
 MAINTAINER COMPARE-WIGNER-NODE
 
 RUN apt-get update
-RUN apt-get install -y ldap-utils git openssh-server python-dev python-pip vim nfs-common
+RUN apt-get install -y sudo ldap-utils git openssh-server python-dev python-pip vim nfs-common curl wget
 RUN apt-get install -y apt-transport-https ca-certificates
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 RUN echo 'deb https://apt.dockerproject.org/repo debian-jessie main' > /etc/apt/sources.list.d/docker.list
@@ -20,6 +20,8 @@ RUN sed -i 's/#URI.*/URI ldap:\/\/compare-ldap:389/' /etc/ldap/ldap.conf
 #RUN mount -t nfs -o proto=tcp,port=2049 172.18.0.4:/home /home
 
 ARG BRANCHVAR
+
+RUN docker ps -a
 
 RUN git clone --branch $BRANCHVAR https://github.com/eltevo/compare-config.git /tmp/compare-config
 RUN find . -name "*.sh" -exec chmod 744 {} \;
