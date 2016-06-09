@@ -3,12 +3,12 @@
 # build image for administering Kooplex
 
 mkdir -p $SRV/admin/etc
-mkdir -p $SRV/src/kooplex-config
+mkdir -p $SRC/kooplex-config
 
-echo "Copying config to $SRV/config"
+echo "Copying config to $SRC/kooplex-config"
 echo "If necessary, modify settings at this new location"
 
-cp -R ../* $SRV/src/kooplex-config
+cp -R ../* $SRC/kooplex-config
 
 echo "Building admin docker image..."
 
@@ -23,7 +23,7 @@ docker run -d --ip $ADMINIP \
   --net $PROJECT-net \
   -v /var/run/docker.sock:/run/docker.sock \
   -v /usr/bin/docker:/bin/docker \
-  -v $SRV:$SRV \
+  -v $ROOT/$PROJECT:$ROOT/$PROJECT \
   $PROJECT-admin
   
 echo "Admin container is running. SSH to $ADMINIP or execute "

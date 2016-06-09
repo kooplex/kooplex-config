@@ -35,6 +35,23 @@ ip_addip () {
 
 # LDAP functions
 
+ldap_getconfig () {
+  LDAPPASS=$(getsecret ldap)
+  echo "uid nslcd
+gid nslcd
+
+uri ldap://$PROJECT-ldap/
+
+base $LDAPORG
+scope subtree
+
+binddn cn=admin,$LDAPORG
+bindpw $LDAPPASS
+rootpwmoddn cn=admin,$LDAPORG
+rootpwmodpw $LDAPPASS
+"
+}
+
 ldap_fdqn2cn () {
   local aa q fdqn=$@
   IFS=. read -ra aa <<< "$fdqn"
@@ -216,7 +233,7 @@ print(a.uid, \" \", a.secret, \"\\n\")
 
 getservices() {
   if [ $# -lt 1 ] || [ "$1" = "all" ]; then
-    echo "ldap home gitlab jupyterhub nginx"
+    echo "ldap home gitlab jupyterhub owncloud nginx"
   else
     echo "$@"
   fi
@@ -304,6 +321,7 @@ config() {
   source config.sh
   
   SRV=$ROOT/$PROJECT/srv 
+  SRC=$ROOT/$PROJECT/src
   SECRETS=$SRV/.secrets
 
   ADMINIP=$(ip_addip "$SUBNET" 2)
@@ -318,6 +336,8 @@ config() {
   GITLABIP=$(ip_addip "$SUBNET" 5)
   
   JUPYTERHUBIP=$(ip_addip "$SUBNET" 6)
+  
+  OWNCLOUDIP=$(ip_addip "$SUBNET" 7)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
   

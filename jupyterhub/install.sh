@@ -6,31 +6,14 @@ echo "Installing jupyterhub $PROJECT-jupyterhub [$JUPYTERHUBIP]"
 
 mkdir -p $SRV/jupyterhub
 mkdir -p $SRV/jupyterhub/etc
-cp jupyterhub_config.py $SRV/jupyterhub/
-cp etc/nsswitch.conf $SRV/jupyterhub/etc
 
-# Prepare config file
+# Prepare config files
 
-echo "
-uid nslcd
-gid nslcd
-
-uri ldap://$PROJECT-ldap/
-
-base $LDAPORG
-scope subtree
-
-binddn cn=admin,$LDAPORG
-bindpw $LDAPPASS
-rootpwmoddn cn=admin,$LDAPORG
-rootpwmodpw $LDAPPASS
-" > $SRV/jupyterhub/etc/nslcd.conf
-
-chmod 0600 $SRV/jupyterhub/etc/nslcd.conf
+echo "$(ldap_getconfig)" > etc/nslcd.conf
 
 # Install and execute docker image
 
-docker build -t jupyterhub-$PROJECT --no-cache=true .
+docker build -t $PROJECT-jupyterhub --no-cache=true .
 
 docker run -d \
   --name $PROJECT-jupyterhub \
@@ -39,7 +22,5 @@ docker run -d \
   --ip $JUPYTERHUBIP \
   -e "GITLAB_HOST=http://$DOMAIN/gitlab" \
   -v $SRV/jupyterhub:/srv/jupyterhub \
-  -v $SRV/jupyterhub/etc/nslcd.conf:/etc/nslcd.conf:ro \
-  -v $SRV/jupyterhub/etc/nsswitch.conf:/etc/nsswitch.conf:ro \
-  jupyterhub-$PROJECT
+  $PROJECT-jupyterhub
 

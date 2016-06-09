@@ -4,4 +4,4 @@ docker stop $PROJECT-admin
 docker rm $PROJECT-admin
 
 rm -R $SRV/admin/etc
-rm -R $SRV/src/kooplex-config
+rm -R $SRC/kooplex-config

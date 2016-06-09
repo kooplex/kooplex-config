@@ -1,75 +1,17 @@
-FROM php:5.6-apache
+FROM owncloud
 
-RUN apt-get update && apt-get install -y \
-	bzip2 \
-	libcurl4-openssl-dev \
-	libfreetype6-dev \
-	libicu-dev \
-	libjpeg-dev \
-	libmcrypt-dev \
-	libmemcached-dev \
-	libpng12-dev \
-	libpq-dev \
-	libxml2-dev \
-	php5-ldap 
-	&& rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get update && \
+    apt-get install -q -y libnss-ldapd
 
+COPY etc/pam.d/* /etc/pam.d/
+COPY etc/nsswitch.conf /etc/nsswitch.conf
+COPY etc/nslcd.conf /etc/nslcd.conf
+RUN chmod 0600 /etc/nslcd.conf
 
-# https://doc.owncloud.org/server/8.1/admin_manual/installation/source_installation.html#prerequisites
-RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd exif intl mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
-
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-RUN { \
-		echo 'opcache.memory_consumption=128'; \
-		echo 'opcache.interned_strings_buffer=8'; \
-		echo 'opcache.max_accelerated_files=4000'; \
-		echo 'opcache.revalidate_freq=60'; \
-		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
-	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-# PECL extensions
-RUN pecl install APCu-4.0.10 redis memcached \
-	&& docker-php-ext-enable apcu redis memcached
-
-RUN a2enmod rewrite
-
-
-
-ENV OWNCLOUD_VERSION 9.0.2
-VOLUME /var/www/html
-
-
-
-RUN curl -fsSL -o owncloud.tar.bz2 \
-		"https://download.owncloud.org/community/owncloud-${OWNCLOUD_VERSION}.tar.bz2" \
-	&& curl -fsSL -o owncloud.tar.bz2.asc \
-		"https://download.owncloud.org/community/owncloud-${OWNCLOUD_VERSION}.tar.bz2.asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-# gpg key from https://owncloud.org/owncloud.asc
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys E3036906AD9F30807351FAC32D5D5E97F6978A26 \
-	&& gpg --batch --verify owncloud.tar.bz2.asc owncloud.tar.bz2 \
-	&& rm -r "$GNUPGHOME" owncloud.tar.bz2.asc \
-	&& tar -xjf owncloud.tar.bz2 -C /usr/src/ \
-	&& rm owncloud.tar.bz2
-
-
-
-
-#ADD LDAP
-RUN apt-get install libldap2-dev
-
-RUN a2enmod authnz_ldap
-RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/
-RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
-RUN docker-php-ext-configure ldap && docker-php-ext-install ldap
-
-RUN service apache2 restart
-
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+ADD wrapper.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2-foreground"]
+CMD ["/bin/bash", "/wrapper.sh"]
