@@ -21,6 +21,10 @@ server {
   location /hub {
     proxy_pass http://$PROJECT-jupyterhub:8000;
   }
+  
+  location /owncloud {
+    proxy_pass http://$PROJECT-owncloud;
+  }
 }
 " > $SRV/nginx/etc/sites.conf
 
