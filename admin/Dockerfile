@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip3 install --upgrade pip
 RUN pip3 install argparse datetime
+RUN pip3 install docker-compose
 
 #RUN mount -t nfs -o proto=tcp,port=2049 172.18.0.4:/home /home
 
