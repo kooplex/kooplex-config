@@ -26,21 +26,29 @@ $SRV with the kooplex root directory on your host machine.
 * and execute
 
     ./init.sh
-	./init.sh admin
+    
+    ./init.sh admin
 	
-	(it is important to stick to the proper order)
+    (it is important to stick to the proper order)
 
 ## Proxy configuration
 
 * add following lines to configuration file _default_ of nginx _host_ 
- (e.g. /etc/nginx/sites-available/default):
+ 
+  (e.g. /etc/nginx/sites-available/default):
 
     server {
+    
       listen $DOMAIN:80;
+      
       server_name $DOMAIN;
+      
       location / {
+      
         proxy_pass http://$NGINXIP/;
+        
       }
+      
     }
 
 ## Remove
