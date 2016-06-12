@@ -28,7 +28,8 @@ RUN pip3 install --upgrade pip
 RUN pip3 install argparse datetime
 RUN pip3 install docker-compose
 
-#RUN mount -t nfs -o proto=tcp,port=2049 172.18.0.4:/home /home
+# Start rpcbind service for mounting
+RUN service rpcbind start
 
 # Configure sshd
 
@@ -37,6 +38,8 @@ RUN echo 'root:c0mp4r3' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#BASE.*/BASE $LDAPORG/' /etc/ldap/ldap.conf
 RUN sed -i 's/#URI.*/URI ldap:\/\/$PROJECT-ldap:389/' /etc/ldap/ldap.conf
+
+ADD RepoUtils.py /root/scripts/
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]

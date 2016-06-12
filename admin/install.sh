@@ -13,11 +13,12 @@ cp -R ../* $SRC/kooplex-config
 echo "Building admin docker image..."
 
 docker build -t $PROJECT-admin \
-  --build-arg PROJECT=$PROJECT .
+  --build-arg PROJECT=$PROJECT \
+  --build-arg LDAPORG=$LDAPORG .
 
 echo "Starting admin docker container..."
   
-docker run -d --ip $ADMINIP \
+docker run --privileged -d --ip $ADMINIP \
   --name $PROJECT-admin \
   --hostname $PROJECT-admin \
   --net $PROJECT-net \

@@ -10,7 +10,7 @@ $SRV with the kooplex root directory on your host machine.
 	git clone https://github.com/kooplex/kooplex-config.git
 
 * modify config.sh as necessary
-* configure network by runnin the following command on the docker _host_:
+* configure network by running the following command on the docker _host_:
 
 	./install.sh net admin
 
@@ -22,10 +22,26 @@ $SRV with the kooplex root directory on your host machine.
 
 	cd $SRV/src/kooplex-config
 	./install.sh
+	
+* and execute
+
+    ./init.sh
+	./init.sh admin
+	
+	(it is important to stick to the proper order)
 
 ## Proxy configuration
 
-nginx host setup will come here
+* add following lines to configuration file _default_ of nginx _host_ 
+ (e.g. /etc/nginx/sites-available/default):
+
+    server {
+      listen $DOMAIN:80;
+      server_name $DOMAIN;
+      location / {
+        proxy_pass http://$NGINXIP/;
+      }
+    }
 
 ## Remove
 
