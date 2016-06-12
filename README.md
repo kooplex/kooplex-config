@@ -37,19 +37,19 @@ $SRV with the kooplex root directory on your host machine.
  
   (e.g. /etc/nginx/sites-available/default):
 
-    server {
-    
-      listen $DOMAIN:80;
-      
-      server_name $DOMAIN;
-      
-      location / {
-      
-        proxy_pass http://$NGINXIP/;
-        
-      }
-      
-    }
+>    server {
+>    
+>      listen $DOMAIN:80;
+>      
+>      server_name $DOMAIN;
+>      
+>      location / {
+>      
+>        proxy_pass http://$NGINXIP/;
+>        
+>      }
+>      
+>    }
 
 ## Remove
 
