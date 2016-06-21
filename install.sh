@@ -14,9 +14,9 @@ svcs=$(getservices "$@")
 for svc in $svcs
 do
   echo "Installing $PROJECT-$svc"
-  cd $svc
+  cd modules/$svc
   . ./install.sh
-  cd ..
+  cd ../..
 done
 
 echo "Install complete"

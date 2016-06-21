@@ -8,8 +8,8 @@ svcs=$(reverse "$svcs")
 for svc in $svcs
 do
   echo "Removing $PROJECT-$svc"
-  cd $svc
+  cd modules/$svc
   . ./remove.sh
-  cd ..
+  cd ../..
 done
 

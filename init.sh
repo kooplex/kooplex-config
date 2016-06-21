@@ -11,9 +11,9 @@ svcs=$(getservices "$@")
 for svc in $svcs
 do
   echo "Initializing $PROJECT-$svc"
-  cd $svc
+  cd modules/$svc
   . ./init.sh
-  cd ..
+  cd ../..
 done
 
 echo "Initialize complete"
