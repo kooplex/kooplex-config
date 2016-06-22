@@ -39,5 +39,9 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
 
 ADD etc/pam.d/* /etc/pam.d/
 ADD etc/nsswitch.conf /etc/nsswitch.conf
+ADD start.sh /start.sh
 RUN touch /etc/nslcd.conf && \
     chmod 0600 /etc/nslcd.conf
+
+ENTRYPOINT ["tini", "--"]
+CMD ["/bin/bash", "/start.sh"]

@@ -10,9 +10,12 @@ mkdir -p $SRV/ldap/var/
 # Generate LDAP random password
 LDAPPASS=$(createsecret ldap)
 
+# Creating LDAP config file
+echo "$(ldap_getconfig)" > ../../etc/nslcd.conf
+
 # Install and execute docker image
 
-docker run -d \
+docker $DOCKERARGS run -d \
   --name $PROJECT-ldap \
   --hostname $PROJECT-ldap \
   --net $PROJECT-net \

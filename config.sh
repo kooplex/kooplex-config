@@ -1,5 +1,6 @@
+DOCKERARGS="-H 0.0.0.0:5555"
 PROJECT="compare"
-ROOT="/data/data1"
+ROOT="/srv/kooplex"
 SUBNET="172.20.0.0/16"
 DOMAIN="compare.vo.elte.hu"
 SMTP=mail.elte.hu

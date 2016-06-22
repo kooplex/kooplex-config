@@ -49,6 +49,7 @@ binddn cn=admin,$LDAPORG
 bindpw $LDAPPASS
 rootpwmoddn cn=admin,$LDAPORG
 rootpwmodpw $LDAPPASS
+
 "
 }
 
@@ -255,6 +256,16 @@ getsecret() {
   cat $SECRETS/$name.secret
 }
 
+cpetc() {
+  printf "$(ldap_getconfig)\n\n" > ../../etc/nslcd.conf
+  mkdir etc
+  cp -R ../../etc/* etc/
+}
+
+rmetc() {
+  rm -R etc
+}
+
 adduser() {
   local username=$1
   local firstname=$2
@@ -338,6 +349,8 @@ config() {
   JUPYTERHUBIP=$(ip_addip "$SUBNET" 6)
   
   OWNCLOUDIP=$(ip_addip "$SUBNET" 7)
+  
+  NOTEBOOKIP=$(ip_addip "$SUBNET" 8)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
   
