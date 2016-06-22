@@ -2,4 +2,5 @@ FROM kooplex-base
 
 MAINTAINER Laszlo Dobos <dobos@complex.elte.hu
 
-# add jupyter stuff
+# TODO add jupyter stuff
+
