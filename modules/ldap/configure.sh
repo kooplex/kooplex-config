@@ -14,7 +14,7 @@ case $VERB in
       --hostname $PROJECT-ldap \
       --net $PROJECT-net \
       --ip $LDAPIP \
-      -p 666:$LDAPPORT \        # TODO: remove
+      -p 666:$LDAPPORT \
       -v $SRV/ldap/etc:/etc/ldap \
       -v $SRV/ldap/var:/var/lib/ldap \
       -e SLAPD_PASSWORD="$LDAPPASS" \
