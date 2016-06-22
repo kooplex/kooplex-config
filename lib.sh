@@ -35,7 +35,7 @@ ip_addip () {
 
 # LDAP functions
 
-ldap_getconfig () {
+ldap_nslcdconfig () {
   LDAPPASS=$(getsecret ldap)
   echo "uid nslcd
 gid nslcd
@@ -145,7 +145,7 @@ gidNumber: $uid
 # Gitlab functions
 
 gitlab_exec() {
-  docker exec $PROJECT-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
+  docker $DOCKERARGS exec $PROJECT-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
 }
 
 gitlab_adduser() {
@@ -180,6 +180,8 @@ gitlab_resetpass() {
   local username=$1
   local pass=$2
   
+  # TODO: find a way to do via API
+  
   gitlab_exec "
 u = User.find_by_username(\"$username\")
 u.password = \"$pass\"
@@ -189,6 +191,8 @@ u.save!
 
 gitlab_makeadmin() {
   local username=$1
+  
+  # TODO: find a way to do via API
   
   gitlab_exec "
 u = User.find_by_username(\"$username\")
@@ -233,10 +237,11 @@ print(a.uid, \" \", a.secret, \"\\n\")
 }
 
 getservices() {
-  if [ $# -lt 1 ] || [ "$1" = "all" ]; then
-    echo "ldap home gitlab jupyterhub owncloud nginx"
+  if [ $# -lt 2 ] || [ "$2" = "all" ]; then
+    echo "ldap home gitlab notebook owncloud nginx"
   else
-    echo "$@"
+    local args=($@)
+	echo "${args[@]:1}"
   fi
 }
 
@@ -257,7 +262,7 @@ getsecret() {
 }
 
 cpetc() {
-  printf "$(ldap_getconfig)\n\n" > ../../etc/nslcd.conf
+  printf "$(ldap_nslcdconfig)\n\n" > ../../etc/nslcd.conf
   mkdir etc
   cp -R ../../etc/* etc/
 }
@@ -289,6 +294,7 @@ adduser() {
   
   mkdir -p $SRV/home/$username
   mkdir -p $SRV/home/$username/.ssh
+  rm $SRV/home/$username/.ssh/gitlab.key
   ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
 
   # Register key in Gitlab
