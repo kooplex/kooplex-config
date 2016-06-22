@@ -13,12 +13,17 @@ case $VERB in
     mkdir -p $SRV/notebook/etc
     cp etc/nslcd.conf $SRV/notebook/etc
     
+    mkdir -p $SRV/notebook/init
+    echo "mount -t nfs $PROJECT-home:/exports/home /home" >> $SRV/notebook/init/0.sh
+        
     docker $DOCKERARGS create \
       --name $PROJECT-notebook \
       --hostname $PROJECT-notebook \
       --net $PROJECT-net \
       --ip $OWNCLOUDIP \
+      --privileged \
       -v $SRV/notebook/etc/nslcd.conf:/etc/nslcd.conf \
+      -v $SRV/notebook/init:/init \
       kooplex-notebook
     
     rmetc
@@ -40,7 +45,7 @@ case $VERB in
   ;;
   "purge")
     echo "Purging notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    rm -R $SRV/notebook/etc
+    rm -R $SRV/notebook
     echo "Purging base image kooplex-notebook"
     docker $DOCKERARGS rmi kooplex-notebook
   ;;

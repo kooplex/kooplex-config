@@ -1,4 +1,4 @@
-# Based on the official docker image for jupyterhub
+# Based on the official docker image for jupyterhub and cpuguy83/docker-nfs-client 
 
 # Debian Jessie image released 2016 May 03.
 FROM debian@sha256:32a225e412babcd54c0ea777846183c61003d125278882873fb2bc97f9057c51
@@ -47,6 +47,13 @@ RUN systemctl disable nslcd
 ADD etc/pam.d/* /etc/pam.d/
 ADD etc/nsswitch.conf /etc/nsswitch.conf
 ADD entrypoint.sh /entrypoint.sh
+
+# Install NFS client
+RUN apt-get install -q -y nfs-common
+    
+EXPOSE 111/udp
+
+RUN mkdir /init
 
 ENTRYPOINT ["tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]

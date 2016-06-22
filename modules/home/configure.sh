@@ -2,18 +2,16 @@
 
 case $VERB in
   "install")
-    echo "Installing nfs home $PROJECT-home [$HOMEIP]"
-    
-    mkdir -p $SRV/home
-    
+  
     docker $DOCKERARGS create \
       --name $PROJECT-home \
       --hostname $PROJECT-home \
       --net $PROJECT-net \
       --ip $HOMEIP \
       --privileged \
-      -v $SRV/home:/home \
-      cpuguy83/nfs-server /home  ;;
+      -v $SRV/home:/exports/home \
+      cpuguy83/nfs-server /exports/home
+  ;;
   "start")
     echo "Starting nfs home $PROJECT-home [$HOMEIP]"
     docker $DOCKERARGS start $PROJECT-home
