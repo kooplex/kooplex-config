@@ -4,12 +4,9 @@ case $VERB in
   "install")
     echo "Installing base image kooplex-base"
     
-    mkdir etc
-    cp -R ../../etc/* etc/
-    
+    cpetc
     docker $DOCKERARGS build -t kooplex-base  .
-    
-    rm -R etc
+    rmetc
   ;;
   "start")
     
