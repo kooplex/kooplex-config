@@ -30,6 +30,10 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.9.0/tini &
 
 # Install LDAP and setup authentication
 ENV DEBIAN_FRONTEND=noninteractive
+
+RUN touch /etc/nslcd.conf && \
+    chmod 0600 /etc/nslcd.conf
+
 RUN apt-get update && \
     apt-get install -q -y \
     libnss-ldapd openldap-utils ldap-client libldap2-dev 
@@ -37,11 +41,12 @@ RUN apt-get update && \
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/  
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
 
+# Do not run nslcd as a daemon
+RUN systemctl disable nslcd
+
 ADD etc/pam.d/* /etc/pam.d/
 ADD etc/nsswitch.conf /etc/nsswitch.conf
-ADD start.sh /start.sh
-RUN touch /etc/nslcd.conf && \
-    chmod 0600 /etc/nslcd.conf
+ADD entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["tini", "--"]
-CMD ["/bin/bash", "/start.sh"]
+CMD ["/bin/bash", "/entrypoint.sh"]
