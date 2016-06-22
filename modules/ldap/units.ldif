@@ -1,9 +1,0 @@
-dn: ou=users,dc=compare,dc=vo,dc=elte,dc=hu
-objectClass: organizationalUnit
-objectClass: top
-ou: people
-
-dn: ou=groups,dc=compare,dc=vo,dc=elte,dc=hu
-objectClass: organizationalUnit
-objectClass: top
-ou: groups

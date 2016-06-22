@@ -35,9 +35,18 @@ case $VERB in
     
     LDAPPASS=$(getsecret ldap)
 
+    echo "dn: ou=users,$LDAPORG
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+
+dn: ou=groups,$LDAPORG
+objectClass: organizationalUnit
+objectClass: top
+ou: groups" | \
     ldapadd -h $LDAPIP -p $LDAPPORT \
       -D cn=admin,$LDAPORG -w "$LDAPPASS" \
-      -f units.ldif
+
   ;;
   "stop")
     echo "Stopping slapd $PROJECT-ldap [$LDAPIP]"
