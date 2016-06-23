@@ -288,17 +288,25 @@ adduser() {
   ldap_adduser "$username" "$firstname" "$lastname" "$email" "$pass" "$uid"
   gitlab_adduser "$username" "$firstname" "$lastname" "$email" "$pass"
   
-  # Create home directory and generate private key
-
-  SSHKEYPASS=$(getsecret sshkey)
-  
+  # Create home directory
   mkdir -p $SRV/home/$username
+  
+  # Create jupyter config
+  mkdir -p $SRV/home/$username/.jupyter
+  cp $KOOPLEXWD/modules/notebook/jupyter_notebook_config.py $SRV/home/$username/.jupyter/
+  
+  # Generate git private key
+  SSHKEYPASS=$(getsecret sshkey)
   mkdir -p $SRV/home/$username/.ssh
   rm $SRV/home/$username/.ssh/gitlab.key
   ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
 
   # Register key in Gitlab
   gitlab_addsshkey $username $pass
+  
+  # Set home owner
+  chown -R $uid $SRV/home/$username
+  # TODO set permissions
   
   echo "New user created: $uid $username"
 }
@@ -336,6 +344,8 @@ isindocker() {
 
 config() {
   source config.sh
+  
+  KOOPLEXWD=`pwd`
   
   SRV=$ROOT/$PROJECT/srv 
   SRC=$ROOT/$PROJECT/src
