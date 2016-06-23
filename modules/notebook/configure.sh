@@ -1,14 +1,17 @@
 #!/bin/bash
 
 case $VERB in
-  "install")
+  "build")
+    echo "Building image kooplex-notebook"
+    
     cpetc
-    
-    echo "Installing image kooplex-notebook"
-    
-    docker $DOCKERARGS build -t kooplex-notebook  .
-    
+    docker $DOCKERARGS build -t kooplex-notebook .
+    rmetc
+  ;;
+  "install")
     echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
+    
+    cpetc
     
     mkdir -p $SRV/notebook/etc
     cp etc/nslcd.conf $SRV/notebook/etc

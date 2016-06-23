@@ -4,21 +4,11 @@ case $VERB in
   "install")
     echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
     
-    GITLABRB=$SRV/gitlab/etc/gitlab.rb
     mkdir -p $SRV/gitlab/etc
     mkdir -p $SRV/gitlab/log
     mkdir -p $SRV/gitlab/opt
     
-    docker $DOCKERARGS create \
-      --name $PROJECT-gitlab \
-      --hostname $PROJECT-gitlab \
-      --net $PROJECT-net \
-      --ip $GITLABIP \
-      -v $SRV/gitlab/etc:/etc/gitlab \
-      -v $SRV/gitlab/log:/var/log/gitlab \
-      -v $SRV/gitlab/opt:/var/opt/gitlab \
-      gitlab/gitlab-ce:latest
-      
+    GITLABRB=$SRV/gitlab/etc/gitlab.rb
     echo "
 external_url 'http://$DOMAIN/gitlab'
 
@@ -55,6 +45,17 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 EOS
 
 " > $GITLABRB
+    
+    docker $DOCKERARGS create \
+      --name $PROJECT-gitlab \
+      --hostname $PROJECT-gitlab \
+      --net $PROJECT-net \
+      --ip $GITLABIP \
+      -v $SRV/gitlab/etc:/etc/gitlab \
+      -v $SRV/gitlab/log:/var/log/gitlab \
+      -v $SRV/gitlab/opt:/var/opt/gitlab \
+      gitlab/gitlab-ce:latest
+      
   ;;
   "start")
     echo "Starting gitlab $PROJECT-gitlab [$GITLABIP]"
