@@ -1,5 +1,0 @@
-session [default=1]                     pam_permit.so
-session requisite                       pam_deny.so
-session required                        pam_permit.so
-session required        pam_unix.so
-session [success=ok default=ignore]     pam_ldap.so minimum_uid=10000

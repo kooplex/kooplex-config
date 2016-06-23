@@ -272,6 +272,9 @@ rmetc() {
 }
 
 adduser() {
+
+    # TODO: replace this with python script
+
   local username=$1
   local firstname=$2
   local lastname=$3
@@ -305,7 +308,7 @@ adduser() {
   gitlab_addsshkey $username $pass
   
   # Set home owner
-  chown -R $uid $SRV/home/$username
+  chown -R $uid:$uid $SRV/home/$username
   # TODO set permissions
   
   echo "New user created: $uid $username"
@@ -367,6 +370,8 @@ config() {
   OWNCLOUDIP=$(ip_addip "$SUBNET" 7)
   
   NOTEBOOKIP=$(ip_addip "$SUBNET" 8)
+  
+  PROXYIP=$(ip_addip "$SUBNET" 9)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
   
