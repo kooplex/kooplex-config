@@ -2,7 +2,7 @@
 
 source ./lib.sh
 VERB=$1
-SVCS=$(getservices "$@")
+SVCS=$(getmodules "$@")
 
 echo "Starting $VERB..."
 

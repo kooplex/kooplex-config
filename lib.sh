@@ -236,9 +236,9 @@ print(a.uid, \" \", a.secret, \"\\n\")
 "
 }
 
-getservices() {
+getmodules() {
   if [ $# -lt 2 ] || [ "$2" = "all" ]; then
-    echo "ldap home gitlab notebook owncloud nginx"
+    echo "$ALLMODULES"
   else
     local args=($@)
 	echo "${args[@]:1}"
