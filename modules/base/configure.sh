@@ -1,8 +1,8 @@
 #!/bin/bash
 
 case $VERB in
-  "install")
-    echo "Installing base image kooplex-base"
+  "build")
+    echo "Building base image kooplex-base"
     
     cpetc
     docker $DOCKERARGS build -t kooplex-base  .
