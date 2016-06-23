@@ -32,6 +32,8 @@ case $VERB in
     rmetc
   ;;
   "start")
+    # TODO: we have a single notebook server now, perhaps there will
+    # one per user later or more if we scale out
     echo "Starting notebook $PROJECT-notebook [$NOTEBOOKIP]"
     docker $DOCKERARGS start $PROJECT-notebook
   ;;
