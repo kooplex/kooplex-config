@@ -23,6 +23,7 @@ server {
   server_name $DOMAIN;
 
   location /gitlab {
+    proxy_set_header Host \$http_host;
     proxy_pass http://$GITLABIP;
   }
   
