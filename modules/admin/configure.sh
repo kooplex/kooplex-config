@@ -33,4 +33,8 @@ case $VERB in
   ;;
   "purge")
   ;;
+  "clean")
+    echo "Cleaning admin image kooplex-admin"
+    docker $DOCKERARGS rmi kooplex-admin
+  ;;
 esac

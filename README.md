@@ -38,6 +38,10 @@ server {
     
 ## Purge configuration
 
-To remove ALL data, config and docker images
+To remove ALL data and config
 
     $ sudo bash kooplex.sh purge all
+    
+To delete generated docker images
+
+    $ sudo bash kooplex.sh clean all

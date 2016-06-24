@@ -2,7 +2,7 @@
 
 case $VERB in
   "build")
-    LDAPPASS=$(createsecret ldap)
+    
   ;;
   "install")
     echo "Installing slapd $PROJECT-ldap [$LDAPIP]"
@@ -61,7 +61,7 @@ ou: groups" | \
   ;;
   "purge")
     echo "Purging slapd $PROJECT-ldap [$LDAPIP]"
-    rm -R -f $SRV/ldap/etc/
-    rm -R -f $SRV/ldap/var/
+    rm -R -f $SRV/ldap
+    rm -R -f $SRV/ldap
   ;;
 esac

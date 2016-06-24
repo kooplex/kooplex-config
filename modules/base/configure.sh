@@ -9,6 +9,10 @@ case $VERB in
     
     docker $DOCKERARGS build -t kooplex-base  .
   ;;
+  "install")
+  echo "Generating secrets..."
+    LDAPPASS=$(createsecret ldap)
+  ;;
   "start")
     
   ;;
@@ -22,7 +26,10 @@ case $VERB in
 
   ;;
   "purge")
-    echo "Purging base image kooplex-base"
+
+  ;;
+  "clean")
+    echo "Cleaning base image kooplex-base"
     docker $DOCKERARGS rmi kooplex-base
   ;;
 esac

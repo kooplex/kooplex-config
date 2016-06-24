@@ -51,6 +51,6 @@ server {
   ;;
   "purge")
     echo "Purging nginx $PROJECT-nginx [$NGINXIP]"
-    rm -R $SRV/nginx/etc/
+    rm -R $SRV/nginx
   ;;
 esac

@@ -29,6 +29,6 @@ case $VERB in
   ;;
   "purge")
     echo "Purging nfs home $PROJECT-home [$HOMEIP]"
-    mkdir -p $SRV/home
+    rm -R $SRV/home
   ;;
 esac

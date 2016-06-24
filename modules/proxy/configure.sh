@@ -36,8 +36,8 @@ case $VERB in
     echo "Removing proxy $PROJECT-proxy [$PROXYIP]"
     docker $DOCKERARGS rm $PROJECT-proxy
   ;;
-  "purge")
-    echo "Purging image kooplex-proxy"
+  "clean")
+    echo "Cleaning image kooplex-proxy"
     docker $DOCKERARGS rmi kooplex-proxy
   ;;
 esac

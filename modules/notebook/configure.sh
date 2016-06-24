@@ -68,7 +68,9 @@ cd /home/\$NB_USER
   "purge")
     echo "Purging notebook $PROJECT-notebook [$NOTEBOOKIP]"
     rm -R $SRV/notebook
-    echo "Purging base image kooplex-notebook"
+  ;;
+  "clean")
+    echo "Cleaning base image kooplex-notebook"
     docker $DOCKERARGS rmi kooplex-notebook
   ;;
 esac
