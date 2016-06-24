@@ -367,7 +367,7 @@ config() {
   
   JUPYTERHUBIP=$(ip_addip "$SUBNET" 6)
   
-  OWNCLOUDIP=$(ip_addip "$SUBNET" 7)
+  NEXTCLOUDIP=$(ip_addip "$SUBNET" 7)
   
   NOTEBOOKIP=$(ip_addip "$SUBNET" 8)
   
