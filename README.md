@@ -7,29 +7,14 @@ $SRV with the kooplex root directory on your host machine.
 
 * clone this repository
 
-	git clone https://github.com/kooplex/kooplex-config.git
+	$ git clone https://github.com/kooplex/kooplex-config.git
 
 * modify config.sh as necessary
 * configure network by running the following command on the docker _host_:
 
-	./install.sh net admin
-
-* ssh to admin machine or execute bash inside docker
-
-	docker exec -ti $PROJECT-admin bash
-
-* inside the admin container, execute
-
-	cd $SRV/src/kooplex-config
-	./install.sh
-	
-* and execute
-
-    ./init.sh
-    
-    ./init.sh admin
-	
-    (it is important to stick to the proper order)
+	$ sudo bash kooplex.sh build all
+    $ sudo bash kooplex.sh install all
+    $ sudo bash kooplex.sh init all
 
 ## Proxy configuration
 
@@ -37,27 +22,22 @@ $SRV with the kooplex root directory on your host machine.
  
   (e.g. /etc/nginx/sites-available/default):
 
->    server {
->    
->      listen $DOMAIN:80;
->      
->      server_name $DOMAIN;
->      
->      location / {
->      
->        proxy_pass http://$NGINXIP/;
->        
->      }
->      
->    }
+```
+server {
+    listen $DOMAIN:80;
+    server_name $DOMAIN;
+    location / {
+        proxy_pass http://$NGINXIP/;
+    }
+}
 
 ## Remove
 
-* inside the admin container, execute
+    $ sudo bash kooplex.sh stop all
+    $ sudo bash kooplex.sh remove all
+    
+## Purge configuration
 
-	cd $SRV/src/kooplex-config
-	./remove.sh
+To remove ALL data, config and docker images
 
-* on the host, execute
-
-	./remove.sh net admin
+    $ sudo bash kooplex.sh purge all

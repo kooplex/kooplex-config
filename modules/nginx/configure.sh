@@ -21,18 +21,15 @@ case $VERB in
 server {
   listen 80;
   server_name $DOMAIN;
-
+  
   location /gitlab {
     proxy_set_header Host \$http_host;
     proxy_pass http://$GITLABIP;
   }
-  
-  #location /hub {
-  #  proxy_pass http://$PROJECT-jupyterhub:8000;
-  #}
-  
-  location /owncloud {
-    proxy_pass http://$OWNCLOUDIP;
+
+  location /notebook {
+    proxy_set_header Host \$http_host;
+    proxy_pass http://$PROXYIP;
   }
 }
 " > $SRV/nginx/etc/sites.conf
