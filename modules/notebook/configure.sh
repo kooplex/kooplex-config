@@ -47,8 +47,6 @@ cd /home/\$NB_USER
       -e NB_URL=/notebook/test/ \
       -e NB_PORT=8888 \
       kooplex-notebook
-    
-    rmetc
   ;;
   "start")
     # TODO: we have a single notebook server now, perhaps there will
