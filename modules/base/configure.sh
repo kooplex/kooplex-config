@@ -4,9 +4,10 @@ case $VERB in
   "build")
     echo "Building base image kooplex-base"
     
-    cpetc
+    mkdir -p $SRV
+    mkdir -p $SECRETS
+    
     docker $DOCKERARGS build -t kooplex-base  .
-    rmetc
   ;;
   "start")
     

@@ -1,8 +1,24 @@
 #!/bin/bash
 
-source ./lib.sh
-VERB=$1
+. ./lib.sh
+
+VERB=$(getverb "$@")
 SVCS=$(getmodules "$@")
+
+case $VERB in
+  "build")
+    set -e
+  ;;
+  "install")
+    set -e
+  ;;
+  "start")
+    set -e
+  ;;
+  "init")
+    set -e
+  ;;
+esac
 
 echo "Starting $VERB..."
 

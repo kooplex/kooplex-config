@@ -35,6 +35,35 @@ ip_addip () {
 
 # LDAP functions
 
+ldap_ldapconfig() {
+    echo "
+BASE   $LDAPORG
+URI    ldap://$PROJECT-ldap/
+
+# TLS certificates (needed for GnuTLS)
+TLS_CACERT      /etc/ssl/certs/ca-certificates.crt
+"
+}
+
+ldap_nsswitchconfig() {
+  echo "
+passwd:         ldap compat
+group:          ldap compat
+shadow:         ldap compat
+gshadow:        files
+
+hosts:          files dns
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+netgroup:       nis
+  "
+}
+
 ldap_nslcdconfig () {
   LDAPPASS=$(getsecret ldap)
   echo "uid nslcd
@@ -236,6 +265,10 @@ print(a.uid, \" \", a.secret, \"\\n\")
 "
 }
 
+getverb() {
+  echo $1
+}
+
 getmodules() {
   if [ $# -lt 2 ] || [ "$2" = "all" ]; then
     echo "$SYSMODULES $MODULES"
@@ -261,16 +294,6 @@ createsecret() {
 getsecret() {
   local name=$1
   cat $SECRETS/$name.secret
-}
-
-cpetc() {
-  printf "$(ldap_nslcdconfig)\n\n" > ../../etc/nslcd.conf
-  mkdir etc
-  cp -R ../../etc/* etc/
-}
-
-rmetc() {
-  rm -R etc
 }
 
 adduser() {
@@ -303,7 +326,7 @@ adduser() {
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
   mkdir -p $SRV/home/$username/.ssh
-  rm $SRV/home/$username/.ssh/gitlab.key
+  rm -f $SRV/home/$username/.ssh/gitlab.key
   ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
 
   # Register key in Gitlab
@@ -354,9 +377,6 @@ config() {
   
   SRV=$ROOT/$PROJECT
   SECRETS=$SRV/.secrets
-  
-  mkdir -p $SRV
-  mkdir -p $SECRETS
 
   ADMINIP=$(ip_addip "$SUBNET" 2)
   

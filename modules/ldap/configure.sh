@@ -1,13 +1,16 @@
 #!/bin/bash
 
 case $VERB in
+  "build")
+    LDAPPASS=$(createsecret ldap)
+  ;;
   "install")
     echo "Installing slapd $PROJECT-ldap [$LDAPIP]"
     
+    LDAPPASS=$(getsecret ldap)
+    
     mkdir -p $SRV/ldap/etc/
     mkdir -p $SRV/ldap/var/
-    
-    LDAPPASS=$(createsecret ldap)
     
     docker $DOCKERARGS create \
       --name $PROJECT-ldap \
@@ -58,7 +61,7 @@ ou: groups" | \
   ;;
   "purge")
     echo "Purging slapd $PROJECT-ldap [$LDAPIP]"
-    rm -R $SRV/ldap/etc/
-    rm -R $SRV/ldap/var/
+    rm -R -f $SRV/ldap/etc/
+    rm -R -f $SRV/ldap/var/
   ;;
 esac

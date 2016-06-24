@@ -44,7 +44,6 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
 # Do not run nslcd as a daemon
 RUN systemctl disable nslcd
 
-ADD etc/nsswitch.conf /etc/nsswitch.conf
 ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package

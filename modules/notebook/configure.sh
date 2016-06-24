@@ -4,17 +4,16 @@ case $VERB in
   "build")
     echo "Building image kooplex-notebook"
     
-    cpetc
     docker $DOCKERARGS build -t kooplex-notebook .
-    rmetc
   ;;
   "install")
     echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
     
-    cpetc
-    
     mkdir -p $SRV/notebook/etc
-    cp etc/nslcd.conf $SRV/notebook/etc
+    mkdir -p $SRV/notebook/etc/ldap
+    printf "$(ldap_ldapconfig)\n\n" > $SRV/notebook/etc/ldap/ldap.conf
+    printf "$(ldap_nslcdconfig)\n\n" > $SRV/notebook/etc/nslcd.conf
+    printf "$(ldap_nsswitchconfig)\n\n" > $SRV/notebook/etc/nsswitch.conf
     
     mkdir -p $SRV/notebook/init
     # NFS mount for home
@@ -38,7 +37,9 @@ cd /home/\$NB_USER
       --net $PROJECT-net \
       --ip $NOTEBOOKIP \
       --privileged \
+      -v $SRV/notebook/etc/ldap/ldap.conf:/etc/ldap.conf \
       -v $SRV/notebook/etc/nslcd.conf:/etc/nslcd.conf \
+      -v $SRV/notebook/etc/nsswitch.conf:/etc/nsswitch.conf \
       -v $SRV/notebook/init:/init \
       -e NB_USER=test \
       -e NB_UID=10002 \
@@ -52,8 +53,8 @@ cd /home/\$NB_USER
   "start")
     # TODO: we have a single notebook server now, perhaps there will
     # one per user later or more if we scale out
-    echo "Starting notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    docker $DOCKERARGS start $PROJECT-notebook
+    # echo "Starting notebook $PROJECT-notebook [$NOTEBOOKIP]"
+    # docker $DOCKERARGS start $PROJECT-notebook
   ;;
   "init")
     
