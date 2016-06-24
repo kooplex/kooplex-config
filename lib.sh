@@ -354,6 +354,9 @@ config() {
   
   SRV=$ROOT/$PROJECT
   SECRETS=$SRV/.secrets
+  
+  mkdir -p $SRV
+  mkdir -p $SECRETS
 
   ADMINIP=$(ip_addip "$SUBNET" 2)
   
