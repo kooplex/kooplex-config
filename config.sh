@@ -1,5 +1,5 @@
-ADMINMODULES="net"
-ALLMODULES="base ldap home gitlab notebook proxy nginx"
+SYSMODULES="net base admin"
+MODULES="ldap home gitlab notebook proxy nginx"
 
 DOCKERARGS="-H 0.0.0.0:5555"
 PROJECT="compare"

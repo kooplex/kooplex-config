@@ -238,10 +238,12 @@ print(a.uid, \" \", a.secret, \"\\n\")
 
 getmodules() {
   if [ $# -lt 2 ] || [ "$2" = "all" ]; then
-    echo "$ALLMODULES"
+    echo "$SYSMODULES $MODULES"
+  elif [ "$2" = "sys" ]; then
+    echo "$SYSMODULES"
   else
     local args=($@)
-	echo "${args[@]:1}"
+    echo "${args[@]:1}"
   fi
 }
 
