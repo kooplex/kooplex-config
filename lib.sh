@@ -352,8 +352,7 @@ config() {
   
   KOOPLEXWD=`pwd`
   
-  SRV=$ROOT/$PROJECT/srv 
-  SRC=$ROOT/$PROJECT/src
+  SRV=$ROOT/$PROJECT
   SECRETS=$SRV/.secrets
 
   ADMINIP=$(ip_addip "$SUBNET" 2)
