@@ -7,14 +7,21 @@ $SRV with the kooplex root directory on your host machine.
 
 * clone this repository
 
-	$ git clone https://github.com/kooplex/kooplex-config.git
+    $ git clone https://github.com/kooplex/kooplex-config.git
 
 * modify config.sh as necessary
 * configure network by running the following command on the docker _host_:
 
-	$ sudo bash kooplex.sh build all
-    $ sudo bash kooplex.sh install all
-    $ sudo bash kooplex.sh init all
+    $ sudo bash kooplex.sh build
+    $ sudo bash kooplex.sh install
+    $ sudo bash kooplex.sh start
+    $ sudo bash kooplex.sh init
+    
+Individual modules can be installed, started etc. by specifying the module name, e.g.
+
+    $ sudo bash kooplex.sh start proxy
+    
+starts the proxy only. Multiple modules names can be listed.
 
 ## Proxy configuration
 
