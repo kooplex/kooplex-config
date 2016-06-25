@@ -35,6 +35,6 @@ RUN conda install --quiet --yes \
 RUN pip --no-cache-dir install 'jupyterhub==0.5'
 
 # Add local files as late as possible to avoid cache busting
-COPY start-notebook.sh /usr/local/bin/
-COPY start-singleuser.sh /usr/local/bin/
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
+ADD start-singleuser.sh /usr/local/bin/start-singleuser.sh
 
