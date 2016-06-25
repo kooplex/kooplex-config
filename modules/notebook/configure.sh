@@ -12,8 +12,10 @@ case $VERB in
     mkdir -p $SRV/notebook/etc
     mkdir -p $SRV/notebook/etc/ldap
     printf "$(ldap_ldapconfig)\n\n" > $SRV/notebook/etc/ldap/ldap.conf
-    printf "$(ldap_nslcdconfig)\n\n" > $SRV/notebook/etc/nslcd.conf
     printf "$(ldap_nsswitchconfig)\n\n" > $SRV/notebook/etc/nsswitch.conf
+    printf "$(ldap_nslcdconfig)\n\n" > $SRV/notebook/etc/nslcd.conf
+    chown root $SRV/notebook/etc/nslcd.conf
+    chmod 0600 $SRV/notebook/etc/nslcd.conf
     
     mkdir -p $SRV/notebook/init
     # NFS mount for home
