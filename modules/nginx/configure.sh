@@ -20,6 +20,7 @@ case $VERB in
 server {
   listen 80;
   server_name $DOMAIN;
+  client_max_body_size 20M;
   
   location /gitlab {
     proxy_set_header Host \$http_host;
@@ -27,9 +28,15 @@ server {
   }
 
   location /notebook {
-    proxy_set_header Host \$http_host;
-    proxy_pass http://$PROXYIP:8000;
+    proxy_set_header      Host \$http_host;
+    proxy_pass            http://$PROXYIP:8000;
+    # websocket support
+    proxy_http_version    1.1;
+    proxy_set_header      Upgrade \"websocket\";
+    proxy_set_header      Connection \"Upgrade\";
+    proxy_read_timeout    86400;
   }
+  
 }
 " > $SRV/nginx/etc/sites.conf
 
