@@ -23,6 +23,13 @@ Individual modules can be installed, started etc. by specifying the module name,
     
 starts the proxy only. Multiple modules names can be listed.
 
+Manual install steps
+
+* build (creates images)
+* install
+* start
+* init
+
 ## Proxy configuration
 
 * add following lines to configuration file _default_ of nginx _host_ 
@@ -36,12 +43,18 @@ server {
     location / {
         proxy_pass http://$NGINXIP/;
     }
-}
+```
 
 ## Remove
 
     $ sudo bash kooplex.sh stop all
     $ sudo bash kooplex.sh remove all
+    
+Manual remove steps:
+
+* remove
+* purge
+* clean (deletes images)
     
 ## Purge configuration
 
