@@ -30,13 +30,16 @@ server {
   location /notebook {
     proxy_set_header      Host \$http_host;
     proxy_pass            http://$PROXYIP:8000;
-    # websocket support
-    proxy_http_version    1.1;
-    proxy_set_header      Upgrade \"websocket\";
-    proxy_set_header      Connection \"Upgrade\";
-    proxy_read_timeout    86400;
   }
   
+  location ~* /notebook/[^/]+/[^/]+/(api/kernels/[^/]+/(channels|iopub|shell|stdin)|terminals/websocket)/? {
+    proxy_pass            http://$PROXYIP:8000;
+    proxy_http_version    1.1;
+    proxy_set_header      Host \$http_host;
+    proxy_set_header      Upgrade \$http_upgrade;
+    proxy_set_header      Connection \"upgrade\";
+    proxy_read_timeout    86400;
+  }
 }
 " > $SRV/nginx/etc/sites.conf
 

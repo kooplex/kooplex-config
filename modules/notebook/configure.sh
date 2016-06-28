@@ -9,45 +9,47 @@ case $VERB in
   "install")
     echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
     
+    # LDAP
     mkdir -p $SRV/notebook/etc
-    mkdir -p $SRV/notebook/etc/ldap
-    printf "$(ldap_ldapconfig)\n\n" > $SRV/notebook/etc/ldap/ldap.conf
-    printf "$(ldap_nsswitchconfig)\n\n" > $SRV/notebook/etc/nsswitch.conf
-    printf "$(ldap_nslcdconfig)\n\n" > $SRV/notebook/etc/nslcd.conf
-    chown root $SRV/notebook/etc/nslcd.conf
-    chmod 0600 $SRV/notebook/etc/nslcd.conf
+    $(ldap_makeconfig notebook)
+    cp jupyter_notebook_config.py $SRV/notebook/etc/
     
-    mkdir -p $SRV/notebook/init
-    # NFS mount for home
     echo "#/bin/sh
-echo \"Mounting home...\"
-mount -t nfs $PROJECT-home:/exports/home /home" \
-      > $SRV/notebook/init/0.sh
+echo "Configuring LDAP..."
+chmod 0600 /etc/nslcd.conf
+exec nslcd 
+    " > $SRV/notebook/init/0.sh
+        
+    
+    # NFS mount for home
+    mkdir -p $SRV/notebook/init
+    #$(home_makensfmount) > $SRV/notebook/init/1.sh
+      
     # Start jupyter
     echo "#/bin/sh
 echo \"Starting notebook for \$NB_USER...\"
 cd /home/\$NB_USER
-. start-notebook.sh --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT " \
+. start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
       > $SRV/notebook/init/1.sh
     
     # TODO: we create a notebook container here for testing but
     # individual containers will later be created for single
-    # users
+    # users from python. Use python unit tests to create notebook container!
     docker $DOCKERARGS create \
       --name $PROJECT-notebook \
       --hostname $PROJECT-notebook \
       --net $PROJECT-net \
       --ip $NOTEBOOKIP \
       --privileged \
-      -v $SRV/notebook/etc/ldap/ldap.conf:/etc/ldap.conf \
-      -v $SRV/notebook/etc/nslcd.conf:/etc/nslcd.conf \
-      -v $SRV/notebook/etc/nsswitch.conf:/etc/nsswitch.conf \
+      $(ldap_makebinds notebook) \
+      $(home_makebinds notebook) \
+      -v $SRV/notebook/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py \
       -v $SRV/notebook/init:/init \
       -e NB_USER=test \
       -e NB_UID=10002 \
       -e NB_GID=10002 \
       -e NB_URL=/notebook/test/ \
-      -e NB_PORT=8888 \
+      -e NB_PORT=8000 \
       kooplex-notebook
   ;;
   "start")

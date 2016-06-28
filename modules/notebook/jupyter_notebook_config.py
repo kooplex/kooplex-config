@@ -9,8 +9,9 @@ PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
 
 c = get_config()
 c.NotebookApp.ip = '*'
-c.NotebookApp.port = 8888
+c.NotebookApp.port = 8000
 c.NotebookApp.open_browser = False
+c.HistoryManager.hist_file = '/tmp/ipython_hist.sqlite'
 
 # Set a certificate if USE_HTTPS is set to any value
 if 'USE_HTTPS' in os.environ:

@@ -82,6 +82,26 @@ rootpwmodpw $LDAPPASS
 "
 }
 
+ldap_makeconfig () {
+  SVC=$1
+  
+  mkdir -p $SRV/$SVC/etc/ldap
+  printf "$(ldap_ldapconfig)\n\n" > $SRV/$SVC/etc/ldap/ldap.conf
+  printf "$(ldap_nsswitchconfig)\n\n" > $SRV/$SVC/etc/nsswitch.conf
+  printf "$(ldap_nslcdconfig)\n\n" > $SRV/$SVC/etc/nslcd.conf
+  chown root $SRV/$SVC/etc/nslcd.conf
+  chmod 0600 $SRV/$SVC/etc/nslcd.conf
+}
+
+ldap_makebinds () {
+  SVC=$1
+  
+  echo "-v $SRV/$SVC/etc/ldap/ldap.conf:/etc/ldap.conf
+  -v $SRV/$SVC/etc/nslcd.conf:/etc/nslcd.conf
+  -v $SRV/$SVC/etc/nsswitch.conf:/etc/nsswitch.conf
+  -v $SRV/$SVC/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py"
+}
+
 ldap_fdqn2cn () {
   local aa q fdqn=$@
   IFS=. read -ra aa <<< "$fdqn"
@@ -150,6 +170,13 @@ shadowMin: 8
 shadowMax: 999999
 shadowLastChange: 10877
 "
+
+  ldap_add "dn: cn=$username,ou=groups,$LDAPORG
+objectClass: top
+objectClass: posixGroup
+gidNumber: $uid
+memberUid: $uid
+"
 }
 
 ldap_addgroup() {
@@ -169,6 +196,18 @@ gidNumber: $uid
 " | \
   ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
   
+}
+
+# Home functions
+
+home_makensfmount() {
+  echo "#/bin/sh
+echo \"Mounting home...\"
+mount -t nfs $PROJECT-home:/exports/home /home"
+}
+
+home_makebinds() {
+  echo "-v $SRV/home:/home"
 }
 
 # Gitlab functions
@@ -318,10 +357,6 @@ adduser() {
   
   # Create home directory
   mkdir -p $SRV/home/$username
-  
-  # Create jupyter config
-  mkdir -p $SRV/home/$username/.jupyter
-  cp $KOOPLEXWD/modules/notebook/jupyter_notebook_config.py $SRV/home/$username/.jupyter/
   
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
