@@ -2,7 +2,8 @@
 
 case $VERB in
   "build")
-    
+    echo "Building image kooplex-ldap"
+    docker $DOCKERARGS build -t kooplex-ldap  .
   ;;
   "install")
     echo "Installing slapd $PROJECT-ldap [$LDAPIP]"
@@ -23,7 +24,7 @@ case $VERB in
       -e SLAPD_PASSWORD="$LDAPPASS" \
       -e SLAPD_CONFIG_PASSWORD="$LDAPPASS" \
       -e SLAPD_DOMAIN=$DOMAIN \
-      dinkel/openldap
+      kooplex-ldap 
   ;;
   "start")
     echo "Starting slapd $PROJECT-ldap [$LDAPIP]"
@@ -63,5 +64,9 @@ ou: groups" | \
     echo "Purging slapd $PROJECT-ldap [$LDAPIP]"
     rm -R -f $SRV/ldap
     rm -R -f $SRV/ldap
+  ;;
+  "clean")
+    echo "Cleaning image kooplex-ldap"
+    docker $DOCKERARGS rmi kooplex-ldap
   ;;
 esac

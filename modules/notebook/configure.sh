@@ -11,18 +11,17 @@ case $VERB in
     
     # LDAP
     mkdir -p $SRV/notebook/etc
+    mkdir -p $SRV/notebook/init
     $(ldap_makeconfig notebook)
     cp jupyter_notebook_config.py $SRV/notebook/etc/
-    
+        
     echo "#/bin/sh
-echo "Configuring LDAP..."
+echo \"Configuring LDAP...\"
 chmod 0600 /etc/nslcd.conf
 exec nslcd 
     " > $SRV/notebook/init/0.sh
         
-    
     # NFS mount for home
-    mkdir -p $SRV/notebook/init
     #$(home_makensfmount) > $SRV/notebook/init/1.sh
       
     # Start jupyter
