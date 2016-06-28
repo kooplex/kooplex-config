@@ -12,6 +12,8 @@ case $VERB in
     
     mkdir -p $SRV/ldap/etc/
     mkdir -p $SRV/ldap/var/
+    chown -R root $SRV/ldap
+    chmod -R 755 $SRV/ldap
     
     docker $DOCKERARGS create \
       --name $PROJECT-ldap \

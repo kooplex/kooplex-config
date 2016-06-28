@@ -7,6 +7,8 @@ case $VERB in
     mkdir -p $SRV/gitlab/etc
     mkdir -p $SRV/gitlab/log
     mkdir -p $SRV/gitlab/opt
+    chown -R root $SRV/gitlab
+    chmod -R 755 $SRV/gitlab
     
     GITLABRB=$SRV/gitlab/etc/gitlab.rb
     echo "
@@ -55,7 +57,7 @@ EOS
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
       -p 23:22 \
-      gitlab/gitlab-ce:latest
+      gitlab/gitlab-ce
       
   ;;
   "start")
