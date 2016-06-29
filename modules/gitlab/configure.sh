@@ -68,6 +68,10 @@ EOS
   ;;
   "init")
     echo "Initializing gitlab $PROJECT-gitlab [$GITLABIP]"
+    
+    echo "Securing host keys..."
+    chmod 600 /srv/kooplex/compare/gitlab/etc/ssh_host_*
+        
     echo "Creating Gitlab admin user..."
     
     # Generate Gitlab and keyfile random password
