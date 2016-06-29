@@ -5,20 +5,20 @@ case $VERB in
     echo "Building $PROJECT-dashboard images"
     echo  "COMPOSE_PROJECT_NAME=$PROJECT" > .env
     echo  "PROJECT_NETWORK=$PROJECT-net" >> .env
-    docker-compose build
+    docker-compose $DOCKERARGS build
   ;;
   "install")
   ;;
   "start")
     echo "Starting proxy $PROJECT-proxy [$PROXYIP]"
-    docker-compose up -d
+    docker-compose $DOCKERARGS up -d
   ;;
   "init")
     
   ;;
   "stop")
     echo "Stopping  and removing $PROJECT-dashboards "
-    docker-compose down
+    docker-compose $DOCKERARGS down
   ;;
   "remove")
   ;;
