@@ -18,11 +18,8 @@ case $VERB in
     echo "#/bin/sh
 echo \"Configuring LDAP...\"
 chmod 0600 /etc/nslcd.conf
-exec nslcd 
+service nslcd start
     " > $SRV/notebook/init/0.sh
-        
-    # NFS mount for home
-    #$(home_makensfmount) > $SRV/notebook/init/1.sh
       
     # Start jupyter
     echo "#/bin/sh
