@@ -51,7 +51,8 @@ RUN apt-get install -q -y \
 # Do not run nslcd as a daemon
 RUN systemctl disable nslcd   
 RUN pam-auth-update --package 
- 
+
+#apt-get install davfs2 
 
 #USER root
 ENTRYPOINT ["/entrypoint.sh"]
