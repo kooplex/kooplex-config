@@ -8,6 +8,9 @@ RUN pip install jupyter_kernel_gateway==0.5.1
 ARG IPYWIDGETS_VER
 RUN pip install "ipywidgets==$IPYWIDGETS_VER"
 
+RUN /opt/conda/envs/python2/bin/pip install -U folium==0.1.5
+
+
 # install Declarative Widgets python package
 # don't bother activating the extension, not needed outside notebook
 ARG DECLWIDGETS_VER
