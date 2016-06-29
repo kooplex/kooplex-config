@@ -19,6 +19,7 @@ case $VERB in
       -e PUBLICIP=$PROXYIP \
       -e ADMINIP=$PROXYIP \
       -e CONFIGPROXY_AUTH_TOKEN=$PROXYTOKEN \
+      -p 8001:8001 \
       kooplex-proxy
   ;;
   "start")
