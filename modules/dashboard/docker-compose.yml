@@ -1,0 +1,44 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+---
+version: "2"
+
+services:
+  dashboards:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboards
+      args:
+          # npm versioning:
+          DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
+    networks:
+      - project_network
+    ports:
+      - "3000:3000"
+    depends_on:
+      - kernel_gateway
+    links:
+      - kernel_gateway
+    env_file: db_secrets.env
+    environment:
+      PORT: 3000
+      KERNEL_GATEWAY_URL: http://kernel_gateway:8888
+
+  kernel_gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.kernel
+      args:
+        # pip versioning:
+        IPYWIDGETS_VER: '5.1.*'
+        DECLWIDGETS_VER: '0.6.*'
+    networks:
+      - project_network
+    environment:
+      KG_ALLOW_ORIGIN: '*'
+
+networks:
+  project_network:
+    external: 
+      name: ${PROJECT_NETWORK}

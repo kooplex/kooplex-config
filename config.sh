@@ -1,11 +1,11 @@
 SYSMODULES="net base" # admin"
-MODULES="ldap home gitlab notebook proxy nginx"
+MODULES="ldap home gitlab notebook proxy nginx dashboard"
 
-DOCKERARGS="-H 0.0.0.0:5555"
+DOCKERARGS=""
 PROJECT="compare"
 ROOT="/srv/kooplex"
 SUBNET="172.20.0.0/16"
-DOMAIN="dobos.compare.vo.elte.hu"
+DOMAIN="localhost"
 SMTP=mail.elte.hu
 EMAIL=dobos@complex.elte.hu
 DUMMYPASS="almafa137"
