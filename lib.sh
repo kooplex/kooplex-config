@@ -362,7 +362,8 @@ adduser() {
   SSHKEYPASS=$(getsecret sshkey)
   mkdir -p $SRV/home/$username/.ssh
   rm -f $SRV/home/$username/.ssh/gitlab.key
-  ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
+  #ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
+  ssh-keygen -N "" -f $SRV/home/$username/.ssh/gitlab.key
 
   # Register key in Gitlab
   gitlab_addsshkey $username $pass
