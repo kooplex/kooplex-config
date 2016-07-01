@@ -1,48 +1,43 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
+FROM kooplex-base
 
-# Pin to a known release for sanity
-FROM jupyter/pyspark-notebook:8015c88c4b11
+MAINTAINER Laszlo Dobos <dobos@complex.elte.hu
 
-# Become root to do the apt-gets
-USER root
+# TODO add jupyter stuff
 
-RUN apt-get update && \
-		apt-get install -y curl && \
-		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-		apt-get install --yes nodejs && \
-		npm install -g bower
+# Configure environment
+ENV CONDA_DIR /opt/conda
+ENV PATH $CONDA_DIR/bin:$PATH
+ENV SHELL /bin/bash
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 
-# Do the pip installs as the unprivileged notebook user
-USER jovyan
+# Create conda dir
+RUN mkdir -p $CONDA_DIR
+    
+# Install conda
+RUN cd /tmp && \
+    mkdir -p $CONDA_DIR && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-3.19.0-Linux-x86_64.sh && \
+    echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
+    /bin/bash Miniconda3-3.19.0-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-3.19.0-Linux-x86_64.sh && \
+    $CONDA_DIR/bin/conda install --quiet --yes conda==3.19.1 && \
+    $CONDA_DIR/bin/conda config --system --add channels conda-forge && \
+    conda clean -tipsy
+    
+# Install Jupyter notebook
+RUN conda install --quiet --yes \
+    'notebook=4.2*' \
+    && conda clean -tipsy
+    
+# Install JupyterHub to get the jupyterhub-singleuser startup script
+RUN pip --no-cache-dir install 'jupyterhub==0.5'
 
-ENV  DASHBOARDS_VER '0.6.*'
-ENV  DECLWIDGETS_VER '0.6.*'
-ENV  CMS_VER '0.5.*'
-ENV  BUNDLER_VER '0.8.*'
+# install the dashboard python package
+RUN pip install jupyter_dashboards
+RUN jupyter dashboards quick-setup --sys-prefix
 
-# Install dashboard layout and preview within Jupyter Notebook
-ARG DASHBOARDS_VER
-RUN pip install "jupyter_dashboards==$DASHBOARDS_VER" && \
-	jupyter dashboards quick-setup --sys-prefix
-
-# Install declarative widgets for Jupyter Notebook
-ARG DECLWIDGETS_VER
-RUN pip install "jupyter_declarativewidgets==$DECLWIDGETS_VER" && \
-	jupyter declarativewidgets quick-setup --sys-prefix
-
-# Install content management to support dashboard bundler options
-ARG CMS_VER
-ARG BUNDLER_VER
-RUN pip install "jupyter_cms==$CMS_VER" && \
-	jupyter cms quick-setup --sys-prefix
-RUN pip install "jupyter_dashboards_bundlers==$BUNDLER_VER" && \
-	jupyter dashboards_bundlers quick-setup --sys-prefix
-
-# make shure notebook sees dashboard server maybe not the best place to define 
-# we could define these at container creation!!!!
-ENV  DASHBOARD_REDIRECT_URL http://localhost:3000/
-ENV  DASHBOARD_SERVER_URL http://dashboards:3000/
-
-
-# Stay as jovyan in the newer docker stack images
+# Add local files as late as possible to avoid cache busting
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
+ADD start-singleuser.sh /usr/local/bin/start-singleuser.sh
