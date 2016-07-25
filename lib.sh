@@ -432,6 +432,8 @@ config() {
   
   PROXYIP=$(ip_addip "$SUBNET" 9)
   
+  KEYSTONEIP=$(ip_addip "$SUBNET" 15)
+  
   NGINXIP=$(ip_addip "$SUBNET" 16)
   
   if [ $(isindocker) -eq 1 ]; then
