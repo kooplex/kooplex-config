@@ -68,9 +68,6 @@ EOS
   ;;
   "init")
     echo "Initializing gitlab $PROJECT-gitlab [$GITLABIP]"
-    
-    echo "Securing host keys..."
-    chmod 600 $SRV/gitlab/etc/ssh_host_*
         
     echo "Creating Gitlab admin user..."
     
@@ -82,6 +79,9 @@ EOS
     gitlab_makeadmin gitlabadmin
 
     # TODO: disable standard login and self-registration via Gitlab
+    
+    echo "Securing host keys..."
+    chmod 600 $SRV/gitlab/etc/ssh_host_*
   ;;
   "stop")
     echo "Stopping gitlab $PROJECT-gitlab [$GITLABIP]"
