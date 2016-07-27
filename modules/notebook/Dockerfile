@@ -5,6 +5,7 @@ MAINTAINER Laszlo Dobos <dobos@complex.elte.hu
 # TODO add jupyter stuff
 
 # Configure environment
+ENV CONDA_VER latest
 ENV CONDA_DIR /opt/conda
 ENV PATH $CONDA_DIR/bin:$PATH
 ENV SHELL /bin/bash
@@ -18,21 +19,24 @@ RUN mkdir -p $CONDA_DIR
 # Install conda
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-3.19.0-Linux-x86_64.sh && \
-    echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
-    /bin/bash Miniconda3-3.19.0-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-3.19.0-Linux-x86_64.sh && \
-    $CONDA_DIR/bin/conda install --quiet --yes conda==3.19.1 && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
+    # echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
+    /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
+    $CONDA_DIR/bin/conda install --quiet --yes conda && \
     $CONDA_DIR/bin/conda config --system --add channels conda-forge && \
-    conda clean -tipsy
+    $CONDA_DIR/bin/conda install --quiet --yes 'notebook' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter==4.2.0'
     
 # Install Jupyter notebook
-RUN conda install --quiet --yes \
-    'notebook=4.2*' \
-    && conda clean -tipsy
+# RUN conda clean -tipsy
     
 # Install JupyterHub to get the jupyterhub-singleuser startup script
-RUN pip --no-cache-dir install 'jupyterhub==0.5'
+RUN pip install 'jupyter_dashboards' && \
+    jupyter-dashboards quick-setup && \
+    jupyter-nbextension enable jupyter_dashboards --py
 
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
