@@ -37,12 +37,27 @@ Manual install steps
   (e.g. /etc/nginx/sites-available/default):
 
 ```
+map $http_upgrade $connection_upgrade {
+	default upgrade;
+	'' close;
+}
+
 server {
     listen $DOMAIN:80;
     server_name $DOMAIN;
     location / {
         proxy_pass http://$NGINXIP/;
     }
+    
+    location ~* /(api/kernels/[^/]+/(channels|iopub|shell|stdin)|terminals/websocket)/? {
+        proxy_pass http://$NGINXIP;
+        proxy_set_header      Host $host;
+        # websocket support
+        proxy_http_version    1.1;
+        proxy_set_header      Upgrade $http_upgrade;
+        proxy_set_header      Connection $connection_upgrade;
+    }
+}
 ```
 
 ## Remove
