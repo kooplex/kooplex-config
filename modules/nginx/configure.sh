@@ -56,7 +56,7 @@ server {
     docker $DOCKERARGS stop $PROJECT-nginx
   ;;
   "remove")
-    echo "Removing network $PROJECT-net [$SUBNET]"
+    echo "Removing nginx $PROJECT-net [$SUBNET]"
     docker $DOCKERARGS rm $PROJECT-nginx
   ;;
   "purge")
