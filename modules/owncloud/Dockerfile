@@ -1,4 +1,4 @@
-FROM php:5.6-apache
+FROM php:5.6.25-apache
 
 RUN apt-get update && apt-get install -y \
 	bzip2 \
@@ -6,21 +6,18 @@ RUN apt-get update && apt-get install -y \
 	libfreetype6-dev \
 	libicu-dev \
 	libjpeg-dev \
+	libldap2-dev \
 	libmcrypt-dev \
 	libmemcached-dev \
 	libpng12-dev \
 	libpq-dev \
 	libxml2-dev \
-	php5-ldap 
-#	openldap-utils \
-#	ldap-client 
-#	&& rm -rf /var/lib/apt/lists/*
-
-
+	&& rm -rf /var/lib/apt/lists/*
 
 # https://doc.owncloud.org/server/8.1/admin_manual/installation/source_installation.html#prerequisites
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd exif intl mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
+	&& docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
+	&& docker-php-ext-install exif gd intl ldap mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -32,19 +29,17 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-# PECL extensions
-RUN pecl install APCu-4.0.10 redis memcached \
-	&& docker-php-ext-enable apcu redis memcached
-
 RUN a2enmod rewrite
 
+# PECL extensions
+RUN set -ex \
+	&& pecl install APCu-4.0.10 \
+	&& pecl install memcached-2.2.0 \
+	&& pecl install redis-2.2.8 \
+	&& docker-php-ext-enable apcu memcached redis
 
-
-ENV OWNCLOUD_VERSION 9.0.2
+ENV OWNCLOUD_VERSION 9.1.0
 VOLUME /var/www/html
-
-
 
 RUN curl -fsSL -o owncloud.tar.bz2 \
 		"https://download.owncloud.org/community/owncloud-${OWNCLOUD_VERSION}.tar.bz2" \
@@ -59,20 +54,11 @@ RUN curl -fsSL -o owncloud.tar.bz2 \
 	&& rm owncloud.tar.bz2
 
 
-
-
-#ADD LDAP
-RUN apt-get install libldap2-dev
-#	libapache2-mod-webauthldap
-RUN a2enmod authnz_ldap
-RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/
-RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
-RUN docker-php-ext-configure ldap && docker-php-ext-install ldap
-
-RUN service apache2 restart
-
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
+
+COPY setup-ldap.sh /setup-ldap.sh
+#RUN chmod a+x /setup-ldap.sh  && bash /setup-ldap.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
