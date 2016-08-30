@@ -42,9 +42,9 @@ LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
 #./occ user:enable owncloud-admin
 
 ./occ app:enable files_external
-export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
+export dum=\`./occ files_external:create "/Files" "\\OC\\Files\\Storage\\Local" "null::null"\`
 export MOUNTID=\`echo \${dum#*with id}\`
-./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
+./occ files_external:config \$MOUNTID datadir "/home/\\\$user/files"
 
 perl -pi -e 's/localhost/157.181.172.106:90/g' config/config.php
 
