@@ -370,8 +370,11 @@ adduser() {
   
   # Set home owner
   chown -R $uid:$uid $SRV/home/$username
-  # TODO set permissions
-  
+  setfacl -R -m d:u:$uid:rwx $SRV/home/$username
+
+  # Set user quota
+  setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
+
   echo "New user created: $uid $username"
 }
 

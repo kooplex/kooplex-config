@@ -28,7 +28,7 @@ RUN cd /tmp && \
     $CONDA_DIR/bin/conda install --quiet --yes 'notebook' && \
     $CONDA_DIR/bin/conda install --quiet --yes 'jupyter' && \
     $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter==4.1.0'
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter'
     
 # Install Jupyter notebook
 # RUN conda clean -tipsy
