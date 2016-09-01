@@ -40,6 +40,11 @@ server {
     proxy_set_header      Connection \"upgrade\";
     proxy_read_timeout    86400;
   }
+
+  location /owncloud {
+    proxy_set_header Host \$http_host;
+    proxy_pass http://$OWNCLOUDIP;
+  }
 }
 " > $SRV/nginx/etc/sites.conf
 

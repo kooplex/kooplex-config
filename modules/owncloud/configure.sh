@@ -21,10 +21,10 @@ chown root config/config.php
 ./occ ldap:create-empty-config
 dummy=\`./occ ldap:create-empty-config\`
 LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
-./occ ldap:set-config \$LDAP_ID ldapAgentName "cn=admin,dc=127,dc=0,dc=0,dc=1"
-./occ ldap:set-config \$LDAP_ID ldapBase "dc=127,dc=0,dc=0,dc=1"
-./occ ldap:set-config \$LDAP_ID ldapBaseGroups "dc=127,dc=0,dc=0,dc=1"
-./occ ldap:set-config \$LDAP_ID ldapBaseUsers "dc=127,dc=0,dc=0,dc=1"
+./occ ldap:set-config \$LDAP_ID ldapAgentName "cn=admin,$LDAPORG"
+./occ ldap:set-config \$LDAP_ID ldapBase "$LDAPORG"
+./occ ldap:set-config \$LDAP_ID ldapBaseGroups "$LDAPORG"
+./occ ldap:set-config \$LDAP_ID ldapBaseUsers "$LDAPORG"
 ./occ ldap:set-config \$LDAP_ID ldapHost $LDAPIP
 ./occ ldap:set-config \$LDAP_ID ldapAgentPassword $SECRET
 ./occ ldap:set-config \$LDAP_ID ldapPort 389
@@ -46,7 +46,7 @@ export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "
 export MOUNTID=\`echo \${dum#*with id}\`
 ./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
 
-perl -pi -e 's/localhost/157.181.172.106:90/g' config/config.php
+perl -pi -e "s/localhost'/$DOMAIN',1 => '$NGINXIP',/g" config/config.php
 
 chown www-data config/config.php
 
@@ -66,8 +66,6 @@ EOF
       --net $PROJECT-net \
       --ip $OWNCLOUDIP \
       -v $SRV/home/:/home \
-      -p 90:80 \
-      -p 91:9000 \
       --privileged \
             kooplex-owncloud
 #       owncloud
@@ -75,13 +73,12 @@ EOF
   ;;
   "start")
   #
-  docker start $PROJECT-owncloud
+  docker $DOCKERARGS start $PROJECT-owncloud
   ;;
   "init")
 
 #MOUNT EVERYONES OWNCLOUD DIR
 
-http://157.181.172.106:90/remote.php/webdav/ test almafa137
     
   ;;
   "stop")
