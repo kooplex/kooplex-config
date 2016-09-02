@@ -10,14 +10,14 @@ case $VERB in
   "install")
   ;;
   "start")
-    echo "Starting proxy $PROJECT-proxy [$PROXYIP]"
+    echo "Starting $PROJECT-dashboard"
     docker-compose $DOCKERARGS up -d
   ;;
   "init")
     
   ;;
   "stop")
-    echo "Stopping  and removing $PROJECT-dashboards "
+    echo "Stopping and removing $PROJECT-dashboard"
     docker-compose $DOCKERARGS down
   ;;
   "remove")
