@@ -5,7 +5,8 @@ case $VERB in
     echo "Building base image kooplex-base"
 
     mkdir -p $DISKIMG
-    dd if=/dev/zero of=$DISKIMG/kooplexfs.img bs=$DISKSIZE count=1
+    cnt=`echo $DISKSIZE_GB | awk '{print $1*1000}'`
+    dd if=/dev/zero of=$DISKIMG/kooplexfs.img bs=1M count=$cnt
     mkfs -t ext4 $DISKIMG/kooplexfs.img
 
     mkdir -p $SRV
