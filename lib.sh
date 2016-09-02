@@ -417,12 +417,15 @@ config() {
   SRV=$ROOT/$PROJECT
   SECRETS=$SRV/.secrets
 
+  SSHLOC=`which ssh`
+
   ADMINIP=$(ip_addip "$SUBNET" 2)
   
   LDAPIP=$(ip_addip "$SUBNET" 3)
   LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
   LDAPSERV=$PROJECT-ldap
   LDAPPORT=389
+  LDAPPASS=$(getsecret ldap)
 
   HOMEIP=$(ip_addip "$SUBNET" 4)
   
@@ -437,7 +440,17 @@ config() {
   PROXYIP=$(ip_addip "$SUBNET" 9)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
-  
+
+  GITLABPASS=$(createsecret gitlab)
+  SSHKEYPASS=$(createsecret sshkey)
+
+  DOCKERPORT=${DOCKERARGS##*:}
+
+  IPPOOLB=$(ip_addip "$SUBNET" 5121)
+  IPPOOLE=$(ip_addip "$SUBNET" 5375) 
+
+  PROXYTOKEN=$(createsecret proxy)
+
   if [ $(isindocker) -eq 1 ]; then
     echo "Process is running inside a docker container."
   else
