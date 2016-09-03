@@ -440,9 +440,14 @@ config() {
   PROXYIP=$(ip_addip "$SUBNET" 9)
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
+  
+  HUBIP=$(ip_addip "$SUBNET" 18)
+  
+  MYSQLIP=$(ip_addip "$SUBNET" 19)
 
   GITLABPASS=$(createsecret gitlab)
   SSHKEYPASS=$(createsecret sshkey)
+  MYSQLPASS=$DUMMYPASS
 
   DOCKERPORT=${DOCKERARGS##*:}
 

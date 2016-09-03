@@ -33,7 +33,7 @@ case $VERB in
     
   ;;
   "remove")
-
+  umount $DISKIMG/kooplexfs.img 
   ;;
   "purge")
 

@@ -20,4 +20,14 @@ RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython ne
 RUN cd /opt
 RUN git clone https://github.com/kooplex/kooplex-hub.git
 RUN mv kooplex-hub kooplexhub
-COPY settings.py kooplexhub/kooplex/settings.py 
+COPY settings.py /settings.py 
+
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh
+
+COPY Runserver.sh /Runserver.sh
+RUN chmod a+x /Runserver.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["./Runserver.sh"]
+#CMD ["cd /kooplexhub/kooplexhub/;python3 manage.py runserver 0:80"]

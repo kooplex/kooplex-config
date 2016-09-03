@@ -1,10 +1,38 @@
 #!/bin/bash
 
+PROJECTDB=$PROJECT"_kooplex"
+
 case $VERB in
   "build")
     echo "Building base image kooplex-hub"
-    
-    docker $DOCKERARGS build -t kooplex-hub .
+
+cat << EOO > Runserver.sh
+
+cd /kooplexhub/kooplexhub/
+/usr/bin/python3.4 manage.py runserver 0:80
+
+EOO
+
+
+
+cat << EOD > docker-entrypoint.sh
+#!/bin/bash
+set -e
+
+if [ ! -e 'kooplexhub/kooplexhub/kooplex/settings.py' ]; then
+        cp /settings.py kooplexhub/kooplexhub/kooplex/settings.py
+
+fi
+
+v=\`echo "use $PROJECTDB; show tables" | mysql -u root --password=$MYSQLPASS -h $PROJECT-mysql | wc| awk '{print \$1}'\`
+if [ !  "\$v" -gt "10" ]; then
+        cd /kooplexhub/kooplexhub/; python3 manage.py migrate
+fi
+
+exec "\$@"
+EOD
+
+
 
 cat << EOF > settings.py
 
@@ -31,10 +59,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '$PROJECT-kooplex',
+        'NAME': '$PROJECTDB',
         'USER': 'kooplex',
-        'PASSWORD': 'Almafa137',
-        'HOST': '$DOMAIN',
+        'PASSWORD': '$MYSQLPASS',
+        'HOST': '$MYSQLIP',
         'PORT': '3306',
     }
 }
@@ -88,7 +116,7 @@ KOOPLEX = {
         'ssh_port': 23,
         'admin_username': 'gitlabadmin',
         'admin_password': '$GITLABPASS',
-        'ssh_key_password': '$SSHKEYPASS'
+        'ssh_key_password': '$SSHKEYPASS',
     },
     'docker': {
         'host': '$DOMAIN', 
@@ -301,10 +329,12 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 EOF
 
+    docker $DOCKERARGS build -t kooplex-hub .
+
   ;;
   "install")
     echo "Installing hub $PROJECT-hub [$HUBIP]"
-
+echo $HUBIP
     docker $DOCKERARGS create  \
       --name $PROJECT-hub \
       --hostname $PROJECT-hub \
@@ -314,15 +344,32 @@ EOF
 
   ;;
   "start")
+
+ v=`docker $DOCKERARGS exec $PROJECT-mysql \
+  bash -c "echo \"show databases\" | mysql -u root --password=$MYSQLPASS | grep $PROJECTDB"`
+ if [ ! $v == "$PROJECTDB" ]; then
+   docker $DOCKERARGS exec $PROJECT-mysql \
+    bash -c "echo 'CREATE DATABASE '$PROJECT'_kooplex;' | mysql -u root --password=$MYSQLPASS"
+   docker $DOCKERARGS exec $PROJECT-mysql \
+    bash -c "echo  \"   CREATE USER 'kooplex'@'%' IDENTIFIED BY 'almafa137';\" | mysql -u root --password=$MYSQLPASS"
+   docker $DOCKERARGS exec $PROJECT-mysql \
+    bash -c "echo \"    GRANT ALL ON \"$PROJECT\"_kooplex.* TO 'kooplex'@'%';\" | mysql -u root --password=$MYSQLPASS"
+ fi
+ 
+   docker $DOCKERARGS start $PROJECT-hub
     
   ;;
   "init")
+
     
   ;;
-  "stop")
-    
+ "stop")
+    echo "Stopping hub $PROJECT-hub [$HUBIP]"
+    docker $DOCKERARGS stop $PROJECT-hub
   ;;
   "remove")
+    echo "Removing hub $PROJECT-hub [$HUBIP]"
+    docker $DOCKERARGS rm $PROJECT-hub
 
   ;;
   "purge")

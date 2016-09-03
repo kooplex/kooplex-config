@@ -12,6 +12,7 @@ case $VERB in
       --hostname $PROJECT-nginx \
       --net $PROJECT-net \
       --ip $NGINXIP \
+      -p 96:80\
       -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
       nginx
@@ -26,6 +27,13 @@ server {
     proxy_set_header Host \$http_host;
     proxy_pass http://$GITLABIP;
   }
+
+  location /hub {
+    proxy_set_header Host $http_host;
+    proxy_pass http://$HUBIP;
+  }
+
+
 
   location /notebook {
     proxy_set_header      Host \$http_host;
