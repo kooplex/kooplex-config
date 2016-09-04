@@ -425,7 +425,6 @@ config() {
   LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
   LDAPSERV=$PROJECT-ldap
   LDAPPORT=389
-  LDAPPASS=$(getsecret ldap)
 
   HOMEIP=$(ip_addip "$SUBNET" 4)
   
@@ -445,8 +444,6 @@ config() {
   
   MYSQLIP=$(ip_addip "$SUBNET" 19)
 
-  GITLABPASS=$(createsecret gitlab)
-  SSHKEYPASS=$(createsecret sshkey)
   MYSQLPASS=$DUMMYPASS
 
   DOCKERPORT=${DOCKERARGS##*:}

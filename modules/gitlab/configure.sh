@@ -3,6 +3,8 @@
 case $VERB in
   "install")
     echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
+
+    LDAPPASS=$(getsecret ldap)
     
     mkdir -p $SRV/gitlab/etc
     mkdir -p $SRV/gitlab/log
