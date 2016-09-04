@@ -29,11 +29,9 @@ server {
   }
 
   location /hub {
-    proxy_set_header Host $http_host;
+    proxy_set_header Host \$http_host;
     proxy_pass http://$HUBIP;
   }
-
-
 
   location /notebook {
     proxy_set_header      Host \$http_host;
