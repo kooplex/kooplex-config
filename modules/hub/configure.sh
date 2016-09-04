@@ -30,7 +30,7 @@ fi
 
 v=\`echo "use $PROJECTDB; show tables" | mysql -u root --password=$MYSQLPASS -h $PROJECT-mysql | wc| awk '{print \$1}'\`
 if [ !  "\$v" -gt "10" ]; then
-        cd /kooplexhub/kooplexhub/; python3 manage.py migrate
+        cd /kooplexhub/kooplexhub/; python3 manage.py migrate; cd /
 fi
 
 exec "\$@"
