@@ -13,7 +13,7 @@ case $VERB in
 cat << EOO > Runserver.sh
 
 cd /kooplexhub/kooplexhub/
-/usr/bin/python3.4 manage.py runserver $HUBIP:80
+/usr/bin/python3 manage.py runserver $HUBIP:80
 
 EOO
 
@@ -115,9 +115,10 @@ KOOPLEX = {
     },
     'gitlab': {
         'base_url': 'http://%s/gitlab/' % KOOPLEX_EXTERNAL_HOST,
-        'ssh_cmd': r'/usr/bin/ssh',
+        'base_repourl': 'http://$GITLABIP',
+        'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
         'ssh_host': '$DOMAIN',
-        'ssh_port': 23,
+        'ssh_port': 22,
         'admin_username': 'gitlabadmin',
         'admin_password': '$GITLABPASS',
         'ssh_key_password': '$SSHKEYPASS',
@@ -344,23 +345,28 @@ echo $HUBIP
       --hostname $PROJECT-hub \
       --net $PROJECT-net \
       --ip $HUBIP \
+      --privileged \
+      -v $SRV/home:/home \
             kooplex-hub
 
   ;;
   "start")
     echo "Starting hub $PROJECT-hub [$HUBIP]"
- v=`docker $DOCKERARGS exec $PROJECT-mysql \
-  bash -c "echo \"show databases\" | mysql -u root --password=$MYSQLPASS | grep $PROJECTDB"`
- if [ ! $v == "$PROJECTDB" ]; then
+
+   if ! docker $DOCKERARGS exec $PROJECT-mysql bash -c "echo \"show databases\" | mysql -u root --password=$MYSQLPASS " | grep -q  $PROJECTDB ; then
+   echo "CREATING mysql DATABASE for hub"
    docker $DOCKERARGS exec $PROJECT-mysql \
-    bash -c "echo 'CREATE DATABASE '$PROJECT'_kooplex;' | mysql -u root --password=$MYSQLPASS"
+    bash -c "echo \"CREATE DATABASE \"$PROJECT\"_kooplex;\" | mysql -u root --password=$MYSQLPASS"
    docker $DOCKERARGS exec $PROJECT-mysql \
     bash -c "echo  \"   CREATE USER 'kooplex'@'%' IDENTIFIED BY 'almafa137';\" | mysql -u root --password=$MYSQLPASS"
    docker $DOCKERARGS exec $PROJECT-mysql \
     bash -c "echo \"    GRANT ALL ON \"$PROJECT\"_kooplex.* TO 'kooplex'@'%';\" | mysql -u root --password=$MYSQLPASS"
+    
+ else
+  echo "mysql Database exists"
  fi
- 
-   docker $DOCKERARGS start $PROJECT-hub
+
+ docker $DOCKERARGS start $PROJECT-hub
     
   ;;
   "init")

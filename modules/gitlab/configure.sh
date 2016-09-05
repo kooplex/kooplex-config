@@ -58,7 +58,6 @@ EOS
       -v $SRV/gitlab/etc:/etc/gitlab \
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
-      -p 23:22 \
       gitlab/gitlab-ce
       
   ;;

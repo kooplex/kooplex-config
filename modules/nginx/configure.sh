@@ -12,7 +12,6 @@ case $VERB in
       --hostname $PROJECT-nginx \
       --net $PROJECT-net \
       --ip $NGINXIP \
-      -p 80:80\
       -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
       nginx 

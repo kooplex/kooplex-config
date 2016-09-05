@@ -12,9 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 ENV DJANGO_VERSION 1.9
 
+RUN pip3 install setuptools
 RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"
-
-RUN apt-get install -y libcurl4-openssl-dev
 
 RUN cd /opt
 RUN git clone https://github.com/kooplex/kooplex-hub.git
