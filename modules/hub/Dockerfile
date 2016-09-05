@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 		mysql-server mysql-client libmysqlclient-dev \
 		postgresql-client libpq-dev \
                 vim less \
-                git \
+                git ssh\
 		python3-pip \
 	--no-install-recommends && rm -rf /var/lib/apt/lists/*
 

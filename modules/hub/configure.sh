@@ -9,7 +9,7 @@ case $VERB in
 cat << EOO > Runserver.sh
 
 cd /kooplexhub/kooplexhub/
-/usr/bin/python3.4 manage.py runserver 0:80
+/usr/bin/python3.4 manage.py runserver $HUBIP:80
 
 EOO
 

@@ -12,10 +12,10 @@ case $VERB in
       --hostname $PROJECT-nginx \
       --net $PROJECT-net \
       --ip $NGINXIP \
-      -p 96:80\
+      -p 80:80\
       -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
-      nginx
+      nginx 
       
     echo "
 server {
@@ -29,7 +29,7 @@ server {
   }
 
   location /hub {
-    proxy_set_header Host $http_host;
+    proxy_set_header Host \$http_host;
     proxy_pass http://$HUBIP;
   }
 

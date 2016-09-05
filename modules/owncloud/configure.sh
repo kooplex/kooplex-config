@@ -38,15 +38,13 @@ LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
 ./occ ldap:set-config \$LDAP_ID ldapExpertUsernameAttr "uid"
 ./occ ldap:set-config \$LDAP_ID ldapConfigurationActive 1
 
-#export OC_PASS="almafa137"; ./occ user:add --password-from-env --display-name owncloud-admin owncloud-admin --group="admin"
-#./occ user:enable owncloud-admin
-
 ./occ app:enable files_external
 export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
 export MOUNTID=\`echo \${dum#*with id}\`
 ./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
 
-perl -pi -e "s/localhost'/$DOMAIN',1 => '$NGINXIP',/g" config/config.php
+perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP'/g" config/config.php
+#perl -pi -e "s/url' => 'localhost'/url' => '$DOMAIN',1 => '$NGINXIP'/g" config/config.php
 
 chown www-data config/config.php
 
