@@ -6,6 +6,10 @@ case $VERB in
   "build")
     echo "Building base image kooplex-hub"
 
+    LDAPPASS=$(getsecret ldap)
+    GITLABPASS=$(getsecret gitlab)
+    SSHKEYPASS=$(getsecret sshkey)
+
 cat << EOO > Runserver.sh
 
 cd /kooplexhub/kooplexhub/
@@ -26,7 +30,7 @@ fi
 
 v=\`echo "use $PROJECTDB; show tables" | mysql -u root --password=$MYSQLPASS -h $PROJECT-mysql | wc| awk '{print \$1}'\`
 if [ !  "\$v" -gt "10" ]; then
-        cd /kooplexhub/kooplexhub/; python3 manage.py migrate
+        cd /kooplexhub/kooplexhub/; python3 manage.py migrate; cd /
 fi
 
 exec "\$@"
@@ -344,7 +348,7 @@ echo $HUBIP
 
   ;;
   "start")
-
+    echo "Starting hub $PROJECT-hub [$HUBIP]"
  v=`docker $DOCKERARGS exec $PROJECT-mysql \
   bash -c "echo \"show databases\" | mysql -u root --password=$MYSQLPASS | grep $PROJECTDB"`
  if [ ! $v == "$PROJECTDB" ]; then

@@ -33,7 +33,10 @@ server {
     proxy_pass http://$HUBIP;
   }
 
-
+  location /static/ {
+    proxy_set_header Host \$http_host;
+    proxy_pass http://$HUBIP/static/;
+  }
 
   location /notebook {
     proxy_set_header      Host \$http_host;
