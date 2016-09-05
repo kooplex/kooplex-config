@@ -33,7 +33,7 @@ server {
   }
 
   location / {
-    rewrite ^/.* http://$server_name/hub permanent;
+    rewrite ^/.* http://$DOMAIN/hub permanent;
   }
 
   location /static/ {
