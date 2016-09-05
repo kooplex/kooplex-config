@@ -32,6 +32,10 @@ server {
     proxy_pass http://$HUBIP;
   }
 
+  location / {
+    rewrite ^/.* http://$server_name/hub permanent;
+  }
+
   location /static/ {
     proxy_set_header Host \$http_host;
     proxy_pass http://$HUBIP/static/;
