@@ -15,6 +15,9 @@ ENV DJANGO_VERSION 1.9
 RUN pip3 install setuptools
 RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"
 
+# It is very important that the following command 'git clone...' cannot be cached
+# (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
+ARG CACHE_DATE=2016-01-01
 RUN cd /opt
 RUN git clone https://github.com/kooplex/kooplex-hub.git
 RUN mv kooplex-hub kooplexhub

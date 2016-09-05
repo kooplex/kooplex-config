@@ -117,7 +117,7 @@ KOOPLEX = {
         'base_url': 'http://%s/gitlab/' % KOOPLEX_EXTERNAL_HOST,
         'base_repourl': 'http://$GITLABIP',
         'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
-        'ssh_host': '$DOMAIN',
+        'ssh_host': '$PROJECT-gitlab',
         'ssh_port': 22,
         'admin_username': 'gitlabadmin',
         'admin_password': '$GITLABPASS',
@@ -334,7 +334,8 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 EOF
 
-    docker $DOCKERARGS build -t kooplex-hub .
+    DATE=$(date +%y-%m-%d)
+    docker $DOCKERARGS build -t kooplex-hub --build-arg CACHE_DATE=$DATE .
 
   ;;
   "install")
@@ -346,7 +347,7 @@ echo $HUBIP
       --net $PROJECT-net \
       --ip $HUBIP \
       --privileged \
-      -v $SRV/home:/home \
+      -v $SRV/home:$SRV/home \
             kooplex-hub
 
   ;;
@@ -370,8 +371,8 @@ echo $HUBIP
     
   ;;
   "init")
-
-    
+    echo "Initializing $PROJECT-hub [$HUBIP]"
+    docker $DOCKERARGS exec $PROJECT-hub bash -c "mkdir ~/.ssh; ssh-keyscan -H $PROJECT-gitlab >> ~/.ssh/known_hosts"
   ;;
  "stop")
     echo "Stopping hub $PROJECT-hub [$HUBIP]"
