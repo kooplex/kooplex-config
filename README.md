@@ -30,6 +30,18 @@ Manual install steps
 * start
 * init
 
+Recommended :)  Install sequence is the following:
+
+* sudo bash kooplex.sh build 
+* sudo bash kooplex.sh install
+* sudo bash kooplex.sh start
+* sudo bash kooplex.sh init
+* sudo bash kooplex.sh build hub
+* sudo bash kooplex.sh install hub
+* sudo bash kooplex.sh start hub
+* sudo bash kooplex.sh init hub
+
+
 ## Proxy configuration
 
 * add following lines to configuration file _default_ of nginx _host_ 

@@ -1,5 +1,5 @@
 SYSMODULES="net base" # admin"
-MODULES="ldap home gitlab notebook proxy nginx dashboard"
+MODULES="ldap home gitlab notebook proxy nginx mysql " # hub dashboard"
 
 DOCKERARGS=""
 PROJECT="compare"
