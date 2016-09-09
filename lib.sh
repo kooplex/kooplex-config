@@ -358,6 +358,16 @@ adduser() {
   # Create home directory
   mkdir -p $SRV/home/$username
   
+  # Create Data directory which can be accessed through ownCloud
+  PATH_OWNCLOUD=$SRV/ownCloud
+  if [ ! -d $PATH_OWNCLOUD ]; then
+     mkdir -p $PATH_OWNCLOUD/
+  fi
+  mkdir -p $PATH_OWNCLOUD/$username/
+  mkdir -p $PATH_OWNCLOUD/$username/files/
+  chown -R $uid:$uid $PATH_OWNCLOUD/$username/
+  ln -s $PATH_OWNCLOUD/$username/files/ $SRV/home/$username/Data
+  
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
   mkdir -p $SRV/home/$username/.ssh

@@ -38,12 +38,12 @@ LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
 ./occ ldap:set-config \$LDAP_ID ldapExpertUsernameAttr "uid"
 ./occ ldap:set-config \$LDAP_ID ldapConfigurationActive 1
 
-./occ app:enable files_external
-export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
-export MOUNTID=\`echo \${dum#*with id}\`
-./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
+#./occ app:enable files_external
+#export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
+#export MOUNTID=\`echo \${dum#*with id}\`
+#./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
 
-perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP'/g" config/config.php
+perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
 #perl -pi -e "s/url' => 'localhost'/url' => '$DOMAIN',1 => '$NGINXIP'/g" config/config.php
 
 chown www-data config/config.php
@@ -56,6 +56,15 @@ EOF
   ;;
   "install")
     echo "Installing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+
+    if [ ! -d $SRV/ownCloud/ ]; then 
+      echo "OwnCloud database needs to be created!"; 
+      mkdir -p $SRV/ownCloud/;
+    else
+      echo "OwnCloud database exists!";
+    fi
+    
+    echo "OwnCloud database is in $SRV/ownCloud/";
     
     # Create owncloud container. We need to setup ldap as well
     docker $DOCKERARGS create \
@@ -63,7 +72,7 @@ EOF
       --hostname $PROJECT-owncloud \
       --net $PROJECT-net \
       --ip $OWNCLOUDIP \
-      -v $SRV/home/:/home \
+      -v $SRV/ownCloud/:/var/www/html/data \
       --privileged \
             kooplex-owncloud
 #       owncloud
