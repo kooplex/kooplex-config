@@ -41,7 +41,7 @@ case $VERB in
 
   ;;
   "purge")
-  umount $SRV 
+  #umount $SRV 
   echo "Check if $SRV is still mounted! Then run: ' rm -f $DISKIMG/kooplexfs.img '" 
   #rm -f $DISKIMG/kooplexfs.img 
 
