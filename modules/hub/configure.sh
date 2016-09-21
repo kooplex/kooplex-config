@@ -13,6 +13,7 @@ case $VERB in
 cat << EOO > Runserver.sh
 
 cd /kooplexhub/kooplexhub/
+git pull
 /usr/bin/python3 manage.py runserver $HUBIP:80
 
 EOO
@@ -348,6 +349,7 @@ echo $HUBIP
       --ip $HUBIP \
       --privileged \
       -v $SRV/home:$SRV/home \
+      -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
 
   ;;
