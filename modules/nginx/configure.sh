@@ -33,7 +33,7 @@ server {
   }
 
   location / {
-    rewrite ^/.* http://$DOMAIN/hub permanent;
+    rewrite / http://$DOMAIN/hub permanent;
   }
 
   location /static/ {
@@ -56,8 +56,24 @@ server {
   }
 
   location /owncloud {
-    proxy_set_header Host \$http_host;
-    proxy_pass http://$OWNCLOUDIP;
+    proxy_pass http://$OWNCLOUDIP/;
+    proxy_set_header Accept-Encoding \"\";
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    client_max_body_size 1024M;
+    proxy_read_timeout 600s;
+    proxy_send_timeout 600s;
+    proxy_connect_timeout 600s;
+    rewrite ^/owncloud/caldav /owncloud/remote.php/caldav redirect;
+    rewrite ^/owncloud/carddav /owncloud/remote.php/carddav redirect;
+    rewrite ^/owncloud/webdav /owncloud/remote.php/webdav redirect;
+    rewrite ^/.well-known/carddav /remote.php/carddav/ redirect;
+    rewrite ^/.well-known/caldav /remote.php/caldav/ redirect;
+    rewrite ^(/core/doc/[^\/]+/)$ \$1/index.html;
+    rewrite ^/owncloud/(.*) /\$1 break;
+
   }
 }
 " > $SRV/nginx/etc/sites.conf

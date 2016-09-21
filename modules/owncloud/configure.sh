@@ -43,8 +43,20 @@ LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
 #export MOUNTID=\`echo \${dum#*with id}\`
 #./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
 
-perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
-#perl -pi -e "s/url' => 'localhost'/url' => '$DOMAIN',1 => '$NGINXIP'/g" config/config.php
+./occ config:system:set 'overwritewebroot' --value '/owncloud'
+./occ config:system:set 'overwrite.cli.url' --value  '$OWNCLOUDIP'
+
+#perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
+
+./occ config:system:set trusted_domains 0 --value  'localhost'
+./occ config:system:set trusted_domains 1 --value  'lucan.elte.hu'
+./occ config:system:set trusted_domains 2 --value  '$OWNCLOUDIP'
+./occ config:system:set trusted_domains 3 --value  '$NGINXIP'
+
+./occ config:system:set 'trusted_proxies' --value "[$OWNCLOUDIP,$NGINXIP]"
+./occ config:system:set 'overwritehost' --value '$DOMAIN'
+
+rm -r core/skeleton/Photos/ core/skeleton/Documents/
 
 chown www-data config/config.php
 
