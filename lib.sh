@@ -365,7 +365,7 @@ adduser() {
   fi
   mkdir -p $PATH_OWNCLOUD/$username/
   mkdir -p $PATH_OWNCLOUD/$username/files/
-  chown -R $uid:$uid $PATH_OWNCLOUD/$username/
+  chown -R www-data:www-data $PATH_OWNCLOUD/$username/
   ln -s $PATH_OWNCLOUD/$username/files/ $SRV/home/$username/Data
   
   # Generate git private key
