@@ -4,7 +4,7 @@ case $VERB in
   "build")
     echo "Building mysql $PROJECT-mysql [$MYSQLIP]"
     
-    mkdir $SRV/mysql
+    mkdir -p $SRV/mysql
     docker $DOCKERARGS pull mysql:5.7
   
   ;;
