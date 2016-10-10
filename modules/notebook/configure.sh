@@ -24,7 +24,8 @@ service nslcd start
     # Start jupyter
     echo "#/bin/sh
 echo \"Starting notebook for \$NB_USER...\"
-cd /home/\$NB_USER
+#cd /home/\$NB_USER
+cd /\$NB_USER
 . start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
       > $SRV/notebook/init/1.sh
     

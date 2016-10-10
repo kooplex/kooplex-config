@@ -101,6 +101,9 @@ KOOPLEX_BASE_URL = 'http://' + KOOPLEX_EXTERNAL_HOST
 KOOPLEX_HUB_PREFIX = 'hub'
 
 KOOPLEX = {
+    'project':{
+        'name': '$PROJECT',
+    },
     'hub': {
     },
     'users': {
@@ -130,7 +133,7 @@ KOOPLEX = {
         'network': '$PROJECT-net',
     },
     'spawner': {
-        'notebook_container_name': '$PROJECT-notebook-{\$username}',
+        'notebook_container_name': '$PROJECT-notebook-{\$username}-{\$project_name}',
         'notebook_ip_pool': ['$IPPOOLB', '$IPPOOLE'],
         'srv_path': '$SRV'
     },
@@ -374,7 +377,7 @@ echo $HUBIP
   ;;
   "init")
     echo "Initializing $PROJECT-hub [$HUBIP]"
-    docker $DOCKERARGS exec $PROJECT-hub bash -c "mkdir ~/.ssh; ssh-keyscan -H $PROJECT-gitlab >> ~/.ssh/known_hosts"
+    docker $DOCKERARGS exec $PROJECT-hub bash -c "mkdir -p ~/.ssh; ssh-keyscan -H $PROJECT-gitlab >> ~/.ssh/known_hosts"
   ;;
  "stop")
     echo "Stopping hub $PROJECT-hub [$HUBIP]"

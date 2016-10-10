@@ -110,7 +110,7 @@ EOF
   ;;
   "purge")
     echo "Purging owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
-    #docker $DOCKERARGS rmi kooplex-owncloud
+	rm -R -f $SRV/ownCloud
   ;;
   "clean")
     echo "Cleaning base image kooplex-owncloud"
