@@ -5,6 +5,15 @@ case $VERB in
     echo "Building image kooplex-notebook"
     
     docker $DOCKERARGS build -t kooplex-notebook .
+    
+    # mkdir -p $SRV/notebook/images
+    # cp Dockerfile.* $SRV/notebook/images
+    # for dofile in $SRV/notebook/images/Dockerfile.*
+    # do
+    # 	doname=${dofile}
+    #   docker $DOCKERARGS build -f $dofile -t kooplex-notebook-$doname .
+    # done
+    
   ;;
   "install")
     echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
@@ -25,7 +34,8 @@ service nslcd start
     echo "#/bin/sh
 echo \"Starting notebook for \$NB_USER...\"
 #cd /home/\$NB_USER
-cd /\$NB_USER
+#cd /\$NB_USER
+cd /home
 . start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
       > $SRV/notebook/init/1.sh
     

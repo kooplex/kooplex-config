@@ -122,6 +122,12 @@ ldap_add() {
   printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
 }
 
+ldap_del() {
+  local ldappass=$(getsecret ldap)
+  echo $LDAPORG
+  printf "uid=%s,ou=users,$LDAPORG " "$1" | ldapdelete -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass" -v 
+}
+
 ldap_nextuid() {
 
   local ldappass=$(getsecret ldap)
@@ -244,6 +250,17 @@ i.save!
 "
 }
 
+gitlab_deluser() {
+  local username=$1
+
+  echo "Deleting Gitlab user $username..."
+  
+  gitlab_exec "
+  u = User.find_by_username(\"$username\") 
+  u.destroy
+"
+}
+
 gitlab_resetpass() {
   local username=$1
   local pass=$2
@@ -358,15 +375,7 @@ adduser() {
   # Create home directory
   mkdir -p $SRV/home/$username
   
-  # Create Data directory which can be accessed through ownCloud
-  PATH_OWNCLOUD=$SRV/ownCloud
-  if [ ! -d $PATH_OWNCLOUD ]; then
-     mkdir -p $PATH_OWNCLOUD/
-  fi
-  mkdir -p $PATH_OWNCLOUD/$username/
-  mkdir -p $PATH_OWNCLOUD/$username/files/
-  chown -R www-data:www-data $PATH_OWNCLOUD/$username/
-  ln -s $PATH_OWNCLOUD/$username/files/ $SRV/home/$username/Data
+
   
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
@@ -384,6 +393,16 @@ adduser() {
 
   # Set user quota
   setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
+  
+    # Create Data directory which can be accessed through ownCloud
+  PATH_OWNCLOUD=$SRV/ownCloud
+  if [ ! -d $PATH_OWNCLOUD ]; then
+     mkdir -p $PATH_OWNCLOUD/
+  fi
+  mkdir -p $PATH_OWNCLOUD/$username/
+  mkdir -p $PATH_OWNCLOUD/$username/files/
+  chown -R www-data:www-data $PATH_OWNCLOUD/$username/
+#  ln -s $PATH_OWNCLOUD/$username/files/ $SRV/home/$username/Data
 
   echo "New user created: $uid $username"
 }
@@ -397,9 +416,13 @@ modifyuser() {
 
 deleteuser() {
   # TODO: implement
+  local username=$1
+  
+  echo "Deleting LDAP user ($username)..."
 
-  echo Not implemented >&2
-  exit 2
+  ldap_del $username 
+  gitlab_deluser $username
+  rm -r $SRV/home/$username/
 }
 
 resetpass() {

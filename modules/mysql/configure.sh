@@ -24,6 +24,7 @@ case $VERB in
   ;;
   "start")
     echo "Starting mysql $PROJECT-mysql [$MYSQLIP]"
+    echo "AT RESTART THERE MIGHT BE PROBLEMS!!!!"
     docker $DOCKERARGS start $PROJECT-mysql
   ;;
   "init")

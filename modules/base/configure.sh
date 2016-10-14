@@ -20,10 +20,10 @@ case $VERB in
       mkdir -p $SRV
       mount $DISKIMG/kooplexfs.img $SRV -t auto -o usrquota,grpquota,acl,loop=$LOOPNO
 
-     mkdir -p $SECRETS
+
   fi
     
-    
+     mkdir -p $SECRETS
      quotacheck -cuvg $SRV
      quotaon -vu $SRV
      quotaon -vg $SRV
@@ -52,7 +52,7 @@ case $VERB in
   quotaoff -vu $SRV
   quotaoff -vg $SRV
   rm -f $SRV/aquota.*
-
+  rm -r $SRV/.secrets
   ;;
   "clean")
     echo "Cleaning base image kooplex-base"
