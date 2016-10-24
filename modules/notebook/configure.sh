@@ -2,16 +2,16 @@
 
 case $VERB in
   "build")
-    echo "Building image kooplex-notebook"
+    echo "Building image $PREFIX-notebook"
     
-    docker $DOCKERARGS build -t kooplex-notebook .
+    docker $DOCKERARGS build -t $PREFIX-notebook .
     
     # mkdir -p $SRV/notebook/images
     # cp Dockerfile.* $SRV/notebook/images
     # for dofile in $SRV/notebook/images/Dockerfile.*
     # do
     # 	doname=${dofile}
-    #   docker $DOCKERARGS build -f $dofile -t kooplex-notebook-$doname .
+    #   docker $DOCKERARGS build -f $dofile -t $PREFIX-notebook-$doname .
     # done
     
   ;;
@@ -57,7 +57,7 @@ cd /home
       -e NB_GID=10002 \
       -e NB_URL=/notebook/test/ \
       -e NB_PORT=8000 \
-      kooplex-notebook
+      $PREFIX-notebook
   ;;
   "start")
     # TODO: we have a single notebook server now, perhaps there will
@@ -81,7 +81,7 @@ cd /home
     rm -R $SRV/notebook
   ;;
   "clean")
-    echo "Cleaning base image kooplex-notebook"
-    docker $DOCKERARGS rmi kooplex-notebook
+    echo "Cleaning base image $PREFIX-notebook"
+    docker $DOCKERARGS rmi $PREFIX-notebook
   ;;
 esac

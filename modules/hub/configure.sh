@@ -101,8 +101,8 @@ KOOPLEX_BASE_URL = 'http://' + KOOPLEX_EXTERNAL_HOST
 KOOPLEX_HUB_PREFIX = 'hub'
 
 KOOPLEX = {
-    'project':{
-        'name': '$PROJECT',
+    'prefix':{
+        'name': '$PREFIX',
     },
     'hub': {
     },

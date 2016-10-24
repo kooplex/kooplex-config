@@ -4,21 +4,21 @@ case $VERB in
   "build")
     echo "Building base image kooplex-base"
 
-  if [ -e $DISKIMG/kooplexfs.img ]; then
-   echo "WARNING $DISKIMG/kooplexfs.img exists!!"
+  if [ -e $DISKIMG/$PROJECT"fs.img" ]; then
+   echo WARNING $DISKIMG/$PROJECT"fs.img exists!!"
    echo "If you want to remove it, please, use remove and purge for complete removal"
   else
     mkdir -p $DISKIMG
     cnt=`echo $DISKSIZE_GB | awk '{print $1*1000}'`
-    dd if=/dev/zero of=$DISKIMG/kooplexfs.img bs=1M count=$cnt
-    mkfs -t ext4 $DISKIMG/kooplexfs.img
+    dd if=/dev/zero of=$DISKIMG/$PROJECT"fs.img" bs=1M count=$cnt
+    mkfs -t ext4 $DISKIMG/$PROJECT"fs.img"
   fi
   
   if grep -qs "$SRV" /proc/mounts; then
-    echo "$DISKIMG/kooplexfs.img is already mounted to $SRV"  
+    echo $DISKIMG/$PROJECT"fs.img is already mounted to $SRV"  
   else
       mkdir -p $SRV
-      mount $DISKIMG/kooplexfs.img $SRV -t auto -o usrquota,grpquota,acl,loop=$LOOPNO
+      mount $DISKIMG/$PROJECT"fs.img" $SRV -t auto -o usrquota,grpquota,acl,loop=$LOOPNO
 
 
   fi
@@ -57,8 +57,8 @@ case $VERB in
   "clean")
     echo "Cleaning base image kooplex-base"
     #umount $SRV 
-    echo "Check if $SRV is still mounted! Then run: ' rm -f $DISKIMG/kooplexfs.img '" 
-    #rm -f $DISKIMG/kooplexfs.img 
+    echo "Check if $SRV is still mounted! Then run: ' rm -f "$DISKIMG/$PROJECT"fs.img '" 
+    #rm -f $DISKIMG/$PROJECT"fs.img" 
     docker $DOCKERARGS rmi kooplex-base
   ;;
 esac
