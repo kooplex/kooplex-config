@@ -1,9 +1,10 @@
 SYSMODULES="net base" # admin"
 MODULES="ldap home gitlab notebook proxy nginx mysql " # hub dashboard"
 
+PREFIX="kooplex"
 DOCKERARGS=""
 PROJECT="compare"
-ROOT="/srv/kooplex"
+ROOT="/srv/"$PREFIX
 DISKIMG="/var/diskimg"
 DISKSIZE_GB="100"
 LOOPNO="/dev/loop3"
