@@ -4,15 +4,16 @@ case $VERB in
   "build")
     echo "Building image $PREFIX-notebook"
     
-    docker $DOCKERARGS build -t $PREFIX-notebook .
+#    docker $DOCKERARGS build -t $PREFIX-notebook .
     
-    # mkdir -p $SRV/notebook/images
-    # cp Dockerfile.* $SRV/notebook/images
-    # for dofile in $SRV/notebook/images/Dockerfile.*
-    # do
-    # 	doname=${dofile}
-    #   docker $DOCKERARGS build -f $dofile -t $PREFIX-notebook-$doname .
-    # done
+     mkdir -p $SRV/notebook/images
+     cp Dockerfile* start-*.sh $SRV/notebook/images/
+     for dofile in $SRV/notebook/images/Dockerfile*
+     do
+     	doname=`basename $dofile`
+     	echo ${doname#*-}
+        docker $DOCKERARGS build -f $dofile -t $PREFIX-notebook-${doname#*-} `dirname $dofile`
+     done
     
   ;;
   "install")
