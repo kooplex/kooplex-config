@@ -92,6 +92,10 @@ EOS
     echo "Removing gitlab $PROJECT-gitlab [$GITLABIP]"
     docker $DOCKERARGS rm $PROJECT-gitlab
   ;;
+    "clean")
+    echo "Removing gitlab image gitlab/gitlab-ce"
+    docker $DOCKERARGS rmi gitlab/gitlab-ce
+  ;;
   "purge")
     echo "Purging gitlab $PROJECT-gitlab [$GITLABIP]"
     rm -R $SRV/gitlab
