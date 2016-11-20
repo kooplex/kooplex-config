@@ -24,9 +24,10 @@ case $VERB in
   fi
     
      mkdir -p $SECRETS
-     quotacheck -cuvg $SRV
-     quotaon -vu $SRV
-     quotaon -vg $SRV
+     if [ ! `quotacheck -cuvgf $SRV` ]; then
+       quotaon -vu $SRV
+       quotaon -vg $SRV
+     fi
     
    
     docker $DOCKERARGS build -t kooplex-base  .

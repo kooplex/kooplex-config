@@ -395,6 +395,7 @@ adduser() {
   setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
   
     # Create Data directory which can be accessed through ownCloud
+  echo "Initializing OwnCloud folders for  $uid $username"
   PATH_OWNCLOUD=$SRV/ownCloud
   if [ ! -d $PATH_OWNCLOUD ]; then
      mkdir -p $PATH_OWNCLOUD/
@@ -402,7 +403,11 @@ adduser() {
   mkdir -p $PATH_OWNCLOUD/$username/
   mkdir -p $PATH_OWNCLOUD/$username/files/
   chown -R www-data:www-data $PATH_OWNCLOUD/$username/
-#  ln -s $PATH_OWNCLOUD/$username/files/ $SRV/home/$username/Data
+  mkdir -p $SRV/home/$username/Data
+  chown -R www-data:www-data  $SRV/home/$username/Data
+  sleep 10
+  docker $DOCKERARGS exec $PROJECT-owncloud bash -c "cd /var/www/html/;chown root console.php config/config.php; php ./console.php files:scan --unscanned --all; chown www-data console.php config/config.php"
+
 
   echo "New user created: $uid $username"
 }
