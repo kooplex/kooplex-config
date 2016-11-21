@@ -3,17 +3,42 @@
 case $VERB in
   "build")
     echo "Building image $PREFIX-notebook"
+
+    cat << EOD > watch_owncloud_folder.sh
+USER=tmp_twouser
+DIR=/home/\$NB_USER/\$USER
+TARGET=http://compare.vo.elte.hu/owncloud/remote.php/webdav/
+
+mkdir -p \$DIR
+
+inotifywait -m \$DIR  -e create -e moved_to --exclude ".csync_journal.db"|
+while read path action file; do
+        echo "The file '\$file' appeared in directory '\$path' via '\$action'"
+       # do something with the file
+#        owncloudcmd --user \$NB_USER --password almafa137 \$DIR \$TARGET
+        owncloudcmd --user \USER  --password almafa137 \$DIR \$TARGET
+	sleep 3
+done
+EOD
+    
     
 #    docker $DOCKERARGS build -t $PREFIX-notebook .
     
      mkdir -p $SRV/notebook/images
-     cp Dockerfile* start-*.sh $SRV/notebook/images/
-     for dofile in $SRV/notebook/images/Dockerfile*
+#     rm image-*/Dockerfile*~
+     cp -r image-* $SRV/notebook/images/
+     for imagedir in $SRV/notebook/images/image-*
      do
-     	doname=`basename $dofile`
-     	echo ${doname#*-}
-        docker $DOCKERARGS build -f $dofile -t $PREFIX-notebook-${doname#*-} `dirname $dofile`
+       cd $imagedir
+        docfile="Dockerfile-"${imagedir#*-}
+#     	doname=`basename $dofile`
+     	echo $docfile
+        docker $DOCKERARGS build -f $docfile -t $PREFIX-notebook-${docfile#*-}  .
+       cd ..
      done
+
+#http://polc.elte.hu/owncloud/remote.php/webdav /home/jeges6/own davfs user,rw,auto 0 0
+#usermod -aG davfs2 jeges6
     
   ;;
   "install")

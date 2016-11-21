@@ -39,6 +39,7 @@ RUN pip install 'jupyter_dashboards' && \
     jupyter-nbextension enable jupyter_dashboards --py
 
 # Add local files as late as possible to avoid cache busting
-ADD start-notebook.sh /usr/local/bin/start-notebook.sh
-ADD start-singleuser.sh /usr/local/bin/start-singleuser.sh
+#ADD watch_owncloud_folder.sh /watch_owncloud_folder.sh
+ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
+ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
 

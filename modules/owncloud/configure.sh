@@ -38,10 +38,10 @@ LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
 ./occ ldap:set-config \$LDAP_ID ldapExpertUsernameAttr "uid"
 ./occ ldap:set-config \$LDAP_ID ldapConfigurationActive 1
 
-#./occ app:enable files_external
-#export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
-#export MOUNTID=\`echo \${dum#*with id}\`
-#./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
+./occ app:enable files_external
+export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
+export MOUNTID=\`echo \${dum#*with id}\`
+./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
 
 ./occ config:system:set 'overwritewebroot' --value '/owncloud'
 ./occ config:system:set 'overwrite.cli.url' --value  '$OWNCLOUDIP'
@@ -85,6 +85,7 @@ EOF
       --net $PROJECT-net \
       --ip $OWNCLOUDIP \
       -v $SRV/ownCloud/:/var/www/html/data \
+      -v $SRV/home/:/home \
       --privileged \
             kooplex-owncloud
 #       owncloud
