@@ -29,12 +29,10 @@ EOD
      cp -r image-* $SRV/notebook/images/
      for imagedir in $SRV/notebook/images/image-*
      do
-       cd $imagedir
-        docfile="Dockerfile-"${imagedir#*-}
-#     	doname=`basename $dofile`
-     	echo $docfile
-        docker $DOCKERARGS build -f $docfile -t $PREFIX-notebook-${docfile#*-}  .
-       cd ..
+        docfile=$imagedir"/Dockerfile-"${imagedir#*image-}
+     	echo $docfile $imagedir
+        docker $DOCKERARGS build -f $docfile -t $PREFIX-notebook-${docfile#*Dockerfile-} $imagedir
+       
      done
 
 #http://polc.elte.hu/owncloud/remote.php/webdav /home/jeges6/own davfs user,rw,auto 0 0
