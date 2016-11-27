@@ -145,6 +145,9 @@ KOOPLEX = {
     },
     'owncloud': {
         'base_url': 'http://%s/owncloud/' % KOOPLEX_EXTERNAL_HOST,
+    },
+    'dashboards': {
+        'base_url': 'http://%s/' % KOOPLEX_EXTERNAL_HOST,
     }
 }
 

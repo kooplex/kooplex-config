@@ -2,9 +2,15 @@
 
 case $VERB in
   "build")
-    echo "Building $PROJECT-dashboard images"
+  
+    mkdir -p $SRV/dashboards
+    
+    echo "Building $PROJECT-dashboards images"
     echo  "COMPOSE_PROJECT_NAME=$PROJECT" > .env
     echo  "PROJECT_NETWORK=$PROJECT-net" >> .env
+    echo  "HOST_DASHBOARDS_VOLUME=/srv/kooplex/compare/dashboards" >> .env
+    echo  "PUBLIC_LINK_PATTERN=http://$DOMAIN:3000" >> .env
+
     docker-compose $DOCKERARGS build
   ;;
   "install")

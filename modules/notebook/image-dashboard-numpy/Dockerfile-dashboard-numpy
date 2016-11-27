@@ -87,8 +87,8 @@ RUN pip install "jupyter_dashboards_bundlers" && \
 #RUN wget -O $HOME/work/hello_world.ipynb https://gist.githubusercontent.com/parente/bd6789c4a3533fab8085/raw/c5a8e9be2213650332889178b15cf899a844694f/hello_world.ipynb
 #RUN wget -O $HOME/work/meetup-streaming.ipynb https://raw.githubusercontent.com/jupyter-incubator/dashboards/master/etc/notebooks/stream_demo/meetup-streaming.ipynb
 
-#ENV DASHBOARD_SERVER_URL http://compare.vo.elte.hu:3000/
-#ENV PASSWORD  almafa137
+RUN pip install matplotlib
+
 
 # Stay as jovyan in the newer docker stack images
 # Add local files as late as possible to avoid cache busting

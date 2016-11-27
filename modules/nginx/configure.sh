@@ -33,18 +33,27 @@ server {
   }
 
   location / {
-    rewrite / http://$DOMAIN/hub permanent;
+    rewrite / http://$PROJECT-hub/hub permanent;
   }
 
   location /static/ {
     proxy_set_header Host \$http_host;
-    proxy_pass http://$HUBIP/static/;
+    proxy_pass http://$PROJECT-hub/static/;
   }
 
   location /notebook {
     proxy_set_header      Host \$http_host;
     proxy_pass            http://$PROXYIP:8000;
   }
+
+#DASHBOARD SERVER
+#  location ^~ /notebook/[^/]+/[^/]+/api/bundlers/dashboards_server_upload/? {
+  location /notebook/gitlabadmin/07f159b4-99d4-47f9-9c91-d8654f3c70dc/api/bundlers/dashboards_server_upload/ {
+    proxy_set_header      Host \$http_host;
+    proxy_pass http://$DASHBOARDSIP:3000/;
+  }
+
+
   
   location ~* /notebook/[^/]+/[^/]+/(api/kernels/[^/]+/(channels|iopub|shell|stdin)|terminals/websocket)/? {
     proxy_pass            http://$PROXYIP:8000;
@@ -76,11 +85,30 @@ server {
 
   }
 }
+  
+  #DASHBOARD SERVER
+  server {
+  listen 3000;
+  server_name $DOMAIN;
+  client_max_body_size 20M;
+
+  location / {
+    proxy_set_header      Host \$http_host;
+    proxy_pass            http://$DASHBOARDSIP:3000;
+  }
+
+}
+
 " > $SRV/nginx/etc/sites.conf
 
   ;;
   "start")
     echo "Starting nginx $PROJECT-nginx [$NGINXIP]"
+    docker $DOCKERARGS start $PROJECT-nginx
+  ;;
+  "restart")
+    echo "Restarting nginx $PROJECT-nginx [$NGINXIP]"
+    docker $DOCKERARGS stop $PROJECT-nginx
     docker $DOCKERARGS start $PROJECT-nginx
   ;;
   "init")

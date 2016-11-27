@@ -1,8 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 FROM jupyter/pyspark-notebook:8015c88c4b11
 
+USER root
 RUN pip install jupyter_kernel_gateway==0.5.1
 
 ARG IPYWIDGETS_VER
@@ -12,6 +16,22 @@ RUN pip install "ipywidgets==$IPYWIDGETS_VER"
 # don't bother activating the extension, not needed outside notebook
 ARG DECLWIDGETS_VER
 RUN pip install "jupyter_declarativewidgets==$DECLWIDGETS_VER"
+
+RUN pip install pandas numpy scipy matplotlib seaborn plotly igraph
+
+
+RUN apt update
+RUN apt install -y python3-pip
+RUN pip install --upgrade pip
+RUN apt install -y liblapack-dev libblas-dev
+RUN pip3 install pandas 
+RUN pip3 install numpy 
+RUN apt install -y gfortran
+RUN pip3 install scipy 
+RUN apt install -y libfreetype6* pkg-config
+RUN pip3 install matplotlib 
+RUN pip3 install seaborn plotly igraph bokeh lifelines python-igraph
+RUN pip install bokeh lifelines python-igraph
 
 # run kernel gateway, not notebook server
 CMD ["jupyter", "kernelgateway", "--KernelGatewayApp.ip=0.0.0.0"]
