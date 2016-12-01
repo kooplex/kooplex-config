@@ -37,7 +37,7 @@ Recommended :)  Install sequence is the following:
 * sudo bash kooplex.sh start
 * sudo bash kooplex.sh init
 * sudo bash kooplex.sh build hub
-* sudo bash kooplex.sh install hub
+* sudo bash kooplex.sh install hub (after that only use "refresh hub"
 * sudo bash kooplex.sh start hub
 * sudo bash kooplex.sh init hub
 
