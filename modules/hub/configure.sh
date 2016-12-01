@@ -383,6 +383,10 @@ echo $HUBIP
     echo "Initializing $PROJECT-hub [$HUBIP]"
     docker $DOCKERARGS exec $PROJECT-hub bash -c "mkdir -p ~/.ssh; ssh-keyscan -H $PROJECT-gitlab >> ~/.ssh/known_hosts"
   ;;
+  "refresh")
+    echo "Pulling into hub"
+     docker $DOCKERARGS exec $PROJECT-hub bash -c "cd /kooplexhub; git pull;"
+  ;;
  "stop")
     echo "Stopping hub $PROJECT-hub [$HUBIP]"
     docker $DOCKERARGS stop $PROJECT-hub
