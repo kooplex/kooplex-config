@@ -69,6 +69,17 @@ server {
         proxy_set_header      Upgrade $http_upgrade;
         proxy_set_header      Connection $connection_upgrade;
     }
+    
+    #In chrome the kernel stays busy, but if...
+    location ~* /(api/sessions)/? {
+        proxy_pass http://$NGINXIP;
+        proxy_set_header      Host $host;
+        # websocket support
+        proxy_http_version    1.1;
+        proxy_set_header      Upgrade $http_upgrade;
+        proxy_set_header      Connection $connection_upgrade;
+    }
+
 }
 ```
 
