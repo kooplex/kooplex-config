@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CONFIGDIR=$PWD
+
 . ./lib.sh
 
 VERB=$(getverb "$@")
@@ -31,7 +33,7 @@ for svc in $SVCS
 do
   cd modules/$svc
   . ./configure.sh
-  cd ../..
+  cd $CONFIGDIR
 done
 
 echo "Finished $VERB."

@@ -148,6 +148,7 @@ KOOPLEX = {
     },
     'dashboards': {
         'base_url': 'http://%s/' % KOOPLEX_EXTERNAL_HOST,
+        'base_dir': '$DASHBOARDSDIR',
     }
 }
 

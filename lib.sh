@@ -484,6 +484,9 @@ config() {
 
   MYSQLPASS=$DUMMYPASS
 
+  DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
+  DASHBOARDSDIR=$SRV"/dashboards"
+  
   DOCKERPORT=${DOCKERARGS##*:}
 
   IPPOOLB=$(ip_addip "$SUBNET" 5121)
