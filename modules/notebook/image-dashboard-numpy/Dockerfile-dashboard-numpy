@@ -89,6 +89,7 @@ RUN pip install "jupyter_dashboards_bundlers" && \
 
 RUN pip install matplotlib
 
+RUN chmod a+rxw $CONDA_DIR
 
 # Stay as jovyan in the newer docker stack images
 # Add local files as late as possible to avoid cache busting
