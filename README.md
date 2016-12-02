@@ -83,6 +83,9 @@ server {
 }
 ```
 
+## IMPORTANT NOTES
+* Check whether all the necessary ports are open (ufw allow etc) e.g. docker port, http port
+
 ## Remove
 
     $ sudo bash kooplex.sh stop all
