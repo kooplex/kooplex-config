@@ -37,7 +37,7 @@ Recommended :)  Install sequence is the following:
 * sudo bash kooplex.sh start
 * sudo bash kooplex.sh init
 * sudo bash kooplex.sh build hub
-* sudo bash kooplex.sh install hub
+* sudo bash kooplex.sh install hub (after that only use "refresh hub"
 * sudo bash kooplex.sh start hub
 * sudo bash kooplex.sh init hub
 
@@ -69,8 +69,22 @@ server {
         proxy_set_header      Upgrade $http_upgrade;
         proxy_set_header      Connection $connection_upgrade;
     }
+    
+    #In chrome the kernel stays busy, but if...
+    location ~* /(api/sessions)/? {
+        proxy_pass http://$NGINXIP;
+        proxy_set_header      Host $host;
+        # websocket support
+        proxy_http_version    1.1;
+        proxy_set_header      Upgrade $http_upgrade;
+        proxy_set_header      Connection $connection_upgrade;
+    }
+
 }
 ```
+
+## IMPORTANT NOTES
+* Check whether all the necessary ports are open (ufw allow etc) e.g. docker port, http port
 
 ## Remove
 

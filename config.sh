@@ -1,6 +1,8 @@
 SYSMODULES="net base" # admin"
 MODULES="ldap home gitlab notebook proxy nginx mysql " # hub dashboard"
 
+OUTERHOST="http://wignercloud.compare-europe.hu"
+
 PREFIX="kooplex"
 DOCKERARGS=""
 PROJECT="compare"
