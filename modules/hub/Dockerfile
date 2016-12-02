@@ -18,8 +18,8 @@ RUN pip3 install ldap3
 
 # It is very important that the following command 'git clone...' cannot be cached
 # (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
-ARG CACHE_DATE=2016-01-01
-RUN cd /opt
+ARG CACHE_DATE=2016-01-02
+RUN cd /opt 
 RUN git clone https://github.com/kooplex/kooplex-hub.git
 RUN mv kooplex-hub kooplexhub
 COPY settings.py /settings.py 

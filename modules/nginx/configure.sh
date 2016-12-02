@@ -33,12 +33,12 @@ server {
   }
 
   location / {
-    rewrite / http://$PROJECT-hub/hub permanent;
+    rewrite / http://$OUTERHOST/hub permanent;
   }
 
   location /static/ {
     proxy_set_header Host \$http_host;
-    proxy_pass http://$PROJECT-hub/static/;
+    proxy_pass http://$HUBIP/static/;
   }
 
   location /notebook {
