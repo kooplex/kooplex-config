@@ -13,6 +13,7 @@ LOOPNO="/dev/loop3"
 USRQUOTA=10G
 SUBNET="172.20.0.0/16"
 DOMAIN="localhost"
+OUTER_DOMAIN="publicfacinghost.com"
 SMTP=mail.elte.hu
 EMAIL=dobos@complex.elte.hu
 DUMMYPASS="almafa137"
