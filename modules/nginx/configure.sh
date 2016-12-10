@@ -19,7 +19,7 @@ case $VERB in
     echo "
 server {
   listen 80;
-  server_name $DOMAIN;
+  server_name $OUTER_DOMAIN;
   client_max_body_size 20M;
   
   location /gitlab {
@@ -33,7 +33,7 @@ server {
   }
 
   location / {
-    rewrite / http://$OUTERHOST/hub permanent;
+    rewrite / http://$OUTER_DOMAIN/hub permanent;
   }
 
   location /static/ {
