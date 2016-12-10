@@ -110,6 +110,9 @@ KOOPLEX = {
         'srv_dir': '$SRV',
         'home_dir': 'home/{\$username}',
     },
+    'session': {
+        'base_url': '%s' %KOOPLEX_BASE_URL,
+    },
     'ldap': {
         'host': '$DOMAIN',
         'port': 666,

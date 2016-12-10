@@ -2,26 +2,8 @@
 
 case $VERB in
   "build")
-    echo "Building image $PREFIX-notebook"
+    echo "Building image $PREFIX-notebooks"
 
-    cat << EOD > watch_owncloud_folder.sh
-USER=tmp_twouser
-DIR=/home/\$NB_USER/\$USER
-TARGET=http://compare.vo.elte.hu/owncloud/remote.php/webdav/
-
-mkdir -p \$DIR
-
-inotifywait -m \$DIR  -e create -e moved_to --exclude ".csync_journal.db"|
-while read path action file; do
-        echo "The file '\$file' appeared in directory '\$path' via '\$action'"
-       # do something with the file
-#        owncloudcmd --user \$NB_USER --password almafa137 \$DIR \$TARGET
-        owncloudcmd --user \USER  --password almafa137 \$DIR \$TARGET
-	sleep 3
-done
-EOD
-    
-    
 #    docker $DOCKERARGS build -t $PREFIX-notebook .
     
      mkdir -p $SRV/notebook/images
@@ -66,22 +48,22 @@ cd /home
     # TODO: we create a notebook container here for testing but
     # individual containers will later be created for single
     # users from python. Use python unit tests to create notebook container!
-    docker $DOCKERARGS create \
-      --name $PROJECT-notebook \
-      --hostname $PROJECT-notebook \
-      --net $PROJECT-net \
-      --ip $NOTEBOOKIP \
-      --privileged \
-      $(ldap_makebinds notebook) \
-      $(home_makebinds notebook) \
-      -v $SRV/notebook/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py \
-      -v $SRV/notebook/init:/init \
-      -e NB_USER=test \
-      -e NB_UID=10002 \
-      -e NB_GID=10002 \
-      -e NB_URL=/notebook/test/ \
-      -e NB_PORT=8000 \
-      $PREFIX-notebook
+#    docker $DOCKERARGS create \
+#      --name $PROJECT-notebook \
+#      --hostname $PROJECT-notebook \
+#      --net $PROJECT-net \
+#      --ip $NOTEBOOKIP \
+#      --privileged \
+#      $(ldap_makebinds notebook) \
+#      $(home_makebinds notebook) \
+#      -v $SRV/notebook/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py \
+#      -v $SRV/notebook/init:/init \
+#      -e NB_USER=test \
+#      -e NB_UID=10002 \
+#      -e NB_GID=10002 \
+#      -e NB_URL=/notebook/test/ \
+#      -e NB_PORT=8000 \
+#      $PREFIX-notebook
   ;;
   "start")
     # TODO: we have a single notebook server now, perhaps there will
@@ -94,11 +76,11 @@ cd /home
   ;;
   "stop")
     echo "Stopping notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    docker $DOCKERARGS stop $PROJECT-notebook
+#    docker $DOCKERARGS stop $PROJECT-notebook
   ;;
   "remove")
     echo "Removing notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    docker $DOCKERARGS rm $PROJECT-notebook
+#    docker $DOCKERARGS rm $PROJECT-notebook
   ;;
   "purge")
     echo "Purging notebook $PROJECT-notebook [$NOTEBOOKIP]"
@@ -106,6 +88,7 @@ cd /home
   ;;
   "clean")
     echo "Cleaning base image $PREFIX-notebook"
-    docker $DOCKERARGS rmi $PREFIX-notebook
+#    docker $DOCKERARGS rmi $PREFIX-notebook
+    docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi
   ;;
 esac
