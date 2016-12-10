@@ -96,8 +96,10 @@ DATABASES = {
 #}
 
 
-KOOPLEX_EXTERNAL_HOST = '$DOMAIN'
-KOOPLEX_BASE_URL = 'http://' + KOOPLEX_EXTERNAL_HOST
+KOOPLEX_OUTER_HOST = '$OUTER_DOMAIN'
+KOOPLEX_INTERNAL_HOST = '$DOMAIN'
+
+KOOPLEX_BASE_URL = 'http://' + KOOPLEX_INTERNAL_HOST
 KOOPLEX_HUB_PREFIX = 'hub'
 
 KOOPLEX = {
@@ -111,7 +113,7 @@ KOOPLEX = {
         'home_dir': 'home/{\$username}',
     },
     'session': {
-        'base_url': '%s' %KOOPLEX_BASE_URL,
+    	'base_url': '%s' %KOOPLEX_BASE_URL,
     },
     'ldap': {
         'host': '$DOMAIN',
@@ -121,7 +123,7 @@ KOOPLEX = {
         'bind_password': '$LDAPPASS',
     },
     'gitlab': {
-        'base_url': 'http://%s/gitlab/' % KOOPLEX_EXTERNAL_HOST,
+        'base_url': 'http://%s/gitlab/' % KOOPLEX_INTERNAL_HOST,
         'base_repourl': 'http://$GITLABIP',
         'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
         'ssh_host': '$PROJECT-gitlab',
@@ -141,16 +143,16 @@ KOOPLEX = {
         'srv_path': '$SRV'
     },
     'proxy': {
-        'host': KOOPLEX_EXTERNAL_HOST,
+        'host': KOOPLEX_INTERNAL_HOST,
         'port': 8001,   # api port
         'auth_token': '$PROXYTOKEN',
-        'external_url': 'http://%s/' % KOOPLEX_EXTERNAL_HOST,
+        'external_url': 'http://%s/' % KOOPLEX_OUTER_HOST,
     },
     'owncloud': {
-        'base_url': 'http://%s/owncloud/' % KOOPLEX_EXTERNAL_HOST,
+        'base_url': 'http://%s/owncloud/' % KOOPLEX_INTERNAL_HOST,
     },
     'dashboards': {
-        'base_url': 'http://%s/' % KOOPLEX_EXTERNAL_HOST,
+        'base_url': 'http://%s/' % KOOPLEX_INTERNAL_HOST,
         'base_dir': '$DASHBOARDSDIR',
     }
 }
@@ -359,6 +361,7 @@ echo $HUBIP
       --ip $HUBIP \
       --privileged \
       -v $SRV/home:$SRV/home \
+      -v $SRV/dashboards:$SRV/dashboards \
       -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
 
