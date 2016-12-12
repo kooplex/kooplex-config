@@ -49,12 +49,11 @@ export MOUNTID=\`echo \${dum#*with id}\`
 #perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
 
 ./occ config:system:set trusted_domains 0 --value  'localhost'
-./occ config:system:set trusted_domains 1 --value  'lucan.elte.hu'
 ./occ config:system:set trusted_domains 2 --value  '$OWNCLOUDIP'
 ./occ config:system:set trusted_domains 3 --value  '$NGINXIP'
 
 ./occ config:system:set 'trusted_proxies' --value "[$OWNCLOUDIP,$NGINXIP]"
-./occ config:system:set 'overwritehost' --value '$DOMAIN'
+./occ config:system:set 'overwritehost' --value '$OUTER_DOMAIN'
 
 rm -r core/skeleton/Photos/ core/skeleton/Documents/
 
