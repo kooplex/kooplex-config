@@ -103,6 +103,9 @@ KOOPLEX_BASE_URL = 'http://' + KOOPLEX_INTERNAL_HOST
 KOOPLEX_HUB_PREFIX = 'hub'
 
 KOOPLEX = {
+    'debug': {
+        'debug': False,
+    },
     'prefix':{
         'name': '$PREFIX',
     },
