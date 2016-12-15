@@ -42,7 +42,6 @@ RUN chmod a+rxw $CONDA_DIR
 
 
 # Add local files as late as possible to avoid cache busting
-#ADD watch_owncloud_folder.sh /watch_owncloud_folder.sh
 ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
 ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
 
