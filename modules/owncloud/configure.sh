@@ -5,7 +5,8 @@ case $VERB in
     echo "Building image kooplex-owncloud"
     
 
-SECRET=$(getsecret ldap)
+#SECRET=$(getsecret ldap)
+SECRET=$DUMMYPASS
 
 cat << EOF > setup-ldap.sh
 #chown root config/config.php

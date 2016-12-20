@@ -28,6 +28,10 @@ case $VERB in
   ;;
   "remove")
   ;;
+  "purge")
+   echo "Removing $SRV/dashboard" 
+   rm -R -f $SRV/dashboards
+  ;;
   "clean")
   docker rmi ${PROJECT}_dashboards ${PROJECT}_kernel_gateway
   ;;

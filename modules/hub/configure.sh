@@ -119,8 +119,8 @@ KOOPLEX = {
     	'base_url': '%s' %KOOPLEX_BASE_URL,
     },
     'ldap': {
-        'host': '$DOMAIN',
-        'port': 666,
+        'host': '$LDAPSERV',
+        'port': 389,
         'base_dn': '$LDAPORG',
         'bind_username': 'admin',
         'bind_password': '$LDAPPASS',

@@ -24,7 +24,7 @@ case $VERB in
   fi
     
      mkdir -p $SECRETS
-     if [ ! `quotacheck -cuvgf $SRV` ]; then
+     if [ ! `quotacheck -mcuvgf $SRV` ]; then
        quotaon -vu $SRV
        quotaon -vg $SRV
      fi
