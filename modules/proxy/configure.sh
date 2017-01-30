@@ -9,7 +9,7 @@ case $VERB in
   "install")
     echo "Installing proxy $PROJECT-proxy [$PROXYIP]"
     
-    PROXYTOKEN=$(createsecret proxy)
+    PROXYTOKEN=$(getsecret proxy)
     
     docker $DOCKERARGS create \
       --name $PROJECT-proxy \

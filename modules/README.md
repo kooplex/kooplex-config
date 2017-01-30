@@ -10,3 +10,41 @@ nginx: world-facing nginx reverse-proxy
 notebook: jupyter notebook base docker image
 owncloud: to be replaced with nextcloud
 proxy: configurable-http-proxy for notebooks
+
+
+
+
+
+           build  install  start   init    check    stop   remove   purge   clean
+		     |       |       |       |       |       |       |       |       |
+
+base         X       X                                               X       X
+net                  X                                       X
+             
+ldap         X       X       X       X       X       X       X       X       X
+homesrv
+home
+mysql
+nginx
+admin
+gitlab
+owncloud
+notebook
+proxy
+hub
+
+dashboard
+
+
+
+
+
+
+
+
+
+
+
+
+
+

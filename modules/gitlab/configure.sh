@@ -73,9 +73,8 @@ EOS
     echo "Creating Gitlab admin user..."
     
     # Generate Gitlab and keyfile random password
-    GITLABPASS=$(createsecret gitlab)
-    SSHKEYPASS=$(createsecret sshkey)
-
+    GITLABPASS=$(getsecret gitlab)
+    
     adduser gitlabadmin Gitlab Admin "admin@$DOMAIN" "$GITLABPASS" 10001
     gitlab_makeadmin gitlabadmin
 
