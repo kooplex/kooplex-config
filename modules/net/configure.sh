@@ -3,14 +3,9 @@
 case $VERB in
   "install")
     echo "Installing network $PROJECT-net [$SUBNET]"
-  
-    if docker  $DOCKERARGS network ls | grep $PROJECT-net; then 
-     echo "$PROJECT-net exists, moving on..."
-    else
-     docker $DOCKERARGS network create \
+    docker $DOCKERARGS network create \
       --driver bridge \
       --subnet $SUBNET $PROJECT-net
-   fi
   ;;
   "start")
     
