@@ -119,20 +119,20 @@ ldap_fdqn2cn () {
 
 ldap_add() {
   local ldappass=$(getsecret ldap)
-  printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
+  printf "%s" "$1" | ldapadd -h $LDAPIP -D "cn=admin,$LDAPORG" -w "$ldappass"
 }
 
 ldap_del() {
   local ldappass=$(getsecret ldap)
   echo $LDAPORG
-  printf "uid=%s,ou=users,$LDAPORG " "$1" | ldapdelete -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass" -v 
+  printf "uid=%s,ou=users,$LDAPORG " "$1" | ldapdelete -h $LDAPIP -D "cn=admin,$LDAPORG" -w "$ldappass" -v 
 }
 
 ldap_nextuid() {
 
   local ldappass=$(getsecret ldap)
 
-  local maxid=`ldapsearch -h $LDAPIP -p $LDAPPORT \
+  local maxid=`ldapsearch -h $LDAPIP \
     -D "cn=admin,$LDAPORG" -w "$ldappass" \
     -b "ou=users,$LDAPORG" -s one \
     "objectclass=posixAccount" uidnumber | \
@@ -200,7 +200,7 @@ objectClass: posixGroup
 cn: $name
 gidNumber: $uid
 " | \
-  ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
+  ldapadd -h $LDAPIP -D "cn=admin,$LDAPORG" -w "$ldappass"
   
 }
 
@@ -342,9 +342,17 @@ reverse() {
 
 createsecret() {
   local name=$1
-  #openssl rand -base64 32 > $SECRETS/$name.secret
-  echo "$DUMMYPASS" > $SECRETS/$name.secret
-  cat $SECRETS/$name.secret
+  local fn=$SECRETS/$name.secret
+  
+  if [ ! -f $fn ]; then
+    mkdir -p $SECRETS
+    if [ -n "$DUMMYPASS" ]; then
+      echo "$DUMMYPASS" > $fn
+    else
+      openssl rand -base64 32 > $fn
+    fi
+  fi
+  cat $fn
 }
 
 getsecret() {
@@ -462,7 +470,6 @@ config() {
   LDAPIP=$(ip_addip "$SUBNET" 3)
   LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
   LDAPSERV=$PROJECT-ldap
-  LDAPPORT=389
 
   HOMEIP=$(ip_addip "$SUBNET" 4)
   
