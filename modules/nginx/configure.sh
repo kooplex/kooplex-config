@@ -16,10 +16,12 @@ case $VERB in
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
       nginx 
       
+    # TODO: purge dashboard mess from config
+      
     echo "
 server {
   listen 80;
-  server_name $OUTER_DOMAIN;
+  server_name $EXTERNALHOST;
   client_max_body_size 20M;
   
   location /gitlab {
@@ -32,8 +34,9 @@ server {
     proxy_pass http://$HUBIP;
   }
 
+  # TODO: get rid of this
   location / {
-    rewrite / http://$OUTER_DOMAIN/hub permanent;
+    rewrite / http://$EXTERNALHOST/hub permanent;
   }
 
   location /static/ {
@@ -46,14 +49,12 @@ server {
     proxy_pass            http://$PROXYIP:8000;
   }
 
-#DASHBOARD SERVER
-#  location ^~ /notebook/[^/]+/[^/]+/api/bundlers/dashboards_server_upload/? {
-  location /notebook/gitlabadmin/07f159b4-99d4-47f9-9c91-d8654f3c70dc/api/bundlers/dashboards_server_upload/ {
-    proxy_set_header      Host \$http_host;
-    proxy_pass http://$DASHBOARDSIP:3000/;
-  }
-
-
+  #DASHBOARD SERVER
+  #location ^~ /notebook/[^/]+/[^/]+/api/bundlers/dashboards_server_upload/? {
+  #location /notebook/gitlabadmin/07f159b4-99d4-47f9-9c91-d8654f3c70dc/api/bundlers/dashboards_server_upload/ {
+  #  proxy_set_header      Host \$http_host;
+  #  proxy_pass http://$DASHBOARDSIP:3000/;
+  #}
   
   location ~* /notebook/[^/]+/[^/]+/(api/kernels/[^/]+/(channels|iopub|shell|stdin)|terminals/websocket)/? {
     proxy_pass            http://$PROXYIP:8000;
@@ -86,18 +87,17 @@ server {
   }
 }
   
-  #DASHBOARD SERVER
-  server {
-  listen 3000;
-  server_name $DOMAIN;
-  client_max_body_size 20M;
+#DASHBOARD SERVER
+#server {
+  #listen 3000;
+  #server_name $DOMAIN;
+  #client_max_body_size 20M;
 
-  location / {
-    proxy_set_header      Host \$http_host;
-    proxy_pass            http://$DASHBOARDSIP:3000;
-  }
-
-}
+  #location / {
+  #  proxy_set_header      Host \$http_host;
+  #  proxy_pass            http://$DASHBOARDSIP:3000;
+  #}
+#}
 
 " > $SRV/nginx/etc/sites.conf
 
@@ -106,6 +106,7 @@ server {
     echo "Starting nginx $PROJECT-nginx [$NGINXIP]"
     docker $DOCKERARGS start $PROJECT-nginx
   ;;
+  # TODO: remove restart, nowhere else used
   "restart")
     echo "Restarting nginx $PROJECT-nginx [$NGINXIP]"
     docker $DOCKERARGS stop $PROJECT-nginx

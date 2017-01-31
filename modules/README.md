@@ -25,7 +25,7 @@ ldap         X       X       X       X       X       X       X       X       X
 nfs                  X       X                       X       X       X
 home                 X       X                       X       X       X
 mysql        X       X       X               X       X       X       X       X
-nginx
+nginx                X       X                       X       X       X
 admin
 gitlab
 owncloud

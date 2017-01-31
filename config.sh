@@ -12,7 +12,8 @@ PROJECT="compare"
 DOMAIN="localhost"
 
 # Extenal URL of the nginx proxy
-EXTERNALHOST="http://dobos.compare.vo.elte.hu"
+EXTERNALPROTO="http://"
+EXTERNALHOST="dobos.compare.vo.elte.hu"
 
 # Outgoint email settings
 SMTP=mail.elte.hu

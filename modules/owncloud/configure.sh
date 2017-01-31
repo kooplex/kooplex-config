@@ -54,7 +54,7 @@ export MOUNTID=\`echo \${dum#*with id}\`
 ./occ config:system:set trusted_domains 3 --value  '$NGINXIP'
 
 ./occ config:system:set 'trusted_proxies' --value "[$OWNCLOUDIP,$NGINXIP]"
-./occ config:system:set 'overwritehost' --value '$OUTER_DOMAIN'
+./occ config:system:set 'overwritehost' --value '$EXTERNALHOST'
 
 rm -r core/skeleton/Photos/ core/skeleton/Documents/
 
