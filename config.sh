@@ -35,7 +35,7 @@ LDAPPORT=666
 # HOME_DISKIMG=
 # Home volume use image file with loopback
 # This option allows quotas
-HOME_DISKIMG="$ROOT/$PROJECT/home.img"
+HOME_DISKIMG="home.img"
 HOME_DISKSIZEGB="2"
 HOME_DISKLOOPNO="/dev/loop3"
 HOME_USRQUOTA="120M"

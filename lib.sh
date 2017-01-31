@@ -471,7 +471,10 @@ config() {
   LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
   LDAPSERV=$PROJECT-ldap
 
-  HOMEIP=$(ip_addip "$SUBNET" 4)
+  NFSIP=$(ip_addip "$SUBNET" 4)
+  
+  # TODO: we'll have one home volume container per host so need a pool of IPs
+  HOMEIP=$(ip_addip "$SUBNET" 100)
   
   GITLABIP=$(ip_addip "$SUBNET" 5)
   
@@ -496,6 +499,8 @@ config() {
   
   DOCKERPORT=${DOCKERARGS##*:}
 
+  # Notebook IP pool
+  # TODO: rename variables to something meaningful
   IPPOOLB=$(ip_addip "$SUBNET" 5121)
   IPPOOLE=$(ip_addip "$SUBNET" 5375) 
 

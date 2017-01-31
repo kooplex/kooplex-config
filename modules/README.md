@@ -16,13 +16,13 @@ proxy: configurable-http-proxy for notebooks
 
 
            build  install  start   init    check    stop   remove   purge   clean
-		     |       |       |       |       |       |       |       |       |
+             |       |       |       |       |       |       |       |       |
 
 base         X       X                                               X       X
 net                  X                                       X
              
 ldap         X       X       X       X       X       X       X       X       X
-homesrv
+nfs                  X       X                       X       X       X
 home
 mysql
 nginx

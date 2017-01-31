@@ -2,15 +2,16 @@
 
 case $VERB in
   "install")
-  
+    
     docker $DOCKERARGS create \
       --name $PROJECT-home \
       --hostname $PROJECT-home \
       --net $PROJECT-net \
       --ip $HOMEIP \
+      -e "NFS_PORT_2049_TCP_ADDR=$NFSIP" \
       --privileged \
-      -v $SRV/home:/exports/home \
-      cpuguy83/nfs-server /exports/home
+      cpuguy83/nfs-client /exports/home:/home
+ 
   ;;
   "start")
     echo "Starting nfs home $PROJECT-home [$HOMEIP]"
