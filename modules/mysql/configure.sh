@@ -1,7 +1,5 @@
 #!/bin/bash
 
-MYSQLPASS=$(getsecret mysql)
-
 case $VERB in
   "build")
     echo "Building mysql $PROJECT-mysql [$MYSQLIP]"
@@ -12,6 +10,8 @@ case $VERB in
   ;;
   "install")
     echo "Installing mysql $PROJECT-mysql [$MYSQLIP]"
+    
+    MYSQLPASS=$(getsecret mysql)
 
     docker $DOCKERARGS create \
       --name $PROJECT-mysql \
@@ -34,6 +34,9 @@ case $VERB in
   ;;
   "check")
     echo "Checking mysql $PROJECT-mysql [$MYSQLIP]"
+    
+    MYSQLPASS=$(getsecret mysql)
+    
     echo "Accessing via $MYSQLIP:"
     mysql -h $MYSQLIP -u root -p$MYSQLPASS -e "SHOW DATABASES;"
     echo "Accessing via localhost:"

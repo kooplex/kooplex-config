@@ -26,13 +26,13 @@ nfs                  X       X                       X       X       X
 home                 X       X                       X       X       X
 mysql        X       X       X               X       X       X       X       X
 nginx                X       X                       X       X       X
-admin
-gitlab
+gitlab               X       X       X               X       X       X
 owncloud
 notebook
 proxy
 hub
 
+admin
 dashboard
 
 
