@@ -23,8 +23,8 @@ net                  X                                       X
              
 ldap         X       X       X       X       X       X       X       X       X
 nfs                  X       X                       X       X       X
-home
-mysql
+home                 X       X                       X       X       X
+mysql        X       X       X               X       X       X       X       X
 nginx
 admin
 gitlab

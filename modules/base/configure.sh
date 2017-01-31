@@ -10,6 +10,7 @@ case $VERB in
 	# installing other modules
     echo "Generating secrets..."
     createsecret ldap > /dev/null
+    createsecret mysql > /dev/null
 	createsecret gitlab > /dev/null
 	createsecret sshkey > /dev/null
 	createsecret proxy > /dev/null

@@ -492,8 +492,6 @@ config() {
   
   MYSQLIP=$(ip_addip "$SUBNET" 19)
 
-  MYSQLPASS=$DUMMYPASS
-
   DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
   DASHBOARDSDIR=$SRV"/dashboards"
   

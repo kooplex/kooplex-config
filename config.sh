@@ -1,5 +1,5 @@
 SYSMODULES="base net" # admin"
-MODULES="ldap home gitlab notebook proxy nginx mysql " # hub dashboard"
+MODULES="ldap home mysql nginx gitlab notebook proxy" # hub dashboard"
 
 # Prefix all directories
 PREFIX="kooplex"
@@ -39,3 +39,6 @@ HOME_DISKIMG="home.img"
 HOME_DISKSIZEGB="2"
 HOME_DISKLOOPNO="/dev/loop3"
 HOME_USRQUOTA="120M"
+
+# MySQL settings
+MYSQLPORT=669
