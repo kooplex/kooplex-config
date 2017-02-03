@@ -33,10 +33,22 @@ ip_addip () {
   ip_dec2ip "$ip"
 }
 
+# MYSQL functions
+
+mysql_exec() {
+  MYSQLPASS=$(getsecret mysql)
+  
+  if [ $# == 1 ]; then
+	mysql -h $MYSQLIP -u root -p"$MYSQLPASS" -e "$1"
+  else
+    mysql -h $MYSQLIP -u root -p"$MYSQLPASS" -D"$1" -e "$2"
+  fi
+}
+
 # LDAP functions
 
 ldap_ldapconfig() {
-    echo "
+  echo "
 BASE   $LDAPORG
 URI    ldap://$PROJECT-ldap/
 
@@ -362,7 +374,7 @@ getsecret() {
 
 adduser() {
 
-    # TODO: replace this with python script
+  # TODO: replace this with python script and run from admin container
 
   local username=$1
   local firstname=$2
@@ -377,45 +389,45 @@ adduser() {
   
   echo "Adding new user $username with uid $uid..."
   
-  ldap_adduser "$username" "$firstname" "$lastname" "$email" "$pass" "$uid"
-  gitlab_adduser "$username" "$firstname" "$lastname" "$email" "$pass"
+  # Create home directory and subdirectories for owncloud
+  mkdir -p $SRV/home/$username/
+  chown -R $uid:$uid $SRV/home/$username
   
-  # Create home directory
-  mkdir -p $SRV/home/$username
+  mkdir -p $SRV/home/$username/Data/
+  chown -R $uid:$OWNCLOUDGRP $SRV/home/$username/Data
+  chmod -R g+w $SRV/home/$username/Data
   
-
+  setfacl -R -m d:u:$uid:rwx $SRV/home/$username
+  setfacl -R -m d:g:$uid:rwx $SRV/home/$username
+  setfacl -R -m d:u:$OWNCLOUDUSR:rwx $SRV/home/$username/Data
+  setfacl -R -m d:g:$OWNCLOUDGRP:rwx $SRV/home/$username/Data
+      
+  # Create directories for owncloud and grant access to www-data
+  
+  mkdir -p $SRV/owncloud/data/$username/
+  mkdir -p $SRV/owncloud/data/$username/files
+  mkdir -p $SRV/owncloud/data/$username/cache
+  chown -R $OWNCLOUDUSR:$OWNCLOUDGRP $SRV/owncloud/data/$username/
+  chmod u-w $SRV/owncloud/data/$username/files
+  
+  # Set user quota
+  if [ ! -z $HOME_USRQUOTA ]; then
+    # TODO: figure this out, loop should not be on host because
+    # we dont want to set quota there
+    setquota -u $uid $HOME_USRQUOTA $HOME_USRQUOTA 0 0 $HOME_DISKLOOPNO
+  fi
   
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
   mkdir -p $SRV/home/$username/.ssh
   rm -f $SRV/home/$username/.ssh/gitlab.key
-  #ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
-  ssh-keygen -N "" -f $SRV/home/$username/.ssh/gitlab.key
+  ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
+  
+  ldap_adduser "$username" "$firstname" "$lastname" "$email" "$pass" "$uid"
+  gitlab_adduser "$username" "$firstname" "$lastname" "$email" "$pass"
 
   # Register key in Gitlab
   gitlab_addsshkey $username $pass
-  
-  # Set home owner
-  chown -R $uid:$uid $SRV/home/$username
-  setfacl -R -m d:u:$uid:rwx $SRV/home/$username
-
-  # Set user quota
-  setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
-  
-    # Create Data directory which can be accessed through ownCloud
-  echo "Initializing OwnCloud folders for  $uid $username"
-  PATH_OWNCLOUD=$SRV/ownCloud
-  if [ ! -d $PATH_OWNCLOUD ]; then
-     mkdir -p $PATH_OWNCLOUD/
-  fi
-  mkdir -p $PATH_OWNCLOUD/$username/
-  mkdir -p $PATH_OWNCLOUD/$username/files/
-  chown -R www-data:www-data $PATH_OWNCLOUD/$username/
-  mkdir -p $SRV/home/$username/Data
-  chown -R www-data:www-data  $SRV/home/$username/Data
-  sleep 10
-  docker $DOCKERARGS exec $PROJECT-owncloud bash -c "cd /var/www/html/;chown root console.php config/config.php; php ./console.php files:scan --unscanned --all; chown www-data console.php config/config.php"
-
 
   echo "New user created: $uid $username"
 }
@@ -481,6 +493,7 @@ config() {
   JUPYTERHUBIP=$(ip_addip "$SUBNET" 6)
   
   OWNCLOUDIP=$(ip_addip "$SUBNET" 7)
+  OWNCLOUDPATH=$SRV/owncloud
   
   NOTEBOOKIP=$(ip_addip "$SUBNET" 8)
   
