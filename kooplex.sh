@@ -20,6 +20,9 @@ case $VERB in
   "init")
     set -e
   ;;
+  "stop"|"remove"|"purge"|"clean")
+	SVCS=$(reverse $SVCS)
+  ;;
 esac
 
 echo "Starting $VERB..."
