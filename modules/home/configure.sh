@@ -8,9 +8,9 @@ case $VERB in
       --hostname $PROJECT-home \
       --net $PROJECT-net \
       --ip $HOMEIP \
-      -e "NFS_PORT_2049_TCP_ADDR=$NFSIP" \
+      -v $SRV/home:/home \
       --privileged \
-      cpuguy83/nfs-client /exports/home:/home
+      kooplex-base
  
   ;;
   "start")
