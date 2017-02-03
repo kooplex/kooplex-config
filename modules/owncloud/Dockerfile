@@ -1,6 +1,8 @@
 FROM php:5.6.25-apache
 
 RUN apt-get update && apt-get install -y \
+    sudo \
+	cron \
 	bzip2 \
 	libcurl4-openssl-dev \
 	libfreetype6-dev \
@@ -41,7 +43,9 @@ RUN set -ex \
 	&& docker-php-ext-enable apcu memcached redis
 
 ENV OWNCLOUD_VERSION 9.1.0
-VOLUME /var/www/html
+VOLUME /etc/owncloud
+VOLUME /var/www/html/data
+VOLUME /home
 
 RUN curl -fsSL -o owncloud.tar.bz2 \
 		"https://download.owncloud.org/community/owncloud-${OWNCLOUD_VERSION}.tar.bz2" \
@@ -56,11 +60,4 @@ RUN curl -fsSL -o owncloud.tar.bz2 \
 	&& rm owncloud.tar.bz2
 
 
-COPY docker-entrypoint.sh /entrypoint.sh
-RUN chmod a+x /entrypoint.sh
-
-COPY setup-ldap.sh /setup-ldap.sh
-#RUN chmod a+x /setup-ldap.sh  && bash /setup-ldap.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
