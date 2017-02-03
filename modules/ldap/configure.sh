@@ -30,9 +30,6 @@ case $VERB in
   ;;
   "start")
     echo "Starting slapd $PROJECT-ldap [$LDAPIP]"
-	# TODO: implement logic around it
-    echo "AFTER REMOUNT-RESTART: DONT FORGET TO CHECK OWNER: "
-    echo "drwxr-xr-x  6 dnsmasq ssl-cert 4096 okt   14 10:42 etc"
     docker $DOCKERARGS start $PROJECT-ldap
     echo "Waiting for slapd to start"
     # TODO: implement some try-catch logic to wait until

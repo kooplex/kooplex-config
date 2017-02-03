@@ -6,14 +6,15 @@ case $VERB in
     docker $DOCKERARGS build -t kooplex-base .
   ;;
   "install")
-	# Generate secrets here so they can be modified prior to
-	# installing other modules
+    # Generate secrets here so they can be modified prior to
+    # installing other modules
     echo "Generating secrets..."
     createsecret ldap > /dev/null
     createsecret mysql > /dev/null
-	createsecret gitlab > /dev/null
-	createsecret sshkey > /dev/null
-	createsecret proxy > /dev/null
+    createsecret gitlab > /dev/null
+    createsecret owncloud > /dev/null
+    createsecret sshkey > /dev/null
+    createsecret proxy > /dev/null
   ;;
   "start")
     

@@ -1,6 +1,9 @@
 #!/bin/bash
 
 case $VERB in
+  "build")
+    docker pull gitlab/gitlab-ce
+  ;;
   "install")
     echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
 
@@ -75,7 +78,7 @@ EOS
     # Generate Gitlab and keyfile random password
     GITLABPASS=$(getsecret gitlab)
     
-    adduser gitlabadmin Gitlab Admin "admin@$DOMAIN" "$GITLABPASS" 10001
+    adduser gitlabadmin Gitlab Admin "gitlab-admin@$DOMAIN" "$GITLABPASS" 10001
     gitlab_makeadmin gitlabadmin
 
     # TODO: disable standard login and self-registration via Gitlab
