@@ -1,0 +1,4 @@
+sunrpc 111/tcp portmapper
+sunrpc 111/udp portmapper
+nfs 2049/tcp
+nfs 2049/udp
