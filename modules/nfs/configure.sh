@@ -55,7 +55,7 @@ exec runsvdir /etc/sv
     echo "Stopping nfs home server $PROJECT-nfs [$NFSIP]"
 	
 	# Unmount the local NFS mount
-	umount $SRV/home
+	umount -l $SRV/home
 	rm -R $SRV/home
 	
 	# Unmount home disk image
