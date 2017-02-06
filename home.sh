@@ -13,10 +13,15 @@ case $VERB in
 	dd if=/dev/zero of=$SRV/home.img bs=1M count=$cnt 
 	mkfs -t xfs $SRV/home.img
   ;;
-  "mount")
+  "mount-nfs")  
+	echo "Mounting NFS-share locally..."
+	mkdir -p $SRV/home
+	mount $NFSIP:/exports/home $SRV/home
+  ;;
+  "mount-loopback")
     echo "Mounting home loopback file system..."
     mkdir -p $SRV/home
-	mount $SRV/$HOME_DISKIMG $SRV/home -t auto -o usrquota,grpquota,acl,loop=$HOME_DISKLOOPNO
+	mount $SRV/$HOME_DISKIMG $SRV/home -t auto -o loop=$HOME_DISKLOOPNO
   ;;
   "umount")
     umount $SRV/home

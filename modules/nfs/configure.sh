@@ -38,9 +38,6 @@ exec runsvdir /etc/sv
     echo "Starting nfs home server $PROJECT-nfs [$NFSIP]"
     docker $DOCKERARGS start $PROJECT-nfs
 	
-	echo "Waiting for NFS service to start..."
-	sleep 10
-	  
 	echo "Mounting NFS-share locally..."
 	mkdir -p $SRV/home
 	mount $NFSIP:/exports/home $SRV/home
@@ -56,6 +53,10 @@ exec runsvdir /etc/sv
   ;;
   "stop")
     echo "Stopping nfs home server $PROJECT-nfs [$NFSIP]"
+	
+	# Unmount the local NFS mount
+	umount $SRV/home
+	rm -R $SRV/home
 	
 	# Unmount home disk image
     docker $DOCKERARGS exec -ti $PROJECT-nfs umount /exports/home

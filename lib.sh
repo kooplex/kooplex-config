@@ -414,6 +414,7 @@ adduser() {
   echo $uid:/exports/home/$username >> $SRV/nfs/etc/projects
   echo $username:$uid >> $SRV/nfs/etc/projid
   docker $DOCKERARGS exec -ti $PROJECT-nfs xfs_quota -x -c "project -s $username" /exports/home
+  docker $DOCKERARGS exec -ti $PROJECT-nfs xfs_quota -x -c "limit -p bsoft=$HOME_QUOTA bhard=$HOME_QUOTA $username" /exports/home
   
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
