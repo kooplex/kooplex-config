@@ -6,15 +6,15 @@ CONFIGDIR=$PWD
 
 VERB=$(getverb "$@")
 
-echo "Mounting home loopback file system..."
-
 case $VERB in
   "init")
+    echo "Creating image file for home..."
 	cnt=`echo $HOME_DISKSIZEGB | awk '{print $1*1000}'` 
 	dd if=/dev/zero of=$SRV/home.img bs=1M count=$cnt 
-	mkfs -t ext4 $SRV/home.img
+	mkfs -t xfs $SRV/home.img
   ;;
   "mount")
+    echo "Mounting home loopback file system..."
     mkdir -p $SRV/home
 	mount $SRV/$HOME_DISKIMG $SRV/home -t auto -o usrquota,grpquota,acl,loop=$HOME_DISKLOOPNO
   ;;

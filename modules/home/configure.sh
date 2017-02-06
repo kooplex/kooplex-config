@@ -18,7 +18,6 @@ case $VERB in
     docker $DOCKERARGS start $PROJECT-home
   ;;
   "init")
-    
   ;;
   "stop")
     echo "Stopping nfs home $PROJECT-home [$HOMEIP]"
@@ -27,6 +26,7 @@ case $VERB in
   "remove")
     echo "Removing nfs home $PROJECT-home [$HOMEIP]"
     docker $DOCKERARGS rm $PROJECT-home
+	umount -f $SRV/home
   ;;
   "purge")
     echo "Purging nfs home $PROJECT-home [$HOMEIP]"

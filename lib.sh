@@ -411,11 +411,9 @@ adduser() {
   chmod u-w $SRV/owncloud/data/$username/files
   
   # Set user quota
-  if [ ! -z $HOME_USRQUOTA ]; then
-    # TODO: figure this out, loop should not be on host because
-    # we dont want to set quota there
-    setquota -u $uid $HOME_USRQUOTA $HOME_USRQUOTA 0 0 $HOME_DISKLOOPNO
-  fi
+  echo $uid:/exports/home/$username >> $SRV/nfs/etc/projects
+  echo $username:$uid >> $SRV/nfs/etc/projid
+  docker $DOCKERARGS exec -ti $PROJECT-nfs xfs_quota -x -c "project -s $username" /exports/home
   
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
