@@ -33,10 +33,11 @@ SUBNET="172.20.0.0/16"
 LDAPPORT=666
 
 # Home volume use host file system
+# If specified, image is created and destoyed automatically
 # HOME_DISKIMG=
+# HOME_DISKSIZEGB="2"
 # Home volume use image file with loopback
 # This option allows quotas
-HOME_DISKSIZEGB="2"
 HOME_DISKLOOPNO="/dev/loop3"
 HOME_QUOTA="120M"
 

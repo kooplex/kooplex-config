@@ -48,6 +48,7 @@ exec runsvdir /etc/sv
   "check")
     echo "Checking NFS exports..."
 	showmount -e $NFSIP
+	mount | grep $NFSIP
 	echo "Checking quota..."
 	docker $DOCKERARGS exec -ti $PROJECT-nfs xfs_quota -x -c "report"
   ;;
@@ -55,8 +56,11 @@ exec runsvdir /etc/sv
     echo "Stopping nfs home server $PROJECT-nfs [$NFSIP]"
 	
 	# Unmount the local NFS mount
-	umount -l $SRV/home
+	umount -f -l $NFSIP:/exports/home
 	rm -R $SRV/home
+	
+	# Unexport NFS share on server
+	docker $DOCKERARGS exec -ti $PROJECT-nfs exportfs -u *:/exports/home
 	
 	# Unmount home disk image
     docker $DOCKERARGS exec -ti $PROJECT-nfs umount /exports/home
@@ -75,8 +79,6 @@ exec runsvdir /etc/sv
     if [ ! -z "$HOME_DISKIMG" ]; then
       rm $SRV/$HOME_DISKIMG
     fi
-    
-    rm -R $SRV/home
   ;;
   "clean")
     echo "Cleaning image kooplex-nfs"
