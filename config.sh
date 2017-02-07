@@ -1,5 +1,5 @@
 SYSMODULES="base net" # admin"
-MODULES="ldap nfs home mysql nginx gitlab owncloud" #notebook proxy" # hub dashboard"
+MODULES="ldap nfs home mysql nginx gitlab owncloud proxy notebook" # hub dashboard"
 
 # Prefix all directories
 PREFIX="kooplex"

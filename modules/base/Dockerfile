@@ -1,7 +1,3 @@
-# Based on the official docker image for jupyterhub and cpuguy83/docker-nfs-client 
-
-# Debian Jessie image released 2016 May 03.
-#FROM debian@sha256:32a225e412babcd54c0ea777846183c61003d125278882873fb2bc97f9057c51
 FROM ubuntu:xenial
 
 MAINTAINER Laszlo Dobos <dobos@complex.elte.hu>
@@ -15,6 +11,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 		bzip2 \
 		ca-certificates \
 		sudo \
+		acl \
 		locales \
 		nfs-common \
 		inotify-tools \

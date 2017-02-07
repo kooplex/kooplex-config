@@ -29,6 +29,12 @@ case $VERB in
   "init")
     
   ;;
+  "check")
+    echo "Checking proxy $PROJECT-proxy [$PROXYIP]"
+    PROXYTOKEN=$(getsecret proxy)
+	curl -H "Authorization: token $PROXYTOKEN" http://$PROXYIP:8001/api/routes
+	echo ""
+  ;;
   "stop")
     echo "Stopping proxy $PROJECT-proxy [$PROXYIP]"
     docker $DOCKERARGS stop $PROJECT-proxy

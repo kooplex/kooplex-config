@@ -333,6 +333,8 @@ print(a.uid, \" \", a.secret, \"\\n\")
 "
 }
 
+# Generic function
+
 getverb() {
   echo $1
 }
@@ -395,7 +397,7 @@ adduser() {
   
   mkdir -p $SRV/home/$username/Data/
   chown -R $uid:$OWNCLOUDGRP $SRV/home/$username/Data
-  chmod -R g+w $SRV/home/$username/Data
+  chmod -R g+ws $SRV/home/$username/Data
   
   setfacl -R -m d:u:$uid:rwx $SRV/home/$username
   setfacl -R -m d:g:$uid:rwx $SRV/home/$username

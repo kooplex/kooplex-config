@@ -2,24 +2,16 @@
 
 case $VERB in
   "build")
-    echo "Building image $PREFIX-notebooks"
-
-#    docker $DOCKERARGS build -t $PREFIX-notebook .
-    
-     mkdir -p $SRV/notebook/images
-#     rm image-*/Dockerfile*~
-     cp -r image-* $SRV/notebook/images/
-     for imagedir in $SRV/notebook/images/image-*
-     do
-        docfile=$imagedir"/Dockerfile-"${imagedir#*image-}
-     	echo $docfile $imagedir
-        docker $DOCKERARGS build -f $docfile -t $PREFIX-notebook-${docfile#*Dockerfile-} $imagedir
-       
-     done
-
-#http://polc.elte.hu/owncloud/remote.php/webdav /home/jeges6/own davfs user,rw,auto 0 0
-#usermod -aG davfs2 jeges6
-    
+	pushd images
+	for img in *; do
+		echo "Building image $PREFIX-notebook-$img..."
+		mkdir -p $SRV/notebook/images/$img
+		cp -R $img/* $SRV/notebook/images/$img
+		pushd $SRV/notebook/images/$img
+		docker $DOCKERARGS build -t $PREFIX-notebook-$img .
+		popd
+	done
+	popd    
   ;;
   "install")
     echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
@@ -87,8 +79,11 @@ cd /home
     rm -R $SRV/notebook
   ;;
   "clean")
-    echo "Cleaning base image $PREFIX-notebook"
-#    docker $DOCKERARGS rmi $PREFIX-notebook
-    docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi
+    # TODO: now only loop over existing images, later take list from mysql database
+	images=`docker $DOCKERARGS images | grep $PREFIX-notebook- | awk '{print $1}'`
+	for img in $images; do
+		echo "Cleaning image $img..."
+		docker $DOCKERARGS rmi $img
+	done
   ;;
 esac
