@@ -12,10 +12,7 @@ c.NotebookApp.ip = '*'
 c.NotebookApp.port = 8000
 c.NotebookApp.open_browser = False
 c.HistoryManager.hist_file = '/tmp/ipython_hist.sqlite'
-<<<<<<< HEAD
-=======
 c.NotebookApp.allow_origin = '*'
->>>>>>> e81d99e865be695216e13335e4b91a0928a2a452
 
 # Set a certificate if USE_HTTPS is set to any value
 if 'USE_HTTPS' in os.environ:
