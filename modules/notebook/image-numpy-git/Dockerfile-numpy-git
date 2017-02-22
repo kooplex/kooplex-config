@@ -21,18 +21,20 @@ RUN apt update && \
 RUN apt update
 RUN apt install -y python3-pip liblapack-dev libblas-dev
 RUN apt install -y gfortran libfreetype6* pkg-config
-
+RUN python3 --version
 
 #RUN chown jovyan /home/jovyan/* -R
 
 RUN pip3 install --upgrade pip
+RUN python3 --version
 RUN pip3 install pandas  numpy  scipy  matplotlib seaborn plotly igraph bokeh lifelines
 RUN pip install pandas numpy scipy matplotlib seaborn plotly igraph bokeh lifelines
+RUN python3 --version
 
 # TODO add jupyter stuff
 
 # Configure environment
-ENV CONDA_VER latest
+ENV CONDA_VER "4.1.11"
 ENV CONDA_DIR /opt/conda
 ENV PATH $CONDA_DIR/bin:$PATH
 ENV SHELL /bin/bash
@@ -51,11 +53,10 @@ RUN cd /tmp && \
     /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
     rm Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
     $CONDA_DIR/bin/conda install --quiet --yes conda && \
-    $CONDA_DIR/bin/conda config --system --add channels conda-forge && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'notebook' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter'
+    $CONDA_DIR/bin/conda config --system --add channels conda-forge 
+RUN    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter_core==4.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'notebook==4.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' 
 
 # Install Jupyter notebook
 # RUN conda clean -tipsy
@@ -72,8 +73,8 @@ RUN pip install --upgrade pip
 RUN pip install pandas
 # Install declarative widgets for Jupyter Notebook
 #ARG DECLWIDGETS_VER
-RUN pip install "jupyter_declarativewidgets" && \
-        jupyter declarativewidgets quick-setup --sys-prefix
+#RUN pip install "jupyter_declarativewidgets" && \
+#        jupyter declarativewidgets quick-setup --sys-prefix
 
 # Install content management to support dashboard bundler options
 #ARG CMS_VER

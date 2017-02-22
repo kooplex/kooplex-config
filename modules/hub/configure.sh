@@ -136,7 +136,7 @@ KOOPLEX = {
         'ssh_key_password': '$SSHKEYPASS',
     },
     'docker': {
-        'host': '$DOMAIN', 
+        'host': '$DOCKERIP', 
         'port': $DOCKERPORT,
         'network': '$PROJECT-net',
     },
