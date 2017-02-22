@@ -32,7 +32,7 @@ RUN pip install pandas numpy scipy matplotlib seaborn plotly igraph bokeh lifeli
 # TODO add jupyter stuff
 
 # Configure environment
-ENV CONDA_VER latest
+ENV CONDA_VER "4.1.11"
 ENV CONDA_DIR /opt/conda
 ENV PATH $CONDA_DIR/bin:$PATH
 ENV SHELL /bin/bash
@@ -52,11 +52,9 @@ RUN cd /tmp && \
     rm Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
     $CONDA_DIR/bin/conda install --quiet --yes conda && \
     $CONDA_DIR/bin/conda config --system --add channels conda-forge && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'notebook' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter'
-
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter_core==4.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'notebook==4.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub'
 # Install Jupyter notebook
 # RUN conda clean -tipsy
 

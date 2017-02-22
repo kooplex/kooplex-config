@@ -11,6 +11,7 @@ case $VERB in
       --name $PROJECT-nginx \
       --hostname $PROJECT-nginx \
       --net $PROJECT-net \
+      -p 80:80 -p 443:443 \
       --ip $NGINXIP \
       -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
@@ -19,7 +20,7 @@ case $VERB in
     echo "
 server {
   listen 80;
-  server_name $OUTER_DOMAIN;
+  server_name $OUTERHOST;
   client_max_body_size 20M;
   
   location /gitlab {
@@ -33,7 +34,7 @@ server {
   }
 
   location / {
-    rewrite / http://$OUTER_DOMAIN/hub permanent;
+    rewrite / http://$OUTERHOST/hub permanent;
   }
 
   location /static/ {
