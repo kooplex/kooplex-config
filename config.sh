@@ -1,10 +1,12 @@
 SYSMODULES="net base" # admin"
-MODULES="ldap home gitlab notebook proxy nginx mysql " # hub dashboard"
+MODULES="ldap home gitlab notebook proxy nginx mysql owncloud" # hub dashboard"
 
 OUTERHOST="http://wignercloud.compare-europe.hu"
 
 PREFIX="kooplex"
-DOCKERARGS=""
+DOCKERIP="10.3.177.82"
+DOCKERPORT="2376"
+DOCKERARGS="-H $DOCKERIP:$DOCKERPORT"
 PROJECT="compare"
 ROOT="/srv/"$PREFIX
 DISKIMG="/var/diskimg"
