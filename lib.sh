@@ -480,6 +480,8 @@ config() {
   
   HUBIP=$(ip_addip "$SUBNET" 18)
   
+  SMTPIP=$(ip_addip "$SUBNET" 25)
+  
   MYSQLIP=$(ip_addip "$SUBNET" 19)
 
   MYSQLPASS=$DUMMYPASS

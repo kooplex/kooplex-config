@@ -20,7 +20,7 @@ gitlab_rails['gitlab_email_from'] = '$EMAIL'
 gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'
 gitlab_rails['gitlab_email_reply_to'] = '$EMAIL'
 gitlab_rails['smtp_enable'] = true
-gitlab_rails['smtp_address'] = '$SMTP'
+
 
 gitlab_rails['gitlab_signup_enabled'] = false
 gitlab_rails['gitlab_signin_enabled'] = false
