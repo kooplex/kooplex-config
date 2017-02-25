@@ -8,42 +8,43 @@ services:
   dashboards:
     build:
       context: .
-      dockerfile: Dockerfile.dashboards
+      dockerfile: ${DASHBOARDS_DOCKERFILE}
       args:
           # npm versioning:
           DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
     networks:
       project_network:
-        ipv4_address: 172.20.0.21
+        ipv4_address: ${DASHBOARD_IP}
     ports:
-      - "3000:3000"
+      - "${DASHBOARD_PORT}:${DASHBOARD_PORT}"
     depends_on:
       - kernel_gateway
     links:
       - kernel_gateway
     env_file: db_secrets.env
     environment:
-      PORT: 3000
-      KERNEL_GATEWAY_URL: http://kernel_gateway:8888
+      PORT: ${DASHBOARD_PORT}
+      KERNEL_GATEWAY_URL: http://${KERNEL_GATEWAY_CONTAINER_NAME}:8888
       TRUST_PROXY: "true"
       BASE_URL: "/db"
       PUBLIC_LINK_PATTERN: ${PUBLIC_LINK_PATTERN}
     volumes:
       - ${HOST_DASHBOARDS_VOLUME}:/srv/app/data/:rw
-    container_name: ${COMPOSE_PROJECT_NAME}-dashboards
+    container_name: ${DASHBOARDS_CONTAINER_NAME}
 
   kernel_gateway:
     build:
       context: .
-      dockerfile: Dockerfile.kernel
-      args:
-        # pip versioning:
-        IPYWIDGETS_VER: '5.1.*'
-        DECLWIDGETS_VER: '0.6.*'
+      dockerfile: ${KERNEL_GATEWAY_DOCKERFILE}
+#      args:
+#        # pip versioning:
+#        IPYWIDGETS_VER: '5.1.*'
+#        DECLWIDGETS_VER: '0.6.*'
     networks:
       - project_network
     environment:
       KG_ALLOW_ORIGIN: '*'
+    container_name: ${KERNEL_GATEWAY_CONTAINER_NAME}
 
 networks:
   project_network:
