@@ -3,6 +3,8 @@
     port=3000
     ip=81
 
+DOCKER_HOST=$DOCKERARGS
+
 case $VERB in
   "build")
   
@@ -57,7 +59,7 @@ PUBLIC_LINK_PATTERN=http://$DASHBOARD_IP:$DASHBOARD_PORT
 EOF
 
     cp $ENVFILE .env
-    /usr/local/bin/docker-compose -f $COMPOSE_FILE build 
+    ../../temp/docker-compose $DOCKER_HOST -f $COMPOSE_FILE build 
 
    done
   ;;
@@ -77,7 +79,7 @@ EOF
     ENVFILE=$DOCKER_IMAGE".env"
     cp $ENVFILE .env
 
-    /usr/local/bin/docker-compose $DOCKERARGS -f $COMPOSE_FILE up -d
+    ../../temp/docker-compose $DOCKERARGS -f $COMPOSE_FILE up -d
     sleep 2
    done
   ;;
@@ -86,7 +88,7 @@ EOF
   ;;
   "stop")
     echo "Stopping and removing $PROJECT-dashboard"
-    /usr/local/bin/docker-compose $DOCKERARGS down
+    ../../temp/docker-compose $DOCKERARGS down
   ;;
   "remove")
     for DOCKER_FILE in `ls ../notebook/image*/Docker*`
@@ -99,8 +101,8 @@ EOF
     ENVFILE=$DOCKER_IMAGE".env"
     cp $ENVFILE .env
 
-    /usr/local/bin/docker-compose $DOCKERARGS -f $COMPOSE_FILE kill
-    /usr/local/bin/docker-compose $DOCKERARGS -f $COMPOSE_FILE rm
+    ../../temp/docker-compose $DOCKERARGS -f $COMPOSE_FILE kill
+    ../../temp/docker-compose $DOCKERARGS -f $COMPOSE_FILE rm
     
     done
   ;;

@@ -392,7 +392,7 @@ adduser() {
   setfacl -R -m d:u:$uid:rwx $SRV/home/$username
 
   # Set user quota
-  setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
+#  setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
   
     # Create Data directory which can be accessed through ownCloud
   echo "Initializing OwnCloud folders for  $uid $username"
