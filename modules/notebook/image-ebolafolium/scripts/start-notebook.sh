@@ -17,9 +17,14 @@ if [ $UID == 0 ] ; then
         echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
     fi
 	echo " 3"
+
     # Start the notebook server
     exec su $NB_USER -c "env PATH=$PATH jupyter notebook $*"
     echo " masik 4"
+    # nb-extension
+
+
+
 else
     # Otherwise just exec the notebook
     exec jupyter notebook $*
