@@ -7,6 +7,14 @@ then
     notebook_arg="--notebook-dir=${NOTEBOOK_DIR}"
 fi
 
+# nb-extension
+jupyter nbextensions_configurator enable --system
+
+jupyter nbextension enable codefolding/main
+jupyter nbextension enable hide_input/main
+jupyter nbextension enable hide_input_all/main
+
+
 exec jupyterhub-singleuser \
   --port=8888 \
   --ip=0.0.0.0 \
