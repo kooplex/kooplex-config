@@ -22,7 +22,7 @@ ARG CACHE_DATE=2016-01-02
 RUN cd /opt 
 RUN git clone https://github.com/kooplex/kooplex-hub.git
 RUN mv kooplex-hub kooplexhub
-COPY settings.py /settings.py 
+#COPY settings.py /settings.py 
 
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh

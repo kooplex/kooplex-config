@@ -349,7 +349,9 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
 EOF
-
+	 
+    mkdir -p $SRV/hub
+    cp settings.py $SRV/hub/
     DATE=$(date +%y-%m-%d)
     docker $DOCKERARGS build -t kooplex-hub --build-arg CACHE_DATE=$DATE .
 
@@ -363,6 +365,7 @@ echo $HUBIP
       --net $PROJECT-net \
       --ip $HUBIP \
       --privileged \
+      -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
       -v $SRV/home:$SRV/home \
       -v $SRV/dashboards:$SRV/dashboards \
       -v $SRV/notebook:$SRV/notebook \
