@@ -460,7 +460,7 @@ config() {
   ADMINIP=$(ip_addip "$SUBNET" 2)
   
   LDAPIP=$(ip_addip "$SUBNET" 3)
-  LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
+  LDAPORG=$(ldap_fdqn2cn "$LDAPDOMAIN")
   LDAPSERV=$PROJECT-ldap
   LDAPPORT=389
 

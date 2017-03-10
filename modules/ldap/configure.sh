@@ -25,7 +25,7 @@ case $VERB in
       -v $SRV/ldap/var:/var/lib/ldap \
       -e SLAPD_PASSWORD="$LDAPPASS" \
       -e SLAPD_CONFIG_PASSWORD="$LDAPPASS" \
-      -e SLAPD_DOMAIN=$DOMAIN \
+      -e SLAPD_DOMAIN=$LDAPORG \
       kooplex-ldap 
   ;;
   "start")
