@@ -13,7 +13,7 @@ c.NotebookApp.port = 8000
 c.NotebookApp.open_browser = False
 c.HistoryManager.hist_file = '/tmp/ipython_hist.sqlite'
 c.NotebookApp.allow_origin = '*'
-c.NotebookApp.set_default('nbserver_extensions', {})['jupyter_nbextensions_configurator'] = True
+#c.NotebookApp.set_default('nbserver_extensions', {})['jupyter_nbextensions_configurator'] = True
 
 # Set a certificate if USE_HTTPS is set to any value
 if 'USE_HTTPS' in os.environ:
