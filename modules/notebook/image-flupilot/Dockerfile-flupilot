@@ -47,6 +47,5 @@ ENV PATH "/opt/samtools/bin:/opt/blast/ncbi-blast-2.2.31+-x64-linux.tar.gz/ncbi-
 RUN chmod a+rxw $CONDA_DIR
 ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
 ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
-ADD scripts/start.sh /usr/local/bin/start.sh
 
 #RUN chmod 775 /usr/local/bin/start-notebook.sh /usr/local/bin/start-singleuser.sh

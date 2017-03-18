@@ -23,6 +23,5 @@ RUN jupyter nbextension enable hide_input_all/main
 # Add local files as late as possible to avoid cache busting
 ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
 ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
-ADD scripts/start.sh /usr/local/bin/start.sh
 
 #RUN chmod 775 /usr/local/bin/start-notebook.sh /usr/local/bin/start-singleuser.sh

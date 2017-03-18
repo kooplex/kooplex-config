@@ -32,11 +32,6 @@ RUN cd /tmp && \
 # Install Jupyter notebook
 # RUN conda clean -tipsy
     
-# Install JupyterHub to get the jupyterhub-singleuser startup script
-RUN pip install 'jupyter_dashboards' && \
-    jupyter-dashboards quick-setup && \
-    jupyter-nbextension enable jupyter_dashboards --py
-
 # Become root to do the apt-gets
 #USER root
 
