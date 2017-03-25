@@ -461,6 +461,7 @@ config() {
   
   LDAPIP=$(ip_addip "$SUBNET" 3)
   LDAPORG=$(ldap_fdqn2cn "$LDAPDOMAIN")
+  echo $LDAPORG
   LDAPSERV=$PROJECT-ldap
   LDAPPORT=389
 
@@ -495,6 +496,8 @@ config() {
   IPPOOLE=$(ip_addip "$SUBNET" 5375) 
 
   PROXYTOKEN=$(createsecret proxy)
+
+ 
 
   if [ $(isindocker) -eq 1 ]; then
     echo "Process is running inside a docker container."

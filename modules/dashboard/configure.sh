@@ -56,10 +56,12 @@ KERNEL_GATEWAY_IMAGE_NAME=$KERNEL_GATEWAY_IMAGE_NAME
 KERNEL_GATEWAY_CONTAINER_NAME=$KERNEL_GATEWAY_CONTAINER_NAME
 KERNEL_GATEWAY_DOCKERFILE=$KERNEL_GATEWAY_DOCKERFILE
 PUBLIC_LINK_PATTERN=http://$DASHBOARD_IP:$DASHBOARD_PORT
+TRUST_PROXY=true
+BASE_URL='[/alma]'
 EOF
 
     cp $ENVFILE .env
-    ../../temp/docker-compose $DOCKER_HOST -f $COMPOSE_FILE build 
+ docker-compose $DOCKER_HOST -f $COMPOSE_FILE build 
 
    done
   ;;
@@ -79,7 +81,7 @@ EOF
     ENVFILE=$DOCKER_IMAGE".env"
     cp $ENVFILE .env
 
-    ../../temp/docker-compose $DOCKERARGS -f $COMPOSE_FILE up -d
+    docker-compose $DOCKERARGS -f $COMPOSE_FILE up -d
     sleep 2
    done
   ;;
@@ -88,7 +90,15 @@ EOF
   ;;
   "stop")
     echo "Stopping and removing $PROJECT-dashboard"
-    ../../temp/docker-compose $DOCKERARGS down
+
+    for DOCKER_FILE in `ls ../notebook/image*/Docker*`
+    do
+    
+    DOCKER_IMAGE=${DOCKER_FILE##*Dockerfile-}         
+    COMPOSE_FILE=docker-compose.yml-$DOCKER_IMAGE
+    docker-compose $DOCKERARGS -f $COMPOSE_FILE down
+    
+    done
   ;;
   "remove")
     for DOCKER_FILE in `ls ../notebook/image*/Docker*`
@@ -101,8 +111,8 @@ EOF
     ENVFILE=$DOCKER_IMAGE".env"
     cp $ENVFILE .env
 
-    ../../temp/docker-compose $DOCKERARGS -f $COMPOSE_FILE kill
-    ../../temp/docker-compose $DOCKERARGS -f $COMPOSE_FILE rm
+    docker-compose $DOCKERARGS -f $COMPOSE_FILE kill
+    docker-compose $DOCKERARGS -f $COMPOSE_FILE rm
     
     done
   ;;

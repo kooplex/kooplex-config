@@ -7,7 +7,16 @@ case $VERB in
     mkdir -p $SRV/nginx/etc/
     cp etc/nginx.conf $SRV/nginx/etc/
     
-
+    docker $DOCKERARGS create \
+      --name $PROJECT-nginx \
+      --hostname $PROJECT-nginx \
+      --net $PROJECT-net \
+      -p 80:80 -p 443:443 \
+      --ip $NGINXIP \
+      -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
+      -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
+      -v $SRV/nginx/var:/var/log/nginx \
+      nginx 
       
     echo "
 server {
@@ -98,16 +107,6 @@ server {
 
 " > $SRV/nginx/etc/sites.conf
 
-    docker $DOCKERARGS create \
-      --name $PROJECT-nginx \
-      --hostname $PROJECT-nginx \
-      --net $PROJECT-net \
-      -p 80:80 -p 443:443 \
-      --ip $NGINXIP \
-      -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
-      -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
-      -v $SRV/nginx/var:/var/log/nginx \
-      nginx 
 
   ;;
   "start")

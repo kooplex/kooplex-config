@@ -44,7 +44,8 @@ if [[ ! -d /etc/ldap/slapd.d || "$SLAPD_FORCE_RECONFIGURE" == "true" ]]; then
         slapd slapd/move_old_database boolean true
 EOF
 
-    dpkg-reconfigure -f noninteractive slapd >/dev/null 2>&1
+#    dpkg-reconfigure -f noninteractive slapd >/dev/null 2>&1
+    dpkg-reconfigure slapd 
 
     dc_string=""
 

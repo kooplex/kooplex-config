@@ -110,6 +110,8 @@ KOOPLEX = {
         'name': '$PREFIX',
     },
     'hub': {
+        'internal_host' : KOOPLEX_INTERNAL_HOST,
+        'outer_host' : KOOPLEX_OUTER_HOST,
     },
     'users': {
         'srv_dir': '$SRV',

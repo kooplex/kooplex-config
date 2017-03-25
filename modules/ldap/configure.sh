@@ -15,6 +15,19 @@ case $VERB in
     chown -R root $SRV/ldap
     chmod -R 755 $SRV/ldap
     
+      echo "PLEASE RUN LDAP container manually first. noninteractive configure doesn't work now (?!)"
+      echo ""
+      echo "Use this command:"
+      echo "docker $DOCKERARGS run -it  --name $PROJECT-ldap -p 666:$LDAPPORT \
+      -v $SRV/ldap/etc:/etc/ldap \
+      -v $SRV/ldap/var:/var/lib/ldap \
+      -e SLAPD_PASSWORD="$LDAPPASS" \
+      -e SLAPD_CONFIG_PASSWORD="$LDAPPASS" \
+      -e SLAPD_DOMAIN=$LDAPORG \
+      kooplex-ldap bash"
+      
+      echo ""
+
     docker $DOCKERARGS create \
       --name $PROJECT-ldap \
       --hostname $PROJECT-ldap \
@@ -27,11 +40,11 @@ case $VERB in
       -e SLAPD_CONFIG_PASSWORD="$LDAPPASS" \
       -e SLAPD_DOMAIN=$LDAPORG \
       kooplex-ldap 
+      
+
   ;;
   "start")
     echo "Starting slapd $PROJECT-ldap [$LDAPIP]"
-    echo "AFTER REMOUNT-RESTART: DONT FORGET TO CHECK WHO IS OWNER: "
-    echo "drwxr-xr-x  6 dnsmasq ssl-cert 4096 okt   14 10:42 etc"
     docker $DOCKERARGS start $PROJECT-ldap
     echo "Waiting for slapd to start"
     # TODO: implement some try-catch logic to wait until

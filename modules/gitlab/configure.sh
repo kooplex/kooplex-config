@@ -100,4 +100,14 @@ EOS
     echo "Purging gitlab $PROJECT-gitlab [$GITLABIP]"
     rm -R $SRV/gitlab
   ;;
+  "check")
+    echo "Checking gitlab "
+    mkdir -p $SRV/errors/
+    mkdir -p $SRV/checks/
+    
+    for check in check/*.sh
+    do
+     /bin/bash $check
+    done
+  ;;
 esac
