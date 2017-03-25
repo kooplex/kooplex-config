@@ -1,0 +1,132 @@
+FROM kooplex-base
+
+# Installs Jupyter Notebook and IPython kernel from the current branch 
+# Another Docker container should inherit with `FROM jupyter/notebook` 
+# to run actual services. # 
+# For opinionated stacks of ready-to-run Jupyter applications in Docker, 
+# check out docker-stacks <https://github.com/jupyter/docker-stacks> 
+# Not essential, but wise to set the lang # Note: Users with other languages should set this in their derivative image 
+#ENV PYTHONIOENCODING UTF-8 # Remove preinstalled copy of python that blocks our ability to install development python. 
+RUN apt update
+RUN  DEBIAN_FRONTEND=noninteractive apt install -yq --no-install-recommends \
+ build-essential \
+ ca-certificates \
+ curl \
+ git \
+ language-pack-en \
+ libcurl4-openssl-dev \
+ libffi-dev \
+ libsqlite3-dev \
+ libzmq3-dev \
+ pandoc 
+
+RUN  DEBIAN_FRONTEND=noninteractive apt install -yq --no-install-recommends python \
+ python3 \
+ python-dev \
+ python3-dev \
+ sqlite3 
+RUN  DEBIAN_FRONTEND=noninteractive apt install -yq --no-install-recommends  texlive-fonts-recommended \
+ texlive-latex-base \
+ texlive-latex-extra \
+ zlib1g-dev 
+
+RUN curl -L https://github.com/krallin/tini/releases/download/v0.6.0/tini > tini && \
+    echo "d5ed732199c36a1189320e6c4859f0169e950692f451c03e7854243b95f4234b *tini" | sha256sum -c - && \
+    mv tini /usr/local/bin/tini && \
+    chmod +x /usr/local/bin/tini
+
+# Install the recent pip release
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && \ 
+python2 get-pip.py && \ 
+python3 get-pip.py && \ 
+rm get-pip.py 
+
+RUN apt install -y openssl libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev
+
+RUN pip2 --no-cache-dir install requests[security] && \
+ pip3 --no-cache-dir install requests[security] && \
+ rm -rf /root/.cache # Install some dependencies. 
+
+RUN pip2 --no-cache-dir install ipykernel && \
+ pip3 --no-cache-dir install ipykernel && \ 
+ python2 -m ipykernel.kernelspec && \
+ python3 -m ipykernel.kernelspec 
+
+#RUN mkdir -p /usr/src/jupyter-notebook
+ADD . /usr/src/jupyter-notebook # Install dependencies and run tests. 
+
+RUN BUILD_DEPS="nodejs-legacy npm" && \
+ apt-get update -qq && \
+ DEBIAN_FRONTEND=noninteractive apt-get install -yq $BUILD_DEPS && \
+ pip3 install --no-cache-dir /usr/src/jupyter-notebook && \
+ pip2 install --no-cache-dir widgetsnbextension && \
+ pip3 install --no-cache-dir widgetsnbextension && \
+ npm cache clean && \
+ apt-get clean && \
+ rm -rf /root/.npm && \
+ rm -rf /root/.cache && \
+ rm -rf /root/.config && \
+ rm -rf /root/.local && \
+ rm -rf /root/tmp && \
+ rm -rf /var/lib/apt/lists/* 
+
+RUN apt-get purge -y --auto-remove \
+ -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $BUILD_DEPS # Run tests. 
+RUN pip3 install --no-cache-dir notebook[test] && nosetests -v notebook # Add a notebook profile. 
+
+# Configure environment
+ENV CONDA_VER "4.1.11"
+ENV CONDA_DIR /opt/conda
+ENV PATH $CONDA_DIR/bin:$PATH
+ENV SHELL /bin/bash
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+# Create conda dir
+RUN mkdir -p $CONDA_DIR
+
+# Install conda
+RUN cd /tmp && \
+    mkdir -p $CONDA_DIR && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
+    # echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
+    /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
+    $CONDA_DIR/bin/conda install --quiet --yes conda && \
+    $CONDA_DIR/bin/conda config --system --add channels conda-forge && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter_core==4.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'notebook==4.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' 
+
+# Install Jupyter notebook
+# RUN conda clean -tipsy
+
+# Become root to do the apt-gets
+#USER root
+
+RUN apt update && \
+                apt install -y curl && \
+                curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
+                apt install --yes nodejs npm && \
+                npm install -g bower
+
+#USER root
+RUN apt update
+RUN apt install -y python3-pip liblapack-dev libblas-dev
+RUN apt install -y gfortran libfreetype6* pkg-config
+RUN python3 --version
+
+RUN apt install -y git
+
+RUN pip3 install numpy  scipy
+RUN pip3 install matplotlib pandas
+RUN python3 --version
+
+RUN chmod a+rxw $CONDA_DIR
+
+
+# Add local files as late as possible to avoid cache busting
+ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
+ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
+

@@ -9,14 +9,15 @@ services:
     build:
       context: .
       dockerfile: ${DASHBOARDS_DOCKERFILE}
-      args:
+#      args:
           # npm versioning:
-          DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
+          #DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
+          #DASHBOARDS_SERVER_VER: '=0.8'
     networks:
       project_network:
         ipv4_address: ${DASHBOARD_IP}
     ports:
-      - "${DASHBOARD_PORT}:${DASHBOARD_PORT}"
+      - "${DASHBOARD_PORT_HOST}:${DASHBOARD_PORT}"
     depends_on:
       - kernel_gateway
     links:
@@ -25,9 +26,9 @@ services:
     environment:
       PORT: ${DASHBOARD_PORT}
       KERNEL_GATEWAY_URL: http://${KERNEL_GATEWAY_CONTAINER_NAME}:8888
-      TRUST_PROXY: "true"
-      BASE_URL: "/db"
-      PUBLIC_LINK_PATTERN: ${PUBLIC_LINK_PATTERN}
+      #TRUST_PROXY: "true" # v 0.7.x, 0.8.x
+      TRUST_PROXY: "uniquelocal"   # v 0.9-dev
+      BASE_URL: /dashboard/192.168.122.10:${DASHBOARD_PORT_HOST}/${KERNEL_GATEWAY_CONTAINER_IP}:8888
     volumes:
       - ${HOST_DASHBOARDS_VOLUME}:/srv/app/data/:rw
     container_name: ${DASHBOARDS_CONTAINER_NAME}
@@ -41,7 +42,9 @@ services:
 #        IPYWIDGETS_VER: '5.1.*'
 #        DECLWIDGETS_VER: '0.6.*'
     networks:
-      - project_network
+      project_network:
+        ipv4_address: ${KERNEL_GATEWAY_CONTAINER_IP}
+
     environment:
       KG_ALLOW_ORIGIN: '*'
     container_name: ${KERNEL_GATEWAY_CONTAINER_NAME}
