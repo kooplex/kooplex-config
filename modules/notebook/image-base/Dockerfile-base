@@ -15,6 +15,8 @@ ENV LANGUAGE en_US.UTF-8
 
 # Create conda dir
 RUN mkdir -p $CONDA_DIR
+
+
     
 # Install conda
 RUN cd /tmp && \
@@ -22,40 +24,55 @@ RUN cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
     # echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
     /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
-    $CONDA_DIR/bin/conda install --quiet --yes conda && \
+    rm Miniconda3-$CONDA_VER-Linux-x86_64.sh 
+
+RUN $CONDA_DIR/bin/conda install --quiet --yes conda && \
     $CONDA_DIR/bin/conda config --system --add channels conda-forge && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter_core==4.2' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'notebook==4.2' && \
-    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub' 
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyter_core==4.1' && \
+    $CONDA_DIR/bin/conda install --quiet --yes  jupyter_client==4.2.2 && \
+    $CONDA_DIR/bin/conda install --quiet --yes jupyter_console==4.1.1 
+RUN conda install --quiet --yes anaconda-client
+
+RUN anaconda search -t conda notebook
+RUN $CONDA_DIR/bin/conda install --quiet --yes 'notebook==4.2.2' && \
+    $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub'  && \
+    $CONDA_DIR/bin/conda install --quiet --yes widgetsnbextension==1.2.3
 
 # Install Jupyter notebook
 # RUN conda clean -tipsy
     
-# Become root to do the apt-gets
-#USER root
-
 RUN apt update && \
-                apt install -y curl && \
-                curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-                apt install --yes nodejs npm && \
-                npm install -g bower
+    apt install -y curl && \
+    curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
+    apt install --yes nodejs npm && \
+    npm install -g bower
 
-#USER root
-RUN apt update
-RUN apt install -y python3-pip liblapack-dev libblas-dev
+RUN  $CONDA_DIR/bin/conda install --quiet --yes pandas && \
+     $CONDA_DIR/bin/conda install --quiet --yes numpy && \
+     $CONDA_DIR/bin/conda install --quiet --yes scipy && \
+     $CONDA_DIR/bin/conda install --quiet --yes matplotlib
+
+RUN  $CONDA_DIR/bin/conda install --quiet --yes  seaborn && \
+     $CONDA_DIR/bin/conda install --quiet --yes  seaborn && \
+     $CONDA_DIR/bin/conda install --quiet --yes  plotly  && \
+     $CONDA_DIR/bin/conda install --quiet --yes  bokeh && \
+     $CONDA_DIR/bin/conda install --quiet --yes  pandas && \
+     $CONDA_DIR/bin/conda install --quiet --yes  lifelines
+
+RUN  $CONDA_DIR/bin/conda install --quiet --yes  igraph
+
+RUN conda install -c conda-forge ipywidgets && \
+    $CONDA_DIR/bin/conda install --quiet --yes notebook==4.2.2
+
+
+RUN apt install -y python3-pip python-pip liblapack-dev libblas-dev
 RUN apt install -y gfortran libfreetype6* pkg-config
-RUN python3 --version
-
-RUN apt install -y git
+RUN apt install -y git gcc
 
 RUN pip3 install --upgrade pip
-RUN pip3 install numpy  scipy
-RUN pip3 install matplotlib pandas
-RUN python3 --version
+RUN pip install --upgrade pip
 
-#RUN chmod a+rxw $CONDA_DIR
-
+RUN chmod a+rxw $CONDA_DIR
 
 # Add local files as late as possible to avoid cache busting
 ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh

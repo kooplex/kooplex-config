@@ -1,51 +1,32 @@
 FROM kooplex-notebook-base
 
-# Install the recent pip release
-RUN apt install -y python-pip
 
-RUN conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 \
-    'nomkl' \
-    'ipython=5.3*' \
-    'ipywidgets=6.0*' \
-    'pandas=0.19*' \
-    'numexpr=2.6*' \
-    'matplotlib=2.0*' \
-    'scipy=0.19*' \
-    'seaborn=0.7*' \
-    'scikit-learn=0.18*' \
-    'scikit-image=0.12*' \
-    'sympy=1.0*' \
-    'cython=0.25*' \
-    'patsy=0.4*' \
-    'statsmodels=0.8*' \
-    'cloudpickle=0.2*' \
-    'dill=0.2*' \
-    'numba=0.31*' \
-    'bokeh=0.12*' \
-    'hdf5=1.8.17' \
-    'h5py=2.6*' \
-    'sqlalchemy=1.1*' \
-    'pyzmq'
-#    'vincent=0.4.*'     'beautifulsoup4=4.5.*'     'xlrd' 
-RUN  conda remove -n python2 --quiet --yes --force qt pyqt && \
-    conda clean -tipsy
-# Add shortcuts to distinguish pip for python2 and python3 envs
-RUN ln -s $CONDA_DIR/envs/python2/bin/pip $CONDA_DIR/bin/pip2 && \
-ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip3
+# Install dashboard layout and preview within Jupyter Notebook
+#RUN pip install "jupyter_dashboards==0.6.1" && \
+#        jupyter dashboards quick-setup --sys-prefix
 
 
-RUN pip install kernda --no-cache && \
-    $CONDA_DIR/envs/python2/bin/python -m ipykernel install && \
-    kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
-pip uninstall kernda -y
+RUN conda config --add channels conda-forge
 
-RUN pip3 install --upgrade pip
-RUN pip3 install numpy  scipy
-RUN pip3 install matplotlib pandas
-RUN python3 --version
-RUN pip3 install ipywidgets==4.1
-RUN chmod a+rxw $CONDA_DIR
+RUN  $CONDA_DIR/bin/conda install --quiet --yes jupyter_dashboards==0.6.1 && \
+     jupyter dashboards quick-setup --sys-prefix
 
+# Install declarative widgets for Jupyter Notebook
+#ARG DECLWIDGETS_VER
+#RUN pip install "jupyter_declarativewidgets==$DECLWIDGETS_VER" && \
+#        jupyter declarativewidgets quick-setup --sys-prefix
+
+# Install content management to support dashboard bundler options
+#RUN pip install "jupyter_cms==5.1.5" && \
+#        jupyter cms quick-setup --sys-prefix
+#RUN pip install "jupyter_dashboards_bundlers==0.8.0" && \
+#        jupyter dashboards_bundlers quick-setup --sys-prefix
+
+RUN  $CONDA_DIR/bin/conda install --quiet --yes jupyter_cms==0.6.2 && \
+     jupyter cms quick-setup --sys-prefix
+
+#RUN  $CONDA_DIR/bin/conda install --quiet --yes jupyter_dashboards_bundlers==0.7.0 && \
+#     jupyter dashboards_bundlers quick-setup --sys-prefix
 
 # Add local files as late as possible to avoid cache busting
 ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh

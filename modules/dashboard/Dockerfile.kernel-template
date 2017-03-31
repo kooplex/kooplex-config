@@ -10,5 +10,25 @@ FROM IMAGE
 USER root
 RUN pip install jupyter_kernel_gateway==0.5.1
 
+ARG IPYWIDGETS_VER
+#RUN pip install "ipywidgets==$IPYWIDGETS_VER"
+#RUN pip install "ipywidgets==4.1.1" 
+
+# install Declarative Widgets python package
+# don't bother activating the extension, not needed outside notebook
+ARG DECLWIDGETS_VER
+#RUN pip install "jupyter_declarativewidgets==$DECLWIDGETS_VER"
+#RUN pip install "jupyter_declarativewidgets==0.6.2"
+
+#RUN pip install "nbconvert==4.2.0" 
+
+#RUN pip install "jupyter_cms==0.6.0" && \
+#        jupyter cms quick-setup --sys-prefix
+#RUN pip install "jupyter_dashboards_bundlers==0.8.1" && \
+#        jupyter dashboards_bundlers quick-setup --sys-prefix
+
+#RUN pip install pandas numpy scipy matplotlib seaborn plotly igraph
+
+
 # run kernel gateway, not notebook server
 CMD ["jupyter", "kernelgateway", "--KernelGatewayApp.ip=0.0.0.0"]
