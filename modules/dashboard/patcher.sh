@@ -41,5 +41,10 @@ function ptch_css {
 }
 
 exc n ls $FLAGFILE
+if [ $EXC_ST = 0 ] ; then
+  echo "Already patched" >&2
+  exit 0
+fi
+
 ptch_css
 exc n touch $FLAGFILE
