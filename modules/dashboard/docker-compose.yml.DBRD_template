@@ -1,0 +1,24 @@
+  ##DASHBOARDS##:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboards
+      args:
+          DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
+    ports:
+      - "##DASHBOARDS_PORT##:3000"
+    networks:
+      project_network:
+    depends_on:
+      - ##KERNELGATEWAY##
+    links:
+      - ##KERNELGATEWAY##
+    volumes:
+      - ##VOLUME##:/srv/app/data/:ro
+    environment:
+      PORT: 3000
+      KERNEL_GATEWAY_URL: http://##KERNELGATEWAY##:8888
+      BASE_URL: /db/##DASHBOARDS_PORT##
+      PUBLIC_LINK_PATTERN: http://localhost:3000
+      TRUST_PROXY: uniquelocal
+    restart: always
+
