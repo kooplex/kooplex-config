@@ -2,8 +2,6 @@
     build:
       context: .
       dockerfile: Dockerfile.dashboards
-      args:
-          DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
     ports:
       - "##DASHBOARDS_PORT##:3000"
     networks:
