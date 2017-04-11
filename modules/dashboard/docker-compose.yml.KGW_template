@@ -4,49 +4,21 @@
 ---
 version: "2"
 
-services:
-  dashboards:
-    build:
-      context: .
-      dockerfile: ${DASHBOARDS_DOCKERFILE}
-#      args:
-          # npm versioning:
-          #DASHBOARDS_SERVER_VER: '>=0.7.0 <0.8.0'
-          #DASHBOARDS_SERVER_VER: '=0.8'
-    networks:
-      project_network:
-        ipv4_address: ${DASHBOARD_IP}
-    ports:
-      - "${DASHBOARD_PORT_HOST}:${DASHBOARD_PORT}"
-    depends_on:
-      - kernel_gateway
-    links:
-      - kernel_gateway
-    env_file: db_secrets.env
-    environment:
-      PORT: ${DASHBOARD_PORT}
-      KERNEL_GATEWAY_URL: http://${KERNEL_GATEWAY_CONTAINER_NAME}:8888
-      #TRUST_PROXY: "true" # v 0.7.x, 0.8.x
-      TRUST_PROXY: "uniquelocal"   # v 0.9-dev
-      BASE_URL: /dashboard/polc.elte.hu:${DASHBOARD_PORT_HOST}/${KERNEL_GATEWAY_CONTAINER_IP}:8888
-    volumes:
-      - ${HOST_DASHBOARDS_VOLUME}:/srv/app/data/:rw
-    container_name: ${DASHBOARDS_CONTAINER_NAME}
-
-  kernel_gateway:
-    build:
-      context: .
-      dockerfile: ${KERNEL_GATEWAY_DOCKERFILE}
-    networks:
-      project_network:
-        ipv4_address: ${KERNEL_GATEWAY_CONTAINER_IP}
-    volumes:
-      - ${HOST_DASHBOARDS_VOLUME}:/home/:rw
-    environment:
-      KG_ALLOW_ORIGIN: '*'
-    container_name: ${KERNEL_GATEWAY_CONTAINER_NAME}
-
 networks:
   project_network:
     external: 
-      name: ${PROJECT_NETWORK}
+      name: ##NETWORK##
+
+services:
+  ##KERNELGATEWAY##:
+    build:
+      context: .
+      dockerfile: ##KERNELGATEWAY_DOCKERFILE##
+    networks:
+      project_network:
+    environment:
+      KG_ALLOW_ORIGIN: '*'
+    volumes:
+      - ##VOLUME##:/srv/app/data/:ro
+    restart: always
+
