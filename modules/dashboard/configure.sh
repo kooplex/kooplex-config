@@ -1,126 +1,88 @@
 #!/bin/bash
 
-    DASHBOARD_PORT=3000
-    DASHBOARD_PORT_HOST=3000
-    ip=81
-    KGW_IP_LAST=100
+# try to allocate dashboards server ports from this port value
+DASHBOARDS_PORT=3000
+
 
 DOCKER_HOST=$DOCKERARGS
 
 case $VERB in
   "build")
-  
-    mkdir -p $SRV/dashboards
-
-    for DOCKER_FILE in `ls ../notebook/image*/Docker*`
+    for DOCKER_FILE in ../notebook/image*/Dockerfile-*
     do
-	 
+      POSTFIX=${DOCKER_FILE##*Dockerfile-}
+      DOCKER_COMPOSE_FILE=docker-compose.yml-$POSTFIX
 
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-numpy-git
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-dashboard-numpy
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-base
-    DOCKER_IMAGE=${DOCKER_FILE##*Dockerfile-}
-    COMPOSE_FILE=docker-compose.yml-$DOCKER_IMAGE
-    echo "BUILDING $COMPOSE_FILE"
+      echo "1. Building dockerfile file for $POSTFIX..."
+      IMAGE=kooplex-notebook-$POSTFIX
+      KGW_DOCKERFILE=Dockerfile.kernel-$POSTFIX
+#TODO: check the existance of the docker image by docker images
+      sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
 
-    DASHBOARD_IP=$(ip_addip "$SUBNET" $ip)
-     DASHBOARD_PORT_HOST=$((DASHBOARD_PORT_HOST+1))   
-     ip=$((ip+1))
-     KGW_IP_LAST=$((KGW_IP_LAST+1))
-    ENVFILE=$DOCKER_IMAGE".env"
-    IMAGE=kooplex-notebook-$DOCKER_IMAGE
-    KERNEL_GATEWAY_CONTAINER_NAME=kernel-gateway-$DOCKER_IMAGE
-    KERNEL_GATEWAY_CONTAINER_IP=172.20.0.${KGW_IP_LAST}
-    KERNEL_GATEWAY_IMAGE_NAME=kooplex-kernel-gateway-$DOCKER_IMAGE
-    KERNEL_GATEWAY_DOCKERFILE=Dockerfile.kernel-$DOCKER_IMAGE
-    DASHBOARDS_DOCKERFILE=Dockerfile.dashboards-$DOCKER_IMAGE
-    DASHBOARDS_CONTAINER_NAME=dashboards-$DOCKER_IMAGE
-    DASHBOARDS_IMAGE_NAME=kooplex-dashboards-$DOCKER_IMAGE
-    sed -e "s/IMAGE/$IMAGE/" Dockerfile.kernel-template > $KERNEL_GATEWAY_DOCKERFILE
-    cp Dockerfile.dashboards $DASHBOARDS_DOCKERFILE
-    sed -e "s/kernel_gateway/$KERNEL_GATEWAY_IMAGE_NAME/" docker-compose.yml-template > $COMPOSE_FILE
-    perl -pi -e "s/dashboards/$DASHBOARDS_IMAGE_NAME/" $COMPOSE_FILE
+      echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
+      KGV=kernel-gateway-$POSTFIX
+#FIXME: these are hard coded
+      VOL="\/srv\/kooplex\/mnt_kooplex\/compare\/dashboards\/$POSTFIX\/"
+      NETWORK=compare-net
+      sed -e "s/##KERNELGATEWAY##/$KGV/" \
+          -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE/" \
+          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##NETWORK##/$NETWORK/" \
+        docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
+#TODO: when more dashboards do a loop here
+      DASHBOARDS_NAME=kooplex-dashboards-$POSTFIX
+      sed -e "s/##KERNELGATEWAY##/$KGV/" \
+          -e "s/##DASHBOARDS##/$DASHBOARDS_NAME/" \
+          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##DASHBOARDS_PORT##/$DASHBOARDS_PORT/" \
+        docker-compose.yml.DBRD_template >> $DOCKER_COMPOSE_FILE
+      DASHBOARDS_PORT=$((DASHBOARDS_PORT + 1))   
+#NOTE: inner loop over dashboards for a given gateway should end here
 
-	echo "$DASHBOARDS_CONTAINER_NAME and $KERNEL_GATEWAY_CONTAINER_NAME"
-    
-    echo "Building $PROJECT-dashboards images"
-
-    cat << EOF > $ENVFILE  
-COMPOSE_PROJECT_NAME=$PROJECT
-IMAGE=$IMAGE
-PROJECT_NETWORK=$PROJECT-net
-HOST_DASHBOARDS_VOLUME=$DASHBOARDSDIR
-DASHBOARD_IP=$DASHBOARD_IP
-DASHBOARD_PORT=$DASHBOARD_PORT
-DASHBOARD_PORT_HOST=$DASHBOARD_PORT_HOST
-DASHBOARDS_DOCKERFILE=$DASHBOARDS_DOCKERFILE 
-DASHBOARDS_IMAGE_NAME=$DASHBOARDS_IMAGE_NAME
-DASHBOARDS_CONTAINER_NAME=$DASHBOARDS_CONTAINER_NAME 
-KERNEL_GATEWAY_IMAGE_NAME=$KERNEL_GATEWAY_IMAGE_NAME 
-KERNEL_GATEWAY_CONTAINER_NAME=$KERNEL_GATEWAY_CONTAINER_NAME
-KERNEL_GATEWAY_CONTAINER_IP=$KERNEL_GATEWAY_CONTAINER_IP
-KERNEL_GATEWAY_DOCKERFILE=$KERNEL_GATEWAY_DOCKERFILE
-EOF
-
-    cp $ENVFILE .env
- docker-compose $DOCKER_HOST -f $COMPOSE_FILE build 
-
+      echo "3. Building images for $POSTFIX..."
+      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
    done
   ;;
+
   "install")
   ;;
-  "start")
-    
-    for DOCKER_FILE in `ls ../notebook/image*/Docker*`
+
+  "start")  
+    for DOCKER_COMPOSE_FILE in docker-compose.yml-*
     do
-
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-numpy-git
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-dashboard-numpy
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-base
-    DOCKER_IMAGE=${DOCKER_FILE##*Dockerfile-}
-    COMPOSE_FILE=docker-compose.yml-$DOCKER_IMAGE
-    echo "Starting $COMPOSE_FILE"
-    ENVFILE=$DOCKER_IMAGE".env"
-    cp $ENVFILE .env
-
-    docker-compose $DOCKERARGS -f $COMPOSE_FILE up -d
+      echo "Starting service for $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
     sleep 2
    done
   ;;
-  "init")
-    
+
+  "init")  
   ;;
+
   "stop")
-    for DOCKER_FILE in `ls ../notebook/image*/Docker*`
+    for DOCKER_COMPOSE_FILE in docker-compose.yml-*
     do
-    DOCKER_IMAGE=${DOCKER_FILE##*Dockerfile-}
-    COMPOSE_FILE=docker-compose.yml-$DOCKER_IMAGE
-    echo "Stopping and removing $PROJECT-dashboard"
-    docker-compose $DOCKERARGS -f $COMPOSE_FILE down
-    
+      echo "Stopping and removing services in $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
     done
   ;;
+    
   "remove")
-    for DOCKER_FILE in `ls ../notebook/image*/Docker*`
+    for DOCKER_COMPOSE_FILE in docker-compose.yml-*
     do
-
-#           DOCKER_FILE=../notebook/image-numpy-git/Dockerfile-numpy-git
-    DOCKER_IMAGE=${DOCKER_FILE##*Dockerfile-}
-    COMPOSE_FILE=docker-compose.yml-$DOCKER_IMAGE
-    echo "REMOVING $COMPOSE_FILE"
-    ENVFILE=$DOCKER_IMAGE".env"
-    cp $ENVFILE .env
-
-    docker-compose $DOCKERARGS -f $COMPOSE_FILE kill
-    docker-compose $DOCKERARGS -f $COMPOSE_FILE rm
-    
+      POSTFIX=${DOCKER_COMPOSE_FILE##*docker-compose.yml-}
+      echo "Removing $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+#FIXME: should not we remove images and generated Dockerfiles?
     done
   ;;
+
   "purge")
-   echo "Removing $SRV/dashboard" 
-   rm -R -f $SRV/dashboards
+    echo "Removing $SRV/dashboard" 
+    rm -R -f $SRV/dashboards
   ;;
+
   "clean")
-#  docker rmi ${PROJECT}_dashboards ${PROJECT}_kernel_gateway
   ;;
 esac
