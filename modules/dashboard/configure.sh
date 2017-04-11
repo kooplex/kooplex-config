@@ -3,7 +3,8 @@
 # try to allocate dashboards server ports from this port value
 DASHBOARDS_PORT=3000
 
-
+DIR_DBSOURCE=./dashboards_server
+URL_BBSOURCE=https://github.com/jupyter-incubator/dashboards_server.git
 DOCKER_HOST=$DOCKERARGS
 
 case $VERB in
@@ -12,6 +13,15 @@ case $VERB in
     do
       POSTFIX=${DOCKER_FILE##*Dockerfile-}
       DOCKER_COMPOSE_FILE=docker-compose.yml-$POSTFIX
+
+      echo "0. Check for dashboards server sources..."
+      if [ -d $DIR_DBSOURCE ] ; then
+        echo "\tfound in $DIR_DBSOURCE"
+      else
+        echo "\tcloning..."
+        git clone $URL_BBSOURCE $DIR_DBSOURCE
+      fi
+
 
       echo "1. Building dockerfile file for $POSTFIX..."
       IMAGE=kooplex-notebook-$POSTFIX
