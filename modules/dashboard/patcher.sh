@@ -14,7 +14,7 @@ BASE_URL=$(echo $2 | sed s/'\/'/'\\\/'/g)
 
 date
 
-docker inspect $CONTAINER | grep -q -i '"Status": "running"'
+docker $DOCKERARGS inspect $CONTAINER | grep -q -i '"Status": "running"'
 if [ ! $? -eq 0 ] ; then
   echo "$CONTAINER is not running..." >&2
   exit 2
@@ -27,7 +27,7 @@ function exc {
   else
     ex=y
   fi
-  docker exec -it -u root $CONTAINER $@
+  docker $DOCKERARGS exec -it -u root $CONTAINER $@
   EXC_ST=$?
   if [ $ex = 'y' -a ! $EXC_ST = 0 ] ; then 
     echo "ERROR: failed to run $@ in container $CONTAINER" >&2
