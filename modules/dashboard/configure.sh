@@ -7,6 +7,10 @@ DIR_DBSOURCE=./dashboards_server
 URL_BBSOURCE=https://github.com/jupyter-incubator/dashboards_server.git
 DOCKER_HOST=$DOCKERARGS
 
+#TODO:
+# everything generated shold be residing in a separate generated folder ./build
+
+
 case $VERB in
   "build")
     for DOCKER_FILE in ../notebook/image*/Dockerfile-*
