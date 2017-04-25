@@ -7,6 +7,8 @@ CONFIGDIR=$PWD
 VERB=$(getverb "$@")
 SVCS=$(getmodules "$@")
 
+mkdir -p $BUILDDIR
+
 case $VERB in
   "build")
     set -e
