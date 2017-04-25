@@ -17,7 +17,7 @@ case $VERB in
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
      	echo "Building image from $docfile"
-        docker $DOCKERARGS build -f $docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
+        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
        
      done
 
