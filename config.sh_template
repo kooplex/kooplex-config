@@ -2,6 +2,7 @@ SYSMODULES="net base" # admin"
 MODULES="ldap home gitlab notebook proxy nginx mysql owncloud " # hub dashboard"
 
 OUTERHOST=""
+OUTERPROXYIP=""
 
 PREFIX=""
 DOCKERIP=""
