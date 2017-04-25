@@ -1,24 +1,26 @@
 #!/bin/bash
 
+RF=$BUILDDIR/notebooks
+
+
 case $VERB in
   "build")
     echo "Building image $PREFIX-notebooks"
 
 #    docker $DOCKERARGS build -t $PREFIX-notebook .
     
-     mkdir -p $SRV/notebook/images
-#     rm image-*/Dockerfile*~
-     cp -r image-* $SRV/notebook/images/
-     for imagedir in $SRV/notebook/images/image-*
+     mkdir -p $RF
+     for imagedir in ./image-*
      do
-        docfile=$imagedir"/Dockerfile-"${imagedir#*image-}
-     	echo $docfile $imagedir
-        docker $DOCKERARGS build -f $docfile -t $PREFIX-notebook-${docfile#*Dockerfile-} $imagedir
+        cp -r image-* $RF
+        cp start-notebook.sh ${RF}/$imagedir
+        docfile=${imagedir}/Dockerfile
+        imgname=${imagedir#*image-}
+     	echo "Building image from $docfile"
+        docker $DOCKERARGS build -f $docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
        
      done
 
-#http://polc.elte.hu/owncloud/remote.php/webdav /home/jeges6/own davfs user,rw,auto 0 0
-#usermod -aG davfs2 jeges6
     
   ;;
   "install")
@@ -89,6 +91,7 @@ cd /home
   "clean")
     echo "Cleaning base image $PREFIX-notebook"
 #    docker $DOCKERARGS rmi $PREFIX-notebook
+#FIXME: hard coded
     docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi
   ;;
 esac
