@@ -3,8 +3,12 @@
 # try to allocate dashboards server ports from this port value
 DASHBOARDS_PORT=3000
 
-DIR_DBSOURCE=./dashboards_server
-URL_BBSOURCE=https://github.com/jupyter-incubator/dashboards_server.git
+RF=$BUILDDIR/dashboard
+
+mkdir -p $RF
+
+DIR_DBSOURCE=$RF/dashboards_server
+URL_DBSOURCE=https://github.com/jupyter-incubator/dashboards_server.git
 DOCKER_HOST=$DOCKERARGS
 
 #TODO:
@@ -16,32 +20,30 @@ case $VERB in
     for DOCKER_FILE in ../notebook/image*/Dockerfile-*
     do
       POSTFIX=${DOCKER_FILE##*Dockerfile-}
-      DOCKER_COMPOSE_FILE=docker-compose.yml-$POSTFIX
+      DOCKER_COMPOSE_FILE=$RF/docker-compose.yml-$POSTFIX
 
       echo "0. Check for dashboards server sources..."
       if [ -d $DIR_DBSOURCE ] ; then
         echo "\tfound in $DIR_DBSOURCE"
       else
         echo "\tcloning..."
-        git clone $URL_BBSOURCE $DIR_DBSOURCE
+        git clone $URL_DBSOURCE $DIR_DBSOURCE
       fi
 
 
       echo "1. Building dockerfile file for $POSTFIX..."
       IMAGE=kooplex-notebook-$POSTFIX
-      KGW_DOCKERFILE=Dockerfile.kernel-$POSTFIX
+      KGW_DOCKERFILE=$RF/Dockerfile.kernel-$POSTFIX
 #TODO: check the existance of the docker image by docker images
       sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
 
       echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
       KGV=kernel-gateway-$POSTFIX
-#FIXME: these are hard coded
-      VOL="\/srv\/kooplex\/mnt_kooplex\/compare\/dashboards\/$POSTFIX\/"
-      NETWORK=compare-net
+      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
       sed -e "s/##KERNELGATEWAY##/$KGV/" \
           -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE/" \
           -e "s/##VOLUME##/$VOL/" \
-          -e "s/##NETWORK##/$NETWORK/" \
+          -e "s/##NETWORK##/${PROJECT}-net/" \
         docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
 #TODO: when more dashboards do a loop here
       DASHBOARDS_NAME=kooplex-dashboards-$POSTFIX
@@ -62,7 +64,7 @@ case $VERB in
   ;;
 
   "start")  
-    for DOCKER_COMPOSE_FILE in docker-compose.yml-*
+    for DOCKER_COMPOSE_FILE in $RF/docker-compose.yml-*
     do
       echo "Starting service for $DOCKER_COMPOSE_FILE"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
@@ -74,7 +76,7 @@ case $VERB in
   ;;
 
   "stop")
-    for DOCKER_COMPOSE_FILE in docker-compose.yml-*
+    for DOCKER_COMPOSE_FILE in $RF/docker-compose.yml-*
     do
       echo "Stopping and removing services in $DOCKER_COMPOSE_FILE"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
@@ -82,7 +84,7 @@ case $VERB in
   ;;
     
   "remove")
-    for DOCKER_COMPOSE_FILE in docker-compose.yml-*
+    for DOCKER_COMPOSE_FILE in $RF/docker-compose.yml-*
     do
       POSTFIX=${DOCKER_COMPOSE_FILE##*docker-compose.yml-}
       echo "Removing $DOCKER_COMPOSE_FILE"
@@ -93,8 +95,9 @@ case $VERB in
   ;;
 
   "purge")
-    echo "Removing $SRV/dashboard" 
-    rm -R -f $SRV/dashboards
+    echo "Removing $RF" 
+    rm -R -f $RF
+#NOTE: dashboards are stored elsewhere in $DASHBOARDSDIR
   ;;
 
   "clean")
