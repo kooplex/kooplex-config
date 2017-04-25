@@ -1,16 +1,20 @@
+PREFIX=""
+
 SYSMODULES="net base" # admin"
 MODULES="ldap home gitlab notebook proxy nginx mysql owncloud " # hub dashboard"
+
+
+BUILDDIR="/srv/${PREFIX}_build"
 
 OUTERHOST=""
 OUTERPROXYIP=""
 
-PREFIX=""
 DOCKERIP=""
 DOCKERPORT="2375"
 DOCKERARGS="-H tcp://$DOCKERIP:$DOCKERPORT"
 PROJECT=""
-ROOT="/srv/kooplex/"$PREFIX
-DISKIMG="/srv/kooplex/diskimg"
+ROOT="/srv/$PREFIX
+DISKIMG="/srv/diskimg"
 DISKSIZE_GB="100"
 LOOPNO="/dev/loop0"
 USRQUOTA=10G
@@ -20,3 +24,5 @@ DOMAIN=""
 SMTP=""
 EMAIL=""
 DUMMYPASS=""
+REWRITEPROTO=https
+
