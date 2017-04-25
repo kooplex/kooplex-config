@@ -75,6 +75,5 @@ RUN pip install --upgrade pip
 RUN chmod a+rxw $CONDA_DIR
 
 # Add local files as late as possible to avoid cache busting
-ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
-ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 

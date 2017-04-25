@@ -29,6 +29,5 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes jupyter_cms==0.6.2 && \
 #     jupyter dashboards_bundlers quick-setup --sys-prefix
 
 # Add local files as late as possible to avoid cache busting
-ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
-ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 

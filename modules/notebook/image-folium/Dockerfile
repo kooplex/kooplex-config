@@ -21,7 +21,6 @@ RUN jupyter nbextension enable hide_input/main
 RUN jupyter nbextension enable hide_input_all/main
 # Stay as jovyan in the newer docker stack images
 # Add local files as late as possible to avoid cache busting
-ADD scripts/start-notebook.sh /usr/local/bin/start-notebook.sh
-ADD scripts/start-singleuser.sh /usr/local/bin/start-singleuser.sh
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 
 #RUN chmod 775 /usr/local/bin/start-notebook.sh /usr/local/bin/start-singleuser.sh
