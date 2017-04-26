@@ -52,7 +52,7 @@ server {
   }
 
   location / {
-    rewrite / http://$OUTERHOST/hub permanent;
+    rewrite / $REWRITEPROTO://$OUTERHOST/hub permanent;
   }
 
   location /static/ {
