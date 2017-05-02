@@ -19,6 +19,6 @@ services:
     environment:
       KG_ALLOW_ORIGIN: '*'
     volumes:
-      - ##VOLUME##:/srv/app/data/:ro
+      - ##VOLUME##:/home:ro
     restart: always
 
