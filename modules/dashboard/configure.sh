@@ -17,31 +17,35 @@ DOCKER_HOST=$DOCKERARGS
 
 case $VERB in
   "build")
-    for DOCKER_FILE in ../notebook/image*/Dockerfile-*
+    for IMAGEDIR in ../notebook/image*
     do
-      POSTFIX=${DOCKER_FILE##*Dockerfile-}
+      POSTFIX=${IMAGEDIR##*image-}
       DOCKER_COMPOSE_FILE=$RF/docker-compose.yml-$POSTFIX
 
       echo "0. Check for dashboards server sources..."
       if [ -d $DIR_DBSOURCE ] ; then
-        echo "\tfound in $DIR_DBSOURCE"
+        echo "found in $DIR_DBSOURCE"
       else
-        echo "\tcloning..."
+        echo "cloning..."
         git clone $URL_DBSOURCE $DIR_DBSOURCE
       fi
 
 
       echo "1. Building dockerfile file for $POSTFIX..."
       IMAGE=kooplex-notebook-$POSTFIX
+      
+      cp runner.sh patcher.sh Dockerfile.dashboards $RF/
+      
       KGW_DOCKERFILE=$RF/Dockerfile.kernel-$POSTFIX
 #TODO: check the existance of the docker image by docker images
       sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
 
       echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
       KGV=kernel-gateway-$POSTFIX
-      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
+      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed "s/\//\\\\\//g")
+      KGW_DOCKERFILE_SUB=$(echo "$RF/Dockerfile.kernel-$POSTFIX" | sed "s/\//\\\\\//g")
       sed -e "s/##KERNELGATEWAY##/$KGV/" \
-          -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE/" \
+          -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE_SUB/" \
           -e "s/##VOLUME##/$VOL/" \
           -e "s/##NETWORK##/${PROJECT}-net/" \
         docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
