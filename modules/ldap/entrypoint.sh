@@ -34,18 +34,16 @@ if [[ ! -d /etc/ldap/slapd.d || "$SLAPD_FORCE_RECONFIGURE" == "true" ]]; then
 
     cat <<-EOF | debconf-set-selections
         slapd slapd/no_configuration boolean false
+        slapd slapd/domain string $SLAPD_DOMAIN
+        slapd shared/organization string $SLAPD_ORGANIZATION
         slapd slapd/password1 password $SLAPD_PASSWORD
         slapd slapd/password2 password $SLAPD_PASSWORD
-        slapd shared/organization string $SLAPD_ORGANIZATION
-        slapd slapd/domain string $SLAPD_DOMAIN
         slapd slapd/backend select HDB
-        slapd slapd/allow_ldap_v2 boolean false
         slapd slapd/purge_database boolean false
-        slapd slapd/move_old_database boolean true
+        slapd slapd/allow_ldap_v2 boolean false
 EOF
 
-#    dpkg-reconfigure -f noninteractive slapd >/dev/null 2>&1
-    dpkg-reconfigure slapd 
+    dpkg-reconfigure -f noninteractive slapd #>/dev/null 2>&1
 
     dc_string=""
 

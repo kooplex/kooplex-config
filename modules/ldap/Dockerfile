@@ -29,6 +29,6 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chown root /entrypoint.sh && \
     chmod 700 /entrypoint.sh
 
-    ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["slapd", "-d", "32768", "-u", "openldap", "-g", "openldap"]
