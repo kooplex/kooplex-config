@@ -10,7 +10,7 @@ ARG LDAPORG
 
 RUN apt-get update
 RUN apt-get install -y \
-    apt-transport-https ca-certificates
+    apt-transport-https ca-certificates vim
     
 # Install OS and docker packages
 

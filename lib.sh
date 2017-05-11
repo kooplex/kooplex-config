@@ -490,7 +490,7 @@ config() {
   DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
   DASHBOARDSDIR=$SRV"/dashboards"
   
-  DOCKERPORT=${DOCKERARGS##*:}
+#  DOCKERPORT=${DOCKERARGS##*:}
 
   IPPOOLB=$(ip_addip "$SUBNET" 5121)
   IPPOOLE=$(ip_addip "$SUBNET" 5375) 

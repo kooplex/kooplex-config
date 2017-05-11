@@ -34,7 +34,7 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes conda && \
 RUN conda install --quiet --yes anaconda-client
 
 RUN anaconda search -t conda notebook
-RUN $CONDA_DIR/bin/conda install --quiet --yes 'notebook==4.2.2' && \
+RUN $CONDA_DIR/bin/conda install --quiet --yes 'notebook==5.0.0' && \
     $CONDA_DIR/bin/conda install --quiet --yes 'jupyterhub'  && \
     $CONDA_DIR/bin/conda install --quiet --yes widgetsnbextension==1.2.3
 
@@ -61,8 +61,8 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes  seaborn && \
 
 RUN  $CONDA_DIR/bin/conda install --quiet --yes  igraph
 
-RUN conda install -c conda-forge ipywidgets && \
-    $CONDA_DIR/bin/conda install --quiet --yes notebook==4.2.2
+RUN $CONDA_DIR/bin/conda install -c conda-forge ipywidgets
+    
 
 
 RUN apt install -y python3-pip python-pip liblapack-dev libblas-dev
@@ -72,7 +72,7 @@ RUN apt install -y git gcc
 RUN pip3 install --upgrade pip
 RUN pip install --upgrade pip
 
-RUN chmod a+rxw $CONDA_DIR
+RUN chmod a+rxw $CONDA_DIR -R
 
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh

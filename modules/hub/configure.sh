@@ -104,7 +104,7 @@ KOOPLEX_HUB_PREFIX = 'hub'
 
 KOOPLEX = {
     'debug': {
-        'debug': False,
+        'debug': $HUB_DEBUG,
     },
     'prefix':{
         'name': '$PREFIX',
@@ -139,8 +139,9 @@ KOOPLEX = {
     },
     'docker': {
         'host': '$DOCKERIP', 
-        'port': $DOCKERPORT,
+        'port': '$DOCKERPORT',
         'network': '$PROJECT-net',
+        'protocol':'$DOCKERPROTOCOL',
     },
     'spawner': {
         'notebook_container_name': '$PROJECT-notebook-{\$username}-{\$project_name}',
