@@ -43,7 +43,7 @@ case $VERB in
 	    SRF=`echo $RF | sed -e 's/\//\\\\\//g'`
 	    echo $SRF
 	    perl -pi -e "s/##RF##/$SRF/" $RF/$COMPOSE_FILE
-	    perl -pi -e "s/##DOMAIN##/$DOMAIN/" $RF/$COMPOSE_FILE
+	    perl -pi -e "s/##INNERHOST##/$INNERHOST/" $RF/$COMPOSE_FILE
 	    perl -pi -e "s/dashboards/$DASHBOARDS_IMAGE_NAME/" $RF/$COMPOSE_FILE
 
 	echo "$DASHBOARDS_CONTAINER_NAME and $KERNEL_GATEWAY_CONTAINER_NAME"

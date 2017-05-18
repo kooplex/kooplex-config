@@ -3,9 +3,9 @@ MODULES="ldap mysql  gitlab notebook proxy nginx owncloud" # dashboard # hub
 
 OUTERHOST=""
 OUTERPROXYIP=""
-DOMAIN=""
-DOMAINIP=""
-DOMAINPORT=""
+INNERHOST=""
+INNERHOSTIP=""
+INNERPORT=""
 
 PREFIX=""
 PROJECT=""

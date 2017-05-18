@@ -96,7 +96,7 @@ server {
   #DASHBOARD SERVER
   server {
   listen 3000;
-  server_name $DOMAIN;
+  server_name $INNERHOST;
   client_max_body_size 20M;
 
   location / {

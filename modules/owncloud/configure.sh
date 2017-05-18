@@ -47,16 +47,16 @@ export MOUNTID=\`echo \${dum#*with id}\`
 ./occ config:system:set 'overwritewebroot' --value '/owncloud'
 ./occ config:system:set 'overwrite.cli.url' --value  '$OWNCLOUDIP'
 
-#perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$DOMAIN',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
+#perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$INNERHOST',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
 
 ./occ config:system:set trusted_domains 0 --value  'localhost'
 ./occ config:system:set trusted_domains 1 --value  '$OWNCLOUDIP'
 ./occ config:system:set trusted_domains 2 --value  '$NGINXIP'
 ./occ config:system:set trusted_domains 3 --value  '$OUTERHOST'
-./occ config:system:set trusted_domains 4 --value  '$DOMAIN'
+./occ config:system:set trusted_domains 4 --value  '$INNERHOST'
 
 ./occ config:system:set 'trusted_proxies' --value "[$OWNCLOUDIP,$NGINXIP]"
-./occ config:system:set 'overwritehost' --value '$OUTER_DOMAIN'
+./occ config:system:set 'overwritehost' --value '$OUTERHOST'
 
 rm -r core/skeleton/Photos/ core/skeleton/Documents/
 

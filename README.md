@@ -55,8 +55,8 @@ map $http_upgrade $connection_upgrade {
 }
 
 server {
-    listen $DOMAIN:80;
-    server_name $DOMAIN;
+    listen $INNER:80;
+    server_name $INNER;
     location / {
         proxy_pass http://$NGINXIP/;
     }
