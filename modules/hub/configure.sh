@@ -98,8 +98,13 @@ DATABASES = {
 
 KOOPLEX_OUTER_HOST = '$OUTERHOST'
 KOOPLEX_INTERNAL_HOST = '$DOMAIN'
+KOOPLEX_INTERNAL_HOSTIP = '$DOMAINIP'
+KOOPLEX_OUTER_PORT = '$DOMAINPORT'
+if KOOPLEX_OUTER_PORT:
+	KOOPLEX_OUTER_HOST = "%s:%s"%(KOOPLEX_OUTER_HOST,KOOPLEX_OUTER_PORT)
 
-KOOPLEX_BASE_URL = 'http://' + KOOPLEX_INTERNAL_HOST
+PROTOCOL = "$REWRITEPROTO"
+KOOPLEX_BASE_URL = PROTOCOL + '://' + KOOPLEX_OUTER_HOST
 KOOPLEX_HUB_PREFIX = 'hub'
 
 KOOPLEX = {
@@ -112,6 +117,8 @@ KOOPLEX = {
     'hub': {
         'internal_host' : KOOPLEX_INTERNAL_HOST,
         'outer_host' : KOOPLEX_OUTER_HOST,
+        'host_port' : KOOPLEX_OUTER_PORT,
+        'protocol' : PROTOCOL,
     },
     'users': {
         'srv_dir': '$SRV',
@@ -128,7 +135,7 @@ KOOPLEX = {
         'bind_password': '$LDAPPASS',
     },
     'gitlab': {
-        'base_url': 'http://%s/gitlab/' % KOOPLEX_INTERNAL_HOST,
+        'base_url': 'http://%s/gitlab/' % KOOPLEX_OUTER_HOST,
         'base_repourl': 'http://$GITLABIP',
         'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
         'ssh_host': '$PROJECT-gitlab',
@@ -146,19 +153,20 @@ KOOPLEX = {
     'spawner': {
         'notebook_container_name': '$PROJECT-notebook-{\$username}-{\$project_name}',
         'notebook_ip_pool': ['$IPPOOLB', '$IPPOOLE'],
+        'notebook_proxy_path': '/notebook/{\$username}/{\$notebook.id}',
         'srv_path': '$SRV'
     },
     'proxy': {
-        'host': KOOPLEX_INTERNAL_HOST,
+        'host': KOOPLEX_INTERNAL_HOSTIP,        
         'port': 8001,   # api port
         'auth_token': '$PROXYTOKEN',
         'external_url': 'http://%s/' % KOOPLEX_OUTER_HOST,
     },
     'owncloud': {
-        'base_url': 'http://%s/owncloud/' % KOOPLEX_INTERNAL_HOST,
+        'base_url': 'http://%s/owncloud/' % KOOPLEX_OUTER_HOST,
     },
     'dashboards': {
-        'base_url': 'http://%s/' % KOOPLEX_INTERNAL_HOST,
+        'base_url': 'http://%s/' % KOOPLEX_OUTER_HOST,
         'base_dir': '$DASHBOARDSDIR',
     }
 }
@@ -368,6 +376,8 @@ echo $HUBIP
       --net $PROJECT-net \
       --ip $HUBIP \
       --privileged \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
       -v $SRV/home:$SRV/home \
       -v $SRV/dashboards:$SRV/dashboards \
@@ -383,7 +393,7 @@ echo $HUBIP
    docker $DOCKERARGS exec $PROJECT-mysql \
     bash -c "echo \"CREATE DATABASE \"$PROJECT\"_kooplex;\" | mysql -u root --password=$MYSQLPASS"
    docker $DOCKERARGS exec $PROJECT-mysql \
-    bash -c "echo  \"   CREATE USER 'kooplex'@'%' IDENTIFIED BY 'almafa137';\" | mysql -u root --password=$MYSQLPASS"
+    bash -c "echo  \"   CREATE USER 'kooplex'@'%' IDENTIFIED BY '$MYSQLPASS';\" | mysql -u root --password=$MYSQLPASS"
    docker $DOCKERARGS exec $PROJECT-mysql \
     bash -c "echo \"    GRANT ALL ON \"$PROJECT\"_kooplex.* TO 'kooplex'@'%';\" | mysql -u root --password=$MYSQLPASS"
     

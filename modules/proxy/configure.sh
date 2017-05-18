@@ -20,6 +20,8 @@ case $VERB in
       -e ADMINIP=$PROXYIP \
       -e CONFIGPROXY_AUTH_TOKEN=$PROXYTOKEN \
       -p 8001:8001 \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       kooplex-proxy
   ;;
   "start")

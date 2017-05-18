@@ -14,6 +14,8 @@ case $VERB in
       --net $PROJECT-net \
       --ip $ADMINIP \
       --privileged \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       kooplex-admin
   ;;
   "start")

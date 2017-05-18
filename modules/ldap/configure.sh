@@ -21,6 +21,8 @@ case $VERB in
       --net $PROJECT-net \
       --ip $LDAPIP \
       -p 666:$LDAPPORT \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/ldap/etc:/etc/ldap \
       -v $SRV/ldap/var:/var/lib/ldap \
       -e SLAPD_PASSWORD="$LDAPPASS" \

@@ -18,6 +18,8 @@ case $VERB in
       --ip $MYSQLIP \
       -e PUBLICIP=$MYSQLIP \
       -e ADMINIP=$MYSQLIP \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/mysql:/var/lib/mysql \
       -e MYSQL_ROOT_PASSWORD=$MYSQLPASS \
       mysql:5.7

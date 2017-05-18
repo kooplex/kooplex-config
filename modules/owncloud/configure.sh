@@ -86,6 +86,8 @@ EOF
       --hostname $PROJECT-owncloud \
       --net $PROJECT-net \
       --ip $OWNCLOUDIP \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/ownCloud/:/var/www/html/data \
       -v $SRV/home/:/home \
       --privileged \

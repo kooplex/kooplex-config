@@ -13,7 +13,7 @@ case $VERB in
     chmod -R 755 $SRV/gitlab
     
     GITLABRB=$SRV/gitlab/etc/gitlab.rb
-    echo "
+    cat << EOF > $GITLABRB 
 external_url 'http://$DOMAIN/gitlab'
 
 gitlab_rails['gitlab_email_from'] = '$EMAIL'
@@ -48,13 +48,46 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
       last_name:  'sn'
 EOS
 
-" > $GITLABRB
+logging['logrotate_frequency'] = "daily" # rotate logs daily
+logging['logrotate_size'] = nil # do not rotate by size by default
+logging['logrotate_rotate'] = 30 # keep 30 rotated logs
+logging['logrotate_compress'] = "compress" # see 'man logrotate'
+logging['logrotate_method'] = "copytruncate" # see 'man logrotate'
+logging['logrotate_postrotate'] = nil # no postrotate command by default
+logging['logrotate_dateformat'] = nil # use date extensions for rotated files rather than numbers 
+logging['log_level'] = 'ERROR'
+mattermost['log_console_level'] = 'ERROR' 
+mattermost['log_file_level'] = 'ERROR'
+registry['log_level'] = 'error'
+gitlab_shell['log_level'] = 'ERROR'
+
+EOF
+
+#TO DISABLE LOG!!!!!!
+# chmod 0000 -R  $SRV/gitlab/log/nginx/	
+# chmod 0000 -R  $SRV/gitlab/log/gitlab-workhorse/*	
+# rm  $SRV/gitlab/log/nginx/*
+# rm  $SRV/gitlab/log/gitlab-workhorse/*
+
+#AFTER MODIFICATION OF gitlab.rb
+# chmod 0755 -R $SRV/gitlab/etc/
+# chmod 0400 -R $SRV/gitlab/etc/ssh*_key
+# chmod 2770 -R $SRV/gitlab/opt/git-data/repositories/
+# chmod a+w -R $SRV/compare/gitlab/opt/prometheus/
+
     
     docker $DOCKERARGS create \
       --name $PROJECT-gitlab \
       --hostname $PROJECT-gitlab \
+      --sysctl net.core.somaxconn=1024 \
+      --ulimit sigpending=62793 \
+      --ulimit nproc=131072 \
+      --ulimit nofile=60000 \
+      --ulimit core=0 \
       --net $PROJECT-net \
       --ip $GITLABIP \
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/gitlab/etc:/etc/gitlab \
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
