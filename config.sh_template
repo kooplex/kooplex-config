@@ -1,38 +1,47 @@
-PREFIX=""
-
 SYSMODULES="net base" # admin"
-MODULES="ldap home gitlab notebook proxy nginx mysql owncloud " # hub dashboard"
-
-
-BUILDDIR="/srv/${PREFIX}_build"
+MODULES="ldap mysql  gitlab notebook proxy nginx owncloud" # dashboard # hub 
 
 OUTERHOST=""
 OUTERPROXYIP=""
+DOMAIN=""
+DOMAINIP=""
+DOMAINPORT=""
 
-DOCKERIP=""
-DOCKERPORT="2375"
-DOCKERPROTOCOL="tcp"
+PREFIX=""
+PROJECT=""
+
+
+DOCKERIP="/var/run/docker.sock"
+DOCKERPORT=""
+DOCKERPROTOCOL="unix"
 if [[ -z "${DOCKERPORT}" ]]; then
  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP"
 else
  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP:$DOCKERPORT"
 fi
 
-PROJECT=""
-ROOT="/srv/$PREFIX
-DISKIMG="/srv/diskimg"
-DISKSIZE_GB="100"
-LOOPNO="/dev/loop0"
+ROOT="/srv/"$PREFIX
+BUILDDIR=$ROOT"/build"
+DISKIMG=""
+DISKSIZE_GB="20"
+LOOPNO="/dev/loop3"
 USRQUOTA=10G
+
 SUBNET="172.20.0.0/16"
-LDAPDOMAIN=""
-DOMAIN=""
-SMTP=""
-EMAIL=""
-DUMMYPASS=""
-REWRITEPROTO=https
+
+LDAPDOMAIN=$OUTERHOST
+SMTP="smtp"
+SMTPPORT=25
+EMAIL=
+
+DUMMYPASS="almafa137"
+
+REWRITEPROTO=http
 
 HUB_DEBUG=True
+
+ERROR_LOG="error.log"
+CHECK_LOG="check.log"	
 
 #EXECUTABLES
 DOCKER_COMPOSE="docker-compose"
