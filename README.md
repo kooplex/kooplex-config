@@ -9,26 +9,83 @@ $SRV with the kooplex root directory on your host machine.
 
     $ git clone https://github.com/kooplex/kooplex-config.git
 
-* modify config.sh as necessary
-* configure network by running the following command on the docker _host_:
+* copy config.sh_template to config.sh and modify it as necessary. Here are the variables explained:
+```bash
+#The url that will be accessible from a browser
+OUTERHOSTNAME="example.org"
+OUTERHOSTPORT="89"
 
+#The host name of a gateway or virtual host if there is any. If not use outerhost
+#INNERHOSTNAME=$OUTERHOSTNAME
+#INNERHOSTPORT=$OUTERHOSTPORT
+INNERHOSTNAME="192.168.1.15"
+INNERHOSTPORT=""
+
+PREFIX="aprefix"
+PROJECT="projectname"
+
+#Access to docker 
+DOCKERIP="/var/run/docker.sock"
+DOCKERPORT=""
+DOCKERPROTOCOL="unix"
+
+#Where all the homes, config files etc will be
+ROOT="/srv/"$PREFIX
+
+#and scripts needed for building images etc.
+BUILDDIR=$ROOT"/build"
+
+#Probably not needed
+DISKIMG="/home/jegesm/Data/diskimg"
+DISKSIZE_GB="20"
+LOOPNO="/dev/loop3"
+USRQUOTA=10G
+
+#This is the subnet where the containers for services will be
+SUBNET="172.20.0.0/16"
+
+#Domain in ldap
+LDAPDOMAIN=$OUTERHOSTNAME
+
+SMTP="smtp"
+SMTPPORT=25
+EMAIL=
+
+#Password for many things
+DUMMYPASS=""
+
+#This is the web protocol: http or https
+REWRITEPROTO=http
+
+#Prints out debug information on "docker logs $PROJECT-hub"
+HUB_DEBUG=True
+
+ERROR_LOG="error.log"
+CHECK_LOG="check.log"	
+
+#Executables
+DOCKER_COMPOSE="docker-compose"
+```
+* For many of the following steps here you will need write access to the $ROOT and $BUILDDIR folders
+* configure network by running the following command on the docker _host_:
+```bash
     $ sudo bash kooplex.sh build
     $ sudo bash kooplex.sh install
     $ sudo bash kooplex.sh start
     $ sudo bash kooplex.sh init
-    
+```
 Individual modules can be installed, started etc. by specifying the module name, e.g.
 
     $ sudo bash kooplex.sh start proxy
     
-starts the proxy only. Multiple modules names can be listed.
+starts the proxy only. Multiple module names can be listed.
 
 Manual install steps
 
-* build (creates images)
-* install
-* start
-* init
+* build (creates images and config files)
+* install (creates containers out of images and runs maybe a script)
+* start (starts containers)
+* init (runs scripts in the containers, initializes 
 
 Recommended :)  Install sequence is the following:
 
