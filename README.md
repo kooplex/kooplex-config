@@ -67,18 +67,11 @@ CHECK_LOG="check.log"
 DOCKER_COMPOSE="docker-compose"
 ```
 * For many of the following steps here you will need write access to the $ROOT and $BUILDDIR folders
-* configure network by running the following command on the docker _host_:
-```bash
-    $ sudo bash kooplex.sh build
-    $ sudo bash kooplex.sh install
-    $ sudo bash kooplex.sh start
-    $ sudo bash kooplex.sh init
-```
-Individual modules can be installed, started etc. by specifying the module name, e.g.
+* Individual modules can be installed, started etc. by specifying the module name, e.g.
 
     $ sudo bash kooplex.sh start proxy
     
-starts the proxy only. Multiple module names can be listed.
+starts the proxy only. Multiple module names can be listed or if left empty then will iterate on $SYSMODULES and $MODULES.
 
 Manual install steps
 
@@ -94,12 +87,12 @@ Recommended :)  Install sequence is the following:
 * sudo bash kooplex.sh start
 * sudo bash kooplex.sh init
 * sudo bash kooplex.sh build hub
-* sudo bash kooplex.sh install hub (after that only use "refresh hub"
+* sudo bash kooplex.sh install hub (after that use only "refresh hub")
 * sudo bash kooplex.sh start hub
 * sudo bash kooplex.sh init hub
 
 
-## Proxy configuration
+## Proxy configuration of the $OUTERHOST or $INNERHOST if there are two layers
 
 * add following lines to configuration file _default_ of nginx _host_ 
  
@@ -112,9 +105,10 @@ map $http_upgrade $connection_upgrade {
 }
 
 server {
-    listen $INNER:80;
-    server_name $INNER;
+    listen $INNERHOST:80;
+    server_name $INNERHOSTNAME;
     location / {
+    	proxy_set_header      Host $http_host;
         proxy_pass http://$NGINXIP/;
     }
     
@@ -143,23 +137,23 @@ server {
 ## IMPORTANT NOTES
 * Check whether all the necessary ports are open (ufw allow etc) e.g. docker port, http port
 
-## Remove
+## Remove containers
 
-    $ sudo bash kooplex.sh stop all
-    $ sudo bash kooplex.sh remove all
+    $ bash kooplex.sh stop all
+    $ bash kooplex.sh remove all
     
 Manual remove steps:
 
-* remove
-* purge
+* remove (containers)
+* purge (configuration files, datatabases and directories)
 * clean (deletes images)
     
-## Purge configuration
+## Purge configuration files, datatabases and directories
 
 To remove ALL data and config
 
-    $ sudo bash kooplex.sh purge all
+    $ bash kooplex.sh purge all
     
 To delete generated docker images
 
-    $ sudo bash kooplex.sh clean all
+    $ bash kooplex.sh clean all
