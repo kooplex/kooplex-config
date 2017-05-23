@@ -5,19 +5,18 @@ case $VERB in
   "build")
     echo "Building nginx $PROJECT-nginx [$NGINXIP]"
 
-
     echo "
 server {
   listen 80;
-  server_name $OUTERHOST;
+  server_name $REWRITEPROTO://$OUTERHOST;
   client_max_body_size 20M;
 
-  access_log /var/log/nginx/${OUTERHOST}-access.log;
-  error_log /var/log/nginx/${OUTERHOST}-error.log;
+  access_log /var/log/nginx/${OUTERHOSTNAME}-access.log;
+  error_log /var/log/nginx/${OUTERHOSTNAME}-error.log;
 
 # DASHBOARD
   location ~* /db/(?<port>[0-9]*) {
-    proxy_pass            http://${OUTERPROXYIP}:\$port;
+    proxy_pass            http://${INNERHOSTNAME}:\$port;
     proxy_http_version    1.1;
     proxy_set_header      Host \$http_host;
     proxy_set_header X-Real-IP \$remote_addr;

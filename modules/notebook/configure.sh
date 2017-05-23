@@ -13,7 +13,7 @@ case $VERB in
      for imagedir in ./image-*
      do
         cp -r image-* $RF
-        cp start-notebook.sh ${RF}/$imagedir
+        cp scripts/start-notebook.sh ${RF}/$imagedir
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
      	echo "Building image from $docfile"
