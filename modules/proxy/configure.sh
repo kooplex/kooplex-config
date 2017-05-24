@@ -11,7 +11,7 @@ case $VERB in
     
     PROXYTOKEN=$(createsecret proxy)
     
-    cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-proxy | awk '{print $2}'`
+    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-proxy | awk '{print $2}'`
     if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-proxy \

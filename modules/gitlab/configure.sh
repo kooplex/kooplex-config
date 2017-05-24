@@ -77,7 +77,7 @@ EOF
 # rm  $SRV/gitlab/log/gitlab-workhorse/*
 
 
-cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-gitlab | awk '{print $2}'`
+    cont_exist=`docker $DOCKERARGS ps -q | grep $PROJECT-gitlab | awk '{print $2}'`
     if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-gitlab \

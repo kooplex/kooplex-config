@@ -371,7 +371,7 @@ EOF
   "install")
     echo "Installing hub $PROJECT-hub [$HUBIP]"
 
-  cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-hub | awk '{print $2}'`
+  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
     if [ ! $cont_exist ]; then
     docker $DOCKERARGS create  \
       --name $PROJECT-hub \

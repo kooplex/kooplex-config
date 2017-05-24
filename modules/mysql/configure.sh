@@ -11,7 +11,7 @@ case $VERB in
   "install")
     echo "Installing mysql $PROJECT-mysql [$MYSQLIP]"
 
-    cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-mysql | awk '{print $2}'`
+    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-mysql | awk '{print $2}'`
     if [ ! $cont_exist ]; then
 
     docker $DOCKERARGS create \

@@ -5,7 +5,7 @@ case $VERB in
     docker $DOCKERARGS build -t ${PREFIX}-home  .
   ;;
   "install")
-  cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-home | awk '{print $2}'`
+  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-home | awk '{print $2}'`
     if [ ! $cont_exist ]; then
     docker $DOCKERARGS run -d -it \
       --name $PROJECT-home \
