@@ -18,6 +18,10 @@ gitlab_rails['gitlab_email_from'] = '$EMAIL'
 gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'
 gitlab_rails['gitlab_email_reply_to'] = '$EMAIL'
 gitlab_rails['smtp_enable'] = true
+gitlab_rails['smtp_address'] = $SMTP
+gitlab_rails['smtp_port'] = 25
+#gitlab_rails['smtp_authentication'] = "plain"
+#gitlab_rails['smtp_domain'] = "elte.hu"
 
 
 gitlab_rails['gitlab_signup_enabled'] = false
@@ -73,8 +77,8 @@ EOF
 # rm  $SRV/gitlab/log/gitlab-workhorse/*
 
 
-
-    
+cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-gitlab | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-gitlab \
       --hostname $PROJECT-gitlab \
@@ -91,7 +95,9 @@ EOF
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
       gitlab/gitlab-ce
-      
+    else
+     echo "$PROJECT-gitlab is already installed"
+    fi      
   ;;
   "start")
     echo "Starting gitlab $PROJECT-gitlab [$GITLABIP]"

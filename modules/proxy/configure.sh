@@ -11,6 +11,8 @@ case $VERB in
     
     PROXYTOKEN=$(createsecret proxy)
     
+    cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-proxy | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-proxy \
       --hostname $PROJECT-proxy \
@@ -23,6 +25,9 @@ case $VERB in
       --log-opt max-size=1m --log-opt max-file=3 \
       -v /etc/localtime:/etc/localtime:ro \
       kooplex-proxy
+    else
+     echo "$PROJECT-proxy is already installed"
+    fi
   ;;
   "start")
     echo "Starting proxy $PROJECT-proxy [$PROXYIP]"
