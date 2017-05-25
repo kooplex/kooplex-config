@@ -12,7 +12,7 @@ case $VERB in
     
     GITLABRB=$SRV/gitlab/etc/gitlab.rb
     cat << EOF > $GITLABRB 
-external_url = 'http://$OUTERHOST/gitlab'
+external_url  '$REWRITEPROTO://$OUTERHOST/gitlab'
 
 gitlab_rails['gitlab_email_from'] = '$EMAIL'
 gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'
@@ -77,7 +77,7 @@ EOF
 # rm  $SRV/gitlab/log/gitlab-workhorse/*
 
 
-    cont_exist=`docker $DOCKERARGS ps -q | grep $PROJECT-gitlab | awk '{print $2}'`
+    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-gitlab | awk '{print $2}'`
     if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-gitlab \

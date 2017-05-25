@@ -88,12 +88,6 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda && \
 
 RUN pip3 install sklearn-pandas
 
-RUN $CONDA_DIR/bin/conda install --quiet --yes biopython && \
-    $CONDA_DIR/bin/conda install --quiet --yes geopy && \
-    $CONDA_DIR/bin/conda install --quiet --yes jinja2 && \
-    $CONDA_DIR/bin/conda install --quiet --yes folium && \
-    $CONDA_DIR/bin/conda install --quiet --yes -c bioconda ete3
-
 # R KERNEL
 
 #RUN pip3 install rpy2

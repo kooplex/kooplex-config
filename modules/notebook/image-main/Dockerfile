@@ -80,12 +80,6 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes jupyter_dashboards && \
 RUN  $CONDA_DIR/bin/conda install --quiet --yes jupyter_cms && \
      jupyter cms quick-setup --sys-prefix
 
-RUN $CONDA_DIR/bin/conda install --quiet --yes biopython && \
-    $CONDA_DIR/bin/conda install --quiet --yes geopy && \
-    $CONDA_DIR/bin/conda install --quiet --yes jinja2 && \
-    $CONDA_DIR/bin/conda install --quiet --yes folium && \
-    $CONDA_DIR/bin/conda install --quiet --yes -c bioconda ete3 
-
 RUN chmod a+rxw $CONDA_DIR
 
 # Add local files as late as possible to avoid cache busting

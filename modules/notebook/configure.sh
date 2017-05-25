@@ -30,7 +30,7 @@ case $VERB in
     mkdir -p $SRV/notebook/etc
     mkdir -p $SRV/notebook/init
     $(ldap_makeconfig notebook)
-    cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
+    cp jupyter_notebook_config.py $SRV/notebook/etc/
         
     echo "#/bin/sh
 echo \"Configuring LDAP...\"

@@ -370,9 +370,7 @@ EOF
   ;;
   "install")
     echo "Installing hub $PROJECT-hub [$HUBIP]"
-
-  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
-    if [ ! $cont_exist ]; then
+echo $HUBIP
     docker $DOCKERARGS create  \
       --name $PROJECT-hub \
       --hostname $PROJECT-hub \
@@ -386,9 +384,6 @@ EOF
       -v $SRV/dashboards:$SRV/dashboards \
       -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
-    else
-     echo "$PROJECT-hub is already installed"
-    fi
 
   ;;
   "start")

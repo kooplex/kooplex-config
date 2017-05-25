@@ -11,9 +11,6 @@ case $VERB in
   "install")
     echo "Installing mysql $PROJECT-mysql [$MYSQLIP]"
 
-    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-mysql | awk '{print $2}'`
-    if [ ! $cont_exist ]; then
-
     docker $DOCKERARGS create \
       --name $PROJECT-mysql \
       --hostname $PROJECT-mysql \
@@ -26,9 +23,6 @@ case $VERB in
       -v $SRV/mysql:/var/lib/mysql \
       -e MYSQL_ROOT_PASSWORD=$MYSQLPASS \
       mysql:5.7
-    else
-     echo "$PROJECT-mysql is already installed"
-    fi
   ;;
   "start")
     echo "Starting mysql $PROJECT-mysql [$MYSQLIP]"

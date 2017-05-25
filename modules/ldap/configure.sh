@@ -15,8 +15,6 @@ case $VERB in
     chown -R root $SRV/ldap
     chmod -R 755 $SRV/ldap
 
-    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-ldap | awk '{print $2}'`
-    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-ldap \
       --hostname $PROJECT-ldap \
@@ -31,9 +29,7 @@ case $VERB in
       -e SLAPD_CONFIG_PASSWORD="$LDAPPASS" \
       -e SLAPD_DOMAIN=$LDAPDOMAIN \
       kooplex-ldap 
-    else
-     echo "$PROJECT-ldap is already installed"
-    fi      
+      
 
   ;;
   "start")

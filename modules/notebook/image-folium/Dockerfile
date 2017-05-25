@@ -1,0 +1,26 @@
+FROM kooplex-notebook-base
+
+
+USER root
+
+RUN pip3 install biopython ete3 geopy jinja2 folium 
+
+RUN pip3 install  ipykernel
+#RUN python3 -m ipykernel install
+
+
+# nb-extension
+RUN pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master
+RUN jupyter contrib nbextension install --system --symlink
+RUN jupyter contrib nbextensions migrate
+RUN pip install jupyter_nbextensions_configurator
+RUN jupyter nbextensions_configurator enable --system
+
+RUN jupyter nbextension enable codefolding/main
+RUN jupyter nbextension enable hide_input/main
+RUN jupyter nbextension enable hide_input_all/main
+# Stay as jovyan in the newer docker stack images
+# Add local files as late as possible to avoid cache busting
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
+
+#RUN chmod 775 /usr/local/bin/start-notebook.sh /usr/local/bin/start-singleuser.sh
