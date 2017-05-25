@@ -5,7 +5,8 @@ case $VERB in
     docker $DOCKERARGS build -t ${PREFIX}-home  .
   ;;
   "install")
-  
+  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-home | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS run -d -it \
       --name $PROJECT-home \
       --hostname $PROJECT-home \
@@ -16,6 +17,9 @@ case $VERB in
       -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/home:/home \
        ${PREFIX}-home bash
+    else
+     echo "$PROJECT-home is already installed"
+    fi
   ;;
   "start")
     echo "Starting $PROJECT-home [$HOMEIP]"

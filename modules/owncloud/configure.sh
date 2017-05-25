@@ -82,6 +82,8 @@ EOF
     echo "OwnCloud database is in $SRV/ownCloud/";
     
     # Create owncloud container. We need to setup ldap as well
+    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-owncloud | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-owncloud \
       --hostname $PROJECT-owncloud \
@@ -94,6 +96,9 @@ EOF
       --privileged \
             kooplex-owncloud
 #       owncloud
+    else
+     echo "$PROJECT-owncloud is already installed"
+    fi
 
   ;;
   "start")

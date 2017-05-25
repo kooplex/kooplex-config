@@ -2,8 +2,8 @@
 
 case $VERB in
   "build")
-    echo "Building image kooplex-ldap"
-    docker $DOCKERARGS build -t kooplex-ldap  .
+    echo "Building image $PREFIX-ldap"
+    docker $DOCKERARGS build -t $PREFIX-ldap  .
   ;;
   "install")
     echo "Installing slapd $PROJECT-ldap [$LDAPIP]"
@@ -28,7 +28,7 @@ case $VERB in
       -e SLAPD_PASSWORD="$LDAPPASS" \
       -e SLAPD_CONFIG_PASSWORD="$LDAPPASS" \
       -e SLAPD_DOMAIN=$LDAPDOMAIN \
-      kooplex-ldap 
+      $PREFIX-ldap 
       
 
   ;;

@@ -136,7 +136,7 @@ KOOPLEX = {
         'bind_password': '$LDAPPASS',
     },
     'gitlab': {
-        'base_url': '%s/gitlab/' % KOOPLEX_BASE_URL,
+        'base_url': 'http://$GITLABIP/gitlab/',
         'base_repourl': 'http://$GITLABIP',
         'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
         'ssh_host': '$PROJECT-gitlab',
@@ -370,7 +370,9 @@ EOF
   ;;
   "install")
     echo "Installing hub $PROJECT-hub [$HUBIP]"
-echo $HUBIP
+
+  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create  \
       --name $PROJECT-hub \
       --hostname $PROJECT-hub \
@@ -384,6 +386,9 @@ echo $HUBIP
       -v $SRV/dashboards:$SRV/dashboards \
       -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
+    else
+     echo "$PROJECT-hub is already installed"
+    fi
 
   ;;
   "start")

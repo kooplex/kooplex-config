@@ -113,6 +113,8 @@ server {
     mkdir -p $SRV/nginx/etc/
     cp etc/nginx.conf $SRV/nginx/etc/
     
+    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-nginx | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-nginx \
       --hostname $PROJECT-nginx \
@@ -124,6 +126,9 @@ server {
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
       -v $SRV/nginx/var:/var/log/nginx \
       nginx 
+    else
+     echo "$PROJECT-nginx is already installed"
+    fi
       
 
 
