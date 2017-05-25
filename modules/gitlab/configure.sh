@@ -12,13 +12,13 @@ case $VERB in
     
     GITLABRB=$SRV/gitlab/etc/gitlab.rb
     cat << EOF > $GITLABRB 
-external_url = 'http://$OUTERHOST/gitlab'
+external_url '${REWRITEPROTO}://$OUTERHOST/gitlab'
 
 gitlab_rails['gitlab_email_from'] = '$EMAIL'
 gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'
 gitlab_rails['gitlab_email_reply_to'] = '$EMAIL'
 gitlab_rails['smtp_enable'] = true
-gitlab_rails['smtp_address'] = $SMTP
+gitlab_rails['smtp_address'] = '$SMTP'
 gitlab_rails['smtp_port'] = 25
 #gitlab_rails['smtp_authentication'] = "plain"
 #gitlab_rails['smtp_domain'] = "elte.hu"
