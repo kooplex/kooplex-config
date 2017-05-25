@@ -215,7 +215,7 @@ AUTHENTICATION_BACKENDS = (
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Berlin'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -373,19 +373,34 @@ EOF
 
   cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
     if [ ! $cont_exist ]; then
-    docker $DOCKERARGS create  \
-      --name $PROJECT-hub \
-      --hostname $PROJECT-hub \
-      --net $PROJECT-net \
-      --ip $HUBIP \
-      --privileged \
-      --log-opt max-size=1m --log-opt max-file=3 \
-      -v /etc/localtime:/etc/localtime:ro \
-      -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
-      -v $SRV/home:$SRV/home \
-      -v $SRV/dashboards:$SRV/dashboards \
-      -v $SRV/notebook:$SRV/notebook \
+      if [ $DOCKERPROTOCOL == "nix" ]; then
+        docker $DOCKERARGS create  \
+          --name $PROJECT-hub \
+          --hostname $PROJECT-hub \
+          --net $PROJECT-net \
+          --ip $HUBIP \
+          --privileged \
+          --log-opt max-size=1m --log-opt max-file=3 \
+          -v /var/run/docker.sock:/var/run/docker.sock \ 
+          -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
+          -v $SRV/home:$SRV/home \
+          -v $SRV/dashboards:$SRV/dashboards \
+          -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
+      else
+        docker $DOCKERARGS create  \
+          --name $PROJECT-hub \
+          --hostname $PROJECT-hub \
+          --net $PROJECT-net \
+          --ip $HUBIP \
+          --privileged \
+          --log-opt max-size=1m --log-opt max-file=3 \
+          -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
+          -v $SRV/home:$SRV/home \
+          -v $SRV/dashboards:$SRV/dashboards \
+          -v $SRV/notebook:$SRV/notebook \
+            kooplex-hub
+      fi
     else
      echo "$PROJECT-hub is already installed"
     fi
