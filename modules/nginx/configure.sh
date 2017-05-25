@@ -5,19 +5,18 @@ case $VERB in
   "build")
     echo "Building nginx $PROJECT-nginx [$NGINXIP]"
 
-
     echo "
 server {
   listen 80;
-  server_name $OUTERHOST;
+  server_name $REWRITEPROTO://$OUTERHOST;
   client_max_body_size 20M;
 
-  access_log /var/log/nginx/${OUTERHOST}-access.log;
-  error_log /var/log/nginx/${OUTERHOST}-error.log;
+  access_log /var/log/nginx/${OUTERHOSTNAME}-access.log;
+  error_log /var/log/nginx/${OUTERHOSTNAME}-error.log;
 
 # DASHBOARD
   location ~* /db/(?<port>[0-9]*) {
-    proxy_pass            http://${OUTERPROXYIP}:\$port;
+    proxy_pass            http://${INNERHOSTNAME}:\$port;
     proxy_http_version    1.1;
     proxy_set_header      Host \$http_host;
     proxy_set_header X-Real-IP \$remote_addr;
@@ -114,6 +113,8 @@ server {
     mkdir -p $SRV/nginx/etc/
     cp etc/nginx.conf $SRV/nginx/etc/
     
+    cont_exist=`docker $DOCKERARGS ps | grep $PROJECT-nginx | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-nginx \
       --hostname $PROJECT-nginx \
@@ -125,6 +126,9 @@ server {
       -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
       -v $SRV/nginx/var:/var/log/nginx \
       nginx 
+    else
+     echo "$PROJECT-nginx is already installed"
+    fi
       
 
 

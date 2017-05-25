@@ -13,7 +13,7 @@ case $VERB in
      for imagedir in ./image-*
      do
         cp -r image-* $RF
-        cp start-notebook.sh ${RF}/$imagedir
+        cp scripts/start-notebook.sh ${RF}/$imagedir
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
      	echo "Building image from $docfile"
@@ -30,7 +30,7 @@ case $VERB in
     mkdir -p $SRV/notebook/etc
     mkdir -p $SRV/notebook/init
     $(ldap_makeconfig notebook)
-    cp jupyter_notebook_config.py $SRV/notebook/etc/
+    cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
         
     echo "#/bin/sh
 echo \"Configuring LDAP...\"

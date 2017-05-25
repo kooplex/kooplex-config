@@ -1,10 +1,8 @@
 #!/bin/bash
 
 case $VERB in
-  "install")
-    echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
-
-    LDAPPASS=$(getsecret ldap)
+  "build")
+     LDAPPASS=$(getsecret ldap)
     
     mkdir -p $SRV/gitlab/etc
     mkdir -p $SRV/gitlab/log
@@ -14,12 +12,16 @@ case $VERB in
     
     GITLABRB=$SRV/gitlab/etc/gitlab.rb
     cat << EOF > $GITLABRB 
-external_url 'http://$DOMAIN/gitlab'
+external_url = 'http://$OUTERHOST/gitlab'
 
 gitlab_rails['gitlab_email_from'] = '$EMAIL'
 gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'
 gitlab_rails['gitlab_email_reply_to'] = '$EMAIL'
 gitlab_rails['smtp_enable'] = true
+gitlab_rails['smtp_address'] = $SMTP
+gitlab_rails['smtp_port'] = 25
+#gitlab_rails['smtp_authentication'] = "plain"
+#gitlab_rails['smtp_domain'] = "elte.hu"
 
 
 gitlab_rails['gitlab_signup_enabled'] = false
@@ -63,19 +65,20 @@ gitlab_shell['log_level'] = 'ERROR'
 
 EOF
 
+ ;;
+  "install")
+    echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
+
+ 
 #TO DISABLE LOG!!!!!!
 # chmod 0000 -R  $SRV/gitlab/log/nginx/	
 # chmod 0000 -R  $SRV/gitlab/log/gitlab-workhorse/*	
 # rm  $SRV/gitlab/log/nginx/*
 # rm  $SRV/gitlab/log/gitlab-workhorse/*
 
-#AFTER MODIFICATION OF gitlab.rb
-# chmod 0755 -R $SRV/gitlab/etc/
-# chmod 0400 -R $SRV/gitlab/etc/ssh*_key
-# chmod 2770 -R $SRV/gitlab/opt/git-data/repositories/
-# chmod a+w -R $SRV/compare/gitlab/opt/prometheus/
 
-    
+    cont_exist=`docker $DOCKERARGS ps -q | grep $PROJECT-gitlab | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-gitlab \
       --hostname $PROJECT-gitlab \
@@ -92,13 +95,23 @@ EOF
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
       gitlab/gitlab-ce
-      
+    else
+     echo "$PROJECT-gitlab is already installed"
+    fi      
   ;;
   "start")
     echo "Starting gitlab $PROJECT-gitlab [$GITLABIP]"
+    #AFTER MODIFICATION OF gitlab.rb
+echo "chmod 0755 -R $SRV/gitlab/etc/"
+echo "chmod 0400 -R $SRV/gitlab/etc/ssh*_key"
+echo "chmod 2770 -R $SRV/gitlab/opt/git-data/repositories/"
+echo "chmod a+w -R $SRV/gitlab/opt/prometheus/"
+    
     docker $DOCKERARGS start $PROJECT-gitlab
-    echo "Waiting 30 seconds for the Gitlab application to start..."
-    sleep 30
+    echo "Waiting X seconds for the Gitlab application to start... Check whether $PROTOCOL://$OUTERHOST/gitlab shows the sign in page!"
+    
+    echo "docker exec -it $PROJECT-gitlab update-permissions"
+#    sleep 30
   ;;
   "init")
     echo "Initializing gitlab $PROJECT-gitlab [$GITLABIP]"
@@ -109,7 +122,7 @@ EOF
     GITLABPASS=$(createsecret gitlab)
     SSHKEYPASS=$(createsecret sshkey)
 
-    adduser gitlabadmin Gitlab Admin "admin@$INNERHOST" "$GITLABPASS" 10001
+    adduser gitlabadmin Gitlab Admin "admin@$INNERHOSTNAME" "$GITLABPASS" 10001
     gitlab_makeadmin gitlabadmin
 
     # TODO: disable standard login and self-registration via Gitlab

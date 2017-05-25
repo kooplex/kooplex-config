@@ -98,10 +98,11 @@ DATABASES = {
 
 KOOPLEX_OUTER_HOST = '$OUTERHOST'
 KOOPLEX_INTERNAL_HOST = '$INNERHOST'
-KOOPLEX_INTERNAL_HOSTIP = '$INNERHOSTIP'
+KOOPLEX_INTERNAL_HOSTNAME = '$INNERHOSTNAME'
+KOOPLEX_INTERNAL_HOSTIP = '$INNERHOST'
 KOOPLEX_OUTER_PORT = '$OUTERHOSTPORT'
-if KOOPLEX_OUTER_PORT:
-	KOOPLEX_OUTER_HOST = "%s:%s"%(KOOPLEX_OUTER_HOST,KOOPLEX_OUTER_PORT)
+#if KOOPLEX_OUTER_PORT:
+#	KOOPLEX_OUTER_HOST = "%s:%s"%(KOOPLEX_OUTER_HOST,KOOPLEX_OUTER_PORT)
 
 PROTOCOL = "$REWRITEPROTO"
 KOOPLEX_BASE_URL = PROTOCOL + '://' + KOOPLEX_OUTER_HOST
@@ -135,7 +136,7 @@ KOOPLEX = {
         'bind_password': '$LDAPPASS',
     },
     'gitlab': {
-        'base_url': 'http://%s/gitlab/' % KOOPLEX_OUTER_HOST,
+        'base_url': '%s/gitlab/' % KOOPLEX_BASE_URL,
         'base_repourl': 'http://$GITLABIP',
         'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
         'ssh_host': '$PROJECT-gitlab',
@@ -157,16 +158,16 @@ KOOPLEX = {
         'srv_path': '$SRV'
     },
     'proxy': {
-        'host': KOOPLEX_INTERNAL_HOSTIP,        
+        'host': KOOPLEX_INTERNAL_HOSTNAME,        
         'port': 8001,   # api port
         'auth_token': '$PROXYTOKEN',
-        'external_url': 'http://%s/' % KOOPLEX_OUTER_HOST,
+        'external_url': '%s/' % KOOPLEX_BASE_URL,
     },
     'owncloud': {
-        'base_url': 'http://%s/owncloud/' % KOOPLEX_OUTER_HOST,
+        'base_url': '%s/owncloud/' % KOOPLEX_BASE_URL,
     },
     'dashboards': {
-        'base_url': 'http://%s/' % KOOPLEX_OUTER_HOST,
+        'base_url': '%s/' % KOOPLEX_BASE_URL,
         'base_dir': '$DASHBOARDSDIR',
     }
 }
@@ -369,7 +370,9 @@ EOF
   ;;
   "install")
     echo "Installing hub $PROJECT-hub [$HUBIP]"
-echo $HUBIP
+
+  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create  \
       --name $PROJECT-hub \
       --hostname $PROJECT-hub \
@@ -383,6 +386,9 @@ echo $HUBIP
       -v $SRV/dashboards:$SRV/dashboards \
       -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
+    else
+     echo "$PROJECT-hub is already installed"
+    fi
 
   ;;
   "start")

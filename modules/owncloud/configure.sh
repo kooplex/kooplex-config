@@ -57,6 +57,7 @@ export MOUNTID=\`echo \${dum#*with id}\`
 
 ./occ config:system:set 'trusted_proxies' --value "[$OWNCLOUDIP,$NGINXIP]"
 ./occ config:system:set 'overwritehost' --value '$OUTERHOST'
+./occ config:system:set 'overwriteprotocol' --value '$REWRITEPROTO'
 
 rm -r core/skeleton/Photos/ core/skeleton/Documents/
 
@@ -81,6 +82,8 @@ EOF
     echo "OwnCloud database is in $SRV/ownCloud/";
     
     # Create owncloud container. We need to setup ldap as well
+    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-owncloud | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-owncloud \
       --hostname $PROJECT-owncloud \
@@ -93,6 +96,9 @@ EOF
       --privileged \
             kooplex-owncloud
 #       owncloud
+    else
+     echo "$PROJECT-owncloud is already installed"
+    fi
 
   ;;
   "start")
