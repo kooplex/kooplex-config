@@ -126,7 +126,7 @@ KOOPLEX = {
         'home_dir': 'home/{\$username}',
     },
     'session': {
-    	'base_url': '%s' %KOOPLEX_BASE_URL,
+    	'base_url': 'http://%s' %(KOOPLEX_INTERNAL_HOST),
     },
     'ldap': {
         'host': '$LDAPSERV',
@@ -158,7 +158,7 @@ KOOPLEX = {
         'srv_path': '$SRV'
     },
     'proxy': {
-        'host': KOOPLEX_INTERNAL_HOSTNAME,        
+        'host': KOOPLEX_INTERNAL_HOSTIP,        
         'port': 8001,   # api port
         'auth_token': '$PROXYTOKEN',
         'external_url': '%s/' % KOOPLEX_BASE_URL,
