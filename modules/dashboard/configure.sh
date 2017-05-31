@@ -37,6 +37,7 @@ case $VERB in
       KGW_DOCKERFILE=$RF/Dockerfile.kernel-$POSTFIX
 #TODO: check the existance of the docker image by docker images
       sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
+      cp Dockerfile.dashboards $RF
 
       echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
       KGW=kernel-gateway-$POSTFIX
