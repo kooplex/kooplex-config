@@ -1,7 +1,7 @@
   ##DASHBOARDS##:
     build:
       context: .
-      dockerfile: Dockerfile.dashboards
+      dockerfile: ##DASHBOARDS_DOCKERFILE##
     ports:
       - "##DASHBOARDS_PORT##:3000"
     networks:
