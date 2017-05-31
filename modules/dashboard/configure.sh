@@ -1,130 +1,112 @@
 #!/bin/bash
 
-    DASHBOARD_PORT=3000
-    DASHBOARD_PORT_HOST=3000
-    ip=81
-    KGW_IP_LAST=100
+# try to allocate dashboards server ports from this port value
+DASHBOARDS_PORT=3000
 
-    DOCKER_HOST=$DOCKERARGS
+RF=$BUILDDIR/dashboard
 
-    RF=$BUILDDIR"/dashboard"
-    mkdir -p $RF
-    
+mkdir -p $RF
+
+DIR_DBSOURCE=$RF/dashboards_server
+URL_DBSOURCE=https://github.com/jupyter-incubator/dashboards_server.git
+DOCKER_HOST=$DOCKERARGS
+
+#TODO:
+# everything generated shold be residing in a separate generated folder ./build
+
+
 case $VERB in
   "build")
-  
-    mkdir -p $SRV/dashboards
-    cp runner.sh patcher.sh  $RF/
-
-    for IMAGE_DIR in `ls $BUILDDIR/notebooks/image* -d`
+    for DOCKER_FILE in ../notebook/image-*/Dockerfile
     do
+      TMP=$(dirname $DOCKER_FILE)
+      POSTFIX=${TMP##*image-}
+      DOCKER_COMPOSE_FILE=$RF/docker-compose.yml-$POSTFIX
 
-	    DOCKER_FILE=$IMAGE_DIR"/Dockerfile"
-            IMAGE_TYPE=${IMAGE_DIR##*image-}
-	    COMPOSE_FILE=docker-compose.yml-$IMAGE_TYPE
-	    echo "BUILDING $COMPOSE_FILE"
+      echo "0. Check for dashboards server sources..."
+      if [ -d $DIR_DBSOURCE ] ; then
+        echo "\tfound in $DIR_DBSOURCE"
+      else
+        echo "\tcloning..."
+        git clone $URL_DBSOURCE $DIR_DBSOURCE
+      fi
 
-	    DASHBOARD_IP=$(ip_addip "$SUBNET" $ip)
-	    DASHBOARD_PORT_HOST=$((DASHBOARD_PORT_HOST+1))   
-	    ip=$((ip+1))
-	    KGW_IP_LAST=$((KGW_IP_LAST+1))
-	    IMAGE=kooplex-notebook-$IMAGE_TYPE
-	    KERNEL_GATEWAY_CONTAINER_NAME=kernel-gateway-$IMAGE_TYPE
-	    KERNEL_GATEWAY_CONTAINER_IP=172.20.0.${KGW_IP_LAST}
-	    KERNEL_GATEWAY_IMAGE_NAME=kooplex-kernel-gateway-$IMAGE_TYPE
-	    KERNEL_GATEWAY_DOCKERFILE=Dockerfile.kernel-$IMAGE_TYPE
-	    DASHBOARDS_DOCKERFILE=Dockerfile.dashboards-$IMAGE_TYPE
-	    DASHBOARDS_CONTAINER_NAME=dashboards-$IMAGE_TYPE
-	    DASHBOARDS_IMAGE_NAME=kooplex-dashboards-$IMAGE_TYPE
-	    sed -e "s/IMAGE/$IMAGE/" Dockerfile.kernel-template > $RF/$KERNEL_GATEWAY_DOCKERFILE
-	    cp Dockerfile.dashboards $RF/$DASHBOARDS_DOCKERFILE
-	    sed -e "s/kernel_gateway/$KERNEL_GATEWAY_IMAGE_NAME/" docker-compose.yml-template > $RF/$COMPOSE_FILE
-	    perl -pi -e "s/##IMAGE_TYPE##/$IMAGE_TYPE/" $RF/$COMPOSE_FILE
-	    SRF=`echo $RF | sed -e 's/\//\\\\\//g'`
-	    echo $SRF
-	    perl -pi -e "s/##RF##/$SRF/" $RF/$COMPOSE_FILE
-	    perl -pi -e "s/##INNERHOST##/$INNERHOST/" $RF/$COMPOSE_FILE
-	    perl -pi -e "s/dashboards/$DASHBOARDS_IMAGE_NAME/" $RF/$COMPOSE_FILE
 
-	echo "$DASHBOARDS_CONTAINER_NAME and $KERNEL_GATEWAY_CONTAINER_NAME"
-    
-    echo "Building $PROJECT-dashboards images"
+      echo "1. Building dockerfile file for $POSTFIX..."
+      IMAGE=kooplex-notebook-$POSTFIX
+      KGW_DOCKERFILE=$RF/Dockerfile.kernel-$POSTFIX
+#TODO: check the existance of the docker image by docker images
+      sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
 
-	perl -pi -e "s/##PROJECT_NETWORK##/$PROJECT-net/" $RF/$COMPOSE_FILE
-	SDASHBOARDSDIR=`echo $DASHBOARDSDIR | sed -e 's/\//\\\\\//g'`
-	echo $SDASHBOARDSDIR
-	perl -pi -e "s/##HOST_DASHBOARDS_VOLUME##/$SDASHBOARDSDIR\/$IMAGE_TYPE/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##DASHBOARD_IP##/$DASHBOARD_IP/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##DASHBOARD_PORT##/$DASHBOARD_PORT/" $RF/$COMPOSE_FILE
-	SDASHBOARD_PORT_HOST=`echo $DASHBOARD_PORT_HOST | sed -e 's/\//\\\\\//g'`
-	perl -pi -e "s/##DASHBOARD_PORT_HOST##/$SDASHBOARD_PORT_HOST/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##DASHBOARDS_DOCKERFILE##/$DASHBOARDS_DOCKERFILE/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##DASHBOARDS_IMAGE_NAME##/$DASHBOARDS_IMAGE_NAME/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##DASHBOARDS_CONTAINER_NAME##/$DASHBOARDS_CONTAINER_NAME/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##KERNEL_GATEWAY_IMAGE_NAME##/$KERNEL_GATEWAY_IMAGE_NAME/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##KERNEL_GATEWAY_CONTAINER_NAME##/$KERNEL_GATEWAY_CONTAINER_NAME/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##KERNEL_GATEWAY_CONTAINER_IP##/$KERNEL_GATEWAY_CONTAINER_IP/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##KERNEL_GATEWAY_DOCKERFILE##/$KERNEL_GATEWAY_DOCKERFILE/" $RF/$COMPOSE_FILE
-	perl -pi -e "s/##IMAGE_TYPE##/$IMAGE_TYPE/" $RF/$COMPOSE_FILE
+      echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
+      KGW=kernel-gateway-$POSTFIX
+      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
+      KGW_DOCKERFILE_ESCAPED=$(echo $KGW_DOCKERFILE | sed s"/\//\\\\\//"g)
+      DBS_DOCKERFILE_ESCAPED=$(echo $RF/Dockerfile.dashboards | sed s"/\//\\\\\//"g)
 
-    echo "docker-compose $DOCKER_HOST -f $RF/$COMPOSE_FILE build"
-    $DOCKER_COMPOSE $DOCKER_HOST -f $RF/$COMPOSE_FILE build 
+      sed -e "s/##KERNELGATEWAY##/$KGW/" \
+          -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE_ESCAPED/" \
+          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##NETWORK##/${PROJECT}-net/" \
+        docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
 
+#TODO: when more dashboards do a loop here
+      DASHBOARDS_NAME=kooplex-dashboards-$POSTFIX
+      sed -e "s/##KERNELGATEWAY##/$KGW/" \
+          -e "s/##DASHBOARDS_DOCKERFILE##/$DBS_DOCKERFILE_ESCAPED/" \
+          -e "s/##DASHBOARDS##/$DASHBOARDS_NAME/" \
+          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##DASHBOARDS_PORT##/$DASHBOARDS_PORT/" \
+        docker-compose.yml.DBRD_template >> $DOCKER_COMPOSE_FILE
+      DASHBOARDS_PORT=$((DASHBOARDS_PORT + 1))   
+#NOTE: inner loop over dashboards for a given gateway should end here
+
+      echo "3. Building images for $POSTFIX..."
+      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
    done
   ;;
+
   "install")
   ;;
-  "start")
-    
-    for IMAGE_DIR in `ls $BUILDDIR/notebooks/image* -d`
+
+  "start")  
+    for DOCKER_COMPOSE_FILE in $RF/docker-compose.yml-*
     do
-
-            DOCKER_FILE=$IMAGE_DIR"/Dockerfile"
-            IMAGE_TYPE=${IMAGE_DIR##*image-}
-	    COMPOSE_FILE=docker-compose.yml-$IMAGE_TYPE
-	    echo "Starting $COMPOSE_FILE"
-
-	    $DOCKER_COMPOSE $DOCKERARGS -f $RF/$COMPOSE_FILE up -d
-	    sleep 2
+      echo "Starting service for $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+    sleep 2
    done
   ;;
-  "init")
-    
+
+  "init")  
   ;;
+
   "stop")
-
-    for IMAGE_DIR in `ls $BUILDDIR/notebooks/image* -d`
+    for DOCKER_COMPOSE_FILE in $RF/docker-compose.yml-*
     do
-
-            DOCKER_FILE=$IMAGE_DIR"/Dockerfile"
-            IMAGE_TYPE=${IMAGE_DIR##*image-}
-	    COMPOSE_FILE=docker-compose.yml-$IMAGE_TYPE
-	    echo "Stopping and removing $PROJECT-dashboard"
-	    echo "docker-compose $DOCKERARGS -f $COMPOSE_FILE down"
-	    $DOCKER_COMPOSE $DOCKERARGS -f $RF/$COMPOSE_FILE down
+      echo "Stopping and removing services in $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
     done
-
   ;;
-  "remove")
-    for IMAGE_DIR in `ls $BUILDDIR/notebooks/image* -d`
-    do
-
-            DOCKER_FILE=$IMAGE_DIR"/Dockerfile"
-            IMAGE_TYPE=${IMAGE_DIR##*image-}
-	    COMPOSE_FILE=docker-compose.yml-$IMAGE_TYPE
-	    echo "REMOVING $COMPOSE_FILE"
-
-	   
-	    $DOCKER_COMPOSE $DOCKERARGS -f $RF/$COMPOSE_FILE kill
-	    $DOCKER_COMPOSE $DOCKERARGS -f $RF/$COMPOSE_FILE rm
     
+  "remove")
+    for DOCKER_COMPOSE_FILE in $RF/docker-compose.yml-*
+    do
+      POSTFIX=${DOCKER_COMPOSE_FILE##*docker-compose.yml-}
+      echo "Removing $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+#FIXME: should not we remove images and generated Dockerfiles?
     done
   ;;
+
   "purge")
-   echo "Removing $SRV/dashboard" 
-   rm -R -f $SRV/dashboards $RF
+    echo "Removing $RF" 
+    rm -R -f $RF
+#NOTE: dashboards are stored elsewhere in $DASHBOARDSDIR
   ;;
+
   "clean")
-#  docker rmi ${PROJECT}_dashboards ${PROJECT}_kernel_gateway
   ;;
 esac
+
