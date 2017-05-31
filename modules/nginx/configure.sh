@@ -5,6 +5,9 @@ case $VERB in
   "build")
     echo "Building nginx $PROJECT-nginx [$NGINXIP]"
 
+    mkdir -p $SRV/nginx/etc/
+    cp etc/nginx.conf $SRV/nginx/etc/
+
     echo "
 server {
   listen 80;
@@ -110,8 +113,7 @@ server {
   "install")
     echo "Installing nginx $PROJECT-nginx [$NGINXIP]"
     
-    mkdir -p $SRV/nginx/etc/
-    cp etc/nginx.conf $SRV/nginx/etc/
+
     
     cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-nginx | awk '{print $2}'`
     if [ ! $cont_exist ]; then

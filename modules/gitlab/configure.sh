@@ -108,7 +108,7 @@ echo "chmod 2770 -R $SRV/gitlab/opt/git-data/repositories/"
 echo "chmod a+w -R $SRV/gitlab/opt/prometheus/"
     
     docker $DOCKERARGS start $PROJECT-gitlab
-    echo "Waiting X seconds for the Gitlab application to start... Check whether $PROTOCOL://$OUTERHOST/gitlab shows the sign in page!"
+    echo "Waiting X seconds for the Gitlab application to start... Check whether $REWRITEPROTO://$OUTERHOST/gitlab shows the sign in page!"
     
     echo "docker exec -it $PROJECT-gitlab update-permissions"
 #    sleep 30
