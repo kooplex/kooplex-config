@@ -1,0 +1,10 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+FROM ##IMAGE##
+
+USER root
+RUN pip install jupyter_kernel_gateway==0.5.1
+
+# run kernel the gateway
+CMD ["jupyter", "kernelgateway", "--KernelGatewayApp.ip=0.0.0.0"]

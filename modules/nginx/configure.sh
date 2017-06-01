@@ -41,6 +41,12 @@ server {
     proxy_pass http://$HUBIP;
   }
 
+  location /admin {
+    proxy_set_header Host $http_host;
+    proxy_pass http://$HUBIP/admin;
+  }
+
+
   location / {
     rewrite / $REWRITEPROTO://$OUTERHOST/hub permanent;
   }
