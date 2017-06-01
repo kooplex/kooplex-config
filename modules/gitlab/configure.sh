@@ -122,7 +122,7 @@ echo "chmod a+w -R $SRV/gitlab/opt/prometheus/"
     GITLABPASS=$(createsecret gitlab)
     SSHKEYPASS=$(createsecret sshkey)
 
-    adduser gitlabadmin Gitlab Admin "admin@$INNERHOSTNAME" "$GITLABPASS" 10001
+    adduser gitlabadmin Gitlab Admin "admin@$INNERHOST" "$GITLABPASS" 10001
     gitlab_makeadmin gitlabadmin
 
     # TODO: disable standard login and self-registration via Gitlab

@@ -16,7 +16,7 @@ server {
 
 # DASHBOARD
   location ~* /db/(?<port>[0-9]*) {
-    proxy_pass            http://${INNERHOSTNAME}:\$port;
+    proxy_pass            http://${INNERHOST}:\$port;
     proxy_http_version    1.1;
     proxy_set_header      Host \$http_host;
     proxy_set_header X-Real-IP \$remote_addr;

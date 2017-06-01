@@ -16,10 +16,11 @@ OUTERHOSTNAME="example.org"
 OUTERHOSTPORT="89"
 
 #The host name of a gateway or virtual host if there is any. If not use outerhost
-#INNERHOSTNAME=$OUTERHOSTNAME
-#INNERHOSTPORT=$OUTERHOSTPORT
-INNERHOSTNAME="192.168.1.15"
-INNERHOSTPORT=""
+#INNERHOST=$OUTERHOSTNAME
+INNERHOST="192.168.1.15"
+#If you can communicate through only one port on the outerhost then you have
+#to create an extra nginx (e.g. in a container, because you will need to
+#have access to certain ports in your inner network
 
 PREFIX="aprefix"
 PROJECT="projectname"
