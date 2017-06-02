@@ -31,10 +31,11 @@ case $VERB in
     
    
     docker $DOCKERARGS build -t kooplex-base  .
+    echo "Generating secrets..."
+    LDAPPASS=$(createsecret ldap)
   ;;
   "install")
-  echo "Generating secrets..."
-    LDAPPASS=$(createsecret ldap)
+
   ;;
   "start")
     
