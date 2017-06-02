@@ -378,7 +378,7 @@ EOF
           --ip $HUBIP \
           --privileged \
           --log-opt max-size=1m --log-opt max-file=3 \
-          -v /var/run/docker.sock:/var/run/docker.sock \ 
+          -v /var/run/docker.sock:/var/run/docker.sock \
           -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
           -v $SRV/home:$SRV/home \
           -v $SRV/dashboards:$SRV/dashboards \
