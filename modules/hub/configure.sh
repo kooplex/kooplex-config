@@ -370,7 +370,7 @@ EOF
 
   cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
     if [ ! $cont_exist ]; then
-      if [ $DOCKERPROTOCOL == "nix" ]; then
+      if [ $DOCKERPROTOCOL == "unix" ]; then
         docker $DOCKERARGS create  \
           --name $PROJECT-hub \
           --hostname $PROJECT-hub \
