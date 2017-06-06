@@ -96,9 +96,17 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes biopython && \
 
 # R KERNEL
 
-#RUN pip3 install rpy2
 
 RUN $CONDA_DIR/bin/conda install -c r r-essentials
+
+RUN conda create -n py27 python=2.7 ipykernel
+RUN conda create -n py36 python=3.6 ipykernel
+
+RUN pip install kernda --no-cache && \
+	$CONDA_DIR/envs/py27/bin/python -m ipykernel install && \
+	kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
+	pip uninstall kernda -y
+
 
 #RUN chmod a+rxw $CONDA_DIR -R
 
