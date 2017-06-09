@@ -97,9 +97,9 @@ DATABASES = {
 
 
 KOOPLEX_OUTER_HOST = '$OUTERHOST'
-KOOPLEX_OUTER_PORT = '$OUTERHOSTPORT'
 KOOPLEX_INTERNAL_HOST = '$INNERHOST'
-
+KOOPLEX_INTERNAL_HOSTNAME = '$INNERHOSTNAME'
+KOOPLEX_OUTER_PORT = '$OUTERHOSTPORT'
 
 PROTOCOL = "$REWRITEPROTO"
 KOOPLEX_BASE_URL = PROTOCOL + '://' + KOOPLEX_OUTER_HOST
@@ -121,6 +121,7 @@ KOOPLEX = {
     'users': {
         'srv_dir': '$SRV',
         'home_dir': 'home/{\$username}',
+        'project_dir': '{\$username}/projects/{\$path_with_namespace}',
     },
     'session': {
     	'base_url': 'http://%s' %(KOOPLEX_INTERNAL_HOST),
@@ -164,6 +165,9 @@ KOOPLEX = {
         'base_url': '%s/owncloud/' % KOOPLEX_BASE_URL,
     },
     'dashboards': {
+        'dir_to': '{\$image_postfix}',
+        'prefix': 'dashboard',
+        'url_prefix': '/db/{\$dashboard_port}',
         'base_url': '%s/' % KOOPLEX_BASE_URL,
         'base_dir': '$DASHBOARDSDIR',
     }
@@ -315,6 +319,8 @@ INSTALLED_APPS = (
     #'oauth2_provider',
 
     'kooplex.hub.apps.HubConfig',
+    'kooplex.hub.templatetags',
+
 )
 
 # Required by oauth2 provider
@@ -370,7 +376,7 @@ EOF
 
   cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
     if [ ! $cont_exist ]; then
-      if [ $DOCKERPROTOCOL == "nix" ]; then
+      if [ $DOCKERPROTOCOL == "unix" ]; then
         docker $DOCKERARGS create  \
           --name $PROJECT-hub \
           --hostname $PROJECT-hub \
@@ -378,7 +384,7 @@ EOF
           --ip $HUBIP \
           --privileged \
           --log-opt max-size=1m --log-opt max-file=3 \
-          -v /var/run/docker.sock:/var/run/docker.sock \ 
+          -v /var/run/docker.sock:/var/run/docker.sock \
           -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
           -v $SRV/home:$SRV/home \
           -v $SRV/dashboards:$SRV/dashboards \
