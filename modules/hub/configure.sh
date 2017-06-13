@@ -121,7 +121,7 @@ KOOPLEX = {
     'users': {
         'srv_dir': '$SRV',
         'home_dir': 'home/{\$username}',
-        'project_dir': '{\$username}/projects/{\$path_with_namespace}',
+        'project_dir': 'projects/{\$path_with_namespace}',
     },
     'session': {
     	'base_url': 'http://%s' %(KOOPLEX_INTERNAL_HOST),
@@ -165,11 +165,10 @@ KOOPLEX = {
         'base_url': '%s/owncloud/' % KOOPLEX_BASE_URL,
     },
     'dashboards': {
-        'dir_to': '{\$image_postfix}',
-        'prefix': 'dashboard',
+        'dir': '{\$image_postfix}',
+        'prefix': 'dashboards',
         'url_prefix': '/db/{\$dashboard_port}',
         'base_url': '%s/' % KOOPLEX_BASE_URL,
-        'base_dir': '$DASHBOARDSDIR',
     }
 }
 

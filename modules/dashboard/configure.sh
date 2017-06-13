@@ -3,7 +3,7 @@
 # try to allocate dashboards server ports from this port value
 DASHBOARDS_PORT=3000
 
-RF=$BUILDDIR/dashboard
+RF=$BUILDDIR/dashboards
 
 mkdir -p $RF
 
@@ -30,10 +30,11 @@ case $VERB in
         echo "\tcloning..."
         git clone $URL_DBSOURCE $DIR_DBSOURCE
       fi
-
+      
+      cp runner.sh  $RF/
 
       echo "1. Building dockerfile file for $POSTFIX..."
-      IMAGE=kooplex-notebook-$POSTFIX
+      IMAGE=${PREFIX}-notebook-$POSTFIX
       KGW_DOCKERFILE=$RF/Dockerfile.kernel-$POSTFIX
 #TODO: check the existance of the docker image by docker images
       sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
@@ -52,7 +53,7 @@ case $VERB in
         docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
 
 #TODO: when more dashboards do a loop here
-      DASHBOARDS_NAME=kooplex-dashboards-$POSTFIX
+      DASHBOARDS_NAME=dashboards-$POSTFIX
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##DASHBOARDS_DOCKERFILE##/$DBS_DOCKERFILE_ESCAPED/" \
           -e "s/##DASHBOARDS##/$DASHBOARDS_NAME/" \
