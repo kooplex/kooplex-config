@@ -17,10 +17,6 @@ case $VERB in
     set -e
   ;;
   "start")
-    if ! grep -qs "$SRV" /proc/mounts; then    
-      echo "Mount $SRV does not exist! FATAL ERROR"
-      return -1
-    fi
 
     set -e
   ;;
