@@ -105,7 +105,7 @@ EOF
       -v $SRV/gitlab/etc:/etc/gitlab \
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
-      gitlab/gitlab-ce
+      gitlab/gitlab:ce-9.2.6-ce.0
     else
      echo "$PROJECT-gitlab is already installed"
     fi      
