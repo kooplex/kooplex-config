@@ -7,6 +7,8 @@ case $VERB in
     mkdir -p $SRV/gitlab/etc
     mkdir -p $SRV/gitlab/log
     mkdir -p $SRV/gitlab/opt
+    mkdir -p $SRV/gitlab/recipe
+    sed -e "s/##HOST##/$OUTERHOSTNAME/" nginx-gitlab-http.conf.erb >$SRV/gitlab/recipe/nginx-gitlab-http.conf.erb
     chown -R root $SRV/gitlab
     chmod -R 755 $SRV/gitlab
     
@@ -22,6 +24,10 @@ gitlab_rails['smtp_address'] = '$SMTP'
 gitlab_rails['smtp_port'] = 25
 #gitlab_rails['smtp_authentication'] = "plain"
 #gitlab_rails['smtp_domain'] = "elte.hu"
+
+nginx['listen_port'] = 80
+nginx['http2_enabled'] = false
+nginx['listen_https'] = false
 
 
 gitlab_rails['gitlab_signup_enabled'] = false
@@ -76,6 +82,8 @@ gitlab_rails['db_password'] = '$GITLABDBPASS'
 
 EOF
 
+docker pull gitlab/gitlab-ce:9.2.6-ce.0
+
  ;;
   "install")
     echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
@@ -102,10 +110,11 @@ EOF
       --ip $GITLABIP \
       --log-opt max-size=1m --log-opt max-file=3 \
       -v /etc/localtime:/etc/localtime:ro \
+      -v $SRV/gitlab/recipe/nginx-gitlab-http.conf.erb:/opt/gitlab/embedded/cookbooks/gitlab/templates/default/nginx-gitlab-http.conf.erb\
       -v $SRV/gitlab/etc:/etc/gitlab \
       -v $SRV/gitlab/log:/var/log/gitlab \
       -v $SRV/gitlab/opt:/var/opt/gitlab \
-      gitlab/gitlab:ce-9.2.6-ce.0
+      gitlab/gitlab-ce:9.2.6-ce.0
     else
      echo "$PROJECT-gitlab is already installed"
     fi      
