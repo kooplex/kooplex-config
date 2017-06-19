@@ -487,6 +487,10 @@ config() {
 
   MYSQLPASS=$DUMMYPASS
 
+  GITLABDBIP=$(ip_addip "$SUBNET" 32)
+
+  GITLABDBPASS=$DUMMYPASS
+
   DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
   DASHBOARDSDIR=$SRV"/dashboards"
   

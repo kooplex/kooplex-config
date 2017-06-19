@@ -63,6 +63,17 @@ mattermost['log_file_level'] = 'ERROR'
 registry['log_level'] = 'error'
 gitlab_shell['log_level'] = 'ERROR'
 
+# Disable the built-in Postgres
+postgresql['enable'] = false
+
+# Fill in the values for database.yml
+gitlab_rails['db_adapter'] = 'postgresql'
+gitlab_rails['db_encoding'] = 'utf8'
+gitlab_rails['db_host'] = '$GITLABDBIP'
+gitlab_rails['db_port'] = '5432'
+gitlab_rails['db_username'] = 'postgres'
+gitlab_rails['db_password'] = '$GITLABDBPASS'
+
 EOF
 
  ;;
@@ -77,7 +88,7 @@ EOF
 # rm  $SRV/gitlab/log/gitlab-workhorse/*
 
 
-    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-gitlab | awk '{print $2}'`
+    cont_exist=`docker $DOCKERARGS ps -a | grep -w $PROJECT-gitlab | awk '{print $2}'`
     if [ ! $cont_exist ]; then
     docker $DOCKERARGS create \
       --name $PROJECT-gitlab \
