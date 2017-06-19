@@ -1,5 +1,5 @@
 SYSMODULES="net base" # admin"
-MODULES="ldap mysql  gitlab notebook proxy nginx owncloud" # dashboard # hub 
+MODULES="ldap mysql gitlabdb gitlab notebook proxy nginx owncloud" # dashboard # hub 
 
 OUTERHOSTNAME="polc.elte.hu"
 OUTERHOSTPORT="89"
