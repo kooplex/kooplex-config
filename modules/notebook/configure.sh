@@ -25,9 +25,15 @@ case $VERB in
   ;;
   "install")
     echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
+
+    # DNS
+    mkdir -p $SRV/notebook/etc
+    cat > $SRV/notebook/etc/hosts << EOF
+127.0.0.1       localhost
+$GITLABIP       ${PROJECT}-gitlab
+EOF
     
     # LDAP
-    mkdir -p $SRV/notebook/etc
     mkdir -p $SRV/notebook/init
     $(ldap_makeconfig notebook)
     cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
@@ -41,31 +47,10 @@ service nslcd start
     # Start jupyter
     echo "#/bin/sh
 echo \"Starting notebook for \$NB_USER...\"
-#cd /home/\$NB_USER
-#cd /\$NB_USER
-cd /home
+cd /home/\$NB_USER
 . start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
       > $SRV/notebook/init/1.sh
     
-    # TODO: we create a notebook container here for testing but
-    # individual containers will later be created for single
-    # users from python. Use python unit tests to create notebook container!
-#    docker $DOCKERARGS create \
-#      --name $PROJECT-notebook \
-#      --hostname $PROJECT-notebook \
-#      --net $PROJECT-net \
-#      --ip $NOTEBOOKIP \
-#      --privileged \
-#      $(ldap_makebinds notebook) \
-#      $(home_makebinds notebook) \
-#      -v $SRV/notebook/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py \
-#      -v $SRV/notebook/init:/init \
-#      -e NB_USER=test \
-#      -e NB_UID=10002 \
-#      -e NB_GID=10002 \
-#      -e NB_URL=/notebook/test/ \
-#      -e NB_PORT=8000 \
-#      $PREFIX-notebook
   ;;
   "start")
     # TODO: we have a single notebook server now, perhaps there will
