@@ -386,6 +386,9 @@ EOF
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
           -v $SRV/home:$SRV/home \
+          -v $SRV/_git:$SRV/_git \
+          -v $SRV/_share:$SRV/_share \
+          -v $SRV/_oc:$SRV/_oc \
           -v $SRV/dashboards:$SRV/dashboards \
           -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
@@ -399,6 +402,9 @@ EOF
           --log-opt max-size=1m --log-opt max-file=3 \
           -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
           -v $SRV/home:$SRV/home \
+          -v $SRV/_git:$SRV/_git \
+          -v $SRV/_share:$SRV/_share \
+          -v $SRV/_oc:$SRV/_oc \
           -v $SRV/dashboards:$SRV/dashboards \
           -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
