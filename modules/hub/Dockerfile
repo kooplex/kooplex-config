@@ -21,7 +21,7 @@ RUN pip3 install pwgen
 # (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
 ARG CACHE_DATE=2016-01-02
 RUN cd /opt 
-RUN git clone https://github.com/kooplex/kooplex-hub.git
+RUN git clone -b devnew https://github.com/kooplex/kooplex-hub.git
 RUN mv kooplex-hub kooplexhub
 #COPY settings.py /settings.py 
 

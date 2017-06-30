@@ -389,7 +389,7 @@ EOF
           -v $SRV/_git:$SRV/_git \
           -v $SRV/_share:$SRV/_share \
           -v $SRV/_oc:$SRV/_oc \
-          -v $SRV/dashboards:$SRV/dashboards \
+          -v $SRV/_report:$SRV/_report \
           -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
       else
@@ -405,7 +405,7 @@ EOF
           -v $SRV/_git:$SRV/_git \
           -v $SRV/_share:$SRV/_share \
           -v $SRV/_oc:$SRV/_oc \
-          -v $SRV/dashboards:$SRV/dashboards \
+          -v $SRV/_report:$SRV/_report \
           -v $SRV/notebook:$SRV/notebook \
             kooplex-hub
       fi

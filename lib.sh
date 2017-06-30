@@ -492,7 +492,7 @@ config() {
   GITLABDBPASS=$DUMMYPASS
 
   DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
-  DASHBOARDSDIR=$SRV"/dashboards"
+  DASHBOARDSDIR=$SRV"/_report"
   
 #  DOCKERPORT=${DOCKERARGS##*:}
 

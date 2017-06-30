@@ -128,6 +128,7 @@ server {
       --hostname $PROJECT-nginx \
       --net $PROJECT-net \
       --ip $NGINXIP \
+      -p 80:80 \
       --log-opt max-size=1m --log-opt max-file=3 \
       -v /etc/localtime:/etc/localtime:ro \
       -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
