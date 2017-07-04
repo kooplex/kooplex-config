@@ -28,7 +28,17 @@ if [ $UID == 0 ] ; then
     # make sure project users are in the group associated with share folder
     addgroup --gid $(( $GID_OFFSET + $PR_ID )) $PR_NAME
     for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
-        addgroup  $username $PR_NAME
+        addgroup $username $PR_NAME
+    done
+
+    # make sure project users are in the group associated with external (nfs) share folders
+    for lbl_gid in $(echo $MNT_GIDS | sed s/,/\ /g) ; do
+        lbl=mnt_$(echo $lbl_gid | cut -f1 -d:)
+        gid=$(echo $lbl_gid | cut -f2 -d:)
+        addgroup --gid $gid $lbl
+        for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
+            addgroup $username $lbl
+        done
     done
 
     echo "host key retieval"
