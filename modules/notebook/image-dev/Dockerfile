@@ -107,6 +107,7 @@ RUN pip install kernda --no-cache && \
 	kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
 	pip uninstall kernda -y
 
+RUN apt install -y tmux zip curlftpfs
 
 #RUN chmod a+rxw $CONDA_DIR -R
 
