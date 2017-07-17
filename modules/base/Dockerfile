@@ -56,5 +56,7 @@ EXPOSE 111/udp
 
 RUN mkdir /init
 
+ENV SSH_AUTH_SOCK /tmp/my_sshagent_sock
+
 ENTRYPOINT ["tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]

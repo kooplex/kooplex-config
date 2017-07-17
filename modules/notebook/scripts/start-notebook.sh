@@ -58,11 +58,11 @@ echo 5
 
     echo "cloning"
 
-    su $NB_USER -c "eval \"\$(ssh-agent)\" && ssh-add \$HOME/.ssh/gitlab.key"
+    su $NB_USER -c "eval \"\$(ssh-agent -a $SSH_AUTH_SOCK)\" && ssh-add \$HOME/.ssh/gitlab.key"
     # git clone if it does not exist
     if [ ! -d /home/${NB_USER}/git/.git ] ; then
         echo exec su $NB_USER -c "git clone $PR_URL \$HOME/git"
-        su $NB_USER -c "eval \"\$(ssh-agent)\" && ssh-add \$HOME/.ssh/gitlab.key && git clone $PR_URL \$HOME/git"
+        su $NB_USER -c "git clone $PR_URL \$HOME/git"
     else
         echo "$PR_URL already cloned..."
     fi
