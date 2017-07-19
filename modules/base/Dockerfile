@@ -1,24 +1,20 @@
-# Based on the official docker image for jupyterhub and cpuguy83/docker-nfs-client 
-
-# Debian Jessie image released 2016 May 03.
-#FROM debian@sha256:32a225e412babcd54c0ea777846183c61003d125278882873fb2bc97f9057c51
 FROM ubuntu:xenial
 
-MAINTAINER Laszlo Dobos <dobos@complex.elte.hu>
+MAINTAINER Kooplex Team <kooplex@complex.elte.hu>
 
 USER root
 
+# configure apt frontent
+ENV DEBIAN_FRONTEND noninteractive
+
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
-ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     wget \
     bzip2 \
     ca-certificates \
     sudo vim\
-    locales \
-    && apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    locales
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
@@ -30,14 +26,11 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.9.0/tini &
     chmod +x /usr/local/bin/tini
 
 # Install LDAP and setup authentication
-ENV DEBIAN_FRONTEND=noninteractive
-
 RUN touch /etc/nslcd.conf && \
     chmod 0600 /etc/nslcd.conf
 
-RUN apt-get update && \
-    apt-get install -q -y \
-    libnss-ldapd openldap-utils ldap-client libldap2-dev 
+RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev 
+
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/  
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
@@ -49,12 +42,20 @@ ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package
 
-# Install NFS client
-RUN apt-get install -q -y nfs-common
+# Install NFS client ACL manipulation
+RUN apt-get install -q -y nfs-common acl nfs4-acl-tools
     
+# Patch bashrc
+COPY bashrc_tail /tmp
+RUN cat /tmp/bashrc_tail >> /etc/bash.bashrc
+RUN rm /tmp/bashrc_tail
+
 EXPOSE 111/udp
 
 RUN mkdir /init
+
+# we don't run apt-get clean, coz the apt-cache is useful when preparing new module volumes
+RUN rm -rf /var/lib/apt/lists/*
 
 ENV SSH_AUTH_SOCK /tmp/my_sshagent_sock
 

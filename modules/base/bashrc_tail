@@ -1,0 +1,7 @@
+
+# source bash initialisation fragments from volumes attached to the comtainter
+if [ -d /vol ] ; then
+    for rc in /vol/*/bashrc ; do
+        . $rc
+    done
+fi
