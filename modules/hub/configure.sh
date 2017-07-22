@@ -302,6 +302,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'kooplex.hub.apps.HubConfig',
+    'kooplex.hub.templatetags',
+
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -317,8 +320,7 @@ INSTALLED_APPS = (
     #'corsheaders',
     #'oauth2_provider',
 
-    'kooplex.hub.apps.HubConfig',
-    'kooplex.hub.templatetags',
+
 
 )
 
@@ -425,8 +427,11 @@ EOF
     bash -c "echo  \"   CREATE USER 'kooplex'@'%' IDENTIFIED BY '$MYSQLPASS';\" | mysql -u root --password=$MYSQLPASS"
    docker $DOCKERARGS exec $PROJECT-mysql \
     bash -c "echo \"    GRANT ALL ON \"$PROJECT\"_kooplex.* TO 'kooplex'@'%';\" | mysql -u root --password=$MYSQLPASS"
+
     
  else
+    docker $DOCKERARGS exec $PROJECT-mysql \
+    bash -c "echo \"GRANT ALL PRIVILEGES ON * . * TO 'kooplex'@'%';\" | mysql -u root --password=$MYSQLPASS"
   echo "mysql Database exists"
  fi
 
