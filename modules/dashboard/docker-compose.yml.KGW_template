@@ -1,24 +1,25 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
-
----
 version: "2"
 
 networks:
-  project_network:
-    external: 
-      name: ##NETWORK##
+  ##NETWORK##:
+    external: true
+
+volumes:
+  ##PREFIX##-report-##POSTFIX##:
+    external: true
 
 services:
   ##KERNELGATEWAY##:
+    container_name: ##KERNELGATEWAY##
+    image: ##PREFIX##-kernelgateway-##POSTFIX##
     build:
       context: .
       dockerfile: ##KERNELGATEWAY_DOCKERFILE##
     networks:
-      project_network:
+      - ##NETWORK##
     environment:
       KG_ALLOW_ORIGIN: '*'
     volumes:
-      - ##VOLUME##:/home:ro
+      - ##PREFIX##-report-##POSTFIX##:/home:ro
     restart: always
 
