@@ -41,23 +41,27 @@ case $VERB in
       cp Dockerfile.dashboards $RF
 
       echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
-      KGW=kernel-gateway-$POSTFIX
-      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
+      KGW=${PREFIX}-kernelgateway-$POSTFIX
+#TODO: check if docker volume exists
+#      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
       KGW_DOCKERFILE_ESCAPED=$(echo $KGW_DOCKERFILE | sed s"/\//\\\\\//"g)
       DBS_DOCKERFILE_ESCAPED=$(echo $RF/Dockerfile.dashboards | sed s"/\//\\\\\//"g)
 
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE_ESCAPED/" \
-          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##POSTFIX##/$POSTFIX/" \
           -e "s/##NETWORK##/${PROJECT}-net/" \
         docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
 
 #TODO: when more dashboards do a loop here
-      DASHBOARDS_NAME=dashboards-$POSTFIX
+      DASHBOARDS_NAME=${PREFIX}-dashboards-$POSTFIX
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##DASHBOARDS_DOCKERFILE##/$DBS_DOCKERFILE_ESCAPED/" \
           -e "s/##DASHBOARDS##/$DASHBOARDS_NAME/" \
-          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##POSTFIX##/$POSTFIX/" \
+          -e "s/##NETWORK##/${PROJECT}-net/" \
           -e "s/##DASHBOARDS_PORT##/$DASHBOARDS_PORT/" \
         docker-compose.yml.DBRD_template >> $DOCKER_COMPOSE_FILE
       DASHBOARDS_PORT=$((DASHBOARDS_PORT + 1))   

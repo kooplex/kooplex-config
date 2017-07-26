@@ -1,0 +1,27 @@
+version: "2"
+
+
+services:
+  ##PREFIX##-git:
+    container_name: ##PREFIX##-git
+    image: ##PREFIX##-git:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - ##PREFIX##-home:/home:rw
+      - ##PREFIX##-git:/git:rw
+    restart: always
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-home:
+    external: true
+  ##PREFIX##-git:
+    external: true
+
