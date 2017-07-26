@@ -134,7 +134,7 @@ KOOPLEX = {
         'bind_password': '$LDAPPASS',
     },
     'gitlab': {
-        'base_url': 'http://%s/gitlab/' % KOOPLEX_INTERNAL_HOST,
+        'base_url': 'http://$GITLABIP/gitlab/',
         'base_repourl': 'http://$GITLABIP',
         'ssh_cmd': r'/usr/bin/ssh',   # TODO def find_ssh()
         'ssh_host': '$PROJECT-gitlab',
