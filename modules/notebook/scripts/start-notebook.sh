@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 # Handle special flags if we're root
 if [ $UID == 0 ] ; then
 
@@ -67,8 +69,20 @@ echo 5
         echo "$PR_URL already cloned..."
     fi
 
+source /etc/bash.bashrc
+# source bash initialisation fragments from volumes attached to the container
+if [ -d /vol ] ; then
+    for rc in /vol/*/bashrc ; do
+        . $rc
+    done
+fi
+
+    env    
+    export condaenvs=`echo "['"$CONDA_ENV_DIR"']"| sed -e "s/:/','/g"`                                                                                    
+    echo $CONDA_ENV_DIR                                                                                                                   
+    echo $condaenvs 
     # Start the notebook server
-    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $*"
+    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $* --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\""
     echo " masik 4"
 else
     # Otherwise just exec the notebook
