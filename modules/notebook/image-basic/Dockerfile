@@ -40,18 +40,24 @@ RUN cd /tmp && \
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
 RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console 
 RUN $CONDA_DIR/bin/conda install --quiet --yes  notebook widgetsnbextension
+#RUN  $CONDA_DIR/bin/conda install --quiet --yes pandas numpy scipy matplotlib seaborn plotly  bokeh pymysql sqlite ujson
+#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge  igraph lifelines
+#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
+#     jupyter dashboards quick-setup --sys-prefix
+#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
+#     jupyter cms quick-setup --sys-prefix
 
 
 # TO SWITCH BETWEEN CONDA ENVS
 RUN pip install environment_kernels
 
-
 # THIS IS VERY IMPORTANT !!!! 
 # WITHOUT THIS IPYWIDGETS WON'T WORK
 #RUN $CONDA_DIR/bin/conda install -c conda-forge ipywidgets
 WORKDIR /tmp
-RUN git clone https://github.com/jupyter-widgets/ipywidgets.git
+RUN git clone https://github.com/jupyter-widgets/ipywidgets.git 
 WORKDIR /tmp/ipywidgets/
+#RUN git reset  96450b6
 RUN  pip install -e .
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
 # THIS IS VERY IMPORTANT !!!! 
