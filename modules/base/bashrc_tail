@@ -2,6 +2,6 @@
 # source bash initialisation fragments from volumes attached to the container
 if [ -d /vol ] ; then
     for rc in /vol/*/bashrc ; do
-        . $rc
+        [ -f $rc ] && . $rc
     done
 fi
