@@ -13,6 +13,7 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       cp Dockerfile $RF
       cp scripts/start.sh $RF
+      cp scripts/init-ssh-agent.sh $RF
       cp etc/nsswitch.conf $RF
 #FIXME: sed from template, or use lib
       cp etc/nslcd.conf $RF
