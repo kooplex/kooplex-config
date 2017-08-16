@@ -9,3 +9,4 @@ RUN apt clean
 COPY nsswitch.conf /etc
 COPY nslcd.conf /etc
 COPY start.sh /init
+COPY init-ssh-agent.sh /usr/local/bin
