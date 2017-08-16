@@ -40,12 +40,10 @@ RUN cd /tmp && \
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
 RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console 
 RUN $CONDA_DIR/bin/conda install --quiet --yes  notebook widgetsnbextension
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes pandas numpy scipy matplotlib seaborn plotly  bokeh pymysql sqlite ujson
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge  igraph lifelines
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
-#     jupyter dashboards quick-setup --sys-prefix
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
-#     jupyter cms quick-setup --sys-prefix
+RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
+     jupyter dashboards quick-setup --sys-prefix
+RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
+     jupyter cms quick-setup --sys-prefix
 
 
 # TO SWITCH BETWEEN CONDA ENVS
@@ -62,9 +60,16 @@ RUN  pip install -e .
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
 # THIS IS VERY IMPORTANT !!!! 
 
+ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
+RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
+
+ADD fileexpander.py /usr/local/lib/python3.6/site-packages/kooplexutils/fileexpander.py
 
 # This one is not needed as long as it cannot discover conda envs outside of /opt/conda
 #RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
+
+RUN apt install -y autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends 
+
 
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
