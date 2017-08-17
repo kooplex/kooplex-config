@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+"""Extend regular notebook server to be aware of multiuser things."""
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+from jinja2 import ChoiceLoader, FunctionLoader
+from notebook.notebookapp import NotebookApp
+
+page_template = """
+{% extends "templates/page.html" %}
+{% block meta %}
+<style>
+.nav > li {
+  padding-left:30px;
+  padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+{% block header_buttons %}
+<div class="navbar navbar-inverse navbar-fixed-top" style="padding: 10px 40px 10px 40px;">
+  <div class="container-fluid">
+    <div class="navbar-header">
+
+        <a href="/hub/notebooks" class="navbar-brand">Kooplex Hub</a>
+
+    </div>
+    <ul class="nav navbar-nav">
+     <li><a href=""  class="navbar-brand">Project name: <strong>{{ project_name }}</strong></a></li>
+
+
+
+
+
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+        <li><span class="navbar-brand">Hello {{ user_name }}!</span></li>
+       <li> <div id="ipython_notebook" class="nav "><a href="{{default_url}}
+        {%- if logged_in and token -%}?token={{token}}{%- endif -%}" title='{% trans %}dashboard{% endtrans %}'>
+      <img src='{{static_url("base/images/logo.png") }}' alt='Jupyter Notebook'/>
+</a></div></li>
+    </ul>
+  </div>     <!-- container-fluid -->
+</div>
+{% endblock %}
+"""
+
+
+
+class KooplexUserNotebookApp(NotebookApp):
+
+      def patch_templates(self):
+        import os
+
+        # let us point to some crasy urls with the buttons
+        # this illustrates the values of some internal url type strings
+        env = self.web_app.settings['jinja2_env']
+        env.globals['stop_link'] = 'http://www.google.com/'+self.base_url
+        env.globals['commit_link'] = 'http://www.google.com/'+self.connection_url
+        env.globals['project_name'] =  os.getenv("PR_NAME")
+        env.globals['user_name'] = os.getenv("NB_USER")
+
+
+        # patch jinja env loading to modify page template
+        def get_page(name):
+            if name == 'page.html':
+                return page_template
+
+        orig_loader = env.loader
+        env.loader = ChoiceLoader([
+            FunctionLoader(get_page),
+            orig_loader,
+        ])
+
+     
+      def init_webapp(self):
+
+          super(KooplexUserNotebookApp,self).init_webapp()
+          self.patch_templates()
+
+def main(argv=None):
+    return KooplexUserNotebookApp.launch_instance(argv)
+
+
+if __name__ == "__main__":
+     main()

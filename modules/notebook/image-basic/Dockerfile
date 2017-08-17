@@ -60,6 +60,8 @@ RUN  pip install -e .
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
 # THIS IS VERY IMPORTANT !!!! 
 
+RUN apt install -y autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends 
+
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
 
@@ -68,8 +70,13 @@ ADD fileexpander.py /usr/local/lib/python3.6/site-packages/kooplexutils/fileexpa
 # This one is not needed as long as it cannot discover conda envs outside of /opt/conda
 #RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
 
-RUN apt install -y autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends 
-
+### HACKINGGGGGGGGGGGGGGGGGG
+WORKDIR /tmp
+RUN git clone https://github.com/jupyter/notebook.git
+RUN  cd notebook; git checkout tags/5.1.0rc1; #pip install --no-deps -e . ;
+WORKDIR /tmp/notebook
+RUN  cp -r notebook/* /opt/conda/lib/python3.6/site-packages/notebook/
+### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
