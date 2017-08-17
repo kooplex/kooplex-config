@@ -31,7 +31,7 @@ case $VERB in
         git clone $URL_DBSOURCE $DIR_DBSOURCE
       fi
       
-      cp runner.sh  $RF/
+      cp fileexpander.py runner.sh start-kernelgateway.sh  $RF/
 
       echo "1. Building dockerfile file for $POSTFIX..."
       IMAGE=${PREFIX}-notebook-$POSTFIX

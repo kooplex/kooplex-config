@@ -6,5 +6,8 @@ FROM ##IMAGE##
 USER root
 RUN pip install jupyter_kernel_gateway==0.5.1
 
+ADD start-kernelgateway.sh /etc/start-kernelgateway.sh
+
 # run kernel the gateway
-CMD ["jupyter", "kernelgateway", "--KernelGatewayApp.ip=0.0.0.0"]
+#CMD ["jupyter", "kernelgateway", "--KernelGatewayApp.ip=0.0.0.0"]
+CMD ["bash","/etc/start-kernelgateway.sh"]
