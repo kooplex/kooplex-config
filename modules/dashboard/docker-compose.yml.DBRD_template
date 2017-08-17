@@ -1,6 +1,6 @@
   ##DASHBOARDS##:
     container_name: ##DASHBOARDS##
-    image: ##PREFIX##-dashboard-##POSTFIX##
+    image: ##PREFIX##-dashboards-##POSTFIX##
     build:
       context: .
       dockerfile: ##DASHBOARDS_DOCKERFILE##

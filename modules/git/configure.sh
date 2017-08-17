@@ -11,6 +11,7 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-git..."
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -i -e "s/##PROJECT##/$PROJECT/" $DOCKER_COMPOSE_FILE
       cp Dockerfile $RF
       cp scripts/start.sh $RF
       cp scripts/init-ssh-agent.sh $RF
