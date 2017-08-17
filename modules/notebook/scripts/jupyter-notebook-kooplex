@@ -20,7 +20,7 @@ page_template = """
 {% block logo %}
 {% endblock %}
 {% block header_buttons %}
-<div class="navbar navbar-inverse navbar-fixed-top" style="padding: 10px 40px 10px 40px;">
+<div class="navbar navbar-inverse navbar-fixed-top" style="padding: 5px 40px 5px 40px;">
   <div class="container-fluid">
     <div class="navbar-header">
 
@@ -59,7 +59,7 @@ class KooplexUserNotebookApp(NotebookApp):
         env = self.web_app.settings['jinja2_env']
         env.globals['stop_link'] = 'http://www.google.com/'+self.base_url
         env.globals['commit_link'] = 'http://www.google.com/'+self.connection_url
-        env.globals['project_name'] =  os.getenv("PR_NAME")
+        env.globals['project_name'] =  os.getenv("PR_FULLNAME")
         env.globals['user_name'] = os.getenv("NB_USER")
 
 
