@@ -2,26 +2,26 @@ version: "2"
 
 
 services:
-  ##PREFIX##-git:
-    container_name: ##PREFIX##-git
+  ##PROJECT##-git:
+    container_name: ##PROJECT##-git
     image: ##PREFIX##-git:latest
     build:
       context: .
       dockerfile: Dockerfile
     networks:
-      - ##PREFIX##-net
+      - ##PROJECT##-net
     volumes:
-      - ##PREFIX##-home:/home:rw
-      - ##PREFIX##-git:/git:rw
+      - ##PROJECT##-home:/home:rw
+      - ##PROJECT##-git:/git:rw
     restart: always
 
 networks:
-  ##PREFIX##-net:
+  ##PROJECT##-net:
     external: true
 
 volumes:
-  ##PREFIX##-home:
+  ##PROJECT##-home:
     external: true
-  ##PREFIX##-git:
+  ##PROJECT##-git:
     external: true
 
