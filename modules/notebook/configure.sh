@@ -38,14 +38,14 @@ EOF
     $(ldap_makeconfig notebook)
     cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
         
-    echo "#/bin/sh
+    echo "#!/bin/sh
 echo \"Configuring LDAP...\"
 chmod 0600 /etc/nslcd.conf
 service nslcd start
     " > $SRV/notebook/init/0.sh
       
     # Start jupyter
-    echo "#/bin/sh
+    echo "#!/bin/sh
 echo \"Starting notebook for \$NB_USER...\"
 cd /home/\$NB_USER
 . start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
