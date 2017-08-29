@@ -1,5 +1,6 @@
 #! /bin/bash
 
+PATCH=$(dirname $0)/patch.sh
 USER=$1
 AGENTSOCKET=/tmp/$USER
 COMMAND="ssh-agent -a $AGENTSOCKET"
@@ -23,6 +24,8 @@ function addkey {
      echo "Key added"
   fi
 }
+
+$PATCH $USER
 
 getpids
 
