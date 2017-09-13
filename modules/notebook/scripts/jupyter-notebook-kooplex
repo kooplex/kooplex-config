@@ -11,9 +11,8 @@ page_template = """
 {% extends "templates/page.html" %}
 {% block meta %}
 <style>
-.nav > li {
-  padding-left:30px;
-  padding-right:30px;
+.navbar-header > a {
+    padding-right:30px;
 }
 </style>
 {% endblock %}
@@ -23,24 +22,18 @@ page_template = """
 <div class="navbar navbar-inverse navbar-fixed-top" style="padding: 5px 40px 5px 40px;">
   <div class="container-fluid">
     <div class="navbar-header">
-
         <a href="/hub/notebooks" class="navbar-brand">Kooplex Hub</a>
-
     </div>
     <ul class="nav navbar-nav">
-     <li><a href=""  class="navbar-brand">Project name: <strong>{{ project_name }}</strong></a></li>
-
-
-
-
-
+     <li><a href="#"  class="navbar-brand">Project name: <strong>{{ project_name }}</strong></a></li>
+     <li><a href="{{default_url}}" class="navbar-brand"><strong>Back to the tree</strong></a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
         <li><span class="navbar-brand">Hello {{ user_name }}!</span></li>
        <li> <div id="ipython_notebook" class="nav "><a href="{{default_url}}
         {%- if logged_in and token -%}?token={{token}}{%- endif -%}" title='{% trans %}dashboard{% endtrans %}'>
-      <img src='{{static_url("base/images/logo.png") }}' alt='Jupyter Notebook'/>
-</a></div></li>
+         <img src='{{static_url("base/images/logo.png") }}' alt='Jupyter Notebook'/>
+        </a></div></li>
     </ul>
   </div>     <!-- container-fluid -->
 </div>
