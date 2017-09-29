@@ -65,6 +65,9 @@ echo 5
     if [ ! -d /home/${NB_USER}/git/.git ] ; then
         echo exec su $NB_USER -c "git clone $PR_URL \$HOME/git"
         su $NB_USER -c "git clone $PR_URL \$HOME/git"
+        # make sure if it is a fork of a template project, those contents are copy-ed
+        CLONE=/home/${NB_USER}/.gitclone-${PR_NAME}.sh
+        [ -x $CLONE ] && su $NB_USER -c $CLONE
     else
         echo "$PR_URL already cloned..."
     fi
@@ -82,7 +85,7 @@ fi
     echo $CONDA_ENV_DIR                                                                                                                   
     echo $condaenvs 
     # Start the notebook server
-    exec su $NB_USER -c "env PATH=$PATH jupyter notebook-kooplex $* --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\""
+    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $* --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\""
     echo " masik 4"
 else
     # Otherwise just exec the notebook
