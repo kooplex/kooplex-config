@@ -85,7 +85,7 @@ fi
     echo $CONDA_ENV_DIR                                                                                                                   
     echo $condaenvs 
     # Start the notebook server
-    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $* --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\""
+    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $* --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" --EnvironmentKernelSpecManager.display_name_template=\" {}\""
     echo " masik 4"
 else
     # Otherwise just exec the notebook
