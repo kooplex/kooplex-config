@@ -13,7 +13,7 @@ case $VERB in
      for imagedir in ./image-*
      do
         cp -r image-* $RF
-        cp scripts/start-notebook.sh scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/fileexpander.py ${RF}/$imagedir
+        cp scripts/start-notebook.sh scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
      	echo "Building image from $docfile"
@@ -36,7 +36,7 @@ EOF
     # LDAP
     mkdir -p $SRV/notebook/init
     $(ldap_makeconfig notebook)
-    cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
+    cp scripts/jupyter_notebook_config.py scripts/jupyter_report_config.py  $SRV/notebook/etc/
         
     echo "#!/bin/sh
 echo \"Configuring LDAP...\"
