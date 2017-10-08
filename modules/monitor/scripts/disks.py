@@ -27,7 +27,7 @@ templ = "%f %-17s %d %d %d %4.1f %9s  %s\n"
 #with open("/tmp/disk.dat", "a") as F:
 if int(sys.argv[1])%60==0:
     with open("/usr/local/apache2/htdocs/disks.dat", "a") as F:
-        F.write("# Time Device Total Used Free Use Type Mount\n")
+        F.write("Time Device Total Used Free Use Type Mount\n")
     #print(templ % ("Device", "Total", "Used", "Free", "Use ", "Type", "Mount"))
  
         T=time.time()
