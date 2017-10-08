@@ -169,7 +169,11 @@ KOOPLEX = {
         'prefix': 'dashboards',
         'url_prefix': '/db/{\$dashboard_port}',
         'base_url': '%s/' % KOOPLEX_BASE_URL,
+    },
+    'report_server': {
+        'max_number': 3,
     }
+
 }
 
 # AllAuth authentication backend
@@ -378,7 +382,7 @@ EOF
   cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-hub | awk '{print $2}'`
     if [ ! $cont_exist ]; then
       if [ $DOCKERPROTOCOL == "unix" ]; then
-        docker $DOCKERARGS create  \
+        docker $DOCKERARGS run -t  \
           --name $PROJECT-hub \
           --hostname $PROJECT-hub \
           --net $PROJECT-net \
@@ -393,7 +397,7 @@ EOF
           -v $SRV/_oc:$SRV/_oc \
           -v $SRV/_report:$SRV/_report \
           -v $SRV/notebook:$SRV/notebook \
-            kooplex-hub
+            kooplex-hub bash
       else
         docker $DOCKERARGS create  \
           --name $PROJECT-hub \
