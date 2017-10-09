@@ -25,9 +25,12 @@ def bytes2human(n):
 #templ = "%f %-17s %8s %8s %8s %5s%% %9s  %s\n"
 templ = "%f %-17s %d %d %d %4.1f %9s  %s\n"
 #with open("/tmp/disk.dat", "a") as F:
+Fname="/usr/local/apache2/htdocs/disks.dat"
+
 if int(sys.argv[1])%60==0:
-    with open("/usr/local/apache2/htdocs/disks.dat", "a") as F:
-        F.write("Time Device Total Used Free Use Type Mount\n")
+    with open(Fname, "a") as F:
+        if os.lstat(Fname).st_size==0:
+            F.write("Time Device Total Used Free Use Type Mount\n")
     #print(templ % ("Device", "Total", "Used", "Free", "Use ", "Type", "Mount"))
  
         T=time.time()
