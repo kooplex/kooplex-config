@@ -1,130 +1,65 @@
 #!/bin/bash
 
+RF=$BUILDDIR/owncloud
+mkdir -p $RF
+
 case $VERB in
   "build")
-    echo "Building image kooplex-owncloud"
-    
-
-#SECRET=$(getsecret ldap)
-SECRET=$DUMMYPASS
-
-cat << EOF > setup-ldap.sh
-#chown root config/config.php
-
-#INSTALL
-./occ maintenance:install --admin-user "$PROJECT-admin" --admin-pass "$SECRET"
-#sudo -u www-data php occ maintenance:install --database "mysql" --database-name "owncloud"  --database-user "root" --database-pass "password" --admin-user "admin" --admin-pass "password"
-
-chown root config/config.php
-
-#ENABLE AND CONFIGURE LDAP
-./occ app:enable user_ldap
-./occ ldap:create-empty-config
-dummy=\`./occ ldap:create-empty-config\`
-LDAP_ID=\`echo \${dummy#*configID}| sed -e "s/'//g"\`
-./occ ldap:set-config \$LDAP_ID ldapAgentName "cn=admin,$LDAPORG"
-./occ ldap:set-config \$LDAP_ID ldapBase "$LDAPORG"
-./occ ldap:set-config \$LDAP_ID ldapBaseGroups "$LDAPORG"
-./occ ldap:set-config \$LDAP_ID ldapBaseUsers "$LDAPORG"
-./occ ldap:set-config \$LDAP_ID ldapHost $LDAPIP
-./occ ldap:set-config \$LDAP_ID ldapAgentPassword $SECRET
-./occ ldap:set-config \$LDAP_ID ldapPort 389
-./occ ldap:set-config \$LDAP_ID ldapLoginFilter "(&(|(objectclass=inetOrgPerson))(uid=%uid))"
-./occ ldap:set-config \$LDAP_ID ldapUserDisplayName displayname
-./occ ldap:set-config \$LDAP_ID ldapUserFilterObjectclass inetOrgPerson
-./occ ldap:set-config \$LDAP_ID ldapEmailAttribute mail
-./occ ldap:set-config \$LDAP_ID ldapUserFilter "(|(objectclass=inetOrgPerson))"
-./occ ldap:set-config \$LDAP_ID hasMemberOfFilterSupport ""
-./occ ldap:set-config \$LDAP_ID homeFolderNamingRule attr:uid
-./occ ldap:set-config \$LDAP_ID ldapExpertUsernameAttr "uid"
-./occ ldap:set-config \$LDAP_ID ldapConfigurationActive 1
-
-#./occ app:enable files_external
-#export dum=\`./occ files_external:create "/Data" "\\OC\\Files\\Storage\\Local" "null::null"\`
-#export MOUNTID=\`echo \${dum#*with id}\`
-#./occ files_external:config \$MOUNTID datadir "/home/\\\$user/Data"
-
-./occ config:system:set 'overwritewebroot' --value '/owncloud'
-./occ config:system:set 'overwrite.cli.url' --value  '$OWNCLOUDIP'
-
-#perl -pi -e "s/ 0 => 'localhost'/0 => 'localhost', 1 => '$INNERHOST',2 => '$NGINXIP',3 => '$OWNCLOUDIP'/g" config/config.php
-
-./occ config:system:set trusted_domains 0 --value  'localhost'
-./occ config:system:set trusted_domains 1 --value  '$OWNCLOUDIP'
-./occ config:system:set trusted_domains 2 --value  '$NGINXIP'
-./occ config:system:set trusted_domains 3 --value  '$OUTERHOST'
-./occ config:system:set trusted_domains 4 --value  '$INNERHOST'
-
-./occ config:system:set 'trusted_proxies' --value "[$OWNCLOUDIP,$NGINXIP]"
-./occ config:system:set 'overwritehost' --value '$OUTERHOST'
-./occ config:system:set 'overwriteprotocol' --value '$REWRITEPROTO'
-
-rm -r core/skeleton/Photos/ core/skeleton/Documents/
-
-chown www-data config/config.php
-
-EOF
-
-
-    docker $DOCKERARGS build -t kooplex-owncloud .
-#docker pull owncloud
+    echo "Building image ${PROJECT}-owncloud"
+    sed -e "s/##DOMAIN##/${OUTERHOST}/" \
+        -e "s/##OCADMIN##/ocadmin/" \
+        -e "s/##OCADMINPW##/${DUMMYPASS}/" \
+        -e "s/##DBROOTPW##/${DUMMYPASS}/" \
+        -e "s/##DBUSER##/owncloud/" \
+        -e "s/##DBUSERPW##/${DUMMYPASS}/" \
+        -e "s/##VOLUMEOC##/${PROJECT}-owncloud/" \
+        -e "s/##VOLUMEOCDB##/${PROJECT}-owncloud-mysql/" \
+        -e "s/##VOLUMEOCREDIS##/${PROJECT}-owncloud-redis/" \
+        -e "s/##NETWORK##/${PROJECT}-net/" \
+        -e "s/##NETWORKPRIVATE##/owncloud-net/" \
+        docker-compose.yml_template > $RF/docker-compose.yml
+    docker-compose -f $RF/docker-compose.yml build
+    sed -e "s/##LDAPORG##/${LDAPORG}/" \
+        -e "s/##OWNCLOUDIP##/${OWNCLOUDIP}/" \
+        -e "s/##NGINXIP##/${NGINXIP}/" \
+        -e "s/##OUTERHOST##/${OUTERHOST}/" \
+        -e "s/##INNERHOST##/${INNERHOST}/" \
+        -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+        setup_ldap.sh_template > $RF/setup_ldap.sh
   ;;
+
   "install")
-    echo "Installing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
-
-    if [ ! -d $SRV/ownCloud/ ]; then 
-      echo "OwnCloud database needs to be created!"; 
-      mkdir -p $SRV/ownCloud/;
-    else
-      echo "OwnCloud database exists!";
-    fi
-    
-    echo "OwnCloud database is in $SRV/ownCloud/";
-    
-    # Create owncloud container. We need to setup ldap as well
-    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-owncloud | awk '{print $2}'`
-    if [ ! $cont_exist ]; then
-    docker $DOCKERARGS create \
-      --name $PROJECT-owncloud \
-      --hostname $PROJECT-owncloud \
-      --net $PROJECT-net \
-      --ip $OWNCLOUDIP \
-      --log-opt max-size=1m --log-opt max-file=3 \
-      -v /etc/localtime:/etc/localtime:ro \
-      -v $SRV/ownCloud/:/var/www/html/data \
-      -v $SRV/home/:/home \
-      --privileged \
-            kooplex-owncloud
-#       owncloud
-    else
-     echo "$PROJECT-owncloud is already installed"
-    fi
-
+    echo "Starting owncloud ${PROJECT}-owncloud [$OWNCLOUDIP]"
+    docker-compose -f $RF/docker-compose.yml create
   ;;
+
   "start")
-  #
-  docker $DOCKERARGS start $PROJECT-owncloud
+    echo "Starting owncloud ${PROJECT}-owncloud [$OWNCLOUDIP]"
+    docker-compose -f $RF/docker-compose.yml start -d
   ;;
+
   "init")
-
-#MOUNT EVERYONES OWNCLOUD DIR
-
-    
+    echo "Configuring ${PROJECT}-owncloud [$OWNCLOUDIP]"
+    docker cp $RF/setup_ldap.sh ${}:/
+    docker-compose -f $RF/docker-compose.yml exec -u www-data /setup_ldap.sh
   ;;
+
   "stop")
     echo "Stopping owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
-    docker $DOCKERARGS stop $PROJECT-owncloud
+    docker-compose -f $RF/docker-compose.yml stop
   ;;
+
   "remove")
-    echo "Removing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
-    docker $DOCKERARGS rm $PROJECT-owncloud
+  #  echo "Removing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+  #  docker-compose -f $RF/docker-compose.yml stop
   ;;
+
   "purge")
-    echo "Purging owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
-	rm -R -f $SRV/ownCloud
+  #  echo "Purging owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+  #  rm -R -f $SRV/ownCloud
   ;;
+
   "clean")
-    echo "Cleaning base image kooplex-owncloud"
-    docker $DOCKERARGS rmi kooplex-owncloud
   ;;
+
 esac

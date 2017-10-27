@@ -1,0 +1,85 @@
+version: '3'
+
+services:
+  owncloud:
+    image: owncloud/server:10.0
+    depends_on:
+      - db
+      - redis
+    environment:
+      - OWNCLOUD_DOMAIN=##DOMAIN##
+      - OWNCLOUD_DB_TYPE=mysql
+      - OWNCLOUD_DB_NAME=owncloud
+      - OWNCLOUD_DB_USERNAME=owncloud
+      - OWNCLOUD_DB_PASSWORD=owncloud
+      - OWNCLOUD_DB_HOST=db
+      - OWNCLOUD_ADMIN_USERNAME=##OCADMIN##
+      - OWNCLOUD_ADMIN_PASSWORD=##OCADMINPW##
+      - OWNCLOUD_UTF8MB4_ENABLED=true
+      - OWNCLOUD_REDIS_ENABLED=true
+      - OWNCLOUD_REDIS_HOST=redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/status.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ##VOLUMEOC##:/mnt/data:rw
+    networks:
+      - ##NETWORK##
+      - ##NETWORKPRIVATE##
+
+  db:
+    image: webhippie/mariadb:latest
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=##DBROOTPW##
+      - MARIADB_USERNAME=##DBUSER##
+      - MARIADB_PASSWORD=##DBUSERPW##
+      - MARIADB_DATABASE=owncloud
+      - MARIADB_MAX_ALLOWED_PACKET=128M
+      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+      - MARIADB_INNODB_LARGE_PREFIX=ON
+      - MARIADB_INNODB_FILE_FORMAT=Barracuda
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ##VOLUMEOCDB##:/var/lib/mysql:rw
+    networks:
+      - ##NETWORKPRIVATE##
+
+  redis:
+    image: webhippie/redis:latest
+    restart: always
+    environment:
+      - REDIS_MAXCONN=10000
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - kooplex-owncloud-redis:/var/lib/redis:rw
+    networks:
+      - ##NETWORKPRIVATE##
+
+volumes:
+  ##VOLUMEOC##:
+    external: true
+
+  ##VOLUMEOCDB##:
+    external: true
+
+  ##VOLUMEOCREDIS##:
+    external: true
+
+networks:
+  ##NETWORK##:
+    external: true
+
+  ##NETWORKPRIVATE##:
+    external: false
+
