@@ -480,6 +480,7 @@ config() {
   NGINXIP=$(ip_addip "$SUBNET" 16)
   
   HUBIP=$(ip_addip "$SUBNET" 18)
+  MONITORIP=$(ip_addip "$SUBNET" 20)
   
   SMTPIP=$(ip_addip "$SUBNET" 25)
   

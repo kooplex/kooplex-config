@@ -13,7 +13,7 @@ case $VERB in
      for imagedir in ./image-*
      do
         cp -r image-* $RF
-        cp scripts/start-notebook.sh scripts/jupyter-notebook-kooplex scripts/fileexpander.py ${RF}/$imagedir
+        cp scripts/start-notebook.sh scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
      	echo "Building image from $docfile"
@@ -36,7 +36,7 @@ EOF
     # LDAP
     mkdir -p $SRV/notebook/init
     $(ldap_makeconfig notebook)
-    cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
+    cp scripts/jupyter_notebook_config.py scripts/jupyter_report_config.py  $SRV/notebook/etc/
         
     echo "#!/bin/sh
 echo \"Configuring LDAP...\"
@@ -46,9 +46,16 @@ service nslcd start
       
     # Start jupyter
     echo "#!/bin/sh
-echo \"Starting notebook for \$NB_USER...\"
-cd /home/\$NB_USER
-. start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
+if [ -z \"\$REPORT\" ] ; then 
+  echo \"Starting notebook for \$NB_USER...\"
+  cd /home/\$NB_USER
+  . start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT
+else
+  echo \"Starting Report Server\"
+  cd /report
+  . start-report.sh --allow-root --config=/etc/jupyter_report_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT
+fi
+" \
       > $SRV/notebook/init/1.sh
     
   ;;
