@@ -34,8 +34,6 @@ case $VERB in
   ;;
 
   "install")
-    echo "Starting owncloud ${PROJECT}-owncloud [$OWNCLOUDIP]"
-    docker-compose -f $RF/docker-compose.yml create
   ;;
 
   "start")
