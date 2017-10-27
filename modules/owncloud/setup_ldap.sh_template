@@ -2,21 +2,6 @@
 
 cd /var/www/owncloud
 
-# INSTALL OWNCLOUD
-
-./occ maintenance:install \
-  --database=$OWNCLOUD_DB_TYPE \
-  --database-name=$OWNCLOUD_DB_NAME \
-  --database-host=$OWNCLOUD_DB_HOST \
-  --database-user=$OWNCLOUD_DB_USERNAME \
-  --database-pass=$OWNCLOUD_DB_PASSWORD \
-  --admin-user=$OWNCLOUD_ADMIN_USERNAME \
-  --admin-pass=$OWNCLOUD_ADMIN_PASSWORD \
-  --data-dir=/mnt/data
-
-#OWNCLOUD_REDIS_ENABLED=true
-#OWNCLOUD_REDIS_HOST=redis
-
 # ENABLE AND CONFIGURE LDAP
 
 ./occ app:enable user_ldap
