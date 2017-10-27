@@ -17,6 +17,9 @@ case $VERB in
         -e "s/##VOLUMEOCREDIS##/${PROJECT}-owncloud-redis/" \
         -e "s/##NETWORK##/${PROJECT}-net/" \
         -e "s/##NETWORKPRIVATE##/owncloud-net/" \
+        -e "s/##CTROC##/${PROJECT}-owncloud/" \
+        -e "s/##CTROCDB##/${PROJECT}-owncloud-mysql/" \
+        -e "s/##CTROCREDIS##/${PROJECT}-owncloud-redis/" \
         docker-compose.yml_template > $RF/docker-compose.yml
     docker-compose -f $RF/docker-compose.yml build
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
@@ -40,7 +43,8 @@ case $VERB in
 
   "init")
     echo "Configuring ${PROJECT}-owncloud [$OWNCLOUDIP]"
-    docker cp $RF/setup_ldap.sh ${}:/
+    docker cp $RF/setup_ldap.sh ${PROJECT}-owncloud:/
+    docker-compose -f $RF/docker-compose.yml exec "chmod +x /setup_ldap.sh"
     docker-compose -f $RF/docker-compose.yml exec -u www-data /setup_ldap.sh
   ;;
 

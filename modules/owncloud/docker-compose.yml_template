@@ -3,6 +3,7 @@ version: '3'
 services:
   owncloud:
     image: owncloud/server:10.0
+    container_name: ##CTROC##
     depends_on:
       - db
       - redis
@@ -31,6 +32,7 @@ services:
 
   db:
     image: webhippie/mariadb:latest
+    container_name: ##CTROCDB##
     restart: always
     environment:
       - MARIADB_ROOT_PASSWORD=##DBROOTPW##
@@ -53,6 +55,7 @@ services:
 
   redis:
     image: webhippie/redis:latest
+    container_name: ##CTROCREDIS##
     restart: always
     environment:
       - REDIS_MAXCONN=10000
