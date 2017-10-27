@@ -6,7 +6,7 @@ cd /var/www/owncloud
 
 ./occ app:enable user_ldap
 dummy=$(./occ ldap:create-empty-config)
-LDAP_ID=$(echo \${dummy#*configID}| sed -e "s/'//g")
+LDAP_ID=$(echo ${dummy#*configID}| sed -e "s/'//g")
 ./occ ldap:set-config $LDAP_ID ldapAgentName "cn=admin,##LDAPORG##"
 ./occ ldap:set-config $LDAP_ID ldapBase "##LDAPORG##"
 ./occ ldap:set-config $LDAP_ID ldapBaseGroups "##LDAPORG##"
