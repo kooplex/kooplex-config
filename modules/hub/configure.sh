@@ -143,6 +143,12 @@ KOOPLEX = {
         'admin_password': '$GITLABPASS',
         'ssh_key_password': '$SSHKEYPASS',
     },
+    'gitlabdb': {
+        'hostname': '$PROJECT-gitlabdb',
+	'psql_port': 5432,
+	'db_username': 'postgres',
+	'db_password': '$GITLABDBPASS',
+    }
     'docker': {
         'host': '$DOCKERIP', 
         'port': '$DOCKERPORT',
