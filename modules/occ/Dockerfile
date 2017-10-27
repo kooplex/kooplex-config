@@ -7,7 +7,7 @@ COPY Release.key /tmp/Release.key
 RUN apt-key add - < /tmp/Release.key && rm /tmp/Release.key
 
 RUN apt update
-RUN apt install -y --no-install-recommends python3 python3-pip owncloud-client-cmd python3-setuptools
+RUN apt install -y --no-install-recommends python3 python3-pip owncloud-client python3-setuptools
 RUN pip3 install watchdog
 
 COPY wd.py /wd.py
