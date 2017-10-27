@@ -79,7 +79,7 @@ server {
     proxy_read_timeout    86400;
   }
 
-  location /owncloud {
+  location /ownCloud {
     proxy_pass http://$OWNCLOUDIP/;
     proxy_set_header Accept-Encoding \"\";
     proxy_set_header Host \$host;
@@ -90,13 +90,13 @@ server {
     proxy_read_timeout 600s;
     proxy_send_timeout 600s;
     proxy_connect_timeout 600s;
-    rewrite ^/owncloud/caldav /owncloud/remote.php/caldav redirect;
-    rewrite ^/owncloud/carddav /owncloud/remote.php/carddav redirect;
-    rewrite ^/owncloud/webdav /owncloud/remote.php/webdav redirect;
+    rewrite ^/ownCloud/caldav /ownCloud/remote.php/caldav redirect;
+    rewrite ^/ownCloud/carddav /ownCloud/remote.php/carddav redirect;
+    rewrite ^/ownCloud/webdav /ownCloud/remote.php/webdav redirect;
     rewrite ^/.well-known/carddav /remote.php/carddav/ redirect;
     rewrite ^/.well-known/caldav /remote.php/caldav/ redirect;
     rewrite ^(/core/doc/[^\/]+/)$ \$1/index.html;
-    rewrite ^/owncloud/(.*) /\$1 break;
+    rewrite ^/ownCloud/(.*) /\$1 break;
 
   }
 }
