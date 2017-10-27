@@ -23,6 +23,8 @@ case $VERB in
         docker-compose.yml_template > $RF/docker-compose.yml
     docker-compose -f $RF/docker-compose.yml build
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
+        -e "s/##LDAPIP##/${LDAPIP}/" \
+        -e "s/##SECRET##/${DUMMYPASS}/" \
         -e "s/##OWNCLOUDIP##/${OWNCLOUDIP}/" \
         -e "s/##NGINXIP##/${NGINXIP}/" \
         -e "s/##OUTERHOST##/${OUTERHOST}/" \
@@ -43,9 +45,9 @@ case $VERB in
 
   "init")
     echo "Configuring ${PROJECT}-owncloud [$OWNCLOUDIP]"
-    docker cp $RF/setup_ldap.sh ${PROJECT}-owncloud:/
-    docker exec ${PROJECT}-owncloud "chmod +x /setup_ldap.sh"
-    docker exec ${PROJECT}-owncloud "su www-data -c /setup_ldap.sh"
+    docker cp $RF/setup_ldap.sh ${PROJECT}-owncloud:/setup_ldap.sh
+    docker exec -t ${PROJECT}-owncloud chmod +x /setup_ldap.sh
+    docker exec -t ${PROJECT}-owncloud su www-data -c /setup_ldap.sh
   ;;
 
   "stop")
