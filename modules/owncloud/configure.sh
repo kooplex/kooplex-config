@@ -38,14 +38,14 @@ case $VERB in
 
   "start")
     echo "Starting owncloud ${PROJECT}-owncloud [$OWNCLOUDIP]"
-    docker-compose -f $RF/docker-compose.yml start -d
+    docker-compose -f $RF/docker-compose.yml up -d
   ;;
 
   "init")
     echo "Configuring ${PROJECT}-owncloud [$OWNCLOUDIP]"
     docker cp $RF/setup_ldap.sh ${PROJECT}-owncloud:/
-    docker-compose -f $RF/docker-compose.yml exec "chmod +x /setup_ldap.sh"
-    docker-compose -f $RF/docker-compose.yml exec -u www-data /setup_ldap.sh
+    docker-compose -f $RF/docker-compose.yml ${PROJECT}-owncloud exec "chmod +x /setup_ldap.sh"
+    docker-compose -f $RF/docker-compose.yml ${PROJECT}-owncloud exec -u www-data /setup_ldap.sh
   ;;
 
   "stop")
