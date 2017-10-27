@@ -56,8 +56,8 @@ case $VERB in
   ;;
 
   "remove")
-  #  echo "Removing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
-  #  docker-compose -f $RF/docker-compose.yml stop
+    echo "Removing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+    docker-compose -f $RF/docker-compose.yml rm
   ;;
 
   "purge")
