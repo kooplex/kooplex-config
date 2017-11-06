@@ -148,7 +148,7 @@ KOOPLEX = {
 	'psql_port': 5432,
 	'db_username': 'postgres',
 	'db_password': '$GITLABDBPASS',
-    }
+    },
     'docker': {
         'host': '$DOCKERIP', 
         'port': '$DOCKERPORT',
