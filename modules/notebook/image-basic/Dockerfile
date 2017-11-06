@@ -50,8 +50,9 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
 RUN pip install environment_kernels
 
 RUN apt install -y autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends 
-
-
+ 
+RUN apt install -y libblacs-mpi-dev libscalapack-mpi-dev
+ 
 
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge ipywidgets=7.0 traittypes
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge bqplot
@@ -60,8 +61,17 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 
+RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise
+
 # This one is not needed as long as it cannot discover conda envs outside of /opt/conda
 #RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
+
+RUN apt update
+RUN apt install -y libfontconfig1 libxrender1
+RUN apt install -y g++-5 libicu-dev libxml2-dev
+RUN apt install -y octave
+
+
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
