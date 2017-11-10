@@ -13,6 +13,7 @@ services:
     volumes:
       - ##PROJECT##-home:/home:rw
       - ##PROJECT##-git:/git:rw
+      - ##PROJECT##-owncloudextracted:/oc:rw
     restart: always
 
 networks:
@@ -23,5 +24,7 @@ volumes:
   ##PROJECT##-home:
     external: true
   ##PROJECT##-git:
+    external: true
+  ##PROJECT##-owncloudextracted:
     external: true
 

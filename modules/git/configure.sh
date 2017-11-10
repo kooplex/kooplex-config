@@ -14,11 +14,15 @@ case $VERB in
       sed -i -e "s/##PROJECT##/$PROJECT/" $DOCKER_COMPOSE_FILE
       cp Dockerfile $RF
       cp scripts/start.sh $RF
+      cp scripts/share.sh $RF
       cp scripts/init-ssh-agent.sh $RF
       cp scripts/patch.sh $RF
       cp etc/nsswitch.conf $RF
 #FIXME: sed from template, or use lib
       cp etc/nslcd.conf $RF
+      cp ../occ/wd.py $RF
+      cp ../occ/owncloud.list $RF
+      cp ../occ/Release.key $RF
 
       echo "2. Building ${PREFIX}-git..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
