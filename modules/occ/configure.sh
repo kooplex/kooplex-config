@@ -2,8 +2,8 @@
 
 case $VERB in
   "build")
-    echo "Building image kooplex-occ"
-    docker $DOCKERARGS build -t kooplex-occ .
+    echo "Building image $PREFIX-occ"
+    docker $DOCKERARGS build -t $PREFIX-occ .
   ;;
   "install")
   ;;
@@ -18,7 +18,7 @@ case $VERB in
   "purge")
   ;;
   "clean")
-    echo "Cleaning base image kooplex-occ"
-    docker $DOCKERARGS rmi kooplex-occ
+    echo "Cleaning base image $PREFIX-occ"
+    docker $DOCKERARGS rmi $PREFIX-occ
   ;;
 esac
