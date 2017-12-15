@@ -60,6 +60,7 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge ipywidgets=7.0 tr
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge bqplot
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
+RUN $CONDA_DIR/bin/conda install -v --yes  -c conda-forge parso=0.1.0
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 
