@@ -72,6 +72,13 @@ echo 5
         echo "$PR_URL already cloned..."
     fi
 
+#########
+echo "http://kooplex-nginx/ownCloud/remote.php/webdav/ /home/$NB_USER/oc davfs user,rw,auto 0 0" > /etc/fstab
+addgroup $NB_USER davfs2
+#########
+
+
+
 source /etc/bash.bashrc
 # source bash initialisation fragments from volumes attached to the container
 if [ -d /vol ] ; then
@@ -85,7 +92,7 @@ fi
     echo $CONDA_ENV_DIR                                                                                                                   
     echo $condaenvs 
     # Start the notebook server
-    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" --EnvironmentKernelSpecManager.display_name_template=\" {}\""
+    exec su $NB_USER -c "mount /home/$NB_USER/oc ; env PATH=$PATH jupyter notebook $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" ; umount /home/$NB_USER/oc"
     echo " masik 4"
 else
     # Otherwise just exec the notebook

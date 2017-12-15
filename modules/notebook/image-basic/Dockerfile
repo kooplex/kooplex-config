@@ -10,6 +10,8 @@ RUN apt install -y tmux zip curlftpfs
 RUN apt install -y liblapack-dev libblas-dev
 RUN apt install -y gfortran libfreetype6* pkg-config
 RUN apt install -y git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake
+RUN apt install -y davfs2
+RUN chmod u+s /usr/sbin/mount.davfs
 
 
 # TODO add jupyter stuff
@@ -71,6 +73,7 @@ RUN apt install -y libfontconfig1 libxrender1
 RUN apt install -y g++-5 libicu-dev libxml2-dev
 RUN apt install -y octave
 
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyterlab
 
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
