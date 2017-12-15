@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RF=$BUILDDIR/git
+RF=$BUILDDIR/impersonator
 
 mkdir -p $RF
 
@@ -9,7 +9,7 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-git..."
+      echo "1. Configuring ${PREFIX}-impersonator..."
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       sed -i -e "s/##PROJECT##/$PROJECT/" $DOCKER_COMPOSE_FILE
       cp Dockerfile $RF
@@ -17,14 +17,12 @@ case $VERB in
       cp scripts/share.sh $RF
       cp scripts/init-ssh-agent.sh $RF
       cp scripts/patch.sh $RF
+      cp scripts/patch-davfs.sh $RF
       cp etc/nsswitch.conf $RF
 #FIXME: sed from template, or use lib
       cp etc/nslcd.conf $RF
-      cp ../occ/wd.py $RF
-      cp ../occ/owncloud.list $RF
-      cp ../occ/Release.key $RF
 
-      echo "2. Building ${PREFIX}-git..."
+      echo "2. Building ${PREFIX}-impersonator..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
 
@@ -32,7 +30,7 @@ case $VERB in
   ;;
 
   "start")  
-      echo "Starting container ${PREFIX}-git"
+      echo "Starting container ${PREFIX}-impersonator"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
   ;;
 
@@ -40,7 +38,7 @@ case $VERB in
   ;;
 
   "stop")
-      echo "Stopping container ${PREFIX}-git"
+      echo "Stopping container ${PREFIX}-impersonator"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
     

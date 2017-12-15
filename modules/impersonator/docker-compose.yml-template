@@ -1,10 +1,9 @@
-version: "2"
-
+version: "3"
 
 services:
-  ##PROJECT##-git:
-    container_name: ##PROJECT##-git
-    image: ##PREFIX##-git:latest
+  ##PROJECT##-impersonator:
+    container_name: ##PROJECT##-impersonator
+    image: ##PREFIX##-impersonator
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,7 +12,7 @@ services:
     volumes:
       - ##PROJECT##-home:/home:rw
       - ##PROJECT##-git:/git:rw
-      - ##PROJECT##-owncloudextracted:/oc:rw
+    privileged: true
     restart: always
 
 networks:
@@ -24,7 +23,5 @@ volumes:
   ##PROJECT##-home:
     external: true
   ##PROJECT##-git:
-    external: true
-  ##PROJECT##-owncloudextracted:
     external: true
 
