@@ -70,7 +70,7 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise
 #RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
 
 RUN apt update
-RUN apt install -y libfontconfig1 libxrender1
+RUN apt install -y libfontconfig1 libxrender1 libxrender-dev
 RUN apt install -y g++-5 libicu-dev libxml2-dev
 RUN apt install -y octave
 
