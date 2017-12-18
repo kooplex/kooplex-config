@@ -19,8 +19,12 @@ case $VERB in
       cp scripts/patch.sh $RF
       cp scripts/patch-davfs.sh $RF
       cp etc/nsswitch.conf $RF
-#FIXME: sed from template, or use lib
-      cp etc/nslcd.conf $RF
+      sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
+          -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
+          -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
+          -e "s/##LDAPBINDPW##/$LDAPPASS/" \
+          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
+          -e "s/##LDAPBINDROOTPW##/$LDAPPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
 
       echo "2. Building ${PREFIX}-impersonator..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
