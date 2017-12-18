@@ -179,6 +179,9 @@ KOOPLEX = {
     'report_server': {
         'max_number': 3,
     }
+    'impersonator': {
+        'container_name' : '$PROJECT-impersonator'
+    },
 
 }
 
