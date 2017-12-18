@@ -26,6 +26,7 @@ case $VERB in
 #          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
 #          -e "s/##LDAPBINDROOTPW##/$LDAPPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
       ldap_nslcdconfig > $RF/nslcd.conf
+      chmod 0600 $RF/nslcd.conf
 
       echo "2. Building ${PREFIX}-impersonator..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
