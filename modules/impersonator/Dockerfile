@@ -12,7 +12,7 @@ COPY nslcd.conf /etc
 RUN chmod 600 /etc/nslcd.conf
 COPY start.sh /init
 COPY init-ssh-agent.sh /usr/local/bin
-COPY patch.sh /usr/local/bin
+COPY patch-gitconfig.sh /usr/local/bin
 COPY patch-davfs.sh /usr/local/bin
 COPY share.sh /usr/local/bin
 
