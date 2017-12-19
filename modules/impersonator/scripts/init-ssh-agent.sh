@@ -1,6 +1,6 @@
 #! /bin/bash
 
-PATCH=$(dirname $0)/patch.sh
+PATCH=$(dirname $0)/patch-gitconfig.sh
 USER=$1
 AGENTSOCKET=/tmp/$USER
 COMMAND="ssh-agent -a $AGENTSOCKET"
