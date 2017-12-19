@@ -10,23 +10,28 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-impersonator..."
-      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-      sed -i -e "s/##PROJECT##/$PROJECT/" $DOCKER_COMPOSE_FILE
       cp Dockerfile $RF
       cp scripts/start.sh $RF
-      cp scripts/share.sh $RF
       cp scripts/init-ssh-agent.sh $RF
-      cp scripts/patch.sh $RF
       cp scripts/patch-davfs.sh $RF
       cp etc/nsswitch.conf $RF
-#      sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
-#          -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
-#          -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
-#          -e "s/##LDAPBINDPW##/$LDAPPASS/" \
-#          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
-#          -e "s/##LDAPBINDROOTPW##/$LDAPPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
-      ldap_nslcdconfig > $RF/nslcd.conf
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##PROJECT##/$PROJECT/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -e "s/##LDAPPORT##/$LDAPPORT/" \
+          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
+          -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
+          -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/"  scripts/patch-gitconfig.sh_template > $RF/patch-gitconfig.sh
+      sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
+          -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
+          -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
+          -e "s/##LDAPBINDPW##/$LDAPPASS/" \
+          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
+          -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
+      sed -e "s/##OWNCLOUDURL##/http:\/\/$PROJECT-nginx\/ownCloud\/ocs\/v1.php\/apps\/files_sharing\/api\/v1\/shares\/" \
+          -e "s/##WEBDAVPATTERN##/http:..$PROJECT-nginx.ownCloud.remote.php.webdav./" scripts/share.sh_template > $RF/share.sh
       chmod 0600 $RF/nslcd.conf
+      chmod 0755 $RF/share.sh
+      chmod 0755 $RF/patch-gitconfig.sh
 
       echo "2. Building ${PREFIX}-impersonator..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 

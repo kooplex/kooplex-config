@@ -1,10 +1,8 @@
 #! /bin/bash
 
 USER=$(whoami)
-URL_API=http://kooplex-nginx/ownCloud/ocs/v1.php/apps/files_sharing/api/v1/shares
-
-#FIXME: URL PATTERN HARDCODED
-PW=$(awk '/^http:..kooplex-nginx.ownCloud.remote.php.webdav./ {print $3}' ~/.davfs2/secrets)
+URL_API=##OWNCLOUDURL##
+PW=$(awk '/^##WEBDAVPATTERN##/ {print $3}' ~/.davfs2/secrets)
 
 case $1 in
   share)
