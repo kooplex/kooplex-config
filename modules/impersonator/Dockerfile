@@ -2,8 +2,7 @@ FROM kooplex-base
 MAINTAINER Kooplex Team <kooplex@complex.elte.hu
 
 RUN apt update && \
-    apt install -y --no-install-recommends curl git 
-RUN apt install -y davfs2
+    apt install -y --no-install-recommends curl git ssh-client davfs2
 RUN apt clean
 
 RUN chmod u+s /usr/sbin/mount.davfs
