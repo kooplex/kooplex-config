@@ -24,7 +24,7 @@ case $VERB in
       sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
           -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
           -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
-          -e "s/##LDAPBINDPW##/$LDAPPASS/" \
+          -e "s/##LDAPBINDPW##/$DUMMYPASS/" \
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
           -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
       sed -e "s/##OWNCLOUDURL##/https:\/\/${PROJECT}-nginx\/ownCloud\/ocs\/v1.php\/apps\/files_sharing\/api\/v1\/shares\//" \
