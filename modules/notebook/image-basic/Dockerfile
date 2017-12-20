@@ -75,6 +75,7 @@ RUN apt install -y g++-5 libicu-dev libxml2-dev
 RUN apt install -y octave
 
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyterlab
+RUN apt install -y gnuplot
 
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 

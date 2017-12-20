@@ -27,7 +27,7 @@ case $VERB in
           -e "s/##LDAPBINDPW##/$DUMMYPASS/" \
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
           -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
-      sed -e "s/##OWNCLOUDURL##/https:\/\/${PROJECT}-nginx\/ownCloud\/ocs\/v1.php\/apps\/files_sharing\/api\/v1\/shares\//" \
+      sed -e "s/##OWNCLOUDURL##/http:\/\/${PROJECT}-nginx\/ownCloud\/ocs\/v1.php\/apps\/files_sharing\/api\/v1\/shares\/" \
           -e "s/##WEBDAVPATTERN##/http:..${PROJECT}-nginx.ownCloud.remote.php.webdav./" scripts/share.sh_template > $RF/share.sh
       chmod 0600 $RF/nslcd.conf
       chmod 0755 $RF/share.sh

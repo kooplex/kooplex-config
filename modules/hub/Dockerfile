@@ -17,6 +17,9 @@ RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython ne
 RUN pip3 install ldap3
 RUN pip3 install pwgen
 
+RUN apt install -y openssh-server 
+RUN mkdir -p /root/.ssh
+
 # It is very important that the following command 'git clone...' cannot be cached
 # (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
 ARG CACHE_DATE=2016-01-02
@@ -31,6 +34,6 @@ RUN chmod a+x /entrypoint.sh
 COPY Runserver.sh /Runserver.sh
 RUN chmod a+x /Runserver.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+#ENTRYPOINT ["/entrypoint.sh"]
 CMD ["./Runserver.sh"]
 #CMD ["cd /kooplexhub/kooplexhub/;python3 manage.py runserver 0:80"]

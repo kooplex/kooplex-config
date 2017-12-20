@@ -111,6 +111,7 @@ KOOPLEX = {
     },
     'prefix':{
         'name': '$PREFIX',
+        'project': '$PROJECT',
     },
     'hub': {
         'internal_host' : KOOPLEX_INTERNAL_HOST,
@@ -398,8 +399,11 @@ EOF
           --ip $HUBIP \
           --privileged \
           --log-opt max-size=1m --log-opt max-file=3 \
+      --expose 22 \
+      -p 22:22 \
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $SRV/hub/settings.py:/kooplexhub/kooplexhub/kooplex/settings.py:ro \
+          -v /home/jegesm/Dropbox/kooplexhub/:/kooplexhub \
           -v $SRV/home:$SRV/home \
           -v $SRV/_git:$SRV/_git \
           -v $SRV/_share:$SRV/_share \
