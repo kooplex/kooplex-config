@@ -1,83 +1,70 @@
 #!/bin/bash
 
+# Change UID of NB_USER to NB_UID if it does not match 
+if [ "$NB_UID" != $(id -u $NB_USER) ] ; then
+    usermod -u $NB_UID $NB_USER
+fi
 
+# Enable sudo if requested
+if [ ! -z "$GRANT_SUDO" ]; then
+    echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
+fi
 
-# Handle special flags if we're root
-if [ $UID == 0 ] ; then
+# debug
+env
 
-	echo " 1"
+# make sure project users are in the group associated with share folder
+addgroup --gid $(( $GID_OFFSET + $PR_ID )) $PR_NAME
+for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
+    addgroup $username $PR_NAME
+done
 
-    # Change UID of NB_USER to NB_UID if it does not match
-     
-    #userid=`ldapsearch -x "(cn=jegesm)" | grep memberUid | awk '{print $2}'`
-    if [ "$NB_UID" != $(id -u $NB_USER) ] ; then
-#    if [ "$NB_UID" != $userid ] ; then
-        usermod -u $NB_UID $NB_USER
-        echo " 12"
-#        chown -R $NB_UID $CONDA_DIR
-        echo " 13"
-    fi
-	echo " 2"
-    # Enable sudo if requested
-    if [ ! -z "$GRANT_SUDO" ]; then
-        echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
-    fi
-	echo " 3"
-
-    # debug
-    env
-
-    # make sure project users are in the group associated with share folder
-    addgroup --gid $(( $GID_OFFSET + $PR_ID )) $PR_NAME
+# make sure project users are in the group associated with external (nfs) share folders
+for lbl_gid in $(echo $MNT_GIDS | sed s/,/\ /g) ; do
+    lbl=mnt_$(echo $lbl_gid | cut -f1 -d:)
+    gid=$(echo $lbl_gid | cut -f2 -d:)
+    addgroup --gid $gid $lbl
     for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
-        addgroup $username $PR_NAME
+        addgroup $username $lbl
     done
-
-    # make sure project users are in the group associated with external (nfs) share folders
-    for lbl_gid in $(echo $MNT_GIDS | sed s/,/\ /g) ; do
-        lbl=mnt_$(echo $lbl_gid | cut -f1 -d:)
-        gid=$(echo $lbl_gid | cut -f2 -d:)
-        addgroup --gid $gid $lbl
-        for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
-            addgroup $username $lbl
-        done
-    done
-
-    echo "host key retieval"
-
-    # host identification #FIXME: hardcoded
-    GITLABHOST=$(grep gitlab /etc/hosts | awk '{ print $2 }')
-echo 1
-    ssh-keyscan -H $GITLABHOST > /tmp/gitlab.pub
-echo 2
-    USER_HOSTKEYS=/home/${NB_USER}/.ssh/known_hosts
-echo 3
-    cat /tmp/gitlab.pub $USER_HOSTKEYS | sort | uniq > /tmp/new
-echo 4
-    mv /tmp/new $USER_HOSTKEYS
-echo 5
-    chown ${NB_USER}:${NB_USER} $USER_HOSTKEYS
-
-    echo "cloning"
-
-    su $NB_USER -c "eval \"\$(ssh-agent -a $SSH_AUTH_SOCK)\" && ssh-add \$HOME/.ssh/gitlab.key"
-    # git clone if it does not exist
-    if [ ! -d /home/${NB_USER}/git/.git ] ; then
-        echo exec su $NB_USER -c "git clone $PR_URL \$HOME/git"
-        su $NB_USER -c "git clone $PR_URL \$HOME/git"
-        # make sure if it is a fork of a template project, those contents are copy-ed
-        CLONE=/home/${NB_USER}/.gitclone-${PR_NAME}.sh
-        [ -x $CLONE ] && su $NB_USER -c $CLONE
-    else
-        echo "$PR_URL already cloned..."
-    fi
-
-#########
-echo "http://kooplex-nginx/ownCloud/remote.php/webdav/ /home/$NB_USER/oc davfs user,rw,auto 0 0" > /etc/fstab
-addgroup $NB_USER davfs2
-#########
+done
 
 
+# remount volumes in the proper folderstructure
+# mount home
+mkdir /home/${NB_USER}
+mount -o bind /mnt/.volumes/home/${NB_USER} /home/${NB_USER}
+# mount git
+mkdir -p /home/${NB_USER}/git
+mount -o bind /mnt/.volumes/git/${NB_USER}/${PR_PWN} /home/${NB_USER}/git
+# mount share
+mkdir -p /home/${NB_USER}/share
+mount -o bind /mnt/.volumes/share/${PR_PWN} /home/${NB_USER}/share
+# mount owncloud
+mkdir -p /home/${NB_USER}/oc
+echo "http://kooplex-nginx/ownCloud/remote.php/webdav/ /home/${NB_USER}/oc davfs user,rw,auto 0 0" > /etc/fstab
+addgroup ${NB_USER} davfs2
+su ${NB_USER} -c "mount /home/${NB_USER}/oc"
+# hide volumes from the user
+mkdir /tmp/.empty
+mount -o bind /tmp/.empty /mnt/.volumes
+
+# host identification #FIXME: hardcoded
+GITLABHOST=$(grep gitlab /etc/hosts | awk '{ print $2 }')
+ssh-keyscan -H $GITLABHOST > /tmp/gitlab.pub
+USER_HOSTKEYS=/home/${NB_USER}/.ssh/known_hosts
+cat /tmp/gitlab.pub $USER_HOSTKEYS | sort | uniq > /tmp/new
+mv /tmp/new $USER_HOSTKEYS
+chown ${NB_USER}:${NB_USER} $USER_HOSTKEYS
+
+# clone git repository if it has not yet been cloned
+su $NB_USER -c "eval \"\$(ssh-agent -a $SSH_AUTH_SOCK)\" && ssh-add \$HOME/.ssh/gitlab.key"
+if [ ! -d /home/${NB_USER}/git/.git ] ; then
+    su $NB_USER -c "git clone $PR_URL \$HOME/git"
+    # make sure if it is a fork of a template project, those contents are copy-ed
+    CLONE=/home/${NB_USER}/.gitclone-${PR_NAME}.sh
+    [ -x $CLONE ] && su $NB_USER -c $CLONE
+fi
 
 source /etc/bash.bashrc
 # source bash initialisation fragments from volumes attached to the container
@@ -87,16 +74,20 @@ if [ -d /vol ] ; then
     done
 fi
 
-    env    
-    export condaenvs=`echo "['"$CONDA_ENV_DIR"']"| sed -e "s/:/','/g"`                                                                                    
-    echo $CONDA_ENV_DIR                                                                                                                   
-    echo $condaenvs 
-    # Start the notebook server
-    exec su $NB_USER -c "mount /home/$NB_USER/oc ; env PATH=$PATH jupyter notebook $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" ; umount /home/$NB_USER/oc"
-    echo " masik 4"
-else
-    # Otherwise just exec the notebook
-    exec jupyter notebook $*
-    echo " masik 1"
+if [ ! -d /home/$NB_USER/share/.conda ]; then
+  mkdir -p /home/$NB_USER/share/.conda
+  touch /home/$NB_USER/share/.conda/.tobethere
 fi
+#FIXME: if user's .conda folder exists it should be handled somehow
+ln -s /home/$NB_USER/share/.conda /home/$NB_USER/.conda
+export condaenvs=`echo "['"$CONDA_ENV_DIR"']"| sed -e "s/:/','/g"`
 
+# Start the notebook server
+exec su $NB_USER -c "cd ; env PATH=$PATH jupyter notebook $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.conda_env_dirs=\"$condaenvs\" --EnvironmentKernelSpecManager.display_name_template=\" {}\" --EnvironmentKernelSpecManager.display_name_template=\" {}\""
+
+# clean up
+umount /mnt/.volumes
+umount /home/${NB_USER}/oc
+umount /home/${NB_USER}/git
+umount /home/${NB_USER}/share
+umount /home/${NB_USER}
