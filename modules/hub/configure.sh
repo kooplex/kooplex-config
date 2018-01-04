@@ -29,7 +29,7 @@ case $VERB in
           -e "s/##OUTERPORT##/$OUTERHOSTPORT/" \
           -e "s/##INNERHOST##/$INNERHOST/" \
           -e "s/##INNERHOSTNAME##/$INNERHOSTNAME/" \
-          -e "s/##DBHOST##/$MYSQLIP/" \
+          -e "s/##DBHOST##/${PREFIX}-hub-mysql/" \
           -e "s/##PROTOCOL##/$REWRITEPROTO/" \
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##LDAPBASEDN##/$LDAPORG/" \

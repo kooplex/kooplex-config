@@ -16,7 +16,6 @@ services:
       - ##PREFIX##-home:/mnt/volumes/home:rw
       - ##PREFIX##-git:/mnt/volumes/git:rw
       - ##PREFIX##-share:/mnt/volumes/share:rw
-      - /etc/localtime:/etc/localtime:ro
     privileged: true
     restart: always
     logging:
