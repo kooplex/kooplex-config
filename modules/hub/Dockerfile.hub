@@ -33,4 +33,6 @@ RUN chmod a+x /patch-codeNdbschema.sh
 COPY runserver.sh /runserver.sh
 RUN chmod a+x /runserver.sh
 
+EXPOSE 80
+
 ENTRYPOINT [ "/runserver.sh" ]

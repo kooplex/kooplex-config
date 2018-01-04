@@ -20,7 +20,7 @@ case $VERB in
       cp Dockerfile.hub $RF
       cp Dockerfile.hubdb $RF
       cp scripts/patch-codeNdbschema.sh $RF
-      sed -e "s/##PREFIX##/$PREFIX/" scripts/runserver.sh-template > $RF/runserver.sh
+      cp scripts/runserver.sh $RF
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       sed -e "s/##HUBDB##/${PREFIX}_kooplex/" \
           -e "s/##HUBDBUSER##/kooplex/" \
