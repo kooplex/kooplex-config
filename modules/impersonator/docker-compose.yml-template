@@ -1,27 +1,27 @@
 version: "3"
 
 services:
-  ##PROJECT##-impersonator:
-    container_name: ##PROJECT##-impersonator
+  ##PREFIX##-impersonator:
+    container_name: ##PREFIX##-impersonator
     image: ##PREFIX##-impersonator
     build:
       context: .
       dockerfile: Dockerfile
     networks:
-      - ##PROJECT##-net
+      - ##PREFIX##-net
     volumes:
-      - ##PROJECT##-home:/home:rw
-      - ##PROJECT##-git:/git:rw
+      - ##PREFIX##-home:/home:rw
+      - ##PREFIX##-git:/git:rw
     privileged: true
     restart: always
 
 networks:
-  ##PROJECT##-net:
+  ##PREFIX##-net:
     external: true
 
 volumes:
-  ##PROJECT##-home:
+  ##PREFIX##-home:
     external: true
-  ##PROJECT##-git:
+  ##PREFIX##-git:
     external: true
 
