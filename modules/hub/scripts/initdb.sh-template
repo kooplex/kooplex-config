@@ -1,0 +1,15 @@
+#! /bin/bash
+
+FLAG=/var/lib/mysql/.initialized
+
+[ -f $FLAG ] && exit 0
+
+cat | mysql -u root --password=##HUBDBROOTPW## << EOF
+
+CREATE DATABASE ##HUBDB##;
+CREATE USER '##HUBDBUSER##'@'%' IDENTIFIED BY '##HUBDBPW##';
+GRANT ALL ON ##HUBDB##.* TO '##HUBDBUSER##'@'%';
+
+EOF
+
+touch $FLAG

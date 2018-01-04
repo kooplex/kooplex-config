@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  ##PREFIX##-hub:
+    container_name: ##PREFIX##-hub
+    image: ##PREFIX##-hub
+    depends_on:
+      - ##PREFIX##-hub-mysql
+    build:
+      context: .
+      dockerfile: Dockerfile.hub
+    networks:
+      - ##PREFIX##-net
+      - ##PREFIX##-hub-privatenet
+    volumes:
+      - ##PREFIX##-home:/mnt/volumes/home:rw
+      - ##PREFIX##-git:/mnt/volumes/git:rw
+      - ##PREFIX##-share:/mnt/volumes/share:rw
+      - /etc/localtime:/etc/localtime:ro
+    privileged: true
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ##PREFIX##-hub-mysql:
+    container_name: ##PREFIX##-hub-mysql
+    image: ##PREFIX##-hub-mysql
+    build:
+      context: .
+      dockerfile: Dockerfile.hubdb
+    networks:
+      - ##PREFIX##-hub-privatenet
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-hubdb:/var/lib/mysql:rw
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##PREFIX##-hub-privatenet:
+    external: false
+
+volumes:
+  ##PREFIX##-home:
+    external: true
+  ##PREFIX##-git:
+    external: true
+  ##PREFIX##-share:
+    external: true
+  ##PREFIX##-hubdb:
+    external: true
+
