@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  ##PREFIX##-proxy:
+    container_name: ##PREFIX##-proxy
+    image: ##PREFIX##-proxy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - 8001:8001
+    environment:
+      - PUBLICIP=##PROXYIP##
+      - ADMINIP=##PROXYIP##
+      - CONFIGPROXY_AUTH_TOKEN=##PROXYTOKEN##
+
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
