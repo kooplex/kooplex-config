@@ -25,8 +25,8 @@ case $VERB in
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
         -e "s/##LDAPIP##/${LDAPIP}/" \
         -e "s/##SECRET##/${DUMMYPASS}/" \
-        -e "s/##OWNCLOUDIP##/${OWNCLOUDIP}/" \
-        -e "s/##NGINXIP##/${NGINXIP}/" \
+        -e "s/##OWNCLOUD##/${PREFIX}-owncloud/" \
+        -e "s/##NGINX##/${PREFIX}-nginx/" \
         -e "s/##OUTERHOST##/${OUTERHOST}/" \
         -e "s/##INNERHOST##/${INNERHOST}/" \
         -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
