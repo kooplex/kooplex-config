@@ -88,6 +88,14 @@ ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 ADD start-report.sh /usr/local/bin/start-report.sh
 
 
+########## add the rest
+RUN mkdir -p /init
+ADD 0.sh /init/0.sh
+ADD 1.sh /init/1.sh
+ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
+ADD nslcd.conf /etc/nslcd.conf
+ADD ldap.conf /etc/ldap/ldap.conf
+ADD nsswitch.conf /etc/nsswitch.conf
 
 
 
