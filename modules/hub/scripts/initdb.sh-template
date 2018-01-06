@@ -1,6 +1,11 @@
 #! /bin/bash
 
+# Let the database come online
+sleep 10
+
 FLAG=/var/lib/mysql/.initialized
+
+R=`echo "show databases" | mysql -u root --password=##HUBDBROOTPW##  | grep  ##HUBDB##`; [ "$R"  ] && exit 0
 
 [ -f $FLAG ] && exit 0
 

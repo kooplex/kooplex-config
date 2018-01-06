@@ -13,6 +13,12 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
+
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
+
       LDAPPASS=$(getsecret ldap)
       GITLABPASS=$(getsecret gitlab)
       SSHKEYPASS=$(getsecret sshkey)
@@ -22,9 +28,9 @@ case $VERB in
       cp scripts/patch-codeNdbschema.sh $RF
       cp scripts/runserver.sh $RF
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-      sed -e "s/##HUBDB##/${PREFIX}_kooplex/" \
-          -e "s/##HUBDBUSER##/kooplex/" \
-          -e "s/##HUBDBPW##/$MYSQLPASS/" \
+      sed -e "s/##HUBDB##/${HUBDB}/" \
+          -e "s/##HUBDBUSER##/${HUBDBUSER}/" \
+          -e "s/##HUBDBPW##/${HUBDBPW}/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERPORT##/$OUTERHOSTPORT/" \
           -e "s/##INNERHOST##/$INNERHOST/" \
@@ -35,23 +41,23 @@ case $VERB in
           -e "s/##LDAPBASEDN##/$LDAPORG/" \
           -e "s/##LDAPUSER##/admin/" \
           -e "s/##LDAPBINDPW##/$LDAPPASS/" \
-          -e "s/##GITLABADMIN##/gitlabadmin/" \
-          -e "s/##GITLABADMINPW##/$GITLABPASS/" \
+          -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
+          -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" \
           -e "s/##GITLABADMINKEYPW##/$SSHKEYPASS/" \
-          -e "s/##GITLABDB##/${PROJECT}_gitlabdp/" \
+          -e "s/##GITLABDB##/${GITLABDB}/" \
           -e "s/##GITLABDBUSER##/postgres/" \
-          -e "s/##GITLABDBPW##/$GITLABDBPASS/" \
-          -e "s/##DOCKERHOST##/$DOCKERIP/" \
+          -e "s/##GITLABDBPW##/$GITLABDBPW/" \
+          -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERPORT##/$DOCKERPORT/" \
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" etc/settings.py-template > $RF/settings.py
-      sed -e "s/##HUBDB##/${PREFIX}_kooplex/" \
-          -e "s/##HUBDBUSER##/kooplex/" \
-          -e "s/##HUBDBPW##/$MYSQLPASS/" \
-          -e "s/##HUBDBROOTPW##/$MYSQLPASS/" scripts/initdb.sh-template > $RF/initdb.sh
-      chmod +x $RF/dbinit.sh
+      sed -e "s/##HUBDB##/${HUBDB}/" \
+          -e "s/##HUBDBUSER##/${HUBDBUSER}/" \
+          -e "s/##HUBDBPW##/${HUBDBPW}/" \
+          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" scripts/initdb.sh-template > $RF/initdb.sh
+      chmod +x $RF/initdb.sh
   	 
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
@@ -71,7 +77,7 @@ case $VERB in
   ;;
 
   "refresh")
-     #FIXME: docker $DOCKERARGS exec $PROJECT-hub bash -c "cd /kooplexhub; git pull;"
+     #FIXME: docker $DOCKERARGS exec $PREFIX-hub bash -c "cd /kooplexhub; git pull;"
   ;;
 
   "stop")
