@@ -2,7 +2,10 @@
 
 case $VERB in
   "build")
-    docker $DOCKERARGS build -t ${PREFIX}-home  .
+     docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
+     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
+    
+#     docker $DOCKERARGS build -t ${PREFIX}-home  .
   ;;
   "install")
   cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-home | awk '{print $2}'`

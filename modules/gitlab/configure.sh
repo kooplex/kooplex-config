@@ -2,7 +2,9 @@
 
 case $VERB in
   "build")
-     LDAPPASS=$(getsecret ldap)
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
+  
+    LDAPPASS=$(getsecret ldap)
     
     mkdir -p $SRV/gitlab/etc
     mkdir -p $SRV/gitlab/log
