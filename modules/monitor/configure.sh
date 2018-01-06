@@ -38,7 +38,7 @@ case $VERB in
   "init")
     echo "Initialize monitoring $PROJECT-monitor [$MONITORIP]"
 #    ocker $DOCKERARGS exec $PROJECT-mysql \
-#    bash -c "echo \"GRANT ALL PRIVILEGES ON * . * TO 'kooplex'@'%';\" | mysql -u root --password=$MYSQLPASS"
+#    bash -c "echo \"GRANT ALL PRIVILEGES ON * . * TO 'kooplex'@'%';\" | mysql -u root --password=$HUBDBPW"
   
   ;;
   "stop")
