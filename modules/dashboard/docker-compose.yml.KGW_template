@@ -5,7 +5,7 @@ networks:
     external: true
 
 volumes:
-  ##PREFIX##-report-##POSTFIX##:
+  ##REPORTVOLUME##:
     external: true
   python27:
     external: true
@@ -24,7 +24,7 @@ services:
     environment:
       KG_ALLOW_ORIGIN: '*'
     volumes:
-      - ##PREFIX##-report-##POSTFIX##:/home:ro
+      - ##REPORTVOLUME##:/srv/app/data/:ro
       - python27:/vol/python27:ro
       - python36:/vol/python36:ro
     restart: always

@@ -23,6 +23,11 @@ case $VERB in
       POSTFIX=${TMP##*image-}
       DOCKER_COMPOSE_FILE=$RF/docker-compose.yml-$POSTFIX
 
+      REPORTDIR=$SRV/_report/${POSTFIX}
+      REPORTVOLUME=${PREFIX}-report-$POSTFIX
+      mkdir -p ${REPORTDIR}
+      docker $DOCKERARGS volume create -o type=none -o device=${REPORTDIR} -o o=bind ${REPORTVOLUME}
+
       echo "0. Check for dashboards server sources..."
       if [ -d $DIR_DBSOURCE ] ; then
         echo "\tfound in $DIR_DBSOURCE"
@@ -31,7 +36,7 @@ case $VERB in
         git clone $URL_DBSOURCE $DIR_DBSOURCE
       fi
       
-      cp fileexpander.py runner.sh start-kernelgateway.sh  $RF/
+      cp scripts/*  $RF/
 
       echo "1. Building dockerfile file for $POSTFIX..."
       IMAGE=${PREFIX}-notebook-$POSTFIX
@@ -50,6 +55,7 @@ case $VERB in
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE_ESCAPED/" \
           -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##REPORTVOLUME##/$REPORTVOLUME/" \
           -e "s/##POSTFIX##/$POSTFIX/" \
           -e "s/##NETWORK##/${PROJECT}-net/" \
         docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
@@ -59,6 +65,7 @@ case $VERB in
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##DASHBOARDS_DOCKERFILE##/$DBS_DOCKERFILE_ESCAPED/" \
           -e "s/##DASHBOARDS##/$DASHBOARDS_NAME/" \
+          -e "s/##REPORTVOLUME##/$REPORTVOLUME/" \
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##POSTFIX##/$POSTFIX/" \
           -e "s/##NETWORK##/${PROJECT}-net/" \

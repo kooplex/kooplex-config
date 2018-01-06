@@ -13,7 +13,7 @@
     links:
       - ##KERNELGATEWAY##
     volumes:
-      - ##PREFIX##-report-##POSTFIX##:/srv/app/data/:ro
+      - ##REPORTVOLUME##:/srv/app/data/:ro
     environment:
       PORT: 3000
       KERNEL_GATEWAY_URL: http://##KERNELGATEWAY##:8888
