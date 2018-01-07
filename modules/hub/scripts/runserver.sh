@@ -10,6 +10,10 @@ done;
 echo MYSQL created!;
 
 mount -o bind /mnt/volumes/home/ /home 
+mkdir -p /_git
+mount -o bind /mnt/volumes/git/ /_git
+mkdir -p /_share
+mount -o bind /mnt/volumes/share/ /_share
 
 cd /kooplexhub/kooplexhub/
 git pull
