@@ -1,0 +1,69 @@
+version: "3"
+
+services:
+  ##PREFIX##-gitlab:
+    container_name: ##PREFIX##-gitlab
+    image: ##PREFIX##-gitlab
+    depends_on:
+      - ##PREFIX##-gitlabdb
+    build:
+      context: .
+      dockerfile: Dockerfile.gitlab
+    networks:
+      - ##PREFIX##-net
+      - ##GITLABNET##
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ##PREFIX##-gitlabdb:
+    container_name: ##PREFIX##-gitlabdb
+    image: postgres
+    networks:
+      ##GITLABNET##:
+        ipv4_address: ##GITLABDBIP##
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-gitlabdb:/var/lib/postgresql:rw
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=##GITLABDBPW##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    user: postgres
+#    command: >
+#      /bin/bash -c "
+#        docker-entrypoint.sh postgres &
+#        sleep 10
+#        while ! psql -lqt | cut -d \| -f 1 | grep -qw gitlabhq_production
+#        do
+#          createdb gitlabhq_production;
+#          sleep 1500;
+#        done
+#        echo Connected!;
+#        R=`ps axu | grep docker-entrypoint.sh  | grep -v sleep | grep -v grep| awk '{print $2}'`
+#        wait $R
+#      "
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##GITLABNET##:
+    external: false
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: ##GITLABSUBNET##/24
+
+volumes:
+  ##PREFIX##-gitlabdb:
+    external: true
+
