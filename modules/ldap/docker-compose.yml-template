@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  ##PREFIX##-ldap:
+    container_name: ##PREFIX##-ldap
+    image: ##PREFIX##-ldap
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SLAPD_PASSWORD=##SLAPD_PASSWORD##
+      - SLAPD_CONFIG_PASSWORD=##SLAPD_CONFIG_PASSWORD##
+      - SLAPD_DOMAIN=##SLAPD_DOMAIN##
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - ##PREFIX##-ldap-etc:/etc/ldap:rw
+      - ##PREFIX##-ldap-var:/var/lib/ldap:rw
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-ldap-etc:
+    external: true
+  ##PREFIX##-ldap-var:
+    external: true
+
