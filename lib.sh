@@ -452,8 +452,8 @@ config() {
   
   KOOPLEXWD=`pwd`
   
-  SRV=$ROOT/$PREFIX
-  SECRETS=$SRV/.secrets
+#  SRV=$ROOT/$PREFIX
+#  SECRETS=$SRV/.secrets
 
   SSHLOC=`which ssh`
 

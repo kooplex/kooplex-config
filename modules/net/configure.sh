@@ -1,7 +1,7 @@
 #!/bin/bash
 
 case $VERB in
-  "install")
+  "build")
     echo "Installing network $PROJECT-net [$SUBNET]"
   
     if docker  $DOCKERARGS network ls | grep " $PROJECT-net"; then 

@@ -1,5 +1,5 @@
 SYSMODULES="net base" # admin"
-MODULES="ldap mysql gitlabdb gitlab notebook proxy nginx owncloud" # dashboard # hub 
+MODULES="base net ldap gitlabdb  gitlab notebook proxy nginx impersonator owncloud hub"
 
 OUTERHOSTNAME="polc.elte.hu"
 OUTERHOSTPORT="89"
@@ -26,6 +26,7 @@ else
 fi
 
 ROOT="/srv/"$PREFIX
+SRV=$ROOT/$PREFIX
 BUILDDIR=$ROOT"/build"
 
 SUBNET="172.20.0.0/16"
@@ -58,6 +59,7 @@ GITLABDBPW=${DUMMYPASS}
 GITLABADMIN=gitlabadmin
 GITLABADMINPW=${DUMMYPASS}
 
+SECRETS=$SRV/.secrets
 
 # DEPRECATED
 PROJECT=${PREFIX}

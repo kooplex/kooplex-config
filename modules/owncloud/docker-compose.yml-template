@@ -29,6 +29,10 @@ services:
     networks:
       - ##NETWORK##
       - ##NETWORKPRIVATE##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   ##CTROCDB##:
     image: webhippie/mariadb:latest
@@ -52,6 +56,10 @@ services:
       - ##VOLUMEOCDB##:/var/lib/mysql:rw
     networks:
       - ##NETWORKPRIVATE##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   ##CTROCREDIS##:
     image: webhippie/redis:latest
@@ -68,6 +76,10 @@ services:
       - ##VOLUMEOCREDIS##:/var/lib/redis:rw
     networks:
       - ##NETWORKPRIVATE##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   ##VOLUMEOC##:
