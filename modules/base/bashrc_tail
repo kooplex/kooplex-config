@@ -1,7 +1,0 @@
-
-# source bash initialisation fragments from volumes attached to the container
-if [ -d /vol ] ; then
-    for rc in /vol/*/bashrc ; do
-        [ -f $rc ] && . $rc
-    done
-fi
