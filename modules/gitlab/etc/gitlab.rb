@@ -22,7 +22,7 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
   main:
     label: 'LDAP'
     host: '##PREFIX##-ldap'
-    port: 389
+    port: ##LDAPPORT##
     uid: 'uid'
     method: 'plain'
     bind_dn: 'cn=admin,##LDAPORG##'

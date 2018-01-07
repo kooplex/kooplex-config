@@ -15,4 +15,5 @@ COPY init-ssh-agent.sh /usr/local/bin
 COPY patch-gitconfig.sh /usr/local/bin
 COPY patch-davfs.sh /usr/local/bin
 COPY share.sh /usr/local/bin
-
+ADD create_admin.sh /create_admin.sh
+RUN chmod 700 /create_admin.sh

@@ -7,7 +7,6 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-    LDAPPASS=$(getsecret ldap)
 
 case $VERB in
   "build")
@@ -37,7 +36,8 @@ case $VERB in
     
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##LDAPORG##/$LDAPORG/" \
-        -e "s/##LDAPPW##/$LDAPPASS/" \
+        -e "s/##LDAPPW##/$LDAPPW/" \
+        -e "s/##LDAPPORT##/${LDAPPORT}/" \
         -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/"  \
         -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
         -e "s/##OUTERHOST##/${OUTERHOST}/" \
@@ -45,7 +45,12 @@ case $VERB in
         -e "s/##SMTP##/${SMTP}/" \
         -e "s/##GITLABDB##/${GITLABDBIP}/" \
         -e "s/##GITLABDBPW##/${GITLABDBPW}/" etc/gitlab.rb > $RF/gitlab.rb
-
+    sed -e "s/##LDAPORG##/$LDAPORG/" \
+        -e "s/##LDAPPW##/$LDAPPW/" \
+        -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##INNERHOST##/$INNERHOST/" \
+        -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
+        -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" scripts/make_admin.sh-template > $RF/make_admin.sh
    echo "2. Building ${PREFIX}-gitlab..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
 
@@ -63,10 +68,15 @@ case $VERB in
   "init")
     docker $DOCKERARGS exec --user postgres $PREFIX-gitlabdb bash -c 'createdb gitlabhq_production'
 
-    echo "Creating Gitlab admin user..."
-    echo "MAKE SURE THAT GITLABADMIN IS ADMIN!!!!"
-    echo "Securing host keys..."
+   
 #    chmod 600 $SRV/gitlab/etc/ssh_host_*
+  ;;
+  "admin")
+     echo "Creating Gitlab admin user..."
+     docker exec ${PREFIX}-impersonator bash -c /create_admin.sh 
+     sleep 2 
+     docker exec ${PREFIX}-gitlab bash -c /make_admin.sh
+     echo "MAKE SURE THAT GITLABADMIN IS ADMIN!!!!"
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-gitlab"
@@ -77,10 +87,17 @@ case $VERB in
       echo "Removing $DOCKER_COMPOSE_FILE"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-gitlab"
+    rm -R -f $SRV/_gitlabdb
+    
   ;;
 
   "purge")
     echo "Removing $RF" 
     rm -R -f $RF
+    docker $DOCKERARGS volume rm ${PREFIX}-gitlabdb
   ;;
 esac

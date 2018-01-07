@@ -20,6 +20,14 @@ case $VERB in
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
           -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
           -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/"  scripts/patch-gitconfig.sh_template > $RF/patch-gitconfig.sh
+      sed -e "s/##LDAPPORT##/$LDAPPORT/" \
+          -e "s/##LDAPORG##/$LDAPORG/" \
+          -e "s/##LDAPPW##/$LDAPPW/" \
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##INNERHOST##/$INNERHOST/" \
+          -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
+          -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" \
+          -e "s/##LDAPBINDPW##/$DUMMYPASS/" scripts/create_admin.sh-template > $RF/create_admin.sh
       sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
           -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
           -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
