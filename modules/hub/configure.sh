@@ -20,7 +20,7 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
 
-      LDAPPASS=$(getsecret ldap)
+      LDAPPW=$(getsecret ldap)
       GITLABPASS=$(getsecret gitlab)
       SSHKEYPASS=$(getsecret sshkey)
   
@@ -49,7 +49,7 @@ case $VERB in
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##LDAPBASEDN##/$LDAPORG/" \
           -e "s/##LDAPUSER##/admin/" \
-          -e "s/##LDAPBINDPW##/$LDAPPASS/" \
+          -e "s/##LDAPBINDPW##/$LDAPPW/" \
           -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
           -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" \
           -e "s/##GITLABADMINKEYPW##/$SSHKEYPASS/" \
@@ -62,11 +62,6 @@ case $VERB in
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" etc/settings.py-template > $RF/settings.py
-      sed -e "s/##HUBDB##/${HUBDB}/" \
-          -e "s/##HUBDBUSER##/${HUBDBUSER}/" \
-          -e "s/##HUBDBPW##/${HUBDBPW}/" \
-          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" scripts/initdb.sh-template > $RF/initdb.sh
-      chmod +x $RF/initdb.sh
   	 
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
@@ -103,6 +98,16 @@ case $VERB in
   "purge")
       echo "Removing $RF" 
       rm -R -f $RF
+      
+      docker $DOCKERARGS volume rm ${PREFIX}-home
+      docker $DOCKERARGS volume rm ${PREFIX}-share
+      docker $DOCKERARGS volume rm ${PREFIX}-git
+      docker $DOCKERARGS volume rm ${PREFIX}-hubdb
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-hubdb"
+    rm -R -f $SRV/mysql
+    
   ;;
 
   "clean")

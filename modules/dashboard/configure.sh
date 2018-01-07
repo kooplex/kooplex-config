@@ -117,6 +117,13 @@ case $VERB in
     echo "Removing $RF" 
     rm -R -f $RF
 #NOTE: dashboards are stored elsewhere in $DASHBOARDSDIR
+    for DOCKER_FILE in ../notebook/image-*/Dockerfile
+    do
+      TMP=$(dirname $DOCKER_FILE)
+      POSTFIX=${TMP##*image-}
+      REPORTVOLUME=${PREFIX}-report-$POSTFIX
+      docker $DOCKERARGS volume rm ${REPORTVOLUME}
+    done
   ;;
 
   "clean")

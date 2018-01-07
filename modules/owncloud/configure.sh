@@ -29,6 +29,7 @@ case $VERB in
     docker-compose -f $RF/docker-compose.yml build
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
         -e "s/##LDAPIP##/${LDAPIP}/" \
+        -e "s/##LDAPPORT##/${LDAPPORT}/" \
         -e "s/##SECRET##/${DUMMYPASS}/" \
         -e "s/##OWNCLOUD##/${PREFIX}-owncloud/" \
         -e "s/##NGINX##/${PREFIX}-nginx/" \
@@ -66,6 +67,15 @@ case $VERB in
   "purge")
   #  echo "Purging owncloud $PREFIX-owncloud [$OWNCLOUDIP]"
   #  rm -R -f $SRV/ownCloud
+    docker $DOCKERARGS volume rm ${PREFIX}-owncloud
+    docker $DOCKERARGS volume rm ${PREFIX}-owncloud-mysql  
+    docker $DOCKERARGS volume rm ${PREFIX}-owncloud-redis
+
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-owncloud"
+    rm -R -f $SRV/_owncloud $SRV/_owncloud.mysql $SRV/_owncloud.redis
+    
   ;;
 
   "clean")

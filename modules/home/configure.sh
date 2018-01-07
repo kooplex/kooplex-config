@@ -42,5 +42,12 @@ case $VERB in
   "purge")
     echo "Purging nfs home $PROJECT-home [$HOMEIP]"
 #    rm -R $SRV/home
+    docker $DOCKERARGS volume rm ${PREFIX}-home
+    docker $DOCKERARGS volume rm ${PREFIX}-share
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-home"
+    rm -R -f $SRV/home 
+
   ;;
 esac

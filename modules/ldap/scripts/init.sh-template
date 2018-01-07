@@ -8,4 +8,4 @@ objectClass: organizationalUnit
 objectClass: top
 ou: groups" | \
     ldapadd -h ##LDAPIP## -p ##LDAPPORT## \
-      -D cn=admin,##LDAPORG## -w "##LDAPPASS##"
+      -D cn=admin,##LDAPORG## -w "##LDAPPW##"

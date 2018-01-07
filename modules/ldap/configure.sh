@@ -2,7 +2,6 @@
 
 RF=$BUILDDIR/ldap
 
-LDAPPASS=$(getsecret ldap)
 mkdir -p $RF
 
 #    chown -R root $SRV/ldap
@@ -26,12 +25,12 @@ case $VERB in
       cp -r modules $RF
 
       sed -e "s/##PREFIX##/${PREFIX}/" \
-          -e "s/##SLAPD_PASSWORD##/${LDAPPASS}/" \
-          -e "s/##SLAPD_CONFIG_PASSWORD##/${LDAPPASS}/" \
+          -e "s/##SLAPD_PASSWORD##/${LDAPPW}/" \
+          -e "s/##SLAPD_CONFIG_PASSWORD##/${LDAPPW}/" \
           -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
-          -e "s/##LDAPPASS##/$LDAPPASS/" \
+          -e "s/##LDAPPW##/$LDAPPW/" \
           -e "s/##LDAPIP##/${PREFIX}-ldap/" \
           -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
           
@@ -45,17 +44,17 @@ case $VERB in
 
   ;;
   "start")
-      echo "Starting container ${PREFIX}-impersonator"
+      echo "Starting container ${PREFIX}-ldap"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-      sleep 14
-      docker exec ${PREFIX}-ldap /init.sh
+      sleep 10
+      docker exec ${PREFIX}-ldap bash -c /init.sh
   ;;
   "init")
     echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
 
   ;;
   "stop")
-      echo "Stopping container ${PREFIX}-impersonator"
+      echo "Stopping container ${PREFIX}-ldap"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
     
@@ -68,6 +67,15 @@ case $VERB in
   "purge")
     echo "Removing $RF" 
     rm -R -f $RF
+    
+    docker $DOCKERARGS volume rm ${PREFIX}-ldap-etc
+    docker $DOCKERARGS volume rm ${PREFIX}-ldap-var
+
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-ldap"
+    rm -R -f $SRV/ldap/
+    
   ;;
   "clean")
     echo "Cleaning image ${PREFIX}-ldap"

@@ -16,6 +16,7 @@ services:
       - ##PREFIX##-home:/mnt/volumes/home:rw
       - ##PREFIX##-git:/mnt/volumes/git:rw
       - ##PREFIX##-share:/mnt/volumes/share:rw
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     privileged: true
     logging:
