@@ -19,8 +19,8 @@ services:
     ports:
       - 8001:8001
     environment:
-      - PUBLICIP=##PROXYIP##
-      - ADMINIP=##PROXYIP##
+      - PUBLICIP=##PREFIX##-proxy
+      - ADMINIP=##PREFIX##-proxy
       - CONFIGPROXY_AUTH_TOKEN=##PROXYTOKEN##
 
 

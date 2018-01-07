@@ -5,22 +5,27 @@ mkdir -p $RF
 
 case $VERB in
   "build")
-    echo "Building image ${PROJECT}-owncloud"
+    mkdir -p $SRV/_owncloud $SRV/_owncloud.mysql $SRV/_owncloud.redis
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_owncloud -o o=bind ${PREFIX}-owncloud
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_owncloud.mysql -o o=bind ${PREFIX}-owncloud-mysql  
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_owncloud.redis -o o=bind ${PREFIX}-owncloud-redis
+
+    echo "Building image ${PREFIX}-owncloud"
     sed -e "s/##DOMAIN##/${OUTERHOST}/" \
         -e "s/##OCADMIN##/ocadmin/" \
         -e "s/##OCADMINPW##/${DUMMYPASS}/" \
         -e "s/##DBROOTPW##/${DUMMYPASS}/" \
         -e "s/##DBUSER##/owncloud/" \
         -e "s/##DBUSERPW##/${DUMMYPASS}/" \
-        -e "s/##VOLUMEOC##/${PROJECT}-owncloud/" \
-        -e "s/##VOLUMEOCDB##/${PROJECT}-owncloud-mysql/" \
-        -e "s/##VOLUMEOCREDIS##/${PROJECT}-owncloud-redis/" \
-        -e "s/##NETWORK##/${PROJECT}-net/" \
+        -e "s/##VOLUMEOC##/${PREFIX}-owncloud/" \
+        -e "s/##VOLUMEOCDB##/${PREFIX}-owncloud-mysql/" \
+        -e "s/##VOLUMEOCREDIS##/${PREFIX}-owncloud-redis/" \
+        -e "s/##NETWORK##/${PREFIX}-net/" \
         -e "s/##NETWORKPRIVATE##/owncloud-net/" \
-        -e "s/##CTROC##/${PROJECT}-owncloud/" \
-        -e "s/##CTROCDB##/${PROJECT}-owncloud-mysql/" \
-        -e "s/##CTROCREDIS##/${PROJECT}-owncloud-redis/" \
-        docker-compose.yml_template > $RF/docker-compose.yml
+        -e "s/##CTROC##/${PREFIX}-owncloud/" \
+        -e "s/##CTROCDB##/${PREFIX}-owncloud-mysql/" \
+        -e "s/##CTROCREDIS##/${PREFIX}-owncloud-redis/" \
+        docker-compose.yml-template > $RF/docker-compose.yml
     docker-compose -f $RF/docker-compose.yml build
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
         -e "s/##LDAPIP##/${LDAPIP}/" \
@@ -30,36 +35,36 @@ case $VERB in
         -e "s/##OUTERHOST##/${OUTERHOST}/" \
         -e "s/##INNERHOST##/${INNERHOST}/" \
         -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-        setup_ldap.sh_template > $RF/setup_ldap.sh
+        scripts/setup_ldap.sh-template > $RF/setup_ldap.sh
   ;;
 
   "install")
   ;;
 
   "start")
-    echo "Starting owncloud ${PROJECT}-owncloud [$OWNCLOUDIP]"
+    echo "Starting owncloud ${PREFIX}-owncloud [$OWNCLOUDIP]"
     docker-compose -f $RF/docker-compose.yml up -d
   ;;
 
   "init")
-    echo "Configuring ${PROJECT}-owncloud [$OWNCLOUDIP]"
-    docker cp $RF/setup_ldap.sh ${PROJECT}-owncloud:/setup_ldap.sh
-    docker exec -t ${PROJECT}-owncloud chmod +x /setup_ldap.sh
-    docker exec -t ${PROJECT}-owncloud su www-data -c /setup_ldap.sh
+    echo "Configuring ${PREFIX}-owncloud [$OWNCLOUDIP]"
+    docker cp $RF/setup_ldap.sh ${PREFIX}-owncloud:/setup_ldap.sh
+    docker exec -t ${PREFIX}-owncloud chmod +x /setup_ldap.sh
+    docker exec -t ${PREFIX}-owncloud su www-data -c /setup_ldap.sh
   ;;
 
   "stop")
-    echo "Stopping owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+    echo "Stopping owncloud $PREFIX-owncloud [$OWNCLOUDIP]"
     docker-compose -f $RF/docker-compose.yml stop
   ;;
 
   "remove")
-    echo "Removing owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+    echo "Removing owncloud $PREFIX-owncloud [$OWNCLOUDIP]"
     docker-compose -f $RF/docker-compose.yml rm -f
   ;;
 
   "purge")
-  #  echo "Purging owncloud $PROJECT-owncloud [$OWNCLOUDIP]"
+  #  echo "Purging owncloud $PREFIX-owncloud [$OWNCLOUDIP]"
   #  rm -R -f $SRV/ownCloud
   ;;
 

@@ -12,10 +12,10 @@ case $VERB in
     echo "1. Configuring ${PREFIX}-proxy..."
 
       cp Dockerfile $RF
-      cp scripts/entrypoint.sh $RF
+      sed -e "s/##PUBLICIP##/${PREFIX}-proxy/" \
+          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
       
       sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##PROXYIP##/$PROXYIP/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       echo "2. Building ${PREFIX}-proxy..."
