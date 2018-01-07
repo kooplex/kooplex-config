@@ -42,9 +42,7 @@ KOOPLEX = {
     'debug': {
         'debug': True,
     },
-    'prefix':{
-        'name': '##PREFIX##',
-    },
+    'prefix': '##PREFIX##',
     'hub': {
         'internal_host' : KOOPLEX_INTERNAL_HOST,
         'outer_host' : KOOPLEX_OUTER_HOST,
@@ -189,6 +187,11 @@ REST_FRAMEWORK = {
     )
 }
 
+# Paste into each file maybe ?
+# import logging
+# logger = logging.getLogger(__name__)
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -202,7 +205,33 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'dfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/debug.log',
+        },
+        'ifile': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/info.log',
+        },
+        'wfile': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/warning.log',
+        },
+        'efile': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/error.log',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/debug.log2',
+        },
+
     },
     'loggers': {
         'django.request': {
@@ -210,7 +239,33 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-    }
+        'debug_logger': {
+            'handlers': ['dfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'info_logger': {
+            'handlers': ['ifile'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'warning_logger': {
+            'handlers': ['wfile'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'error_logger': {
+            'handlers': ['efile'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+
+   }
 }
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'

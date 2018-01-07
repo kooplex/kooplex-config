@@ -13,7 +13,8 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
-
+      
+      mkdir -p $SRV/mysql $SRV/_git $SRV/_share $SRV/home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
@@ -26,8 +27,16 @@ case $VERB in
       cp Dockerfile.hub $RF
       cp Dockerfile.hubdb $RF
       cp scripts/patch-codeNdbschema.sh $RF
-      cp scripts/runserver.sh $RF
-      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##HUBDB##/${HUBDB}/g" \
+          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
+          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
+          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" scripts/runserver.sh > $RF/runserver.sh
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##HUBDB##/${HUBDB}/g" \
+          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
+          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
+          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       sed -e "s/##HUBDB##/${HUBDB}/" \
           -e "s/##HUBDBUSER##/${HUBDBUSER}/" \
           -e "s/##HUBDBPW##/${HUBDBPW}/" \
@@ -69,7 +78,7 @@ case $VERB in
   "start")
        echo "Starting containers of ${PREFIX}-hub"
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub-mysql
-       docker exec ${PREFIX}-hub-mysql /initdb.sh
+#       docker exec ${PREFIX}-hub-mysql /initdb.sh
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub
   ;;
 

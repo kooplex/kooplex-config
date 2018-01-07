@@ -16,8 +16,8 @@ services:
       - ##PREFIX##-home:/mnt/volumes/home:rw
       - ##PREFIX##-git:/mnt/volumes/git:rw
       - ##PREFIX##-share:/mnt/volumes/share:rw
-    privileged: true
     restart: always
+    privileged: true
     logging:
       options:
         max-size: "10m"
@@ -35,10 +35,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-hubdb:/var/lib/mysql:rw
     restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=##HUBDBROOTPW##
     logging:
       options:
         max-size: "10m"
         max-file: "3"
+
 
 networks:
   ##PREFIX##-net:
