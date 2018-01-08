@@ -107,6 +107,11 @@ KOOPLEX = {
     'impersonator': {
         'container_name' : '##PREFIX##-impersonator'
     },
+    'volumes': {
+        'home': '/mnt/volumes/home',
+        'share': '/mnt/volumes/share',
+        'git': '/mnt/volumes/git',
+    },
 }
 
 TEMPLATES =  [
