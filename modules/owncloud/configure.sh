@@ -28,7 +28,7 @@ case $VERB in
         docker-compose.yml-template > $RF/docker-compose.yml
     docker-compose -f $RF/docker-compose.yml build
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
-        -e "s/##LDAPIP##/${LDAPIP}/" \
+        -e "s/##LDAPIP##/${PREFIX}-ldap/" \
         -e "s/##LDAPPORT##/${LDAPPORT}/" \
         -e "s/##SECRET##/${DUMMYPASS}/" \
         -e "s/##OWNCLOUD##/${PREFIX}-owncloud/" \
