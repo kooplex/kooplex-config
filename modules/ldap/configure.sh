@@ -46,12 +46,10 @@ case $VERB in
   "start")
       echo "Starting container ${PREFIX}-ldap"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-      sleep 10
-      docker exec ${PREFIX}-ldap bash -c /init.sh
   ;;
   "init")
     echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
-
+    docker exec ${PREFIX}-ldap bash -c /init.sh
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-ldap"
