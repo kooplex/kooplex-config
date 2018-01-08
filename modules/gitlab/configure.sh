@@ -21,15 +21,11 @@ case $VERB in
     SSHKEYPASS=$(createsecret sshkey)
   
     GITLABNET=${PREFIX}-gitlab-privatenet
-    GITLABSUBNET=172.19.0.0
-    GITLABDBIP=172.19.0.2
   
     cp Dockerfile.gitlab $RF
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##GITLABDBPW##/$GITLABDBPW/" \
-        -e "s/##GITLABDBIP##/$GITLABDBIP/" \
         -e "s/##GITLABNET##/$GITLABNET/" \
-        -e "s/##GITLABSUBNET##/$GITLABSUBNET/" \
         -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
     sed -e "s/##HOST##/$OUTERHOSTNAME/" etc/nginx-gitlab-http.conf.erb > $RF/nginx-gitlab-http.conf.erb
@@ -43,7 +39,7 @@ case $VERB in
         -e "s/##OUTERHOST##/${OUTERHOST}/" \
         -e "s/##EMAIL##/${EMAIL}/" \
         -e "s/##SMTP##/${SMTP}/" \
-        -e "s/##GITLABDB##/${GITLABDBIP}/" \
+        -e "s/##GITLABDB##/${PREFIX}-gitlabdb/" \
         -e "s/##GITLABDBPW##/${GITLABDBPW}/" etc/gitlab.rb > $RF/gitlab.rb
     sed -e "s/##LDAPORG##/$LDAPORG/" \
         -e "s/##LDAPPW##/$LDAPPW/" \
