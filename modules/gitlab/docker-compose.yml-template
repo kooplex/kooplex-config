@@ -25,7 +25,6 @@ services:
     image: postgres
     networks:
       ##GITLABNET##:
-        ipv4_address: ##GITLABDBIP##
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-gitlabdb:/var/lib/postgresql:rw
@@ -56,12 +55,6 @@ networks:
     external: true
   ##GITLABNET##:
     external: false
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      -
-        subnet: ##GITLABSUBNET##/24
 
 volumes:
   ##PREFIX##-gitlabdb:
