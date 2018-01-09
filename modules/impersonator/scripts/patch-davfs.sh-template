@@ -7,7 +7,7 @@ getent passwd | cut -d: -f1,3 | while read l ; do
   uid=$(echo $l | cut -f2 -d:)
   [ $uid -le 10000 ] && continue
   [ $uname = nobody ] && continue
-  [ $uname = gitlabadmin ] && continue
+  [ $uname = ##GITLABADMIN## ] && continue
   echo "http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ /home/$uname/oc davfs user,rw,auto 0 0" >> /etc/fstab
   addgroup $uname davfs2
 done 

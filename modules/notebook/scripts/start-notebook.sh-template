@@ -42,7 +42,7 @@ mkdir -p /home/${NB_USER}/share
 mount -o bind /mnt/.volumes/share/${PR_PWN} /home/${NB_USER}/share
 # mount owncloud
 mkdir -p /home/${NB_USER}/oc
-echo "http://kooplex-nginx/ownCloud/remote.php/webdav/ /home/${NB_USER}/oc davfs user,rw,auto 0 0" > /etc/fstab
+echo "http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ /home/${NB_USER}/oc davfs user,rw,auto 0 0" > /etc/fstab
 addgroup ${NB_USER} davfs2
 su ${NB_USER} -c "mount /home/${NB_USER}/oc"
 # hide volumes from the user

@@ -94,7 +94,7 @@ KOOPLEX = {
     },
     'owncloud': {
         'base_url': '%s/owncloud/' % KOOPLEX_BASE_URL,
-        'inner_url': 'http://kooplex-nginx/ownCloud/',
+        'inner_url': 'http://##PREFIX##-nginx/ownCloud/',
     },
     'dashboards': {
         'dir': '{$image_postfix}',

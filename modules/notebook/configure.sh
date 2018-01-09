@@ -7,14 +7,13 @@ case $VERB in
   "build")
     echo "Building image $PREFIX-notebooks"
 
-#    docker $DOCKERARGS build -t $PREFIX-notebook .
-    
+
      mkdir -p $RF
      for imagedir in ./image-*
      do
         cp -r image-* $RF
-        cp scripts/start-notebook.sh scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
-
+        cp  scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
+        sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
 #moved from install phase
         cp scripts/jupyter_notebook_config.py scripts/jupyter_report_config.py  ${RF}/$imagedir
         echo "#!/bin/sh
