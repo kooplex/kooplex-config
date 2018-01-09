@@ -7,7 +7,7 @@
     ports:
       - "##DASHBOARDS_PORT##:3000"
     networks:
-      - ##NETWORK##
+      - ##PREFIX##-net
     depends_on:
       - ##KERNELGATEWAY##
     links:

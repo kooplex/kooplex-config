@@ -1,7 +1,7 @@
 version: "2"
 
 networks:
-  ##NETWORK##:
+  ##PREFIX##-net:
     external: true
 
 volumes:
@@ -20,7 +20,7 @@ services:
       context: .
       dockerfile: ##KERNELGATEWAY_DOCKERFILE##
     networks:
-      - ##NETWORK##
+      - ##PREFIX##-net
     environment:
       KG_ALLOW_ORIGIN: '*'
     volumes:
