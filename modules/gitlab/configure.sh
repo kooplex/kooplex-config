@@ -28,7 +28,7 @@ case $VERB in
         -e "s/##GITLABNET##/$GITLABNET/" \
         -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-    sed -e "s/##HOST##/$OUTERHOSTNAME:${OUTERHOSTPORT}/" etc/nginx-gitlab-http.conf.erb > $RF/nginx-gitlab-http.conf.erb
+    sed -e "s/##HOST##/$OUTERHOST/" etc/nginx-gitlab-http.conf.erb > $RF/nginx-gitlab-http.conf.erb
     
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##LDAPORG##/$LDAPORG/" \

@@ -13,9 +13,9 @@ case $VERB in
       cp Dockerfile $RF
       cp scripts/start.sh $RF
       cp scripts/init-ssh-agent.sh $RF
-      cp scripts/patch-davfs.sh $RF
       cp etc/nsswitch.conf $RF
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -e "s/##PREFIX##/$PREFIX/" scripts/patch-davfs.sh-template > $RF/patch-davfs.sh
       sed -e "s/##LDAPPORT##/$LDAPPORT/" \
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
           -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \

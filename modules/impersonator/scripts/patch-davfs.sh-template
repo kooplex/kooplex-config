@@ -8,6 +8,6 @@ getent passwd | cut -d: -f1,3 | while read l ; do
   [ $uid -le 10000 ] && continue
   [ $uname = nobody ] && continue
   [ $uname = gitlabadmin ] && continue
-  echo "http://kooplex-nginx/ownCloud/remote.php/webdav/ /home/$uname/oc davfs user,rw,auto 0 0" >> /etc/fstab
+  echo "http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ /home/$uname/oc davfs user,rw,auto 0 0" >> /etc/fstab
   addgroup $uname davfs2
 done 

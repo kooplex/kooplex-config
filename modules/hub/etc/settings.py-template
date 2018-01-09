@@ -42,7 +42,7 @@ KOOPLEX = {
     'debug': {
         'debug': True,
     },
-    'prefix': '##PREFIX##',
+    'prefix': {'name': '##PREFIX##'},
     'hub': {
         'internal_host' : KOOPLEX_INTERNAL_HOST,
         'outer_host' : KOOPLEX_OUTER_HOST,
@@ -94,6 +94,7 @@ KOOPLEX = {
     },
     'owncloud': {
         'base_url': '%s/owncloud/' % KOOPLEX_BASE_URL,
+        'inner_url': 'http://kooplex-nginx/ownCloud/',
     },
     'dashboards': {
         'dir': '{$image_postfix}',
