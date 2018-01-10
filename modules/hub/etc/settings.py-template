@@ -76,6 +76,8 @@ KOOPLEX = {
         'db_password': '##GITLABDBPW##',
     },
     'docker': {
+        'base_url': '##DOCKERPROTOCOL##://##DOCKERHOST##:##DOCKERPORT##',
+#FIXME: these are not required any more
         'host': '##DOCKERHOST##', 
         'port': '##DOCKERPORT##',
         'network': '##PREFIX##-net',
@@ -112,6 +114,7 @@ KOOPLEX = {
         'home': '/mnt/volumes/home',
         'share': '/mnt/volumes/share',
         'git': '/mnt/volumes/git',
+        'garbage': '/mnt/volumes/garbage',
     },
 }
 
