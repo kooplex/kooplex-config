@@ -16,6 +16,7 @@ services:
       - ##PREFIX##-home:/mnt/volumes/home:rw
       - ##PREFIX##-git:/mnt/volumes/git:rw
       - ##PREFIX##-share:/mnt/volumes/share:rw
+      - ##PREFIX##-garbage:/mnt/volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     privileged: true
@@ -56,6 +57,8 @@ volumes:
   ##PREFIX##-git:
     external: true
   ##PREFIX##-share:
+    external: true
+  ##PREFIX##-garbage:
     external: true
   ##PREFIX##-hubdb:
     external: true
