@@ -44,6 +44,8 @@ KOOPLEX = {
     },
     'prefix': {'name': '##PREFIX##'},
     'hub': {
+        'base_url': '##PROTOCOL##://##OUTERHOST##',
+#FIXME: do we need these below?
         'internal_host' : KOOPLEX_INTERNAL_HOST,
         'outer_host' : KOOPLEX_OUTER_HOST,
         'host_port' : KOOPLEX_OUTER_PORT,
@@ -55,6 +57,7 @@ KOOPLEX = {
     'ldap': {
         'host': '##PREFIX##-ldap',
         'port': 389,
+        'bind_dn': 'cn=admin,##LDAPBASEDN##',
         'base_dn': '##LDAPBASEDN##',
         'bind_username': '##LDAPUSER##',
         'bind_password': '##LDAPBINDPW##',
@@ -77,6 +80,9 @@ KOOPLEX = {
     },
     'docker': {
         'base_url': '##DOCKERPROTOCOL##://##DOCKERHOST##:##DOCKERPORT##',
+        'pattern_imagenamefilter': r'^##PREFIX##-notebook-(\w+):\w+$',
+        'pattern_imagename': '##PREFIX##-notebook-%(imagename)s',
+
 #FIXME: these are not required any more
         'host': '##DOCKERHOST##', 
         'port': '##DOCKERPORT##',
@@ -84,6 +90,11 @@ KOOPLEX = {
         'protocol':'##DOCKERPROTOCOL##',
     },
     'spawner': {
+        'pattern_containername': '%(username)s-%(projectname)s',
+        'pattern_proxypath': 'notebook/%(containername)s',
+        'pattern_jupyterapi': 'http://%(containername)s:8000/api',
+
+#FIXME: do we need these below?                              
         'notebook_container_name': '##PREFIX##-notebook-{$username}-{$project_name}',
         'notebook_ip_pool': ['##IPPOOLLO##', '##IPPOOLHI##'],
         'notebook_proxy_path': '/notebook/{$username}/{$notebook.id}',
@@ -116,6 +127,12 @@ KOOPLEX = {
         'git': '/mnt/volumes/git',
         'garbage': '/mnt/volumes/garbage',
     },
+    'user': {
+        'pattern_davsecret': 'http://kooplex-nginx/ownCloud/remote.php/webdav/ %(username)s %(password)s',
+        'pattern_tokenfile': '/tmp/token.%(username)s',
+        'pattern_passwordfile': '/tmp/pw.%(username)s',
+    },
+
 }
 
 TEMPLATES =  [
