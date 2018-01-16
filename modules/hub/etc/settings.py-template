@@ -91,7 +91,7 @@ KOOPLEX = {
     },
     'spawner': {
         'pattern_containername': '%(username)s-%(projectname)s',
-        'pattern_proxypath': 'notebook/%(containername)s',
+        'pattern_proxypath': 'notebook/%(containername)s', #NOTE: cannot begin with '/' otherwise os.path.join will trick you
         'pattern_jupyterapi': 'http://%(containername)s:8000/api',
 
 #FIXME: do we need these below?                              
@@ -100,6 +100,8 @@ KOOPLEX = {
         'notebook_proxy_path': '/notebook/{$username}/{$notebook.id}',
     },
     'proxy': {
+        'base_url': 'http://##PREFIX##-proxy:8001',
+#FIXME: do we need these below?
         'host': KOOPLEX_INTERNAL_HOST,        
         'port': 8001, 
         'auth_token': '##PROXYTOKEN##',
