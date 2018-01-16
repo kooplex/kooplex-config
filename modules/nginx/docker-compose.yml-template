@@ -12,6 +12,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
     restart: always
+    ports:
+      - 80:80
     logging:
       options:
         max-size: "10m"
