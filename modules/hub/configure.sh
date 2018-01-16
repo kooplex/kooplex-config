@@ -57,6 +57,7 @@ case $VERB in
           -e "s/##GITLABDBUSER##/postgres/" \
           -e "s/##GITLABDBPW##/$GITLABDBPW/" \
           -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
+          -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERPORT##/$DOCKERPORT/" \
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \

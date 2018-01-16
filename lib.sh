@@ -65,7 +65,7 @@ netgroup:       nis
 }
 
 ldap_nslcdconfig () {
-  LDAPPW=$(getsecret ldap)
+#  LDAPPW=$(getsecret ldap)
   echo "uid nslcd
 gid nslcd
 

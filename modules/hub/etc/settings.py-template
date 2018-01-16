@@ -79,7 +79,7 @@ KOOPLEX = {
         'db_password': '##GITLABDBPW##',
     },
     'docker': {
-        'base_url': '##DOCKERPROTOCOL##://##DOCKERHOST##:##DOCKERPORT##',
+        'base_url': '##DOCKERAPIURL##',
         'pattern_imagenamefilter': r'^##PREFIX##-notebook-(\w+):\w+$',
         'pattern_imagename': '##PREFIX##-notebook-%(imagename)s',
 
