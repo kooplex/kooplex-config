@@ -64,6 +64,7 @@ KOOPLEX = {
     },
     'gitlab': {
         'base_url': 'http://##PREFIX##-gitlab/gitlab/',
+        'pattern_urlproject': 'git@##PREFIX##-gitlab:%(username)s/%(projectname)s.git',
         'base_repourl': 'http://##PREFIX##-gitlab',
         'ssh_cmd': r'/usr/bin/ssh',
         'ssh_host': '##PREFIX##-gitlab',
