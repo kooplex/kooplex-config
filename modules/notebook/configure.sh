@@ -14,26 +14,9 @@ case $VERB in
         cp -r image-* $RF
         cp  scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
-#moved from install phase
-        cp scripts/jupyter_notebook_config.py scripts/jupyter_report_config.py  ${RF}/$imagedir
-        echo "#!/bin/sh
-chmod 0600 /etc/nslcd.conf
-service nslcd start
-    " > ${RF}/$imagedir/0.sh
-      
-    # Start jupyter
-    echo "#!/bin/sh
-if [ -z \"\$REPORT\" ] ; then 
-  echo \"Starting notebook for \$NB_USER...\"
-  cd /home/\$NB_USER
-  . start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT
-else
-  echo \"Starting Report Server\"
-  cd /report
-  . start-report.sh --allow-root --config=/etc/jupyter_report_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT
-fi
-" \
-      > ${RF}/$imagedir/1.sh
+        cp scripts/jupyter_notebook_config.py scripts/jupyter_report_config.py 0.sh 1.sh \
+           ${RF}/$imagedir
+
 #####
   printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
   printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/$imagedir/nsswitch.conf
