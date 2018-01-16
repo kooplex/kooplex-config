@@ -93,6 +93,9 @@ KOOPLEX = {
         'pattern_containername': '%(username)s-%(projectname)s',
         'pattern_proxypath': 'notebook/%(containername)s', #NOTE: cannot begin with '/' otherwise os.path.join will trick you
         'pattern_jupyterapi': 'http://%(containername)s:8000/api',
+        'volume-home': '##PREFIX##-home',
+        'volume-git': '##PREFIX##-git',
+        'volume-share': '##PREFIX##-share',
 
 #FIXME: do we need these below?                              
         'notebook_container_name': '##PREFIX##-notebook-{$username}-{$project_name}',
