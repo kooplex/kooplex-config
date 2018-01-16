@@ -14,8 +14,7 @@ case $VERB in
         cp -r image-* $RF
         cp  scripts/start-report.sh  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
-        cp scripts/jupyter_notebook_config.py scripts/jupyter_report_config.py 0.sh 1.sh \
-           ${RF}/$imagedir
+        cp scripts/{jupyter_notebook_config.py,jupyter_report_config.py,0.sh,1.sh} ${RF}/$imagedir
 
 #####
   printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
