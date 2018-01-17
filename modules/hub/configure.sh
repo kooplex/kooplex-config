@@ -14,11 +14,13 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/mysql $SRV/_git $SRV/_share $SRV/home
+      mkdir -p $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html $SRV/_hub.grabage
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report/html -o o=bind ${PREFIX}-report-html
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.grabage -o o=bind ${PREFIX}-garbage
 
       LDAPPW=$(getsecret ldap)
       GITLABPASS=$(getsecret gitlab)
