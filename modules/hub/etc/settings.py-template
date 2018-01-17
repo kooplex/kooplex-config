@@ -131,6 +131,7 @@ KOOPLEX = {
         'home': '/mnt/volumes/home',
         'share': '/mnt/volumes/share',
         'git': '/mnt/volumes/git',
+        'htmlreport': '/mnt/volumes/report.html',
         'garbage': '/mnt/volumes/garbage',
     },
     'user': {
