@@ -50,6 +50,8 @@ KOOPLEX = {
         'outer_host' : KOOPLEX_OUTER_HOST,
         'host_port' : KOOPLEX_OUTER_PORT,
         'protocol' : PROTOCOL,
+        'smtpserver': 'mail.elte.hu',
+        'adminemail': 'kooplex@complex.elte.hu',
     },
     'session': {
     	'base_url': 'http://%s' %(KOOPLEX_INTERNAL_HOST),
@@ -61,6 +63,7 @@ KOOPLEX = {
         'base_dn': '##LDAPBASEDN##',
         'bind_username': '##LDAPUSER##',
         'bind_password': '##LDAPBINDPW##',
+        'usersgroupid': 9998,
     },
     'gitlab': {
         'base_url': 'http://##PREFIX##-gitlab/gitlab/',
