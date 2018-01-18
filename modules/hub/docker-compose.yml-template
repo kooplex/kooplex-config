@@ -17,6 +17,7 @@ services:
       - ##PREFIX##-git:/mnt/volumes/git:rw
       - ##PREFIX##-share:/mnt/volumes/share:rw
       - ##PREFIX##-report-html:/mnt/volumes/report.html:rw
+      - ##PREFIX##-report-dashboard:/mnt/volumes/report.dashboard:rw
       - ##PREFIX##-garbage:/mnt/volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
@@ -60,6 +61,8 @@ volumes:
   ##PREFIX##-share:
     external: true
   ##PREFIX##-report-html:
+    external: true
+  ##PREFIX##-report-dashboard:
     external: true
   ##PREFIX##-garbage:
     external: true

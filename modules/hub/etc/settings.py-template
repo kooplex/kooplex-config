@@ -132,6 +132,7 @@ KOOPLEX = {
         'share': '/mnt/volumes/share',
         'git': '/mnt/volumes/git',
         'htmlreport': '/mnt/volumes/report.html',
+        'dashboardreport': '/mnt/volumes/report.dashboard',
         'garbage': '/mnt/volumes/garbage',
     },
     'user': {
