@@ -229,7 +229,10 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
+       'verbose': {
+            'format': '%(levelname)s -- [%(asctime)s] %(module)s -  %(message)s'
+        },
+        'tooverbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
         'simple': {
@@ -250,31 +253,31 @@ LOGGING = {
         'dfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/debug.log',
+            'filename': '/tmp/debug-hub.log',
             'formatter': 'verbose',
         },
         'ifile': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/info.log',
+            'filename': '/tmp/info-hub.log',
             'formatter': 'verbose',
         },
         'wfile': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/warning.log',
+            'filename': '/tmp/warning-hub.log',
             'formatter': 'verbose',
         },
         'efile': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/error.log',
+            'filename': '/tmp/error-hub.log',
             'formatter': 'verbose',
         },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/debug.log2',
+            'filename': '/tmp/django.log',
         },
 
     },
@@ -284,7 +287,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'debug_logger': {
+        'kooplex': {
             'handlers': ['dfile', 'ifile', 'wfile', 'efile'],
             'level': 'DEBUG',
             'propagate': True,
