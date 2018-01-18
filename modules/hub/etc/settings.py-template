@@ -115,6 +115,10 @@ KOOPLEX = {
         'base_url': '%s/owncloud/' % KOOPLEX_BASE_URL,
         'inner_url': 'http://##PREFIX##-nginx/ownCloud/',
     },
+    'dashboard': {
+        'uid': 9999,
+        'gid': 9999,
+    },
     'dashboards': {
         'dir': '{$image_postfix}',
         'prefix': 'dashboards',
