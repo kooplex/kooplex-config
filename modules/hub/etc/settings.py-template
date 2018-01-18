@@ -228,6 +228,14 @@ REST_FRAMEWORK = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -243,21 +251,25 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/tmp/debug.log',
+            'formatter': 'verbose',
         },
         'ifile': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': '/tmp/info.log',
+            'formatter': 'verbose',
         },
         'wfile': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': '/tmp/warning.log',
+            'formatter': 'verbose',
         },
         'efile': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'filename': '/tmp/error.log',
+            'formatter': 'verbose',
         },
         'file': {
             'level': 'DEBUG',
@@ -273,23 +285,8 @@ LOGGING = {
             'propagate': True,
         },
         'debug_logger': {
-            'handlers': ['dfile'],
+            'handlers': ['dfile', 'ifile', 'wfile', 'efile'],
             'level': 'DEBUG',
-            'propagate': True,
-        },
-        'info_logger': {
-            'handlers': ['ifile'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'warning_logger': {
-            'handlers': ['wfile'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-        'error_logger': {
-            'handlers': ['efile'],
-            'level': 'ERROR',
             'propagate': True,
         },
         'django': {
