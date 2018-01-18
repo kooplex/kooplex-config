@@ -4,7 +4,6 @@ import subprocess
 import os
 import errno
 import stat
-from IPython.lib import passwd
 
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
 
@@ -16,32 +15,10 @@ c.HistoryManager.hist_file = '/tmp/ipython_hist.sqlite'
 c.NotebookApp.allow_origin = '*'
 #c.NotebookApp.set_default('nbserver_extensions', {})['jupyter_nbextensions_configurator'] = True
 c.NotebookApp.trust_xheaders = True
-
 c.NotebookApp.password_required = False
-c.NotebookApp.password = passwd("")
-c.NotebookApp.disable_check_xsrf = True
-c.NotebookApp.token = ''
-
-if 'PASSWD' in os.environ:
-   c.NotebookApp.password_required = True
-   c.NotebookApp.password = passwd(os.environ['PASSWD'])
-   #c.NotebookApp.token = os.environ['PASSWORD']
-   #del os.environ['PASSWORD']
-   c.NotebookApp.disable_check_xsrf = False
-   c.NotebookApp.token = 'aiSiga1aiFai2AiZu1veeWein5gijei8yeLay2Iecae3ahkiekeisheegh2ahgee'
-
-
-
-
-
-
-
-#c.NotebookApp.password_required = False
-#c.NotebookApp.disable_check_xsrf = True
-#c.NotebookApp.token = ''#aiSiga1aiFai2AiZu1veeWein5gijei8yeLay2Iecae3ahkiekeisheegh2ahgee'
+c.NotebookApp.disable_check_xsrf = False
 
 # This will enable the option to switch between conda envs in the notebook-server
-c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
 
 # Set a certificate if USE_HTTPS is set to any value
 if 'USE_HTTPS' in os.environ:
@@ -64,7 +41,7 @@ if 'USE_HTTPS' in os.environ:
     c.NotebookApp.certfile = PEM_FILE
 
 # Set a password if PASSWORD is set
-#if 'PASSWORD' in os.environ:
-#    from IPython.lib import passwd
-#   c.NotebookApp.password = passwd(os.environ['PASSWORD'])
-#    del os.environ['PASSWORD']
+if 'PASSWORD' in os.environ:
+    from IPython.lib import passwd
+    c.NotebookApp.password = passwd(os.environ['PASSWORD'])
+    del os.environ['PASSWORD']
