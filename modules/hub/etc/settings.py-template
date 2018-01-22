@@ -176,8 +176,7 @@ TEMPLATES =  [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'kooplex.lib.auth.Auth',
+    'kooplex.idp.AuthBackend',
 )
 
 TIME_ZONE = 'Europe/Berlin'
