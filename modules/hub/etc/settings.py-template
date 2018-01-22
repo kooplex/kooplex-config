@@ -66,7 +66,7 @@ KOOPLEX = {
         'usersgroupid': 9998,
     },
     'gitlab': {
-        'base_url': 'http://##PREFIX##-gitlab/gitlab/',
+        'base_url': 'http://##PREFIX##-gitlab/gitlab/api/v4',
         'pattern_urlproject': 'git@##PREFIX##-gitlab:%(username)s/%(projectname)s.git',
         'base_repourl': 'http://##PREFIX##-gitlab',
         'ssh_cmd': r'/usr/bin/ssh',
@@ -97,9 +97,12 @@ KOOPLEX = {
         'pattern_containername': '%(username)s-%(projectname)s',
         'pattern_proxypath': 'notebook/%(containername)s', #NOTE: cannot begin with '/' otherwise os.path.join will trick you
         'pattern_jupyterapi': 'http://%(containername)s:8000/api',
+        'pattern_mnt_functionalvolume': '/vol/%(name)s', 
+        'pattern_mnt_storagevolume': '/mnt/%(name)s', 
         'volume-home': '##PREFIX##-home',
         'volume-git': '##PREFIX##-git',
         'volume-share': '##PREFIX##-share',
+
 
 #FIXME: do we need these below?                              
         'notebook_container_name': '##PREFIX##-notebook-{$username}-{$project_name}',
@@ -141,6 +144,10 @@ KOOPLEX = {
         'htmlreport': '/mnt/volumes/report.html',
         'dashboardreport': '/mnt/volumes/report.dashboard',
         'garbage': '/mnt/volumes/garbage',
+        'pattern_functionalvolumenamefilter': r'^vol-([_\w-]+)$',
+        'pattern_storagevolumenamefilter': r'^storage-([_\w-]+)$',
+        'pattern_functionalvolumename': 'vol-%(name)s',
+        'pattern_storagevolumename': 'storage-%(name)s',
     },
     'user': {
         'pattern_davsecret': 'http://kooplex-nginx/ownCloud/remote.php/webdav/ %(username)s %(password)s',
