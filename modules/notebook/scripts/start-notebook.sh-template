@@ -49,9 +49,7 @@ su ${NB_USER} -c "mount /home/${NB_USER}/oc"
 mkdir /tmp/.empty
 mount -o bind /tmp/.empty /mnt/.volumes
 
-# host identification #FIXME: hardcoded
-GITLABHOST=$(grep gitlab /etc/hosts | awk '{ print $2 }')
-ssh-keyscan -H $GITLABHOST > /tmp/gitlab.pub
+ssh-keyscan -H ##PREFIX##-gitlab > /tmp/gitlab.pub
 USER_HOSTKEYS=/home/${NB_USER}/.ssh/known_hosts
 cat /tmp/gitlab.pub $USER_HOSTKEYS | sort | uniq > /tmp/new
 mv /tmp/new $USER_HOSTKEYS
