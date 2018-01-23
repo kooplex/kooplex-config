@@ -7,8 +7,8 @@
 from jinja2 import ChoiceLoader, FunctionLoader
 from notebook.notebookapp import NotebookApp
 
-page_template = """
-{% extends "templates/page.html" %}
+edit_template = """
+{% extends "templates/edit.html" %}
 {% block meta %}
 <style>
 .navbar-header > a {
@@ -18,28 +18,106 @@ page_template = """
 {% endblock %}
 {% block logo %}
 {% endblock %}
-{% block header_buttons %}
-<div class="navbar navbar-inverse navbar-fixed-top" style="padding: 5px 40px 5px 40px;">
-  <div class="container-fluid">
-    <div class="navbar-header">
-        <a href="/hub/notebooks" class="navbar-brand">Kooplex Hub</a>
-    </div>
-    <ul class="nav navbar-nav">
-     <li><a href="#"  class="navbar-brand">Project name: <strong>{{ project_name }}</strong></a></li>
-     <li><a href="{{default_url}}" class="navbar-brand"><strong>Back to the tree</strong></a></li>
-    </ul>
+  {% block headercontainer %}
+
+    <a href="/hub/notebooks" >
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
+    </a>
+    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
     <ul class="nav navbar-nav navbar-right">
-        <li><span class="navbar-brand">Hello {{ user_name }}!</span></li>
-       <li> <div id="ipython_notebook" class="nav "><a href="{{default_url}}
-        {%- if logged_in and token -%}?token={{token}}{%- endif -%}" title='{% trans %}dashboard{% endtrans %}'>
-         <img src='{{static_url("base/images/logo.png") }}' alt='Jupyter Notebook'/>
-        </a></div></li>
+        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a></li>
     </ul>
-  </div>     <!-- container-fluid -->
-</div>
 {% endblock %}
 """
 
+terminal_template = """
+{% extends "templates/terminal.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+
+    <a href="/hub/notebooks" >
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
+    </a>
+    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a></li>
+    </ul>
+{% endblock %}
+"""
+
+
+tree_template = """
+{% extends "templates/tree.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+
+    <a href="/hub/notebooks" >
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
+    </a>
+    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a></li>
+    </ul>
+{% endblock %}
+"""
+
+notebook_template = """
+{% extends "templates/notebook.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+
+<span id="save_widget" class="save_widget">
+    <span id="notebook_name" class="filename"></span>
+    <span class="checkpoint_status"></span>
+    <span class="autosave_status"></span>
+    <a href="/hub/notebooks">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
+    </a>
+    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
+</span>
+
+<a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a>
+<span id="kernel_logo_widget">
+  {% block kernel_logo_widget %}
+  <img class="current_kernel_logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
+  {% endblock %}
+</span>
+
+  {% endblock %}
+
+"""
 
 
 class KooplexUserNotebookApp(NotebookApp):
@@ -58,8 +136,14 @@ class KooplexUserNotebookApp(NotebookApp):
 
         # patch jinja env loading to modify page template
         def get_page(name):
-            if name == 'page.html':
-                return page_template
+            if name == 'tree.html':
+                return tree_template
+            if name == 'notebook.html':
+                return notebook_template
+            if name == 'terminal.html':
+                return terminal_template
+            if name == 'edit.html':
+                return edit_template
 
         orig_loader = env.loader
         env.loader = ChoiceLoader([

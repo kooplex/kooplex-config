@@ -7,30 +7,105 @@
 from jinja2 import ChoiceLoader, FunctionLoader
 from notebook.notebookapp import NotebookApp
 
-page_template = """
-{% extends "templates/page.html" %}
+notebook_template = """
+{% extends "templates/notebook.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
 {% block logo %}
-KOOPLEX
 {% endblock %}
-{% block header_buttons %}
-<div class="navbar navbar-inverse navbar-fixed-top" style="padding: 5px 40px 5px 40px;">
-  <div class="container-fluid">
-    <div class="navbar-header">
-        <a href="/hub/notebooks" class="navbar-brand">Kooplex Hub</a>
-    </div>
-    <ul class="nav navbar-nav">
-     <li><a href="#"  class="navbar-brand">Report name: <strong>{{ report_name }}</strong></a></li>
-     <li><a href="#"  class="navbar-brand">Author: <strong>{{ author_name }}</strong></a></li>
-    </ul>
-  </div>     <!-- container-fluid -->
-</div>
-{% endblock %}
-{% block login_widget %}
-{% endblock %}
+  {% block headercontainer %}
+
+<span id="save_widget" class="save_widget">
+    <span id="notebook_name" class="filename"></span>
+    <span class="checkpoint_status"></span>
+    <span class="autosave_status"></span>
+    <a href="/hub/notebooks">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
+    </a>
+    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
+</span>
+
+<a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a>
+<span id="kernel_logo_widget">
+  {% block kernel_logo_widget %}
+  <img class="current_kernel_logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
+  {% endblock %}
+</span>
+
+  {% endblock %}
 {% block header %}
+
+
+<div id="menubar-container" class="container" style="visibility: hidden;">
+<div id="menubar">
+    <div id="menus" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <button type="button" class="btn btn-default navbar-btn navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <i class="fa fa-bars"></i>
+              <span class="navbar-text">{% trans %}Menu{% endtrans %}</span>
+            </button>
+            <p id="kernel_indicator" class="navbar-text indicator_area">
+              <span class="kernel_indicator_name">{% trans %}Kernel{% endtrans %}</span>
+              <i id="kernel_indicator_icon"></i>
+            </p>
+            <i id="readonly-indicator" class="navbar-text" title='{% trans %}This notebook is read-only{% endtrans %}'>
+                <span class="fa-stack">
+                    <i class="fa fa-save fa-stack-1x"></i>
+                    <i class="fa fa-ban fa-stack-2x text-danger"></i>
+                </span>
+            </i>
+            <i id="modal_indicator" class="navbar-text"></i>
+            <span id="notification_area"></span>
+           <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Help{% endtrans %}</a>
+                    <ul  id="help_menu" class="dropdown-menu">
+                        {% block help %}
+                        {% set
+                            sections = (
+                                (
+                                    ("http://nbviewer.jupyter.org/github/ipython/ipython/blob/3.x/examples/Notebook/Index.ipynb", _("Notebook Help"), True),
+                                    ("https://help.github.com/articles/markdown-basics/",_("Markdown"),True),
+                                ),
+                            )
+                        %}
+
+						{% set openmsg = _("Opens in a new window") %}
+                        {% for helplinks in sections %}
+                            {% for link in helplinks %}
+                                <li><a rel="noreferrer" href="{{link[0]}}" target="{{'_blank' if link[2]}}" title="{{openmsg if link[2]}}">
+                                {% if link[2] %}
+                                    <i class="fa fa-external-link menu-icon pull-right"></i>
+                                {% endif %}
+
+                                {{link[1]}}
+                                </a></li>
+                            {% endfor %}
+                            {% if not loop.last %}
+                                <li class="divider"></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li class="divider"></li>
+                        <li title="{% trans %}About Jupyter Notebook{% endtrans %}"><a id="notebook_about" href="#">{% trans %}About{% endtrans %}</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+              </ul>
+          </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 """
-
 
 
 class KooplexUserNotebookApp(NotebookApp):
@@ -44,12 +119,17 @@ class KooplexUserNotebookApp(NotebookApp):
         env.globals['report_name'] =  os.getenv("REPORT_NAME")
         env.globals['author_name'] = os.getenv("AUTHOR NAME")
 
-
         # patch jinja env loading to modify page template
         def get_page(name):
-            if name == 'page.html':
-                return page_template
-
+            if name == 'tree.html':
+                return tree_template
+            if name == 'notebook.html':
+                return notebook_template
+            if name == 'terminal.html':
+                return terminal_template
+            if name == 'edit.html':
+                return edit_template
+                
         orig_loader = env.loader
         env.loader = ChoiceLoader([
             FunctionLoader(get_page),
