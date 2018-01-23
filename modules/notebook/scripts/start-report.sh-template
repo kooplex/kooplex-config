@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source /etc/bash.bashrc
+# source bash initialisation fragments from volumes attached to the container
+if [ -d /vol ] ; then
+    for rc in /vol/*/bashrc ; do
+        . $rc
+    done
+fi
+
+#FIXME: if user's .conda folder exists it should be handled somehow
+ln -s /home/$NB_USER/share/.conda /home/$NB_USER/.conda
+export condaenvs=`echo "['"$CONDA_ENV_DIR"']"| sed -e "s/:/','/g"`
+
+# Start the notebook server 
+exec su $NB_USER -c "cd ; env PATH=$PATH jupyter report-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10"
+

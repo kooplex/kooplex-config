@@ -86,7 +86,7 @@ RUN chmod a+x /opt/conda/bin/jupyter-report-kooplex
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 ADD start-report.sh /usr/local/bin/start-report.sh
-
+ADD kooplex-logo.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/kooplex-logo.png
 
 ########## add the rest
 RUN mkdir -p /init
