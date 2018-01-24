@@ -23,7 +23,7 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report/dashboard -o o=bind ${PREFIX}-report-dashboard
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.grabage -o o=bind ${PREFIX}-garbage
 
-      LDAPPW=$(getsecret ldap)
+# Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       GITLABPASS=$(getsecret gitlab)
       SSHKEYPASS=$(getsecret sshkey)
   

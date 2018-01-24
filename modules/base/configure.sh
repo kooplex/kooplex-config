@@ -14,7 +14,7 @@ case $VERB in
 
     docker $DOCKERARGS build -t ${PREFIX}-base  $RF
     echo "Generating secrets..."
-    LDAPPW=$(createsecret ldap)
+# Ez a config.sh-ban van    LDAPPW=$(createsecret ldap)
   ;;
   "install")
 
