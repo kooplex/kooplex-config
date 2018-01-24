@@ -135,7 +135,8 @@ KOOPLEX = {
         'max_number': 20,
     },
     'impersonator': {
-        'container_name' : '##PREFIX##-impersonator'
+        'container_name': '##PREFIX##-impersonator',
+        'git': '/git',
     },
     'volumes': {
         'home': '/mnt/volumes/home',
@@ -164,7 +165,7 @@ TEMPLATES =  [
         'OPTIONS': {
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
-                'kooplex.lib.extra_context.extra_context',
+                'kooplex.hub.views.extra_context',
             ],
             'debug': DEBUG,
             'loaders': [
