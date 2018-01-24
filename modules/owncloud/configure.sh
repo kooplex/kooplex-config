@@ -30,7 +30,7 @@ case $VERB in
     sed -e "s/##LDAPORG##/${LDAPORG}/" \
         -e "s/##LDAPIP##/${PREFIX}-ldap/" \
         -e "s/##LDAPPORT##/${LDAPPORT}/" \
-        -e "s/##SECRET##/${DUMMYPASS}/" \
+        -e "s/##LDAPPW##/${LDAPPW}/" \
         -e "s/##OWNCLOUD##/${PREFIX}-owncloud/" \
         -e "s/##NGINX##/${PREFIX}-nginx/" \
         -e "s/##OUTERHOST##/${OUTERHOST}/" \
