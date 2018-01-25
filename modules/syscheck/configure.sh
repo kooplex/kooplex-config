@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RF=$BUILDDIR/proxy
+RF=$BUILDDIR/syscheck
 
 mkdir -p $RF
 
@@ -14,7 +14,7 @@ case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-proxy..."
 
-      cp Dockerfile $RF
+      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-template > $RF/Dockerfile
       cp scripts/syscheck.py $RF
       cp etc/crontab $RF
       

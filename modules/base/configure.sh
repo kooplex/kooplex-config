@@ -11,10 +11,12 @@ case $VERB in
     mkdir -p $SECRETS
     cp  scripts/* $RF
     cp Dockerfile $RF
-
+    sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-notebook-template > $RF/Dockerfile-notebook
+ 
     docker $DOCKERARGS build -t ${PREFIX}-base  $RF
+    docker $DOCKERARGS build -t ${PREFIX}-notebook-base -f $RF/Dockerfile-notebook  $RF 
     echo "Generating secrets..."
-    LDAPPW=$(createsecret ldap)
+# Ez a config.sh-ban van    LDAPPW=$(createsecret ldap)
   ;;
   "install")
 

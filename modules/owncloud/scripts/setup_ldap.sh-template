@@ -12,7 +12,7 @@ LDAP_ID=$(echo ${dummy#*configID}| sed -e "s/'//g")
 ./occ ldap:set-config $LDAP_ID ldapBaseGroups "##LDAPORG##"
 ./occ ldap:set-config $LDAP_ID ldapBaseUsers "##LDAPORG##"
 ./occ ldap:set-config $LDAP_ID ldapHost ##LDAPIP##
-./occ ldap:set-config $LDAP_ID ldapAgentPassword ##SECRET##
+./occ ldap:set-config $LDAP_ID ldapAgentPassword ##LDAPPW##
 ./occ ldap:set-config $LDAP_ID ldapPort ##LDAPPORT##
 ./occ ldap:set-config $LDAP_ID ldapLoginFilter "(&(|(objectclass=inetOrgPerson))(uid=%uid))"
 ./occ ldap:set-config $LDAP_ID ldapUserDisplayName displayname

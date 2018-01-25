@@ -10,7 +10,8 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-impersonator..."
-      cp Dockerfile $RF
+      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-template > $RF/Dockerfile
+
       cp scripts/start.sh $RF
       cp scripts/init-ssh-agent.sh $RF
       cp etc/nsswitch.conf $RF
