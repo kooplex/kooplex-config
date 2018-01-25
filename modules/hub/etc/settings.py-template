@@ -151,7 +151,7 @@ KOOPLEX = {
         'pattern_storagevolumename': 'storage-%(name)s',
     },
     'user': {
-        'pattern_davsecret': 'http://kooplex-nginx/ownCloud/remote.php/webdav/ %(username)s %(password)s',
+        'pattern_davsecret': 'http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ %(username)s %(password)s',
         'pattern_tokenfile': '/tmp/token.%(username)s',
         'pattern_passwordfile': '/tmp/pw.%(username)s',
     },
