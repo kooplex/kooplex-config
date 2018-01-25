@@ -1,4 +1,5 @@
-echo "dn: ou=users,##LDAPORG##
+cat | ldapadd -h ##LDAPHOST## -p ##LDAPPORT## -D cn=admin,##LDAPORG## -w "##SLAPD_PASSWORD##" << EOF
+dn: ou=users,##LDAPORG##
 objectClass: organizationalUnit
 objectClass: top
 ou: people
@@ -6,6 +7,6 @@ ou: people
 dn: ou=groups,##LDAPORG##
 objectClass: organizationalUnit
 objectClass: top
-ou: groups" | \
-    ldapadd -h ##LDAPIP## -p ##LDAPPORT## \
-      -D cn=admin,##LDAPORG## -w "##LDAPPW##"
+ou: groups
+EOF
+    

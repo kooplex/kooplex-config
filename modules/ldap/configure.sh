@@ -30,8 +30,8 @@ case $VERB in
           -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
-          -e "s/##LDAPPW##/$LDAPPW/" \
-          -e "s/##LDAPIP##/${PREFIX}-ldap/" \
+          -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
+          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
           -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
           
       echo "2. Building ${PREFIX}-ldap..."
