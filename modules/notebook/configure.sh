@@ -11,7 +11,8 @@ case $VERB in
      mkdir -p $RF
      for imagedir in ./image-*
      do
-        cp -r image-* $RF
+        mkdir -p $RF/$imagedir
+        sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         cp  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-report.sh-template > $RF/$imagedir/start-report.sh
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh

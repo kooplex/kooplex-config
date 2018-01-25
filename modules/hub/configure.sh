@@ -26,8 +26,7 @@ case $VERB in
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       GITLABPASS=$(getsecret gitlab)
       SSHKEYPASS=$(getsecret sshkey)
-  
-      cp Dockerfile.hub $RF
+      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
       cp Dockerfile.hubdb $RF
       cp scripts/patch-codeNdbschema.sh $RF
       sed -e "s/##PREFIX##/$PREFIX/" \

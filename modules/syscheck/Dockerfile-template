@@ -1,0 +1,43 @@
+FROM ##PREFIX##-base
+
+RUN apt-get update && apt-get install -y \
+		gcc \
+		gettext \
+		mysql-client libmysqlclient-dev \
+		postgresql-client libpq-dev \
+                vim less \
+                ssh git\
+		python3-pip python3-dev python-dev\
+                cron\
+	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+ENV DJANGO_VERSION 1.9
+
+RUN pip3 install --upgrade pip
+#RUN pip3 install setuptools
+#RUN pip3 install docker-py netaddr 
+#RUN pip3 uninstall -y docker-py && pip3 install -U docker
+
+RUN pip3 install netaddr
+RUN pip3 install -U docker
+RUN pip3 install setuptools
+RUN pip3 install mysqlclient
+RUN pip3 install psycopg2
+
+COPY syscheck.py /syscheck.py
+
+# Based on https://github.com/Ekito/docker-cron/blob/master/Dockerfile
+# Add crontab file in the cron directory
+COPY crontab /etc/cron.d/syscheck-cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/syscheck-cron
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+
+# Run the command on container startup
+CMD cron && tail -f /var/log/cron.log
+
+#ENTRYPOINT ["/entrypoint.sh"]
+#CMD ["./Runserver.sh"]
