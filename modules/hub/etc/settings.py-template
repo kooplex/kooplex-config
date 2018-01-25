@@ -177,6 +177,7 @@ TEMPLATES =  [
 ]
 
 AUTHENTICATION_BACKENDS = (
+    'kooplex.idp.adminAuthBackend',
     'kooplex.idp.localAuthBackend',
 #    'kooplex.idp.enaAuthBackend',
 )
