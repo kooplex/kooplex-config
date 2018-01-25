@@ -15,12 +15,7 @@ RUN apt-get update && \
 
 RUN mv /etc/ldap /etc/ldap.dist
 
-COPY modules/ /etc/ldap.dist/modules
-
-VOLUME ["/etc/ldap", "/var/lib/ldap"]
-
-RUN chown -R openldap:openldap /etc/ldap && \
-    chown -R openldap:openldap /var/lib/ldap/ /var/run/slapd/
+RUN chown -R openldap:openldap /var/run/slapd/
 
 EXPOSE 389
 
