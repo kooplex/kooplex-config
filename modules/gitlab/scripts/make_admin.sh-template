@@ -2,7 +2,7 @@ gitlab_adduser() {
   local username=##GITLABADMIN##  
   local firstname=Gitlab
   local lastname=Admin
-  local email="admin@##INNERHOST##" 
+  local email="admin@##OUTERHOST##" 
   local pass=##GITLABADMINPW## 
   
   echo "Adding Gitlab user $firstname $lastname ($username)..."
