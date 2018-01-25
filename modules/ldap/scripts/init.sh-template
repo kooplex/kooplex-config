@@ -1,4 +1,4 @@
-cat | ldapadd -h ##LDAPHOST## -p ##LDAPPORT## -D cn=admin,##LDAPORG## -w "##SLAPD_PASSWORD##" << EOF
+cat << EOF | ldapadd -h ##LDAPHOST## -p ##LDAPPORT## -D cn=admin,##LDAPORG## -w "##SLAPD_PASSWORD##"
 dn: ou=users,##LDAPORG##
 objectClass: organizationalUnit
 objectClass: top
