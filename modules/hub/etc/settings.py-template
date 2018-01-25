@@ -177,7 +177,8 @@ TEMPLATES =  [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'kooplex.idp.AuthBackend',
+    'kooplex.idp.localAuthBackend',
+#    'kooplex.idp.enaAuthBackend',
 )
 
 TIME_ZONE = 'Europe/Berlin'
