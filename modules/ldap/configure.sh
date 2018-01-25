@@ -22,7 +22,6 @@ case $VERB in
      
       cp Dockerfile $RF
       cp scripts/entrypoint.sh $RF
-      cp -r modules $RF
 
       sed -e "s/##PREFIX##/${PREFIX}/" \
           -e "s/##SLAPD_PASSWORD##/${LDAPPW}/" \
