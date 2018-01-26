@@ -14,20 +14,20 @@ fi
 env
 
 # make sure project users are in the group associated with share folder
-addgroup --gid $(( $GID_OFFSET + $PR_ID )) $PR_NAME
-for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
-    addgroup $username $PR_NAME
-done
+##addgroup --gid $(( $GID_OFFSET + $PR_ID )) $PR_NAME
+##for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
+##    addgroup $username $PR_NAME
+##done
 
 # make sure project users are in the group associated with external (nfs) share folders
-for lbl_gid in $(echo $MNT_GIDS | sed s/,/\ /g) ; do
-    lbl=mnt_$(echo $lbl_gid | cut -f1 -d:)
-    gid=$(echo $lbl_gid | cut -f2 -d:)
-    addgroup --gid $gid $lbl
-    for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
-        addgroup $username $lbl
-    done
-done
+##for lbl_gid in $(echo $MNT_GIDS | sed s/,/\ /g) ; do
+##    lbl=mnt_$(echo $lbl_gid | cut -f1 -d:)
+##    gid=$(echo $lbl_gid | cut -f2 -d:)
+##    addgroup --gid $gid $lbl
+##    for username in $(echo $PR_MEMBERS | sed s/,/\ /g) ; do
+##        addgroup $username $lbl
+##    done
+##done
 
 
 # remount volumes in the proper folderstructure
@@ -53,15 +53,20 @@ ssh-keyscan -H ##PREFIX##-gitlab > /tmp/gitlab.pub
 USER_HOSTKEYS=/home/${NB_USER}/.ssh/known_hosts
 cat /tmp/gitlab.pub $USER_HOSTKEYS | sort | uniq > /tmp/new
 mv /tmp/new $USER_HOSTKEYS
-chown ${NB_USER}:${NB_USER} $USER_HOSTKEYS
+#FIXME: gid hardcoded
+chown ${NB_USER}:9998 $USER_HOSTKEYS
 
 # clone git repository if it has not yet been cloned
 su $NB_USER -c "eval \"\$(ssh-agent -a $SSH_AUTH_SOCK)\" && ssh-add \$HOME/.ssh/gitlab.key"
-if [ ! -d /home/${NB_USER}/git/.git ] ; then
-    su $NB_USER -c "git clone $PR_URL \$HOME/git"
-    # make sure if it is a fork of a template project, those contents are copy-ed
-    CLONE=/home/${NB_USER}/.gitclone-${PR_NAME}.sh
-    [ -x $CLONE ] && su $NB_USER -c $CLONE
+##if [ ! -d /home/${NB_USER}/git/.git ] ; then
+##    su $NB_USER -c "git clone $PR_URL \$HOME/git"
+##    # make sure if it is a fork of a template project, those contents are copy-ed
+##    CLONE=/home/${NB_USER}/.gitclone-${PR_NAME}.sh
+##    [ -x $CLONE ] && su $NB_USER -c $CLONE
+##fi
+
+if [ -x /home/${NB_USER}/git/clone.sh ] ; then
+    su $NB_USER -c "/home/${NB_USER}/git/clone.sh"
 fi
 
 source /etc/bash.bashrc
