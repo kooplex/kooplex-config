@@ -94,20 +94,21 @@ KOOPLEX = {
         'protocol':'##DOCKERPROTOCOL##',
     },
     'spawner': {
-        'pattern_containername': '%(username)s-%(projectname)s',
+        'pattern_project_containername': 'nb-%(username)s-%(projectname)s',
+        'pattern_dashboard_containername': 'db-%(reportname)s-%(instance_id)d',
+        'pattern_dashboard_containername_filter': r'db-(\w+)-(\d+)',
+        'pattern_notebook_proxypath': 'notebook/%(containername)s', #NOTE: cannot begin with '/' otherwise os.path.join will trick you
+        'pattern_dashboard_proxypath': 'notebook/%(containername)s/notebooks/%(notebook_file)s', #NOTE: cannot begin with '/' otherwise os.path.join will trick you
+        'pattern_dashboard_baseurl': 'notebook/%(containername)s/', #NOTE: cannot begin with '/' otherwise os.path.join will trick you #FIXME: = notebook
+
         'pattern_proxypath': 'notebook/%(containername)s', #NOTE: cannot begin with '/' otherwise os.path.join will trick you
         'pattern_jupyterapi': 'http://%(containername)s:8000/api',
+        'max_dashboards_per_report': 5,
         'pattern_mnt_functionalvolume': '/vol/%(name)s', 
         'pattern_mnt_storagevolume': '/mnt/%(name)s', 
         'volume-home': '##PREFIX##-home',
         'volume-git': '##PREFIX##-git',
         'volume-share': '##PREFIX##-share',
-
-
-#FIXME: do we need these below?                              
-        'notebook_container_name': '##PREFIX##-notebook-{$username}-{$project_name}',
-        'notebook_ip_pool': ['##IPPOOLLO##', '##IPPOOLHI##'],
-        'notebook_proxy_path': '/notebook/{$username}/{$notebook.id}',
     },
     'proxy': {
         'base_url': 'http://##PREFIX##-proxy:8001',
