@@ -64,6 +64,8 @@ KOOPLEX = {
         'bind_username': '##LDAPUSER##',
         'bind_password': '##LDAPBINDPW##',
         'usersgroupid': 9998,
+        'reportuid': 9990,
+        'reportgid': 9990,
     },
     'gitlab': {
         'base_url': 'http://##PREFIX##-gitlab/gitlab/api/v4',
@@ -109,6 +111,7 @@ KOOPLEX = {
         'volume-home': '##PREFIX##-home',
         'volume-git': '##PREFIX##-git',
         'volume-share': '##PREFIX##-share',
+        'volume-dashboard-report': '##PREFIX##-report-dashboard',
     },
     'proxy': {
         'base_url': 'http://##PREFIX##-proxy:8001',
