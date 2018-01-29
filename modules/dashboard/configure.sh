@@ -111,6 +111,10 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
 #FIXME: should not we remove images and generated Dockerfiles?
     done
+
+    docker $DOCKERARGS volume rm ${PREFIX}-report-dashboard
+    docker $DOCKERARGS volume rm ${PREFIX}-report-html
+
   ;;
 
   "purge")

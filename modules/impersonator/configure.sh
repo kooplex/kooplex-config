@@ -33,9 +33,9 @@ case $VERB in
       sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
           -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
           -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
-          -e "s/##LDAPBINDPW##/$DUMMYPASS/" \
+          -e "s/##LDAPBINDPW##/$LDAPPW/" \
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
-          -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/" etc/nslcd.conf_template > $RF/nslcd.conf
+          -e "s/##LDAPBINDROOTPW##/$LDAPPW/" etc/nslcd.conf_template > $RF/nslcd.conf
       sed -e "s/##OWNCLOUDURL##/http:\/\/${PREFIX}-nginx\/ownCloud\/ocs\/v1.php\/apps\/files_sharing\/api\/v1\/shares/" \
           -e "s/##WEBDAVPATTERN##/http:..${PREFIX}-nginx.ownCloud.remote.php.webdav./" scripts/share.sh_template > $RF/share.sh
       chmod 0600 $RF/nslcd.conf
