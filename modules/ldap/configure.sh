@@ -33,6 +33,11 @@ case $VERB in
           -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
           -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
           
+      sed -e "s/##LDAPORG##/$LDAPORG/" \
+          -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
+          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init-core.sh-template > $RF/init-core.sh
+
       echo "2. Building ${PREFIX}-ldap..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
@@ -49,6 +54,7 @@ case $VERB in
   "init")
     echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
     docker exec ${PREFIX}-ldap bash -c /init.sh
+    docker exec ${PREFIX}-ldap bash -c /init-core.sh
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-ldap"

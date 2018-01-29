@@ -21,9 +21,10 @@ EXPOSE 389
 
 COPY entrypoint.sh /entrypoint.sh
 COPY init.sh /init.sh
+COPY init-core.sh /init-core.sh
 
 RUN chown root /entrypoint.sh && \
-    chmod 700 /entrypoint.sh /init.sh
+    chmod 700 /entrypoint.sh /init.sh /init-core.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
