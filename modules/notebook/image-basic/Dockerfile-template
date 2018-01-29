@@ -61,13 +61,9 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge bqplot
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 RUN $CONDA_DIR/bin/conda install -v --yes  -c conda-forge parso=0.1.0
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
+
 
 RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise
-
-# This one is not needed as long as it cannot discover conda envs outside of /opt/conda
-#RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
 
 RUN apt update
 RUN apt install -y libfontconfig1 libxrender1 libxrender-dev
@@ -77,6 +73,14 @@ RUN apt install -y octave
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyterlab
 RUN apt install -y gnuplot
 
+
+
+# This one is not needed as long as it cannot discover conda envs outside of /opt/conda
+
+RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
+
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex

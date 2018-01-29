@@ -2,6 +2,11 @@
 
 # IP address functions
 
+ldapquery () {
+echo ldapsearch -x -H ldap://${PREFIX}-ldap -D cn=admin,$LDAPORG -b ou=users,$LDAPORG -s one "objectclass=top" -w $LDAPPW
+}
+
+
 ip_ip2dec () {
   local a b c d ip=$@
   IFS=. read -r a b c d <<< "$ip"

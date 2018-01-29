@@ -68,9 +68,9 @@ case $VERB in
   ;;
   "admin")
      echo "Creating Gitlab admin user..."
-     docker exec ${PREFIX}-impersonator bash -c /create_admin.sh 
+     docker $DOCKERARGS exec ${PREFIX}-impersonator bash -c /create_admin.sh 
      sleep 2 
-     docker exec ${PREFIX}-gitlab bash -c /make_admin.sh
+     docker $DOCKERARGS exec ${PREFIX}-gitlab bash -c /make_admin.sh
      echo "MAKE SURE THAT GITLABADMIN IS ADMIN!!!!"
   ;;
   "stop")
@@ -82,10 +82,11 @@ case $VERB in
       echo "Removing $DOCKER_COMPOSE_FILE"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
-
+      
   ;;
   "cleandata")
     echo "Cleaning data ${PREFIX}-gitlab"
+    docker $DOCKERARGS volume rm ${PREFIX}-gitlabdb
     rm -R -f $SRV/_gitlabdb
     
   ;;
