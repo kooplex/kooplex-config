@@ -15,7 +15,7 @@ c.HistoryManager.hist_file = '/tmp/ipython_hist.sqlite'
 c.NotebookApp.allow_origin = '*'
 #c.NotebookApp.set_default('nbserver_extensions', {})['jupyter_nbextensions_configurator'] = True
 c.NotebookApp.trust_xheaders = True
-c.NotebookApp.password_required = True
+c.NotebookApp.password_required = False
 c.NotebookApp.disable_check_xsrf = True
 
 # This will enable the option to switch between conda envs in the notebook-server
@@ -40,8 +40,3 @@ if 'USE_HTTPS' in os.environ:
         os.chmod(PEM_FILE, stat.S_IRUSR | stat.S_IWUSR)
     c.NotebookApp.certfile = PEM_FILE
 
-# Set a password if PASSWORD is set
-if 'NB_TOKEN' in os.environ:
-    from IPython.lib import passwd
-    c.NotebookApp.password = passwd(os.environ['NB_TOKEN'])
-    del os.environ['NB_TOKEN']

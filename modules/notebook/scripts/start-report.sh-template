@@ -8,9 +8,9 @@
 ##    done
 ##fi
 
-echo "1 2 3 4 5 6" | adduser --disabled-password --disabled-login $NB_USER
 
-mount -o $REPORT_DIR/home/$NB_USER /home/$NB_USER  
+mkdir -p /home/$NB_USER
+mount -o bind $REPORT_DIR/home/$NB_USER /home/$NB_USER  
 
 # manage symbolic links under user's conda env directory
 for f in /home/$NB_USER/.conda/env/* ; do
@@ -21,8 +21,7 @@ for d in /vol/*/condaenvs/*/ ; do
   ln -s $d /home/$NB_USER/.conda/env/$volname
 done
 
-chown -R $NB_USER /home/$NB_USER
 
 # Start the notebook server 
-exec su $NB_USER -c "cd ; env PATH=$PATH jupyter report-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10"
+exec su $NB_USER -c "cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10"
 
