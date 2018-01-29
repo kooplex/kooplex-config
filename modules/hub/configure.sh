@@ -106,6 +106,7 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-share
       docker $DOCKERARGS volume rm ${PREFIX}-git
       docker $DOCKERARGS volume rm ${PREFIX}-hubdb
+      docker $DOCKERARGS volume rm ${PREFIX}-garbage
   ;;
   "cleandata")
     echo "Cleaning data ${PREFIX}-hubdb"
