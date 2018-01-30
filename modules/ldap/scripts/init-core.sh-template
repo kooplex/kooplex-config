@@ -1,5 +1,5 @@
 cat << EOF | ldapadd -h ##LDAPHOST## -p ##LDAPPORT## -D cn=admin,##LDAPORG## -w "##SLAPD_PASSWORD##"
-uid=reportreader,dc=novo1,dc=complex,dc=elte,dc=hu
+dn: uid=reportreader,##LDAPORG##
 objectClass: simpleSecurityObject
 objectClass: organizationalPerson
 objectClass: person
