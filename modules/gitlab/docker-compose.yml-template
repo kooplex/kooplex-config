@@ -22,9 +22,12 @@ services:
 
   ##PREFIX##-gitlabdb:
     container_name: ##PREFIX##-gitlabdb
-    image: postgres
+    image: ##PREFIX##-gitlabdb
     networks:
       ##GITLABNET##:
+    build:
+      context: .
+      dockerfile: Dockerfile.gitlabdb
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-gitlabdb:/var/lib/postgresql:rw
