@@ -19,7 +19,7 @@ RUN chown -R openldap:openldap /var/run/slapd/
 
 EXPOSE 389
 
-COPY new_group.ldiftemplate /etc/ldap/new_group.ldiftemplate
+COPY new_group.ldiftemplate /etc/new_group.ldiftemplate
 COPY addgroup.sh /usr/local/bin/addgroup.sh
 
 COPY entrypoint.sh /entrypoint.sh

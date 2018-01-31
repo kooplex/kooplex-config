@@ -63,8 +63,8 @@ case $VERB in
     echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
     docker exec ${PREFIX}-ldap bash -c /init.sh
     docker exec ${PREFIX}-ldap bash -c /init-core.sh
-    docker exec ${PREFIX}-ldap bash -c /usr/local/bin/addgroup.sh users 9998
-    docker exec ${PREFIX}-ldap bash -c /usr/local/bin/addgroup.sh report 9990
+    docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh users 9998"
+    docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh report 9990"
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-ldap"
