@@ -28,6 +28,14 @@ case $VERB in
           -e "s/##SLAPD_CONFIG_PASSWORD##/${LDAPPW}/" \
           -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
+      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
+
+      sed -e "s/##LDAPORG##/$LDAPORG/" \
+          -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
+          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh-template > $RF/addgroup.sh
+          
+
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
           -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
@@ -55,6 +63,8 @@ case $VERB in
     echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
     docker exec ${PREFIX}-ldap bash -c /init.sh
     docker exec ${PREFIX}-ldap bash -c /init-core.sh
+    docker exec ${PREFIX}-ldap bash -c /usr/local/bin/addgroup.sh users 9998
+    docker exec ${PREFIX}-ldap bash -c /usr/local/bin/addgroup.sh report 9990
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-ldap"
