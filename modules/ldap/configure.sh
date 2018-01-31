@@ -33,7 +33,7 @@ case $VERB in
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
           -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh-template > $RF/addgroup.sh
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $RF/addgroup.sh
           
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
