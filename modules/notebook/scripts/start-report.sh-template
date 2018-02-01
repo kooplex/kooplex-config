@@ -22,7 +22,7 @@ chown reportreader:9998 /mnt/.volumes/report/.conda
 # manage symbolic links under user's conda env directory
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
-  ln -s $d /home/$NB_USER/.conda/envs/$volname
+  ln -s $d /home/reportreader/.conda/envs/$volname
 done
 
 /opt/conda/bin/conda uninstall nbpresent
