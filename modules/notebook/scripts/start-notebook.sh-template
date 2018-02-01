@@ -54,6 +54,8 @@ fi
 #    done
 #fi
 
+mkdir -p /home/$NB_USER/.conda/envs/
+
 # manage symbolic links under user's conda env directory
 #for f in /home/$NB_USER/.conda/env/* ; do
 #  [ -h $f ] && rm $f
