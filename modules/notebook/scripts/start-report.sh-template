@@ -12,16 +12,21 @@
 mkdir -p /home/$NB_USER
 mount -o bind $REPORT_DIR/home/$NB_USER /home/$NB_USER  
 
+mkdir /mnt/.volumes/report
+mkdir /mnt/.volumes/report/.conda/
+mkdir /mnt/.volumes/report/.conda/env
+chown reportreader:9998 /mnt/.volumes/report
+chown reportreader:9998 /mnt/.volumes/report/.conda
+
+
 # manage symbolic links under user's conda env directory
-for f in /home/$NB_USER/.conda/env/* ; do
-  [ -h $f ] && rm $f
-done
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
-  ln -s $d /home/$NB_USER/.conda/env/$volname
+  ln -s $d /home/$NB_USER/.conda/envs/$volname
 done
 
+/opt/conda/bin/conda uninstall nbpresent
 
 # Start the notebook server 
-exec su $NB_USER -c "cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10"
+exec su reportreader -c "cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10"
 

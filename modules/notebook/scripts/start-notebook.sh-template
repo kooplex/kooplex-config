@@ -55,13 +55,16 @@ fi
 #fi
 
 # manage symbolic links under user's conda env directory
-for f in /home/$NB_USER/.conda/env/* ; do
-  [ -h $f ] && rm $f
-done
+#for f in /home/$NB_USER/.conda/env/* ; do
+#  [ -h $f ] && rm $f
+#done
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
-  ln -s $d /home/$NB_USER/.conda/env/$volname
+  ln -s $d /home/$NB_USER/.conda/envs/$volname
 done
+
+# SO THAT WE DON'T GET A WARNING WHEN ENTERING CONDA TAB
+ln -s /opt/conda/ /home/$NB_USER/.conda/envs/conda 
 
 # Start the notebook server
 exec su $NB_USER -c "cd ; env PATH=$PATH jupyter notebook $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\" "
