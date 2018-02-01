@@ -25,14 +25,14 @@ notebook_template = """
     <span class="checkpoint_status"></span>
     <span class="autosave_status"></span>
     <a href="/hub/notebooks">
-       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
+       <img src="/notebook/{{ container_name }}/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
     </a>
-    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
-       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    <a href="/notebook/{{ container_name }}/tree">
+       <img src="/notebook/{{ container_name }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
     </a>
 </span>
 
-<a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a>
+<a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a>
 <span id="kernel_logo_widget">
   {% block kernel_logo_widget %}
   <img class="current_kernel_logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
@@ -118,6 +118,7 @@ class KooplexUserNotebookApp(NotebookApp):
         env = self.web_app.settings['jinja2_env']
         env.globals['report_name'] =  os.getenv("REPORT_NAME")
         env.globals['author_name'] = os.getenv("AUTHOR NAME")
+        env.globals['container_name'] = "%s-%s-%s" % (os.getenv("AUTHOR NAME"), os.getenv("REPORT_NAME"), os.getenv("AUTHOR NAME"))
 
         # patch jinja env loading to modify page template
         def get_page(name):
