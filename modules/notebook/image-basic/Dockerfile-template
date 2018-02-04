@@ -77,7 +77,8 @@ RUN apt install -y gnuplot
 
 # This one is not needed as long as it cannot discover conda envs outside of /opt/conda
 
-RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
+RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels libiconv
+RUN $CONDA_DIR/bin/conda install --quiet --yes pandas numpy scipy matplotlib seaborn plotly  bokeh pymysql sqlite ujson
 
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
