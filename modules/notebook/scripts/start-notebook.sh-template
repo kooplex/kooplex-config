@@ -29,8 +29,10 @@ echo "http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ /home/${NB_USER}/oc da
 addgroup ${NB_USER} davfs2
 su ${NB_USER} -c "mount /home/${NB_USER}/oc"
 # hide volumes from the user
-mkdir /tmp/.empty
+mkdir -p /tmp/.empty
 mount -o bind /tmp/.empty /mnt/.volumes
+# make sure left off pidfile is removed
+[ -e /var/run/mount.davfs/home-${NB_USER}-oc.pid ] && rm /var/run/mount.davfs/home-${NB_USER}-oc.pid
 
 ssh-keyscan -H ##PREFIX##-gitlab > /tmp/gitlab.pub
 USER_HOSTKEYS=/home/${NB_USER}/.ssh/known_hosts
@@ -39,10 +41,13 @@ mv /tmp/new $USER_HOSTKEYS
 #FIXME: gid hardcoded
 chown ${NB_USER}:9998 $USER_HOSTKEYS
 
-# clone git repository if it has not yet been cloned
+# make sure leftoff socket is removed
+[ -e $SSH_AUTH_SOCK ] && rm $SSH_AUTH_SOCK
 su $NB_USER -c "eval \"\$(ssh-agent -a $SSH_AUTH_SOCK)\" && ssh-add \$HOME/.ssh/gitlab.key"
 
+# clone git repository if it has not yet been cloned
 if [ -x /home/${NB_USER}/git/clone.sh ] ; then
+    echo "try to clone"
     su $NB_USER -c "/home/${NB_USER}/git/clone.sh"
 fi
 
