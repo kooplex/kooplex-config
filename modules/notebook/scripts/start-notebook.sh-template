@@ -55,12 +55,30 @@ fi
 #fi
 
 # manage symbolic links under user's conda env directory
-for f in /home/$NB_USER/.conda/env/* ; do
-  [ -h $f ] && rm $f
-done
+CONDA_ENVS=/home/$NB_USER/.conda/envs
+if [ ! -d $CONDA_ENVS ] ; then 
+  echo "recreating $CONDA_ENVS"
+  mkdir -p $CONDA_ENVS
+  #FIXME: gid hardcoded
+  chown $NB_USER:9998 /home/$NB_USER/.conda
+fi
+#FIXME: gid hardcoded, left here to lazy set formerly screwed permissions
+chown $NB_USER:9998 /home/$NB_USER/.conda
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
-  ln -s $d /home/$NB_USER/.conda/env/$volname
+  LINK=$CONDA_ENVS/$volname
+  if [ ! -e $LINK ] ; then
+      echo "creating symlink $LINK"
+      ln -s $d $LINK
+  elif [ -h $LINK ] ; then
+      if [ $(realpath $LINK) != $(echo $d | sed s/'\/$'//) ] ; then
+          echo "link $LINK exists and points to somewhere else, randomize the name"
+          ln -s $d ${LINK}.$(mktemp -u | sed s/[^\.]*\.//)
+      fi
+  else
+      echo "file or dir $LINK exists, randomize the name"
+      ln -s $d ${LINK}.$(mktemp -u | sed s/[^\.]*\.//)
+  fi
 done
 
 # Start the notebook server
