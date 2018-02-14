@@ -59,11 +59,11 @@ CONDA_ENVS=/home/$NB_USER/.conda/envs
 if [ ! -d $CONDA_ENVS ] ; then 
   echo "recreating $CONDA_ENVS"
   mkdir -p $CONDA_ENVS
-  #FIXME: gid hardcoded
-  chown $NB_USER:9998 /home/$NB_USER/.conda
 fi
+# SO THAT WE DON'T GET A WARNING WHEN ENTERING CONDA TAB
+ln -s /opt/conda/ $CONDA_ENVS/conda 
 #FIXME: gid hardcoded, left here to lazy set formerly screwed permissions
-chown $NB_USER:9998 /home/$NB_USER/.conda
+chown -R $NB_USER:9998 /home/$NB_USER/.conda
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
   LINK=$CONDA_ENVS/$volname
