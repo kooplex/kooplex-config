@@ -66,7 +66,7 @@ if [ ! -d $CONDA_ENVS ] ; then
   mkdir -p $CONDA_ENVS
 fi
 # SO THAT WE DON'T GET A WARNING WHEN ENTERING CONDA TAB
-ln -s /opt/conda/ $CONDA_ENVS/conda 
+[ -e /opt/conda/ $CONDA_ENVS/conda ] || ln -s /opt/conda/ $CONDA_ENVS/conda 
 #FIXME: gid hardcoded, left here to lazy set formerly screwed permissions
 chown -R $NB_USER:9998 /home/$NB_USER/.conda
 for d in /vol/*/condaenvs/*/ ; do
