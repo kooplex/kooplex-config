@@ -44,8 +44,8 @@ for d in /vol/*/condaenvs/*/ ; do
   ln -s $d $LINK
 done
 
-/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_FILE
+/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_DIRANDFILE/$REPORT_FILE
 
 # Start the notebook server 
-exec su reportreader -c "/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_FILE; /opt/conda/bin/jupyter nbextension enable init_cell/main; cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex  $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\""
+exec su reportreader -c "/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_DIRANDFILE/$REPORT_FILE; /opt/conda/bin/jupyter nbextension enable init_cell/main; cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex  $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\""
 
