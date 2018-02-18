@@ -16,6 +16,8 @@ REPORTHOME=/mnt/.volumes/report
 mkdir -p $REPORTHOME
 mkdir $REPORTHOME/.jupyter
 mkdir $REPORTHOME/.jupyter/custom
+mkdir $REPORTHOME/.local
+chown reportreader:9998 $REPORTHOME/.local
 
 cat << EOF > $REPORTHOME/.jupyter/custom/custom.js
 
@@ -42,6 +44,7 @@ for d in /vol/*/condaenvs/*/ ; do
   ln -s $d $LINK
 done
 
+/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_FILE
 
 # Start the notebook server 
 exec su reportreader -c "/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_FILE; /opt/conda/bin/jupyter nbextension enable init_cell/main; cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex  $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\""
