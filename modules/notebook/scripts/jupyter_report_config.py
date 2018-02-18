@@ -18,6 +18,8 @@ c.NotebookApp.trust_xheaders = True
 c.NotebookApp.password_required = False
 c.NotebookApp.disable_check_xsrf = True
 
+c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
+
 # This will enable the option to switch between conda envs in the notebook-server
 
 # Set a certificate if USE_HTTPS is set to any value

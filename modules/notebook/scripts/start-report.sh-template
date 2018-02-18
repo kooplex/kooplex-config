@@ -9,22 +9,40 @@
 ##fi
 
 
-
 mkdir -p /home/$NB_USER
 mount -o bind $REPORT_DIR/home/$NB_USER /home/$NB_USER  
 
-mkdir -p /mnt/.volumes/report
-chown reportreader /mnt/.volumes/report
+REPORTHOME=/mnt/.volumes/report
+mkdir -p $REPORTHOME
+mkdir $REPORTHOME/.jupyter
+mkdir $REPORTHOME/.jupyter/custom
+
+cat << EOF > $REPORTHOME/.jupyter/custom/custom.js
+
+require(['base/js/namespace', 'base/js/events'], function (IPython, events) {
+  events.on("notebook_loaded.Notebook", function () {
+    IPython.notebook.minimum_autosave_interval = 0; // disable autosave
+
+  });
+});
+
+EOF
+
 # manage symbolic links under user's conda env directory
-for f in /home/$NB_USER/.conda/env/* ; do
-  [ -h $f ] && rm $f
-done
+CONDA_ENVS=$REPORTHOME/.conda/envs
+mkdir -p $REPORTHOME/.conda
+mkdir -p $CONDA_ENVS; 
+chown -R reportreader:9998 $REPORTHOME/.conda
+#mount -o bind/vol/$KERNEL/condaenvs/$KERNEL/
+
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
-  ln -s $d $HOME/.conda/envs/$volname
+  LINK=$CONDA_ENVS/$volname
+  echo "creating symlink $LINK"
+  ln -s $d $LINK
 done
 
 
 # Start the notebook server 
-exec su reportreader -c "cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10"
+exec su reportreader -c "/opt/conda/bin/jupyter trust /home/$NB_USER/$REPORT_FILE; /opt/conda/bin/jupyter nbextension enable init_cell/main; cd /home/$NB_USER; env PATH=$PATH jupyter report-kooplex  $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\""
 

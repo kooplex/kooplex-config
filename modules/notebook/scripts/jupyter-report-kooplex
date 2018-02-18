@@ -9,40 +9,13 @@ from notebook.notebookapp import NotebookApp
 
 notebook_template = """
 {% extends "templates/notebook.html" %}
-{% block meta %}
-<style>
-.navbar-header > a {
-    padding-right:30px;
-}
-</style>
-{% endblock %}
 {% block logo %}
 {% endblock %}
-  {% block headercontainer %}
-
-<span id="save_widget" class="save_widget">
-    <span id="notebook_name" class="filename"></span>
-    <span class="checkpoint_status"></span>
-    <span class="autosave_status"></span>
-    <a href="/hub/notebooks">
-       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
-    </a>
-    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
-       <img src="/notebook/gadmin-ccfsd-gadmin/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
-    </a>
-</span>
-
-<a href="#" class="navbar-brand" style="color: black;"> <strong>Project - ccfsd</strong></a>
-<span id="kernel_logo_widget">
+{% block headercontainer %}
   {% block kernel_logo_widget %}
-  <img class="current_kernel_logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
   {% endblock %}
-</span>
-
-  {% endblock %}
+{% endblock %}
 {% block header %}
-
-
 <div id="menubar-container" class="container" style="visibility: hidden;">
 <div id="menubar">
     <div id="menus" class="navbar navbar-default" role="navigation">
