@@ -84,6 +84,10 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_n
 
 RUN $CONDA_DIR/bin/conda remove --offline --quiet --yes nbpresent
 
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge ipyleaflet folium
+RUN $CONDA_DIR/bin/conda install --quiet --yes seaborn pandas qgrid
+
+
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
 ADD jupyter-report-kooplex /opt/conda/bin/jupyter-report-kooplex 
