@@ -10,7 +10,9 @@
 
 
 mkdir -p /home/$NB_USER
-mount -o bind $REPORT_DIR/home/$NB_USER /home/$NB_USER  
+#mount -o bind $REPORT_DIR/home/$NB_USER /home/$NB_USER  
+cp -r $REPORT_DIR/home/$NB_USER/* /home/$NB_USER/  
+chown  reportreader:9998 -R home/$NB_USER
 
 REPORTHOME=/mnt/.volumes/report
 mkdir -p $REPORTHOME
@@ -34,8 +36,11 @@ EOF
 CONDA_ENVS=$REPORTHOME/.conda/envs
 mkdir -p $REPORTHOME/.conda
 mkdir -p $CONDA_ENVS; 
+mkdir $REPORTHOME/.jupyter/nbconfig
 chown -R reportreader:9998 $REPORTHOME/.conda
 #mount -o bind/vol/$KERNEL/condaenvs/$KERNEL/
+chown reportreader:9998  -R $REPORTHOME/* $REPORTHOME/.j*  $REPORTHOME/.l*
+
 
 for d in /vol/*/condaenvs/*/ ; do
   volname=$(echo $d | cut -f3 -d\/)
