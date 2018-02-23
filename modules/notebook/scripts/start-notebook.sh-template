@@ -10,6 +10,13 @@ if [ ! -z "$GRANT_SUDO" ]; then
     echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
 fi
 
+for gid in $(echo $MNT_GIDS | sed 's/,/ /')
+do
+   addgroup --gid=$gid g$gid
+   addgroup $NB_USER g$gid
+
+done
+
 # debug
 env
 
