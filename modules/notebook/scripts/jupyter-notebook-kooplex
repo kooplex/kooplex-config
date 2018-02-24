@@ -30,6 +30,9 @@ edit_template = """
         <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a></li>
     </ul>
 {% endblock %}
+{% block login_widget %}
+{% endblock %}
+
 """
 
 terminal_template = """
@@ -55,6 +58,9 @@ terminal_template = """
         <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a></li>
     </ul>
 {% endblock %}
+{% block login_widget %}
+{% endblock %}
+
 """
 
 
@@ -125,6 +131,8 @@ notebook_template = """
 </span>
 
   {% endblock %}
+{% block login_widget %}
+{% endblock %}
 
 """
 
