@@ -20,10 +20,10 @@ edit_template = """
 {% endblock %}
   {% block headercontainer %}
 
-    <a href="/hub/notebooks" >
+    <a href="/hub" >
        <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
     </a>
-    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+    <a href="/notebook/{{ containername }}/tree">
        <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
     </a>
     <ul class="nav navbar-nav navbar-right">
@@ -48,10 +48,10 @@ terminal_template = """
 {% endblock %}
   {% block headercontainer %}
 
-    <a href="/hub/notebooks" >
+    <a href="/hub" >
        <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
     </a>
-    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+    <a href="/notebook/{{ containername }}/tree">
        <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
     </a>
     <ul class="nav navbar-nav navbar-right">
@@ -77,10 +77,10 @@ tree_template = """
 {% endblock %}
   {% block headercontainer %}
 
-    <a href="/hub/notebooks" >
+    <a href="/hub/" >
        <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
     </a>
-    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+    <a href="/notebook/{{ containername }}/tree">
        <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
     </a>
     <ul class="nav navbar-nav navbar-right">
@@ -115,10 +115,10 @@ notebook_template = """
     <span id="notebook_name" class="filename"></span>
     <span class="checkpoint_status"></span>
     <span class="autosave_status"></span>
-    <a href="/hub/notebooks">
+    <a href="/hub">
        <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
     </a>
-    <a href="/notebook/gadmin-ccfsd-gadmin/tree">
+    <a href="/notebook/{{ containername }}/tree">
        <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
     </a>
 </span>
