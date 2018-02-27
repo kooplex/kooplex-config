@@ -14,7 +14,7 @@ case $VERB in
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-notebook-template > $RF/Dockerfile-notebook
  
     docker $DOCKERARGS build -t ${PREFIX}-base  $RF
-    docker $DOCKERARGS build -t ${PREFIX}-notebook-base -f $RF/Dockerfile-notebook  $RF 
+    docker $DOCKERARGS build -t ${PREFIX}-notebookbase -f $RF/Dockerfile-notebook  $RF 
     echo "Generating secrets..."
 # Ez a config.sh-ban van    LDAPPW=$(createsecret ldap)
   ;;
