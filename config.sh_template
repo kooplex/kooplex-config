@@ -1,5 +1,5 @@
 SYSMODULES="net base" # admin"
-MODULES="base net ldap gitlabdb  gitlab notebook proxy nginx impersonator owncloud hub"
+MODULES="base net ldap gitlab notebook proxy nginx impersonator owncloud hub"
 
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOSTPORT="80"
@@ -59,6 +59,8 @@ GITLABDB=${PREFIX}_gitlabdb
 GITLABDBPW=${DUMMYPASS}
 GITLABADMIN=gitlabadmin
 GITLABADMINPW=${DUMMYPASS}
+
+MINUID=10000
 
 SECRETS=$SRV/.secrets
 

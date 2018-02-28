@@ -17,7 +17,8 @@ case $VERB in
       cp etc/nsswitch.conf $RF
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       sed -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
-          -e "s/##PREFIX##/$PREFIX/" scripts/patch-davfs.sh-template > $RF/patch-davfs.sh
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##MINUID##/$MINUID/" scripts/patch-davfs.sh-template > $RF/patch-davfs.sh
       sed -e "s/##LDAPPORT##/$LDAPPORT/" \
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
           -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \

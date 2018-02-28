@@ -45,6 +45,7 @@ KOOPLEX = {
     'prefix': {'name': '##PREFIX##'},
     'hub': {
         'base_url': '##PROTOCOL##://##OUTERHOST##',
+        'min_userid': ##MINUID##,
 #FIXME: do we need these below?
         'internal_host' : KOOPLEX_INTERNAL_HOST,
         'outer_host' : KOOPLEX_OUTER_HOST,

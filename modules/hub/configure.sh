@@ -52,6 +52,7 @@ case $VERB in
           -e "s/##LDAPBASEDN##/$LDAPORG/" \
           -e "s/##LDAPUSER##/admin/" \
           -e "s/##LDAPBINDPW##/$LDAPPW/" \
+          -e "s/##MINUID##/$MINUID/" \
           -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
           -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" \
           -e "s/##GITLABADMINKEYPW##/$SSHKEYPASS/" \
