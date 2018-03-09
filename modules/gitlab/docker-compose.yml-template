@@ -22,15 +22,12 @@ services:
 
   ##PREFIX##-gitlabdb:
     container_name: ##PREFIX##-gitlabdb
-    image: ##PREFIX##-gitlabdb
+    image: postgres:10.3-alpine
     networks:
       ##GITLABNET##:
-    build:
-      context: .
-      dockerfile: Dockerfile.gitlabdb
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ##PREFIX##-gitlabdb:/var/lib/postgresql:rw
+      - ##PREFIX##-gitlabdb:/var/lib/postgresql/data:rw
     restart: always
     environment:
       - POSTGRES_PASSWORD=##GITLABDBPW##

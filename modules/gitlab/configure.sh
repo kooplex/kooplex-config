@@ -22,7 +22,7 @@ case $VERB in
   
     GITLABNET=${PREFIX}-gitlab-privatenet
   
-    cp Dockerfile.gitlab Dockerfile.gitlabdb $RF
+    cp Dockerfile.gitlab $RF
     cp scripts/docker-entrypoint.sh $RF    
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##GITLABDBPW##/$GITLABDBPW/" \
