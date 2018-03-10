@@ -2,7 +2,7 @@
 
 USER=$(whoami)
 URL_API=##OWNCLOUDURL##
-PW=$(awk '/^##WEBDAVPATTERN##/ {print $3}' ~/.davfs2/secrets)
+PW=$( awk '/^##WEBDAVPATTERN##/ {print $3}' ~/.davfs2/secrets | sed "s/^\(\"\)\(.*\)\1\$/\2/g" )
 
 case $1 in
   share)
