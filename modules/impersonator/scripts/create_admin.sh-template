@@ -4,7 +4,7 @@ ldap_adduser () {
   local lastname=Admin
   local email="admin@##INNERHOST##" 
   local pass=##GITLABADMINPW## 
-  local uid=10001
+  local uid=9999
   
   echo "Adding LDAP user $firstname $lastname ($username)..."
 
