@@ -1,7 +1,7 @@
 #! /bin/bash
 
-
 mv /etc/fstab /etc/fstab.old
+touch /etc/fstab
 getent passwd | cut -d: -f1,3 | while read l ; do
   uname=$(echo $l | cut -f1 -d:)
   uid=$(echo $l | cut -f2 -d:)
