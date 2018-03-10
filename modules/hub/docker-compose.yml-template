@@ -29,10 +29,7 @@ services:
 
   ##PREFIX##-hub-mysql:
     container_name: ##PREFIX##-hub-mysql
-    image: ##PREFIX##-hub-mysql
-    build:
-      context: .
-      dockerfile: Dockerfile.hubdb
+    image: mysql:5.7
     networks:
       - ##PREFIX##-hub-privatenet
     volumes:

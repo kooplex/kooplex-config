@@ -27,8 +27,6 @@ case $VERB in
       GITLABPASS=$(getsecret gitlab)
       SSHKEYPASS=$(getsecret sshkey)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
-      cp Dockerfile.hubdb $RF
-      cp scripts/patch-codeNdbschema.sh $RF
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HUBDB##/${HUBDB}/g" \
           -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
