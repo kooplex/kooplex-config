@@ -29,11 +29,16 @@ case $VERB in
           -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
+      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $RF/new_user.ldiftemplate
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
           -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
           -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $RF/addgroup.sh
+      sed -e "s/##LDAPORG##/$LDAPORG/" \
+          -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
+          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/adduser.sh_template > $RF/adduser.sh
           
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \

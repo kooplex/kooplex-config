@@ -19,7 +19,9 @@ RUN chown -R openldap:openldap /var/run/slapd/
 
 EXPOSE 389
 
+COPY new_user.ldiftemplate /etc/new_user.ldiftemplate
 COPY new_group.ldiftemplate /etc/new_group.ldiftemplate
+COPY adduser.sh /usr/local/bin/adduser.sh
 COPY addgroup.sh /usr/local/bin/addgroup.sh
 
 COPY entrypoint.sh /entrypoint.sh
@@ -27,7 +29,7 @@ COPY init.sh /init.sh
 COPY init-core.sh /init-core.sh
 
 RUN chown root /entrypoint.sh && \
-    chmod 700 /entrypoint.sh /init.sh /init-core.sh /usr/local/bin/addgroup.sh
+    chmod 700 /entrypoint.sh /init.sh /init-core.sh /usr/local/bin/adduser.sh /usr/local/bin/addgroup.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
