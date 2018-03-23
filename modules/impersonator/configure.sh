@@ -21,7 +21,7 @@ case $VERB in
           -e "s/##MINUID##/$MINUID/" scripts/patch-davfs.sh-template > $RF/patch-davfs.sh
       sed -e "s/##LDAPPORT##/$LDAPPORT/" \
           -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
-          -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
+          -e "s/##LDAPBASE##/$LDAPORG/" \
           -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/"  scripts/patch-gitconfig.sh_template > $RF/patch-gitconfig.sh
       sed -e "s/##LDAPPORT##/$LDAPPORT/" \
           -e "s/##LDAPORG##/$LDAPORG/" \
