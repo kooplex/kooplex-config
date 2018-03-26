@@ -64,3 +64,6 @@ gitlab_rails['db_port'] = '5432'
 gitlab_rails['db_username'] = 'postgres'
 gitlab_rails['db_password'] = '##GITLABDBPW##'
 
+# monitoring is bugous and consumes a lot of (all) db connections. disabling
+prometheus_monitoring['enable'] = false
+
