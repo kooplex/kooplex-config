@@ -27,7 +27,7 @@ services:
       ##GITLABNET##:
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ##PREFIX##-gitlabdb:/var/lib/postgresql:rw
+      - ##PREFIX##-gitlabdb:/var/lib/postgresql/data:rw
     restart: always
     environment:
       - POSTGRES_PASSWORD=##GITLABDBPW##
