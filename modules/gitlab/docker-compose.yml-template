@@ -12,6 +12,8 @@ services:
     networks:
       - ##PREFIX##-net
       - ##GITLABNET##
+    ports:
+      - "22222:22"
     volumes:
       - /etc/localtime:/etc/localtime:ro
     restart: always
