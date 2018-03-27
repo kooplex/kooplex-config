@@ -70,7 +70,8 @@ KOOPLEX = {
         'reportgid': 9990,
     },
     'gitlab': {
-        'base_url': 'http://##PREFIX##-gitlab/gitlab/api/v4',
+        'base_url': 'http://##PREFIX##-gitlab/gitlab',
+        'api_path': 'api/v4',
         'pattern_urlproject': 'git@##PREFIX##-gitlab:%(username)s/%(projectname)s.git',
         'base_repourl': 'http://##PREFIX##-gitlab',
         'ssh_cmd': r'/usr/bin/ssh',
@@ -155,7 +156,7 @@ KOOPLEX = {
         'pattern_storagevolumename': 'storage-%(name)s',
     },
     'user': {
-        'pattern_davsecret': 'http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ %(username)s %(password)s',
+        'pattern_davsecret': 'http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ %(username)s "%(password)s"',
         'pattern_tokenfile': '/tmp/token.%(username)s',
         'pattern_passwordfile': '/tmp/pw.%(username)s',
     },
