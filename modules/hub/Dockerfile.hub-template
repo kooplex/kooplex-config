@@ -17,8 +17,8 @@ RUN pip3 install setuptools
 RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"
 RUN pip3 install ldap3
 RUN pip3 install pwgen
-RUN pip3 install python-social-auth
-RUN pip3 install social-auth-core
+RUN pip3 install python-social-auth[django]
+RUN pip3 install social-auth-core[openidconnect]
 
 
 # It is very important that the following command 'git clone...' cannot be cached
