@@ -15,6 +15,7 @@ case $VERB in
       cp scripts/start.sh $RF
       cp scripts/init-ssh-agent.sh $RF
       cp etc/nsswitch.conf $RF
+      cp scripts/create_user_userdb.sh $RF
       sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       sed -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
           -e "s/##PREFIX##/$PREFIX/" \
