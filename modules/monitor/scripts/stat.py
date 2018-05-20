@@ -40,6 +40,8 @@ def check_last_changed(table_name, hubuser_id, container_id, cols, change, s_typ
                 if ins:
                     #print('Ins')
                     return True
+    else:
+        return True
 
 
 def insert_newrow(table_name, hubuser_id, container_id, cols):
