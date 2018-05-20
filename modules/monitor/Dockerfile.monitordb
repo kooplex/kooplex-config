@@ -38,6 +38,7 @@ RUN pip3 install psycopg2
 # Based on https://github.com/Ekito/docker-cron/blob/master/Dockerfile
 # Add crontab file in the cron directory
 COPY crontab /etc/cron.d/monitor-cron
+COPY stat.py /usr/local/bin/stat.py
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/monitor-cron
