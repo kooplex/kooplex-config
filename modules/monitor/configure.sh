@@ -1,60 +1,54 @@
 #!/bin/bash
 
+RF=$SRV/_monitoring
+
+DOCKER_HOST=$DOCKERARGS
+DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+
+
 case $VERB in
   "build")
     echo "Building image $PREFIX-monitor"
-    docker $DOCKERARGS build -t $PREFIX-monitor .
+
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_monitordb -o o=bind ${PREFIX}-monitordb
+    cp scripts/* $RF
+    cp etc/crontab $RF
+    cp Dockerfile.monitordb $RF
+    
+    sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##POSTGRESDBPW##/$GITLABDBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
+    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    
   ;;
   "install")
-    mkdir -p $SRV/_monitoring/data
-    mkdir -p $SRV/_monitoring/scripts
-    cp -r scripts/* $SRV/_monitoring/scripts/
 
-    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-monitor | awk '{print $2}'`
-    if [ ! $cont_exist ]; then
-        docker $DOCKERARGS create  \
-          --name $PROJECT-monitor \
-          --hostname $PROJECT-monitor \
-          --net $PROJECT-net \
-          --ip $MONITORIP \
-          --privileged \
-          --log-opt max-size=1m --log-opt max-file=3 \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $SRV/_monitoring/data/:/usr/local/apache2/htdocs/:rw \
-          -v $SRV/_monitoring/scripts/:/opt/scripts/:rw \
-          --volume=/var/run:/var/run:rw \
-	  --volume=/sys:/sys:ro \
-	  --volume=/var/lib/docker/:/var/lib/docker:ro \
-	  --volume=/dev/disk/:/dev/disk:ro \
-          	$PREFIX-monitor  
-    fi
-  
-  
   ;;
   "start")
      echo "Start monitoring $PROJECT-monitor [$MONITORIP]"
-     docker $DOCKERARGS start $PROJECT-monitor
+     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-monitordb
   ;;
   "init")
-    echo "Initialize monitoring $PROJECT-monitor [$MONITORIP]"
-#    ocker $DOCKERARGS exec $PROJECT-mysql \
-#    bash -c "echo \"GRANT ALL PRIVILEGES ON * . * TO 'kooplex'@'%';\" | mysql -u root --password=$HUBDBPW"
   
   ;;
   "stop")
       echo "Stop monitoring $PROJECT-monitor [$MONITORIP]"
-     docker $DOCKERARGS stop $PROJECT-monitor
-  ;;
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down  
+      
+  ;;    
   "remove")
       echo "Remove monitoring container $PROJECT-monitor [$MONITORIP]"
-     docker $DOCKERARGS rm $PROJECT-monitor
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
   "purge")
       echo "Purge datafiles gathered by  monitoring $PROJECT-monitor [$MONITORIP]"
-     docker $DOCKERARGS start $PROJECT-monitor
+      docker $DOCKERARGS start $PROJECT-monitordb
+
   ;;
   "clean")
     echo "Cleaning base image $PREFIX-monitor"
-    docker $DOCKERARGS rmi $PREFIX-monitor
-  ;;
+    docker $DOCKERARGS volume rm ${PREFIX}-monitordb 
+   
+    ;;
 esac

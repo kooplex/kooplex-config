@@ -1,0 +1,50 @@
+FROM postgres:10.3
+
+RUN apt update
+RUN apt install -y postgis postgresql-10-pgrouting osm2pgsql
+
+# configure apt frontent
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && apt-get install -y \
+                gcc \
+                gettext \
+                postgresql-client libpq-dev \
+                vim less \
+                ssh git\
+                python3-pip python3-dev python-dev\
+                cron\
+        --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+
+RUN chown root:root /tmp
+RUN chmod 1777 /tmp
+
+RUN apt update
+RUN apt install -y --no-install-recommends python3 python3-pip \
+         gcc python3-dev less
+#RUN apt install -y --no-install-recommends openssh-sftp-server  openssh-server
+
+RUN pip3 install setuptools numpy 
+RUN pip3 install psutil
+RUN pip3 install netaddr 
+RUN pip3 install docker
+
+#RUN apt install -y mysql-client default-libmysqlclient-dev
+
+#RUN pip3 install mysqlclient
+RUN pip3 install psycopg2
+
+# Based on https://github.com/Ekito/docker-cron/blob/master/Dockerfile
+# Add crontab file in the cron directory
+COPY crontab /etc/cron.d/monitor-cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/monitor-cron
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
