@@ -16,7 +16,7 @@ services:
       - "22222:22"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    restart: always
+    restart: unless-stopped
     logging:
       options:
         max-size: "10m"
@@ -30,7 +30,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-gitlabdb:/var/lib/postgresql/data:rw
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=##GITLABDBPW##
     logging:

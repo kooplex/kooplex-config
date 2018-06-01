@@ -16,7 +16,7 @@ services:
       - /sys:/sys:ro 
       - /var/lib/docker/:/var/lib/docker:ro 
       - /dev/disk/:/dev/disk:ro 
-    restart: always
+    restart: unless-stopped
     privileged: true
     environment:
       - POSTGRES_PASSWORD=##POSTGRESDBPW##
