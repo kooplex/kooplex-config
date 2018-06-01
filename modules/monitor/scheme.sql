@@ -18,24 +18,59 @@ create table container (
   container_name varchar(64) not null
 );
 
-create table containerstats_current (
+create table containerstats_mem (
   id serial      primary key, 
   hubuser_id     int references hubuser (id),
   container_id   int references container (id),
   last_read      timestamp not null default now(),
-  cpuload        int not null, -- tizezrelek
-  memoryusage    bigint not null, -- byte
+  memoryusage    bigint not null -- byte
+);
+
+create table containerstats_cpuload (
+  id serial      primary key, 
+  hubuser_id     int references hubuser (id),
+  container_id   int references container (id),
+  last_read      timestamp not null default now(),
+  cpuload        int not null -- tizezrelek
+);
+
+create table containerstats_pids (
+  id serial      primary key, 
+  hubuser_id     int references hubuser (id),
+  container_id   int references container (id),
+  last_read      timestamp not null default now(),
   pids           int not null
 );
 
-create table containerstats_aggregate (
+create table containerstats_net_i (
   id             serial primary key, 
   hubuser_id     int references hubuser (id),
   container_id   int references container (id),
   last_read      timestamp not null default now(),
-  net_i          bigint not null, -- byte
-  net_o          bigint not null, -- byte
-  block_i        bigint not null, -- byte
+  net_i          bigint not null -- byte
+);
+
+create table containerstats_net_o (
+  id             serial primary key, 
+  hubuser_id     int references hubuser (id),
+  container_id   int references container (id),
+  last_read      timestamp not null default now(),
+  net_o          bigint not null -- byte
+);
+
+create table containerstats_block_i (
+  id             serial primary key, 
+  hubuser_id     int references hubuser (id),
+  container_id   int references container (id),
+  last_read      timestamp not null default now(),
+  block_i        bigint not null -- byte
+);
+
+create table containerstats_block_o (
+  id             serial primary key, 
+  hubuser_id     int references hubuser (id),
+  container_id   int references container (id),
+  last_read      timestamp not null default now(),
   block_o        bigint not null  -- byte
 );
 

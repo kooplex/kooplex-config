@@ -24,35 +24,29 @@ def get_user_name(container):
         if "NB_USER" in i:
             return i.split('=')[1]
 
-def check_last_changed(table_name, hubuser_id, container_id, cols, change, s_type):
+def check_last_changed(table_name, hubuser_id, container_id, col_name, value, threshold, s_type):
     sqlc = "select * from %s where hubuser_id = %d and container_id = %d \
       order by last_read desc limit 1;" % (table_name, hubuser_id, container_id)
     cur.execute(sqlc)
     res = cur.fetchone()
     if res:
-        for icol, col_name in enumerate(cur.description):
-            if col_name[0] in cols.keys() and cols[col_name[0]]>0:
+        for icol, name in enumerate(cur.description):
+            if name[0] == col_name:
                 #print(hubuser_id, container_id, col_name[0], res[icol], cols[col_name[0]], abs(cols[col_name[0]] - res[icol])/change[col_name[0]])
-                if s_type[col_name[0]] == 'c':
-                    ins = cols[col_name[0]] > change[col_name[0]]
-                else:
-                    ins = res[icol] == 0 or abs(cols[col_name[0]] - res[icol]) > change[col_name[0]]
-                if ins:
-                    #print('Ins')
+                if ( res[icol] == 0 ) or ( s_type == 'c' and value > threshold ) or\
+                        ( s_type == 'a' and abs(value - res[icol]) > threshold ):
+                    #print('Ins', hubuser_id, container_id, value, threshold, abs(value - res[icol]))
+                    #print()
                     return True
     else:
         return True
 
+    return False
 
-def insert_newrow(table_name, hubuser_id, container_id, cols):
-    col_names = ''
-    values = ''
-    for c in cols:
-        col_names += "%s," % c
-        values += "%d," % cols[c]
-
+def insert_new_row(table_name, hubuser_id, container_id, col_name, value):
     sqlc = "INSERT INTO %s (hubuser_id, container_id, %s) VALUES (%d, %d, %s);" % \
-           (table_name, col_names[:-1], hubuser_id, container_id, values[:-1])
+           (table_name, col_name, hubuser_id, container_id, value)
+    #print(sqlc)
     res = cur.execute(sqlc)
     conn.commit()
 
@@ -103,46 +97,53 @@ for cont in container_list:
         cpuload = int(stat['cpu_stats']['cpu_usage']['total_usage']/stat['cpu_stats']['system_cpu_usage']*10000+0.5)
         pids = stat['pids_stats']['current']
 
-        #check first whether anything changed and then insert new numbers
-        cols = { 'cpuload' : cpuload,
-                 'memoryusage' : memoryusage,
-                 'pids' : pids
-                 }
-        change = {'cpuload' : 10.0, # in %00
-                 'memoryusage' : 0.01,
-                 'pids' : 1
-                  }
-        s_type = {'cpuload': 'c',
-                  'memoryusage': 'a',
-                  'pids': 'a'
-                  }
-        if check_last_changed('containerstats_current', hubuser_id, container_id, cols, change, s_type):
-            insert_newrow('containerstats_current', hubuser_id, container_id, cols)
-
-
         net_i = sum([ stat['networks'][interface]['rx_bytes'] for interface in stat['networks'].keys()])
         net_o = sum([ stat['networks'][interface]['tx_bytes'] for interface in stat['networks'].keys()])
 
         block_i = stat['blkio_stats']['io_service_bytes_recursive'][5]['value']
         block_o = stat['blkio_stats']['io_service_bytes_recursive'][6]['value']
 
-        #check first whether anything changed
-        cols = { 'net_i' : net_i,
-                 'net_o' : net_o,
-                 'block_i' : block_i,
-                 'block_o' : block_o
+        
+        #check first whether anything changed and then insert new numbers
+        values = { 'cpuload' : cpuload,
+                   'memoryusage' : memoryusage,
+                   'pids' : pids,
+                   'net_i' : net_i,
+                   'net_o' : net_o,
+                   'block_i' : block_i,
+                   'block_o' : block_o
                  }
-        change = { 'net_i' : 10**6,
+        table_names = { 'cpuload' : 'containerstats_cpuload',
+                   'memoryusage' :   'containerstats_mem',
+                   'pids' : 'containerstats_pids',
+                   'net_i' : 'containerstats_net_i',
+                   'net_o' : 'containerstats_net_o',
+                   'block_i' : 'containerstats_block_i',
+                   'block_o' : 'containerstats_block_o'
+                 }
+        threshold = { 'cpuload' : 10, # in %00
+                   'memoryusage' : 0.01,
+                   'pids' : 1,
+                   'net_i' : 10**6,
                    'net_o' : 10**6,
                    'block_i' : 10**6,
                    'block_o' : 10**6
-                 }
-        s_type = {'net_i': 'a',
-                  'net_o': 'a',
-                  'block_i': 'a',
-                  'block_o': 'a'
                   }
-        if check_last_changed('containerstats_aggregate', hubuser_id, container_id, cols, change, s_type):
-            insert_newrow('containerstats_aggregate', hubuser_id, container_id, cols)
+        s_type = { 'cpuload': 'c',
+                   'memoryusage': 'a',
+                   'pids': 'a',
+                   'net_i': 'a',
+                   'net_o': 'a',
+                   'block_i': 'a',
+                   'block_o': 'a'
+                  }
 
+        col_names = values.keys()
+        for col_name in col_names:
+           if check_last_changed(table_names[col_name], hubuser_id, container_id, col_name, values[col_name],\
+                  threshold[col_name], s_type[col_name]):
+               1==1
+               insert_new_row(table_names[col_name], hubuser_id, container_id, col_name, values[col_name])
+
+        
 

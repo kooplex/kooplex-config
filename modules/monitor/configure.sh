@@ -10,6 +10,7 @@ case $VERB in
   "build")
     echo "Building image $PREFIX-monitor"
 
+    mkdir -p $SRV/_monitordb
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_monitordb -o o=bind ${PREFIX}-monitordb
     cp scripts/* $RF
     cp etc/crontab $RF
