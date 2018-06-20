@@ -30,6 +30,8 @@ RUN mkdir -p $CONDA_DIR
 # Maybe this one is not needed, since you can create conda envs into volumes
 RUN chmod a+wrx $CONDA_DIR    
 
+#Because of strange behaviour some trash hinders installation of the following into this directory
+RUN rm -r /opt/*
 
 # Install conda
 RUN cd /tmp && \
@@ -86,10 +88,23 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
 
-
-
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 RUN $CONDA_DIR/bin/conda install -v --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
+
+RUN $CONDA_DIR/bin/conda install -v --quiet --yes nodejs
+RUN $CONDA_DIR/bin/conda install -v --quiet --yes networkx
+
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.33
+RUN apt install -y texlive-xetex texlive-lang-european texlive-science
+RUN pip install jupyterlab_latex && jupyter serverextension enable --sys-prefix jupyterlab_latex && jupyter labextension install @jupyterlab/latex
+RUN jupyter labextension install @jupyterlab/github@0.5
+
+RUN jupyter labextension install jupyterlab_vim
+
+#RUN jupyter labextension install jupyterlab_bokeh
+# pip install jupyterlab-discovery
+#jupyter labextension install @mflevine/jupyterlab_html
+#jupyter labextension install knowledgelab
 
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 

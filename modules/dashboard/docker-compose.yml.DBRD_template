@@ -20,5 +20,5 @@
       BASE_URL: /db/##DASHBOARDS_PORT##
       PUBLIC_LINK_PATTERN: http://localhost:3000
       TRUST_PROXY: uniquelocal
-    restart: always
+    restart: unless-stopped
 
