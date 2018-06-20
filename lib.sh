@@ -2,6 +2,11 @@
 
 # IP address functions
 
+ldapquery () {
+echo ldapsearch -x -H ldap://${PREFIX}-ldap -D cn=admin,$LDAPORG -b ou=users,$LDAPORG -s one "objectclass=top" -w $LDAPPW
+}
+
+
 ip_ip2dec () {
   local a b c d ip=$@
   IFS=. read -r a b c d <<< "$ip"
@@ -38,7 +43,7 @@ ip_addip () {
 ldap_ldapconfig() {
     echo "
 BASE   $LDAPORG
-URI    ldap://$PROJECT-ldap/
+URI    ldap://$PREFIX-ldap/
 
 # TLS certificates (needed for GnuTLS)
 TLS_CACERT      /etc/ssl/certs/ca-certificates.crt
@@ -65,19 +70,19 @@ netgroup:       nis
 }
 
 ldap_nslcdconfig () {
-  LDAPPASS=$(getsecret ldap)
+#  LDAPPW=$(getsecret ldap)
   echo "uid nslcd
 gid nslcd
 
-uri ldap://$PROJECT-ldap/
+uri ldap://$PREFIX-ldap/
 
 base $LDAPORG
 scope subtree
 
 binddn cn=admin,$LDAPORG
-bindpw $LDAPPASS
+bindpw $LDAPPW
 rootpwmoddn cn=admin,$LDAPORG
-rootpwmodpw $LDAPPASS
+rootpwmodpw $LDAPPW
 
 "
 }
@@ -209,7 +214,7 @@ gidNumber: $uid
 home_makensfmount() {
   echo "#/bin/sh
 echo \"Mounting home...\"
-mount -t nfs $PROJECT-home:/exports/home /home"
+mount -t nfs $PREFIX-home:/exports/home /home"
 }
 
 home_makebinds() {
@@ -219,7 +224,7 @@ home_makebinds() {
 # Gitlab functions
 
 gitlab_exec() {
-  docker $DOCKERARGS exec $PROJECT-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
+  docker $DOCKERARGS exec $PREFIX-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
 }
 
 gitlab_adduser() {
@@ -406,7 +411,7 @@ adduser() {
   mkdir -p $SRV/home/$username/Data
   chown -R www-data:www-data  $SRV/home/$username/Data
   sleep 10
-  docker $DOCKERARGS exec $PROJECT-owncloud bash -c "cd /var/www/html/;chown root console.php config/config.php; php ./console.php files:scan --unscanned --all; chown www-data console.php config/config.php"
+  docker $DOCKERARGS exec $PREFIX-owncloud bash -c "cd /var/www/html/;chown root console.php config/config.php; php ./console.php files:scan --unscanned --all; chown www-data console.php config/config.php"
 
 
   echo "New user created: $uid $username"
@@ -452,8 +457,8 @@ config() {
   
   KOOPLEXWD=`pwd`
   
-  SRV=$ROOT/$PROJECT
-  SECRETS=$SRV/.secrets
+#  SRV=$ROOT/$PREFIX
+#  SECRETS=$SRV/.secrets
 
   SSHLOC=`which ssh`
 
@@ -462,7 +467,7 @@ config() {
   LDAPIP=$(ip_addip "$SUBNET" 3)
   LDAPORG=$(ldap_fdqn2cn "$LDAPDOMAIN")
   echo $LDAPORG
-  LDAPSERV=$PROJECT-ldap
+  LDAPSERV=$PREFIX-ldap
   LDAPPORT=389
 
   HOMEIP=$(ip_addip "$SUBNET" 4)
@@ -480,15 +485,20 @@ config() {
   NGINXIP=$(ip_addip "$SUBNET" 16)
   
   HUBIP=$(ip_addip "$SUBNET" 18)
+  MONITORIP=$(ip_addip "$SUBNET" 20)
   
   SMTPIP=$(ip_addip "$SUBNET" 25)
   
   MYSQLIP=$(ip_addip "$SUBNET" 19)
 
-  MYSQLPASS=$DUMMYPASS
+  MYSQLPASS=$HUBDBPW
+  
+  GITLABDBIP=$(ip_addip "$SUBNET" 32)
+
+  GITLABDBPASS=$GITLABDBPW
 
   DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
-  DASHBOARDSDIR=$SRV"/dashboards"
+  DASHBOARDSDIR=$SRV"/_report"
   
 #  DOCKERPORT=${DOCKERARGS##*:}
 

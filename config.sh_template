@@ -1,23 +1,16 @@
 SYSMODULES="net base" # admin"
-MODULES="ldap mysql  gitlab notebook proxy nginx owncloud" # dashboard # hub 
+MODULES="base net ldap gitlab notebook proxy nginx impersonator owncloud hub"
 
-OUTERHOSTNAME="polc.elte.hu"
-OUTERHOSTPORT="89"
+OUTERHOSTNAME="example.sthg.comu"
+OUTERHOSTPORT="80"
 if [[ -z "${OUTERHOSTPORT}" ]]; then
  OUTERHOST=$OUTERHOSTNAME
 else
  OUTERHOST=$OUTERHOSTNAME":"$OUTERHOSTPORT
 fi
 
-INNERHOSTNAME="polc.elte.hu"
-INNERHOSTPORT="89"
-#INNERHOSTIP="157.181.183.94"
+INNERHOST="192.168.0.25"
 
-if [[ -z "${INNERHOSTPORT}" ]]; then
- INNERHOST=$INNERHOSTNAME
-else
- INNERHOST=$INNERHOSTNAME":"$INNERHOSTPORT
-fi
 
 PREFIX=""
 PROJECT=""
@@ -33,11 +26,8 @@ else
 fi
 
 ROOT="/srv/"$PREFIX
+SRV=$ROOT/$PREFIX
 BUILDDIR=$ROOT"/build"
-DISKIMG=""
-DISKSIZE_GB="20"
-LOOPNO="/dev/loop3"
-USRQUOTA=10G
 
 SUBNET="172.20.0.0/16"
 
@@ -46,7 +36,8 @@ SMTP="smtp"
 SMTPPORT=25
 EMAIL=
 
-DUMMYPASS="almafa137"
+DUMMYPASS=""
+LDAPPW=${DUMMYPASS}
 
 REWRITEPROTO=http
 
@@ -57,3 +48,21 @@ CHECK_LOG="check.log"
 
 #EXECUTABLES
 DOCKER_COMPOSE="docker-compose"
+
+### INHERITED NAMES (or not )
+HUBDB=${PREFIX}_kooplex
+HUBDBUSER=${PREFIX}
+HUBDBPW=${DUMMYPASS}
+HUBDBROOTPW=${DUMMYPASS}
+
+GITLABDB=${PREFIX}_gitlabdb
+GITLABDBPW=${DUMMYPASS}
+GITLABADMIN=gitlabadmin
+GITLABADMINPW=${DUMMYPASS}
+
+MINUID=10000
+
+SECRETS=$SRV/.secrets
+
+# DEPRECATED
+PROJECT=${PREFIX}
