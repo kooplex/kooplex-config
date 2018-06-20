@@ -1,0 +1,12 @@
+#! /bin/bash
+
+if [ ! $# -eq 2 ] ; then
+  echo "$0 <groupname> <groupid>" >&2
+  exit 1
+fi
+
+sed -e "s/%%GROUPNAME%%/$1/" \
+    -e "s/%%GROUPID%%/$2/" \
+    /etc/new_group.ldiftemplate | \
+    ldapadd -h ##LDAPHOST## -p ##LDAPPORT## -D cn=admin,##LDAPORG## -w "##SLAPD_PASSWORD##"
+

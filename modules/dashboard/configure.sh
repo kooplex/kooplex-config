@@ -3,7 +3,7 @@
 # try to allocate dashboards server ports from this port value
 DASHBOARDS_PORT=3000
 
-RF=$BUILDDIR/dashboard
+RF=$BUILDDIR/dashboards
 
 mkdir -p $RF
 
@@ -23,6 +23,11 @@ case $VERB in
       POSTFIX=${TMP##*image-}
       DOCKER_COMPOSE_FILE=$RF/docker-compose.yml-$POSTFIX
 
+      REPORTDIR=$SRV/_report/${POSTFIX}
+      REPORTVOLUME=${PREFIX}-report-$POSTFIX
+      mkdir -p ${REPORTDIR}
+      docker $DOCKERARGS volume create -o type=none -o device=${REPORTDIR} -o o=bind ${REPORTVOLUME}
+
       echo "0. Check for dashboards server sources..."
       if [ -d $DIR_DBSOURCE ] ; then
         echo "\tfound in $DIR_DBSOURCE"
@@ -30,33 +35,40 @@ case $VERB in
         echo "\tcloning..."
         git clone $URL_DBSOURCE $DIR_DBSOURCE
       fi
-
+      
+      cp scripts/*  $RF/
 
       echo "1. Building dockerfile file for $POSTFIX..."
-      IMAGE=kooplex-notebook-$POSTFIX
+      IMAGE=${PREFIX}-notebook-$POSTFIX
       KGW_DOCKERFILE=$RF/Dockerfile.kernel-$POSTFIX
 #TODO: check the existance of the docker image by docker images
       sed -e "s/##IMAGE##/$IMAGE/" Dockerfile.kernel.template > $KGW_DOCKERFILE
       cp Dockerfile.dashboards $RF
 
       echo "2. Building compose file $DOCKER_COMPOSE_FILE..."
-      KGW=kernel-gateway-$POSTFIX
-      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
+      KGW=${PREFIX}-kernelgateway-$POSTFIX
+#TODO: check if docker volume exists
+#      VOL=$(echo $DASHBOARDSDIR/$POSTFIX | sed s"/\//\\\\\//"g)
       KGW_DOCKERFILE_ESCAPED=$(echo $KGW_DOCKERFILE | sed s"/\//\\\\\//"g)
       DBS_DOCKERFILE_ESCAPED=$(echo $RF/Dockerfile.dashboards | sed s"/\//\\\\\//"g)
 
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##KERNELGATEWAY_DOCKERFILE##/$KGW_DOCKERFILE_ESCAPED/" \
-          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##REPORTVOLUME##/$REPORTVOLUME/" \
+          -e "s/##POSTFIX##/$POSTFIX/" \
           -e "s/##NETWORK##/${PROJECT}-net/" \
         docker-compose.yml.KGW_template > $DOCKER_COMPOSE_FILE
 
 #TODO: when more dashboards do a loop here
-      DASHBOARDS_NAME=kooplex-dashboards-$POSTFIX
+      DASHBOARDS_NAME=${PREFIX}-dashboards-$POSTFIX
       sed -e "s/##KERNELGATEWAY##/$KGW/" \
           -e "s/##DASHBOARDS_DOCKERFILE##/$DBS_DOCKERFILE_ESCAPED/" \
           -e "s/##DASHBOARDS##/$DASHBOARDS_NAME/" \
-          -e "s/##VOLUME##/$VOL/" \
+          -e "s/##REPORTVOLUME##/$REPORTVOLUME/" \
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##POSTFIX##/$POSTFIX/" \
+          -e "s/##NETWORK##/${PROJECT}-net/" \
           -e "s/##DASHBOARDS_PORT##/$DASHBOARDS_PORT/" \
         docker-compose.yml.DBRD_template >> $DOCKER_COMPOSE_FILE
       DASHBOARDS_PORT=$((DASHBOARDS_PORT + 1))   
@@ -99,12 +111,23 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
 #FIXME: should not we remove images and generated Dockerfiles?
     done
+
+    docker $DOCKERARGS volume rm ${PREFIX}-report-dashboard
+    docker $DOCKERARGS volume rm ${PREFIX}-report-html
+
   ;;
 
   "purge")
     echo "Removing $RF" 
     rm -R -f $RF
 #NOTE: dashboards are stored elsewhere in $DASHBOARDSDIR
+    for DOCKER_FILE in ../notebook/image-*/Dockerfile
+    do
+      TMP=$(dirname $DOCKER_FILE)
+      POSTFIX=${TMP##*image-}
+      REPORTVOLUME=${PREFIX}-report-$POSTFIX
+      docker $DOCKERARGS volume rm ${REPORTVOLUME}
+    done
   ;;
 
   "clean")

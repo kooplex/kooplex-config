@@ -1,40 +1,25 @@
 #!/bin/bash
 
+RF=$BUILDDIR/base
+mkdir -p $RF
+DOCKER_HOST=$DOCKERARGS
+
 case $VERB in
   "build")
-    echo "Building base image kooplex-base"
+    echo "Building base image ${PREFIX}-base"
 
-  if [ -e $DISKIMG/$PROJECT"fs.img" ]; then
-   echo WARNING $DISKIMG/$PROJECT"fs.img exists!!"
-   echo "If you want to remove it, please, use remove and purge for complete removal"
-  else
-    mkdir -p $DISKIMG
-    cnt=`echo $DISKSIZE_GB | awk '{print $1*1000}'`
-    dd if=/dev/zero of=$DISKIMG/$PROJECT"fs.img" bs=1M count=$cnt
-    mkfs -t ext4 $DISKIMG/$PROJECT"fs.img"
-  fi
-  
-  if grep -qs "$SRV" /proc/mounts; then
-    echo $DISKIMG/$PROJECT"fs.img is already mounted to $SRV"  
-  else
-      mkdir -p $SRV
-      mount $DISKIMG/$PROJECT"fs.img" $SRV -t auto -o usrquota,grpquota,acl,loop=$LOOPNO
-
-
-  fi
-    
-     mkdir -p $SECRETS
-#     if [ ! `quotacheck -mcuvgf $SRV` ]; then
-#       quotaon -vu $SRV
-#       quotaon -vg $SRV
-#     fi
-    
-   
-    docker $DOCKERARGS build -t kooplex-base  .
+    mkdir -p $SECRETS
+    cp  scripts/* $RF
+    cp Dockerfile $RF
+    sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-notebook-template > $RF/Dockerfile-notebook
+ 
+    docker $DOCKERARGS build -t ${PREFIX}-base  $RF
+    docker $DOCKERARGS build -t ${PREFIX}-notebookbase -f $RF/Dockerfile-notebook  $RF 
+    echo "Generating secrets..."
+# Ez a config.sh-ban van    LDAPPW=$(createsecret ldap)
   ;;
   "install")
-  echo "Generating secrets..."
-    LDAPPASS=$(createsecret ldap)
+
   ;;
   "start")
     
@@ -50,16 +35,16 @@ case $VERB in
   ;;
   "purge")
   echo "Cleaning base folder $SRV/; Remove aquota"
-  quotaoff -vu $SRV
-  quotaoff -vg $SRV
-  rm -f $SRV/aquota.*
+#  quotaoff -vu $SRV
+#  quotaoff -vg $SRV
+#  rm -f $SRV/aquota.*
   rm -r $SRV/.secrets
   ;;
   "clean")
-    echo "Cleaning base image kooplex-base"
+    echo "Cleaning base image ${PREFIX}-base"
     #umount $SRV 
-    echo "Check if $SRV is still mounted! Then run: ' rm -f "$DISKIMG/$PROJECT"fs.img '" 
+#    echo "Check if $SRV is still mounted! Then run: ' rm -f "$DISKIMG/$PROJECT"fs.img '" 
     #rm -f $DISKIMG/$PROJECT"fs.img" 
-    docker $DOCKERARGS rmi kooplex-base
+    docker $DOCKERARGS rmi ${PREFIX}-base
   ;;
 esac

@@ -1,17 +1,19 @@
   ##DASHBOARDS##:
+    container_name: ##DASHBOARDS##
+    image: ##PREFIX##-dashboards-##POSTFIX##
     build:
       context: .
       dockerfile: ##DASHBOARDS_DOCKERFILE##
     ports:
       - "##DASHBOARDS_PORT##:3000"
     networks:
-      project_network:
+      - ##PREFIX##-net
     depends_on:
       - ##KERNELGATEWAY##
     links:
       - ##KERNELGATEWAY##
     volumes:
-      - ##VOLUME##:/srv/app/data/:ro
+      - ##REPORTVOLUME##:/srv/app/data/:ro
     environment:
       PORT: 3000
       KERNEL_GATEWAY_URL: http://##KERNELGATEWAY##:8888

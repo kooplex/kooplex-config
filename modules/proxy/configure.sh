@@ -1,51 +1,56 @@
 #!/bin/bash
 
+RF=$BUILDDIR/proxy
+
+mkdir -p $RF
+
+DOCKER_HOST=$DOCKERARGS
+DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+
 case $VERB in
   "build")
-    echo "Building proxy $PROJECT-proxy [$PROXYIP]"
-    docker $DOCKERARGS build -t kooplex-proxy .
+    echo "1. Configuring ${PREFIX}-proxy..."
+
+      cp Dockerfile $RF
+      sed -e "s/##PUBLICIP##/${PREFIX}-proxy/" \
+          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
+      
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
+      echo "2. Building ${PREFIX}-proxy..."
+      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   
   ;;
   "install")
-    echo "Installing proxy $PROJECT-proxy [$PROXYIP]"
-    
-    PROXYTOKEN=$(createsecret proxy)
-    
-    cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-proxy | awk '{print $2}'`
-    if [ ! $cont_exist ]; then
-    docker $DOCKERARGS create \
-      --name $PROJECT-proxy \
-      --hostname $PROJECT-proxy \
-      --net $PROJECT-net \
-      --ip $PROXYIP \
-      -e PUBLICIP=$PROXYIP \
-      -e ADMINIP=$PROXYIP \
-      -e CONFIGPROXY_AUTH_TOKEN=$PROXYTOKEN \
-      -p 8001:8001 \
-      --log-opt max-size=1m --log-opt max-file=3 \
-      -v /etc/localtime:/etc/localtime:ro \
-      kooplex-proxy
-    else
-     echo "$PROJECT-proxy is already installed"
-    fi
   ;;
   "start")
-    echo "Starting proxy $PROJECT-proxy [$PROXYIP]"
-    docker $DOCKERARGS start $PROJECT-proxy
+    echo "Starting proxy ${PREFIX}-proxy "
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
   ;;
+  "restart")
+    echo "Restarting proxy ${PREFIX}-proxy"
+    docker $DOCKERARGS restart ${PREFIX}-proxy
+  ;;
+
   "init")
     
   ;;
   "stop")
-    echo "Stopping proxy $PROJECT-proxy [$PROXYIP]"
-    docker $DOCKERARGS stop $PROJECT-proxy
+    echo "Stopping proxy ${PREFIX}-proxy "
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
   "remove")
-    echo "Removing proxy $PROJECT-proxy [$PROXYIP]"
-    docker $DOCKERARGS rm $PROJECT-proxy
+    echo "Removing proxy ${PREFIX}-proxy "
+  docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
   "clean")
-    echo "Cleaning image kooplex-proxy"
-    docker $DOCKERARGS rmi kooplex-proxy
+    echo "Cleaning image ${PREFIX}-proxy"
   ;;
+  "purge")
+    echo "Purging proxy ${PREFIX}-proxy"
+    rm -R $RF
+  ;;
+
 esac

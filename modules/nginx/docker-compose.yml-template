@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  ##PREFIX##-nginx:
+    container_name: ##PREFIX##-nginx
+    image: ##PREFIX##-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+

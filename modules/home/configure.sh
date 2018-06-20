@@ -2,7 +2,10 @@
 
 case $VERB in
   "build")
-    docker $DOCKERARGS build -t ${PREFIX}-home  .
+     docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
+     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
+    
+#     docker $DOCKERARGS build -t ${PREFIX}-home  .
   ;;
   "install")
   cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-home | awk '{print $2}'`
@@ -39,5 +42,12 @@ case $VERB in
   "purge")
     echo "Purging nfs home $PROJECT-home [$HOMEIP]"
 #    rm -R $SRV/home
+    docker $DOCKERARGS volume rm ${PREFIX}-home
+    docker $DOCKERARGS volume rm ${PREFIX}-share
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-home"
+    rm -R -f $SRV/home 
+
   ;;
 esac

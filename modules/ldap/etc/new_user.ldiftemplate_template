@@ -1,0 +1,11 @@
+dn: uid=%%USERNAME%%,ou=users,##LDAPORG##
+objectClass: posixAccount
+objectClass: InetOrgPerson
+uid: %%USERNAME%%
+cn: %%USERNAME%%
+sn: %%USERNAME%%
+uidNumber: %%UID%%
+gidNumber: %%GID%%
+loginShell: /bin/bash
+homeDirectory: %%HOME%%
+

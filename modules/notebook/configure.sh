@@ -7,15 +7,29 @@ case $VERB in
   "build")
     echo "Building image $PREFIX-notebooks"
 
-#    docker $DOCKERARGS build -t $PREFIX-notebook .
-    
+
      mkdir -p $RF
      for imagedir in ./image-*
      do
-        cp -r image-* $RF
-        cp scripts/start-notebook.sh ${RF}/$imagedir
+        mkdir -p $RF/$imagedir
+        sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
+        sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,0.sh,1.sh,2.sh} ${RF}/$imagedir
+
+#####
+  printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
+  printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/$imagedir/nsswitch.conf
+  printf "$(ldap_nslcdconfig)\n\n" > ${RF}/$imagedir/nslcd.conf
+  chown root ${RF}/$imagedir/nslcd.conf
+  chmod 0600 ${RF}/$imagedir/nslcd.conf
+
+######NOTE: jupyter_report_config.py not in the image
+
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
+
+
+
      	echo "Building image from $docfile"
         docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
        
@@ -24,49 +38,8 @@ case $VERB in
     
   ;;
   "install")
-    echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    
-    # LDAP
-    mkdir -p $SRV/notebook/etc
-    mkdir -p $SRV/notebook/init
-    $(ldap_makeconfig notebook)
-    cp scripts/jupyter_notebook_config.py $SRV/notebook/etc/
-        
-    echo "#/bin/sh
-echo \"Configuring LDAP...\"
-chmod 0600 /etc/nslcd.conf
-service nslcd start
-    " > $SRV/notebook/init/0.sh
-      
-    # Start jupyter
-    echo "#/bin/sh
-echo \"Starting notebook for \$NB_USER...\"
-#cd /home/\$NB_USER
-#cd /\$NB_USER
-cd /home
-. start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT" \
-      > $SRV/notebook/init/1.sh
-    
-    # TODO: we create a notebook container here for testing but
-    # individual containers will later be created for single
-    # users from python. Use python unit tests to create notebook container!
-#    docker $DOCKERARGS create \
-#      --name $PROJECT-notebook \
-#      --hostname $PROJECT-notebook \
-#      --net $PROJECT-net \
-#      --ip $NOTEBOOKIP \
-#      --privileged \
-#      $(ldap_makebinds notebook) \
-#      $(home_makebinds notebook) \
-#      -v $SRV/notebook/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py \
-#      -v $SRV/notebook/init:/init \
-#      -e NB_USER=test \
-#      -e NB_UID=10002 \
-#      -e NB_GID=10002 \
-#      -e NB_URL=/notebook/test/ \
-#      -e NB_PORT=8000 \
-#      $PREFIX-notebook
   ;;
+    
   "start")
     # TODO: we have a single notebook server now, perhaps there will
     # one per user later or more if we scale out

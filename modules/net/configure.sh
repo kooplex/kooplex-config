@@ -1,15 +1,15 @@
 #!/bin/bash
 
 case $VERB in
-  "install")
-    echo "Installing network $PROJECT-net [$SUBNET]"
+  "build")
+    echo "Installing network $PREFIX-net [$SUBNET]"
   
-    if docker  $DOCKERARGS network ls | grep " $PROJECT-net"; then 
-     echo "$PROJECT-net exists, moving on..."
+    if docker  $DOCKERARGS network ls | grep " $PREFIX-net"; then 
+     echo "$PREFIX-net exists, moving on..."
     else
      docker $DOCKERARGS network create \
       --driver bridge \
-      --subnet $SUBNET $PROJECT-net
+      --subnet $SUBNET $PREFIX-net
    fi
   ;;
   "start")
@@ -22,8 +22,8 @@ case $VERB in
     
   ;;
   "remove")
-    echo "Removing network $PROJECT-net [$SUBNET]"
-    docker $DOCKERARGS network rm $PROJECT-net
+    echo "Removing network $PREFIX-net [$SUBNET]"
+    docker $DOCKERARGS network rm $PREFIX-net
   ;;
   "purge")
 

@@ -14,29 +14,34 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html \
-         $SRV/_report/dashboard $SRV/_hub.garbage $SRV/_course $SRV/_usercourse
+      mkdir -p $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html $SRV/_report/dashboard $SRV/_hub.grabage
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.garbage -o o=bind ${PREFIX}-garbage
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report/html -o o=bind ${PREFIX}-report-html
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report/dashboard -o o=bind ${PREFIX}-report-dashboard
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.grabage -o o=bind ${PREFIX}-garbage
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       GITLABPASS=$(getsecret gitlab)
       SSHKEYPASS=$(getsecret sshkey)
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
-          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
-          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" scripts/runserver.sh > $RF/runserver.sh
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
-          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
-          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+echo "WARNING: Dockerfile change for iig instance only"
+#      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
+      cp Dockerfile.hubdb $RF
+      cp scripts/patch-codeNdbschema.sh $RF
+echo "WARNING: runserver.sh change for iig instance only"
+#      sed -e "s/##PREFIX##/$PREFIX/" \
+#          -e "s/##HUBDB##/${HUBDB}/g" \
+#          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
+#          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
+#          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" scripts/runserver.sh > $RF/runserver.sh
+echo "WARNING: docker-compose change for iig instance only"
+#      sed -e "s/##PREFIX##/$PREFIX/" \
+#          -e "s/##HUBDB##/${HUBDB}/g" \
+#          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
+#          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
+#          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
       sed -e "s/##HUBDB##/${HUBDB}/" \
           -e "s/##HUBDBUSER##/${HUBDBUSER}/" \
           -e "s/##HUBDBPW##/${HUBDBPW}/" \
@@ -50,7 +55,12 @@ case $VERB in
           -e "s/##LDAPBASEDN##/$LDAPORG/" \
           -e "s/##LDAPUSER##/admin/" \
           -e "s/##LDAPBINDPW##/$LDAPPW/" \
-          -e "s/##MINUID##/$MINUID/" \
+          -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
+          -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" \
+          -e "s/##GITLABADMINKEYPW##/$SSHKEYPASS/" \
+          -e "s/##GITLABDB##/${GITLABDB}/" \
+          -e "s/##GITLABDBUSER##/postgres/" \
+          -e "s/##GITLABDBPW##/$GITLABDBPW/" \
           -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERPORT##/$DOCKERPORT/" \
@@ -96,9 +106,8 @@ case $VERB in
       rm -R -f $RF
       
       docker $DOCKERARGS volume rm ${PREFIX}-home
-      docker $DOCKERARGS volume rm ${PREFIX}-course
-      docker $DOCKERARGS volume rm ${PREFIX}-usercourse
       docker $DOCKERARGS volume rm ${PREFIX}-share
+      docker $DOCKERARGS volume rm ${PREFIX}-git
       docker $DOCKERARGS volume rm ${PREFIX}-hubdb
       docker $DOCKERARGS volume rm ${PREFIX}-garbage
   ;;

@@ -1,5 +1,5 @@
 # Based on:  https://docs.docker.com/engine/examples/running_ssh_service/
-FROM kooplex-base
+FROM ##PREFIX##-base
 
 MAINTAINER COMPARE-WIGNER-NODE
 
