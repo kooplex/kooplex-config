@@ -14,18 +14,23 @@ services:
       - ##PREFIX##-hub-privatenet
     volumes:
       - ##PREFIX##-home:/mnt/volumes/home:rw
-      - ##PREFIX##-git:/mnt/volumes/git:rw
+      - ##PREFIX##-course:/mnt/volumes/course:rw
+      - ##PREFIX##-usercourse:/mnt/volumes/usercourse:rw
+      - ##PREFIX##-assignment:/mnt/volumes/assignment:rw
       - ##PREFIX##-share:/mnt/volumes/share:rw
-      - ##PREFIX##-report-html:/mnt/volumes/report.html:rw
-      - ##PREFIX##-report-dashboard:/mnt/volumes/report.dashboard:rw
       - ##PREFIX##-garbage:/mnt/volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
+      - /src/kooplex_code:/kooplexhub/
     restart: always
+    ports:
+      - "11122:22"
     privileged: true
     logging:
       options:
         max-size: "10m"
         max-file: "3"
+    environment:
+      - LANG=en_US.UTF-8
 
   ##PREFIX##-hub-mysql:
     container_name: ##PREFIX##-hub-mysql
@@ -53,13 +58,13 @@ networks:
 volumes:
   ##PREFIX##-home:
     external: true
-  ##PREFIX##-git:
+  ##PREFIX##-course:
+    external: true
+  ##PREFIX##-usercourse:
+    external: true
+  ##PREFIX##-assignment:
     external: true
   ##PREFIX##-share:
-    external: true
-  ##PREFIX##-report-html:
-    external: true
-  ##PREFIX##-report-dashboard:
     external: true
   ##PREFIX##-garbage:
     external: true

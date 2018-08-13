@@ -1,4 +1,4 @@
-FROM ##PREFIX##-notebookbase
+FROM ##PREFIX##-notebook-base
 
 RUN apt update && \
     apt install -y curl && \
@@ -11,6 +11,7 @@ RUN apt install -y liblapack-dev libblas-dev
 RUN apt install -y gfortran libfreetype6* pkg-config
 RUN apt install -y git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake
 RUN apt install -y davfs2
+RUN apt install -y inotify-tools
 RUN chmod u+s /usr/sbin/mount.davfs
 
 
@@ -38,7 +39,8 @@ RUN cd /tmp && \
     # echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
     /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
     rm Miniconda3-$CONDA_VER-Linux-x86_64.sh 
-RUN conda update -n base conda
+
+RUN /opt/conda/bin/conda update -y conda
 
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
 RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console 
@@ -73,9 +75,7 @@ RUN apt update
 RUN apt install -y libfontconfig1 libxrender1 libxrender-dev
 RUN apt install -y g++-5 libicu-dev libxml2-dev
 ##RUN apt install -y octave # when setting up ca-certificate-java it dead locks
-RUN apt install -y gnuplot
 
-##RUN $CONDA_DIR/bin/conda remove --offline --quiet --yes nbpresent # not present cannot remove
 RUN $CONDA_DIR/bin/conda update -y notebook
 RUN $CONDA_DIR/bin/conda update -y jupyter_client
 
@@ -94,25 +94,26 @@ RUN $CONDA_DIR/bin/conda install -v --quiet --yes  -c conda-forge jupyter_contri
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
-ADD jupyter-report-kooplex /opt/conda/bin/jupyter-report-kooplex 
-RUN chmod a+x /opt/conda/bin/jupyter-report-kooplex
 
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
-ADD start-report.sh /usr/local/bin/start-report.sh
 ADD kooplex-logo.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/kooplex-logo.png
 ADD kooplex-logo.png /opt/conda/lib/python3.5/site-packages/notebook/static/base/images/kooplex-logo.png
 
+RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
 
 ########## add the rest
 RUN mkdir -p /init
-ADD 0.sh /init/0.sh
-ADD 1.sh /init/1.sh
+
+ADD 01-startnslcd.sh /init/01-startnslcd.sh
+ADD 02-mountuserhome.sh /init/02-mountuserhome.sh
+ADD 03-startinotify.sh /init/03-startinotify.sh
+ADD 99-startnotebookserver.sh /init/99-startnotebookserver.sh
 ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
-ADD jupyter_report_config.py /etc/jupyter_report_config.py
 ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
 
-
+ADD manage_report_mount.sh /usr/local/sbin/manage_report_mount.sh
+RUN chmod +x /usr/local/sbin/manage_report_mount.sh 
 

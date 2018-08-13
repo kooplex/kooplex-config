@@ -20,51 +20,11 @@ done
 # debug
 env
 
-# remount volumes in the proper folderstructure
-# mount home
-mkdir /home/${NB_USER}
-mount -o bind /mnt/.volumes/home/${NB_USER} /home/${NB_USER}
-# mount git
-mkdir -p /home/${NB_USER}/git
-mount -o bind /mnt/.volumes/git/${NB_USER}/${PR_PWN} /home/${NB_USER}/git
-# mount share
-mkdir -p /home/${NB_USER}/share
-mount -o bind /mnt/.volumes/share/${PR_PWN} /home/${NB_USER}/share
-# mount owncloud
-mkdir -p /home/${NB_USER}/oc
-echo "http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ /home/${NB_USER}/oc davfs user,rw,auto 0 0" > /etc/fstab
-addgroup ${NB_USER} davfs2
-su ${NB_USER} -c "mount /home/${NB_USER}/oc"
-# hide volumes from the user
-mkdir -p /tmp/.empty
-mount -o bind /tmp/.empty /mnt/.volumes
-# make sure left off pidfile is removed
-[ -e /var/run/mount.davfs/home-${NB_USER}-oc.pid ] && rm /var/run/mount.davfs/home-${NB_USER}-oc.pid
+id $NB_USER
 
-ssh-keyscan -H ##PREFIX##-gitlab > /tmp/gitlab.pub
-USER_HOSTKEYS=/home/${NB_USER}/.ssh/known_hosts
-cat /tmp/gitlab.pub $USER_HOSTKEYS | sort | uniq > /tmp/new
-mv /tmp/new $USER_HOSTKEYS
 #FIXME: gid hardcoded
-chown ${NB_USER}:9998 $USER_HOSTKEYS
+#chown ${NB_USER}:9998 $USER_HOSTKEYS
 
-# make sure leftoff socket is removed
-[ -e $SSH_AUTH_SOCK ] && rm $SSH_AUTH_SOCK
-su $NB_USER -c "eval \"\$(ssh-agent -a $SSH_AUTH_SOCK)\" && ssh-add \$HOME/.ssh/gitlab.key"
-
-# clone git repository if it has not yet been cloned
-if [ -x /home/${NB_USER}/git/clone.sh ] ; then
-    echo "try to clone"
-    su $NB_USER -c "/home/${NB_USER}/git/clone.sh"
-fi
-
-# source /etc/bash.bashrc
-# source bash initialisation fragments from volumes attached to the container
-#if [ -d /vol ] ; then
-#    for rc in /vol/*/bashrc ; do
-#        . $rc
-#    done
-#fi
 
 # manage symbolic links under user's conda env directory
 CONDA_ENVS=/home/$NB_USER/.conda/envs
@@ -98,7 +58,5 @@ exec su $NB_USER -c "cd ; env PATH=$PATH jupyter notebook $* --NotebookApp.iopub
 
 # clean up
 umount /mnt/.volumes
-umount /home/${NB_USER}/oc
-umount /home/${NB_USER}/git
 umount /home/${NB_USER}/share
 umount /home/${NB_USER}

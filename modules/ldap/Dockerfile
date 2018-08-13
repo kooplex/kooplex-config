@@ -23,6 +23,7 @@ COPY new_user.ldiftemplate /etc/new_user.ldiftemplate
 COPY new_group.ldiftemplate /etc/new_group.ldiftemplate
 COPY adduser.sh /usr/local/bin/adduser.sh
 COPY addgroup.sh /usr/local/bin/addgroup.sh
+COPY ldap.conf /etc/ldap/ldap.conf
 
 COPY entrypoint.sh /entrypoint.sh
 COPY init.sh /init.sh

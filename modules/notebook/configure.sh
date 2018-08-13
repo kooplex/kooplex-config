@@ -13,10 +13,8 @@ case $VERB in
      do
         mkdir -p $RF/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
-        cp  scripts/jupyter-notebook-kooplex scripts/jupyter-report-kooplex  ${RF}/$imagedir
-        sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-report.sh-template > $RF/$imagedir/start-report.sh
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
-        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,jupyter_report_config.py,0.sh,1.sh} ${RF}/$imagedir
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_report_mount.sh} ${RF}/$imagedir
 
 #####
   printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf

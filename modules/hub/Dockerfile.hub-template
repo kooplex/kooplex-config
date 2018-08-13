@@ -1,7 +1,7 @@
 FROM ##PREFIX##-base
 
 RUN apt-get update && apt-get install -y \
-		gcc \
+		gcc cron \
 		gettext \
 		mysql-client libmysqlclient-dev \
 		postgresql-client libpq-dev \
@@ -17,15 +17,15 @@ RUN pip3 install setuptools
 RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"
 RUN pip3 install ldap3
 RUN pip3 install pwgen
-RUN pip3 install python-social-auth
-RUN pip3 install social-auth-core
-
+RUN pip3 install "python-social-auth[django]" "social-auth-core[openidconnect]"
 
 # It is very important that the following command 'git clone...' cannot be cached
 # (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
 ARG CACHE_DATE=2016-01-02
-RUN git clone -b devnew https://github.com/kooplex/kooplex-hub.git /kooplexhub
-COPY settings.py /kooplexhub/kooplexhub/kooplex/settings.py
+#RUN git clone -b devnew https://github.com/kooplex/kooplex-hub.git /kooplexhub
+#COPY settings.py /kooplexhub/kooplexhub/kooplex/settings.py
+
+RUN apt-get install -y openssh-server openssh-sftp-server vim
 
 COPY runserver.sh /runserver.sh
 RUN chmod a+x /runserver.sh

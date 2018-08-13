@@ -30,6 +30,7 @@ case $VERB in
 
       sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
       sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $RF/new_user.ldiftemplate
+      sed -e "s/##LDAPORG##/$LDAPORG/" etc/ldap.conf_template > $RF/ldap.conf
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$LDAPPW/" \
@@ -68,7 +69,7 @@ case $VERB in
     echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
     docker exec ${PREFIX}-ldap bash -c /init.sh
     docker exec ${PREFIX}-ldap bash -c /init-core.sh
-    docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh users 9998"
+    docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh users 1000"
     docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh report 9990"
   ;;
   "stop")
