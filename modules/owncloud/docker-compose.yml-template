@@ -4,6 +4,7 @@ services:
   ##CTROC##:
     image: owncloud/server:10.0
     container_name: ##CTROC##
+    restart: unless-stopped
     depends_on:
       - ##CTROCDB##
       - ##CTROCREDIS##
@@ -37,7 +38,7 @@ services:
   ##CTROCDB##:
     image: webhippie/mariadb:latest
     container_name: ##CTROCDB##
-    restart: always
+    restart: unless-stopped
     environment:
       - MARIADB_ROOT_PASSWORD=##DBROOTPW##
       - MARIADB_USERNAME=##DBUSER##
@@ -64,7 +65,7 @@ services:
   ##CTROCREDIS##:
     image: webhippie/redis:latest
     container_name: ##CTROCREDIS##
-    restart: always
+    restart: unless-stopped
     environment:
       - REDIS_MAXCONN=10000
     healthcheck:

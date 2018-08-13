@@ -11,7 +11,9 @@ services:
       - ##PREFIX##-net
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    restart: always
+    restart: unless-stopped
+    ports:
+      - 80:80
     logging:
       options:
         max-size: "10m"

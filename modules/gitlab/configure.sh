@@ -13,7 +13,15 @@ case $VERB in
     echo "1. Configuring ${PREFIX}-gitlab..."
 
     mkdir -p $SRV/_gitlabdb
+    mkdir -p $SRV/_gitlab/etc_gitlab
+    mkdir -p $SRV/_gitlab/var_log_gitlab
+    mkdir -p $SRV/_gitlab/var_opt_gitlab
+
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlabdb -o o=bind ${PREFIX}-gitlabdb
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlab/etc_gitlab -o o=bind ${PREFIX}-gitlab-etc
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlab/var_log_gitlab -o o=bind ${PREFIX}-gitlab-log
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlab/var_opt_gitlab -o o=bind ${PREFIX}-gitlab-opt
+
 #    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
 
     # Generate Gitlab and keyfile random password

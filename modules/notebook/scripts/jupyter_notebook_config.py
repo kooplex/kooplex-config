@@ -23,6 +23,8 @@ c.FileContentsManager.delete_to_trash = False
 # This will enable the option to switch between conda envs in the notebook-server
 c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
 
+c.LatexConfig.latex_command = 'pdflatex'
+
 # Set a certificate if USE_HTTPS is set to any value
 if 'USE_HTTPS' in os.environ:
     if not os.path.isfile(PEM_FILE):

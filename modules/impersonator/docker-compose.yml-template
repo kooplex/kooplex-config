@@ -13,7 +13,7 @@ services:
       - ##PREFIX##-home:/home:rw
       - ##PREFIX##-git:/git:rw
     privileged: true
-    restart: always
+    restart: unless-stopped
 
 networks:
   ##PREFIX##-net:

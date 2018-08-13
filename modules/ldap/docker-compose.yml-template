@@ -17,7 +17,7 @@ services:
       - ##PREFIX##-ldap-etc:/etc/ldap:rw
       - ##PREFIX##-ldap-var:/var/lib/ldap:rw
       - /etc/localtime:/etc/localtime:ro
-    restart: always
+    restart: unless-stopped
 
 networks:
   ##PREFIX##-net:

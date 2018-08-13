@@ -20,10 +20,7 @@ services:
       - ##PREFIX##-share:/mnt/volumes/share:rw
       - ##PREFIX##-garbage:/mnt/volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
-      - /src/kooplex_code:/kooplexhub/
-    restart: always
-    ports:
-      - "11122:22"
+    restart: unless-stopped
     privileged: true
     logging:
       options:
@@ -40,7 +37,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-hubdb:/var/lib/mysql:rw
-    restart: always
+    restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=##HUBDBROOTPW##
     logging:

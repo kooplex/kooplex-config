@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  ##PREFIX##-userdb:
+    container_name: ##PREFIX##-userdb
+    image: ##PREFIX##-userdb
+    build:
+      context: .
+      dockerfile: Dockerfile.userdb
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-userdb:/var/lib/postgresql/data:rw
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=##USERDBPW##
+    ports:
+      - "15432:5432"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    user: postgres
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-userdb:
+    external: true
+
