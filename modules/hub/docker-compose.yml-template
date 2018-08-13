@@ -13,6 +13,7 @@ services:
       - ##PREFIX##-net
       - ##PREFIX##-hub-privatenet
     volumes:
+      - ##PREFIX##-hubcode:/kooplexhub:rw
       - ##PREFIX##-home:/mnt/volumes/home:rw
       - ##PREFIX##-course:/mnt/volumes/course:rw
       - ##PREFIX##-usercourse:/mnt/volumes/usercourse:rw
@@ -53,6 +54,8 @@ networks:
     external: false
 
 volumes:
+  ##PREFIX##-hubcode:
+    external: true
   ##PREFIX##-home:
     external: true
   ##PREFIX##-course:

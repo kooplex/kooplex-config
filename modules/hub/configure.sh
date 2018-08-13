@@ -14,7 +14,7 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html \
+      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html \
          $SRV/_report/dashboard $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
@@ -23,10 +23,17 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.garbage -o o=bind ${PREFIX}-garbage
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hubcode_ -o o=bind ${PREFIX}-hubcode
+
+      DIR=$SRV/_hubcode_
+      if [ -d $DIR/.git ] ; then
+          echo $DIR
+          #cd $DIR && git pull && cd -
+      else
+          git clone -b devnew https://github.com/kooplex/kooplex-hub.git $DIR
+      fi
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      GITLABPASS=$(getsecret gitlab)
-      SSHKEYPASS=$(getsecret sshkey)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HUBDB##/${HUBDB}/g" \
@@ -58,7 +65,7 @@ case $VERB in
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
-          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" etc/settings.py-template > $RF/settings.py
+          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" etc/settings.py-template > $SRV/_hubcode_/kooplexhub/kooplex/settings.py
   	 
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
