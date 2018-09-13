@@ -12,7 +12,7 @@
 # mount -o bind /mnt/volumes/home/ /home 
 
 #FIXME: this is not nice
-echo "*/1 * * * * /usr/bin/python3 /kooplexhub/kooplexhub/manage.py scheduler" > /var/spool/cron/crontabs/root
+echo -e "*/1 * * * * /usr/bin/python3 /kooplexhub/kooplexhub/manage.py scheduler\n" > /var/spool/cron/crontabs/root
 /etc/init.d/cron start
 ###########
 
