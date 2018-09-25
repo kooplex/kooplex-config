@@ -1,9 +1,20 @@
 # remount volumes in the proper folderstructure
-REPORTDIR=/home/$NB_USER/report
+
+case $1 in
+  report|workdir|share)
+    F=$1
+  ;;
+  *)
+    echo "$0 <report|workdir|share>" >&2
+    exit 1
+  ;;
+esac
+
+TARGETDIR=/home/$NB_USER/$F
 EMPTYDIR=/tmp/.empty
 VOLDIR=/mnt/.volumes
 
-CONF=/tmp/mount_report.conf
+CONF=/tmp/mount_${F}.conf
 
 if [ -f $CONF ]; then
 
@@ -12,7 +23,7 @@ if [ -f $CONF ]; then
 
   while IFS=':' read -r task dir1 dir2 <&3 ; do
     if [ $task = '-' ] ; then
-      udir=$REPORTDIR/$dir1
+      udir=$TARGETDIR/$dir1
       if [ -d $udir ] ; then
         umount $udir
         echo Umounted $udir >&2
@@ -20,8 +31,8 @@ if [ -f $CONF ]; then
         echo Removed $udir >&2
       fi
     elif [ $task = '+' ] ; then
-      sdir=$VOLDIR/$dir1
-      tdir=$REPORTDIR/$dir2
+      sdir=$dir1
+      tdir=$TARGETDIR/$dir2
       if [ ! -d $sdir ] ; then
         echo "Source $sdir does not exist" >&2
         continue

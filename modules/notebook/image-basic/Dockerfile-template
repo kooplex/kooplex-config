@@ -94,10 +94,10 @@ RUN $CONDA_DIR/bin/conda install -v --quiet --yes  -c conda-forge jupyter_contri
 RUN $CONDA_DIR/bin/conda install -v --quiet --yes nodejs
 RUN $CONDA_DIR/bin/conda install -v --quiet --yes networkx
 
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.33
-RUN apt install -y texlive-xetex texlive-lang-european texlive-science
-RUN pip install jupyterlab_latex && jupyter serverextension enable --sys-prefix jupyterlab_latex && jupyter labextension install @jupyterlab/latex
-RUN jupyter labextension install @jupyterlab/github@0.5
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager #@0.33
+#RUN apt install -y texlive-xetex texlive-lang-european texlive-science
+#RUN pip install jupyterlab_latex && jupyter serverextension enable --sys-prefix jupyterlab_latex && jupyter labextension install @jupyterlab/latex
+RUN jupyter labextension install @jupyterlab/github #@0.5
 
 RUN jupyter labextension install jupyterlab_vim
 
@@ -129,6 +129,6 @@ ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
 
-ADD manage_report_mount.sh /usr/local/sbin/manage_report_mount.sh
-RUN chmod +x /usr/local/sbin/manage_report_mount.sh 
+ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
+RUN chmod +x /usr/local/sbin/manage_mount.sh 
 
