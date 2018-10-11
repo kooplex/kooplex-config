@@ -1,10 +1,10 @@
-FROM ##PREFIX##-notebook-base
+FROM ##PREFIX##-notebookbase
 
-RUN apt update && \
-    apt install -y curl && \
-    curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-    apt install --yes nodejs npm && \
-    npm install -g bower
+RUN apt update 
+
+RUN apt install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_10.x |  bash - && \
+    apt install --yes nodejs 
 
 RUN apt install -y tmux zip curlftpfs
 RUN apt install -y liblapack-dev libblas-dev
@@ -32,15 +32,15 @@ RUN mkdir -p $CONDA_DIR
 RUN chmod a+wrx $CONDA_DIR    
 
 #Because of strange behaviour some trash hinders installation of the following into this directory
-RUN rm -r /opt/*
+#RUN rm -r /opt/*
 
 # Install conda
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
-    # echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
-    /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-$CONDA_VER-Linux-x86_64.sh 
+    wget --quiet https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh && \
+    # echo "09f53738b0cd3bb96f5b1bac488e5528df9906be2480fe61df40e0e0d19e3d48 *Anaconda3-5.2.0-Linux-x86_64.sh" | sha256sum -c - && \
+    /bin/bash Anaconda3-5.2.0-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Anaconda3-5.2.0-Linux-x86_64.sh
 
 RUN /opt/conda/bin/conda update -y conda
 
@@ -95,8 +95,8 @@ RUN $CONDA_DIR/bin/conda install -v --quiet --yes nodejs
 RUN $CONDA_DIR/bin/conda install -v --quiet --yes networkx
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager #@0.33
-#RUN apt install -y texlive-xetex texlive-lang-european texlive-science
-#RUN pip install jupyterlab_latex && jupyter serverextension enable --sys-prefix jupyterlab_latex && jupyter labextension install @jupyterlab/latex
+RUN apt install -y texlive-xetex texlive-lang-european texlive-science
+RUN pip install jupyterlab_latex && jupyter serverextension enable --sys-prefix jupyterlab_latex && jupyter labextension install @jupyterlab/latex
 RUN jupyter labextension install @jupyterlab/github #@0.5
 
 RUN jupyter labextension install jupyterlab_vim

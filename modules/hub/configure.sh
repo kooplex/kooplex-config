@@ -37,27 +37,22 @@ case $VERB in
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
-          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
-          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" scripts/runserver.sh > $RF/runserver.sh
+          -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
+          -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
+          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##HUBDBUSER##/${HUBDBUSER}/g" \
-          -e "s/##HUBDBPW##/${HUBDBPW}/g" \
-          -e "s/##HUBDBROOTPW##/${HUBDBROOTPW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-      sed -e "s/##HUBDB##/${HUBDB}/" \
-          -e "s/##HUBDBUSER##/${HUBDBUSER}/" \
-          -e "s/##HUBDBPW##/${HUBDBPW}/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERPORT##/$OUTERHOSTPORT/" \
           -e "s/##INNERHOST##/$INNERHOST/" \
           -e "s/##INNERHOSTNAME##/$INNERHOSTNAME/" \
           -e "s/##DBHOST##/${PREFIX}-hub-mysql/" \
           -e "s/##PROTOCOL##/$REWRITEPROTO/" \
-          -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##LDAPBASEDN##/$LDAPORG/" \
           -e "s/##LDAPUSER##/admin/" \
-          -e "s/##LDAPBINDPW##/$LDAPPW/" \
+          -e "s/##LDAPBIND_PW##/$HUBLDAP_PW/" \
+          -e "s/##HUBLDAP_PW##/$HUBLDAP_PW/" \
+          -e "s/##DJANGO_SECRET_KEY##/$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g')/" \
           -e "s/##MINUID##/$MINUID/" \
           -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
@@ -65,7 +60,11 @@ case $VERB in
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
-          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" etc/settings.py-template > $SRV/_hubcode_/kooplexhub/kooplex/settings.py
+          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
+          -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
+          -e "s/##HUB_USER##/${HUB_USER}/g" \
+          -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
+          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
   	 
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
@@ -82,6 +81,14 @@ case $VERB in
   ;;
 
   "init")
+       docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
+       if [ ! $? -eq 0 ];then
+          docker exec ${PREFIX}-hub-mysql bash -c " echo \"CREATE DATABASE $HUBDB; CREATE USER '$HUBDB_USER'@'%' IDENTIFIED BY '$HUBDB_PW'; GRANT ALL ON $HUBDB.* TO '$HUBDB_USER'@'%';\" |  \
+            mysql -u root --password=$HUBDBROOT_PW  -h $PREFIX-hub-mysql"
+       fi
+       docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
+       docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
+       docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py createsuperuser
   ;;
 
   "refresh")
