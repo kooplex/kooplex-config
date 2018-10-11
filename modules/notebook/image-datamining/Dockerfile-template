@@ -1,10 +1,9 @@
 FROM ##PREFIX##-notebook-base
 
-RUN apt update && \
-    apt install -y curl && \
-    curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-    apt install --yes nodejs npm && \
-    npm install -g bower
+RUN apt update 
+RUN apt install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_10.x |  bash - && \
+    apt install --yes nodejs  
 
 RUN apt install -y tmux zip curlftpfs
 RUN apt install -y liblapack-dev libblas-dev

@@ -14,12 +14,12 @@ services:
       - ##PREFIX##-hub-privatenet
     volumes:
       - ##PREFIX##-hubcode:/kooplexhub:rw
-      - ##PREFIX##-home:/mnt/volumes/home:rw
-      - ##PREFIX##-course:/mnt/volumes/course:rw
-      - ##PREFIX##-usercourse:/mnt/volumes/usercourse:rw
-      - ##PREFIX##-assignment:/mnt/volumes/assignment:rw
-      - ##PREFIX##-share:/mnt/volumes/share:rw
-      - ##PREFIX##-garbage:/mnt/volumes/garbage:rw
+      - ##PREFIX##-home:/mnt/.volumes/home:rw
+      - ##PREFIX##-course:/mnt/.volumes/course:rw
+      - ##PREFIX##-usercourse:/mnt/.volumes/usercourse:rw
+      - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
+      - ##PREFIX##-share:/mnt/.volumes/share:rw
+      - ##PREFIX##-garbage:/mnt/.volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     privileged: true
@@ -29,6 +29,15 @@ services:
         max-file: "3"
     environment:
       - LANG=en_US.UTF-8
+      - DJANGO_SECRET_KEY=##DJANGO_SECRET_KEY##
+      - PREFIX=##PREFIX##
+      - DOMAIN=##OUTERHOST##
+      - HUBPROXY_PW=##PROXYTOKEN##
+      - HUBLDAP_PW=##HUBLDAP_PW##
+      - HUBDB=##HUBDB##
+      - HUBDB_USER=##HUBDB_USER##
+      - HUBDB_PW=##HUBDB_PW##
+      - HUBDBROOT_PW=##HUBDBROOT_PW##
 
   ##PREFIX##-hub-mysql:
     container_name: ##PREFIX##-hub-mysql
@@ -40,7 +49,7 @@ services:
       - ##PREFIX##-hubdb:/var/lib/mysql:rw
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=##HUBDBROOTPW##
+      - MYSQL_ROOT_PASSWORD=##HUBDBROOT_PW##
     logging:
       options:
         max-size: "10m"

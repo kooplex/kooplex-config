@@ -80,9 +80,9 @@ base $LDAPORG
 scope subtree
 
 binddn cn=admin,$LDAPORG
-bindpw $LDAPPW
-rootpwmoddn cn=admin,$LDAPORG
-rootpwmodpw $LDAPPW
+bindpw $HUBLDAP_PW
+#rootpwmoddn cn=admin,$LDAPORG
+#rootpwmodpw $HUBLDAP_PW
 
 "
 }

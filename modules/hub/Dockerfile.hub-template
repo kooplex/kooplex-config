@@ -27,7 +27,8 @@ ARG CACHE_DATE=2016-01-02
 #COPY settings.py /kooplexhub/kooplexhub/kooplex/settings.py
 
 RUN apt-get install -y openssh-server openssh-sftp-server vim
-RUN apt install  -y tzdata
+RUN apt update
+RUN apt-get install  -y tzdata
 
 COPY runserver.sh /runserver.sh
 RUN chmod a+x /runserver.sh
