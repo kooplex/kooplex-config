@@ -17,18 +17,17 @@ case $VERB in
        mkdir -p $DIR/etc/nginx/
        mkdir -p $DIR/etc/nginx/keys/
        mkdir -p $DIR/etc/nginx/sites-enabled
-
-       #files
-       CERT=""
-       KEY=""
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##DIR##/${DIR}/g" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-      sed -e "s/##CERT##/${CERT}/" \
-          -e "s/##KEY##/${KEY}/" \
-          -e "s/##PREFIX##/${PREFIX}/" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf_template > $RF/etc/nginx/sites-enabled/outerhost.conf
+       cp keys/* $DIR/etc/nginx/keys/
+       cp $KEYFILE $CERTFILE $DIR/etc/nginx/keys/
+    
+       sed -e "s/##PREFIX##/${PREFIX}/" \
+          -e "s@##DIR##@${DIR}@g" docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+  
+       sed -e "s/##CERT##/${CERT}/" \
+           -e "s/##KEY##/${KEY}/" \
+           -e "s/##PREFIX##/${PREFIX}/" \
+           -e "s/##OUTERHOST##/$OUTERHOST/" \
+           -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf_template > $RF/etc/nginx/sites-enabled/outerhost.conf
   	 
       echo "2. Building ${PREFIX}-outer-nginx.."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build

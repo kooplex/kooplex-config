@@ -1,4 +1,4 @@
-FROM jupyter/configurable-http-proxy
+FROM jupyter/configurable-http-proxy:3.1.1
 
 MAINTAINER Laszlo Dobos <dobos@complex.elte.hu>
 
@@ -11,8 +11,9 @@ EXPOSE 8001
 WORKDIR /
 
 ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 USER nobody
 
 # Replace entry point to allow passing arguments
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
