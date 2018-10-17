@@ -12,12 +12,11 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    ports:
-      - 80:80
     logging:
       options:
         max-size: "10m"
         max-file: "3"
+    ##EXTRACONFIG##
 
 networks:
   ##PREFIX##-net:

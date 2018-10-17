@@ -13,6 +13,10 @@ case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-impersonator..."
 
+    if [ $REWRITEPROTO = "http" ]; then
+      EXTRACONFIG="ports:\n      - 80:80"
+    fi
+
       cp Dockerfile $RF
       cp etc/nginx.conf $RF
       sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
@@ -21,7 +25,8 @@ case $VERB in
           -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
           -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $RF/sites.conf
       
-      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       echo "2. Building ${PREFIX}-nginx..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
