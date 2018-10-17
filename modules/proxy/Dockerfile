@@ -1,6 +1,6 @@
 FROM jupyter/configurable-http-proxy:3.1.1
 
-MAINTAINER Laszlo Dobos <dobos@complex.elte.hu>
+MAINTAINER Kooplex Team <kooplex@complex.elte.hu>
 
 USER root
 

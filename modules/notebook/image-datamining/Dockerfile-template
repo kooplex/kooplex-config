@@ -1,4 +1,4 @@
-FROM ##PREFIX##-notebook-base
+FROM ##PREFIX##-notebookbase
 
 RUN apt update 
 RUN apt install -y curl && \
@@ -140,6 +140,6 @@ ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
 
-ADD manage_report_mount.sh /usr/local/sbin/manage_report_mount.sh
-RUN chmod +x /usr/local/sbin/manage_report_mount.sh 
+ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
+RUN chmod +x /usr/local/sbin/manage_mount.sh 
 
