@@ -1,21 +1,25 @@
 #!/bin/bash
 
 RF=$BUILDDIR/notebooks
-
+    echo "Building image $PREFIX-notebooks $EXTRA"
 
 case $VERB in
   "build")
-    echo "Building image $PREFIX-notebooks"
+    echo "Building image $PREFIX-notebooks $EXTRA"
 
 
      mkdir -p $RF
-     for imagedir in ./image-*
+     
+#     for imagedir in ./image-*
+     for i in $EXTRA
      do
+        imagedir="./image-"$i
         mkdir -p $RF/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
-        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir
-        cp etc/* ${RF}/$imagedir
+        cp scripts/{jupyterlab.png,kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir
+        cp etc/* DockerFile-pieces/* ${RF}/$imagedir
+
 #####
   printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
   printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/$imagedir/nsswitch.conf
@@ -31,6 +35,7 @@ case $VERB in
 
 
      	echo "Building image from $docfile"
+        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
         docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
        
      done

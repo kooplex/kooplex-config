@@ -326,20 +326,6 @@ print(a.uid, \" \", a.secret, \"\\n\")
 "
 }
 
-getverb() {
-  echo $1
-}
-
-getmodules() {
-  if [ $# -lt 2 ] || [ "$2" = "all" ]; then
-    echo "$SYSMODULES $MODULES"
-  elif [ "$2" = "sys" ]; then
-    echo "$SYSMODULES"
-  else
-    local args=($@)
-    echo "${args[@]:1}"
-  fi
-}
 
 reverse() {
   echo "$@" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }'
