@@ -7,6 +7,29 @@
 from jinja2 import ChoiceLoader, FunctionLoader
 from notebook.notebookapp import NotebookApp
 
+contname="""
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>{{ host_name }}</strong></a></li>
+    </ul>
+"""
+
+switch_lab = """
+    <span id="login_widget">
+        <a href="/notebook/{{ containername }}/lab"><img src=/notebook/{{ containername }}/static/base/images/jupyterlab.png" title="Switch to JupyterLab" width="35px"/></da>
+    </span>
+"""
+
+kooplex_logo = """
+    <a href="/hub" >
+       <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="32px" style="padding-right: 30px;">
+    </a>
+"""
+jupyter_logo = """
+    <a href="/notebook/{{ containername }}/tree">
+       <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
+"""
+
 edit_template = """
 {% extends "templates/edit.html" %}
 {% block meta %}
@@ -20,15 +43,10 @@ edit_template = """
 {% endblock %}
   {% block headercontainer %}
 
-    <a href="/hub" >
-       <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
-    </a>
-    <a href="/notebook/{{ containername }}/tree">
-       <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
-    </a>
-    <ul class="nav navbar-nav navbar-right">
-        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a></li>
-    </ul>
+""" + kooplex_logo + """
+""" + jupyter_logo + """
+
+""" + contname + """
 {% endblock %}
 {% block login_widget %}
 {% endblock %}
@@ -48,15 +66,11 @@ terminal_template = """
 {% endblock %}
   {% block headercontainer %}
 
-    <a href="/hub" >
-       <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
-    </a>
-    <a href="/notebook/{{ containername }}/tree">
-       <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
-    </a>
-    <ul class="nav navbar-nav navbar-right">
-        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a></li>
-    </ul>
+""" + kooplex_logo + """
+
+""" + jupyter_logo + """
+""" + contname + """
+
 {% endblock %}
 {% block login_widget %}
 {% endblock %}
@@ -77,24 +91,37 @@ tree_template = """
 {% endblock %}
   {% block headercontainer %}
 
-    <a href="/hub/" >
-       <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-right: 30px;">
-    </a>
-    <a href="/notebook/{{ containername }}/tree">
-       <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
-    </a>
-    <ul class="nav navbar-nav navbar-right">
-        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a></li>
-    </ul>
+""" + kooplex_logo + """
+
+""" + jupyter_logo + """
+""" + contname + """
 {% endblock %}
 
 {% block login_widget %}
 
-    <span id="login_widget">
-        <a href="/notebook/{{ containername }}/lab"><button id="switch" class="btn btn-sm navbar-btn">Switch to JupyterLab</button></a>
-    </span>
-
   {% endblock %}
+
+{% block script %}
+    {{super()}}
+
+<script type="text/javascript">
+  var node = document.createElement("LI");     
+  var link = document.createElement("a");     
+  link.href="/notebook/{{ containername }}/lab";
+  link.id = "switchlab";
+  var textnode = document.createTextNode('Switch to JupyterLab');
+  link.appendChild(textnode);
+  node.appendChild(link);
+  document.getElementById("tabs").appendChild(node);
+</script>
+<script type="text/javascript">    
+        $( "#switchlab" ).click(function(){
+      var url = $(this).attr('href');
+      $( location ).attr("href", url);
+
+    });
+</script>
+{% endblock %}
 
 """
 
@@ -114,16 +141,11 @@ notebook_template = """
 <span id="save_widget" class="save_widget">
     <span id="notebook_name" class="filename"></span>
     <span class="checkpoint_status"></span>
-    <span class="autosave_status"></span>
-    <a href="/hub">
-       <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="35px" style="padding-left: 30px; padding-right: 30px;">
-    </a>
-    <a href="/notebook/{{ containername }}/tree">
-       <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
-    </a>
+    <span class="autosave_status" style="margin-right: 150px"></span>
+""" + kooplex_logo + """
 </span>
 
-<a href="#" class="navbar-brand" style="color: black;"> <strong>Project - {{ project_name }}</strong></a>
+<a href="#" class="navbar-brand" style="color: black;"> <strong>{{ host_name }}</strong></a>
 <span id="kernel_logo_widget">
   {% block kernel_logo_widget %}
   <img class="current_kernel_logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
@@ -147,7 +169,7 @@ class KooplexUserNotebookApp(NotebookApp):
         env = self.web_app.settings['jinja2_env']
         env.globals['stop_link'] = 'http://www.google.com/'+self.base_url
         env.globals['commit_link'] = 'http://www.google.com/'+self.connection_url
-        env.globals['project_name'] =  os.getenv("PR_NAME")
+        env.globals['host_name'] =  os.getenv("HOSTNAME")
         env.globals['user_name'] = os.getenv("NB_USER")
         env.globals['containername'] = os.getenv("HOSTNAME")
 

@@ -54,7 +54,7 @@ for d in /vol/*/condaenvs/*/ ; do
 done
 
 # Start the notebook server
-exec su $NB_USER -c "cd ; env PATH=$PATH jupyter notebook $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\" "
+exec su $NB_USER -c "cd ; env PATH=$PATH jupyter notebook-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\" "
 
 # clean up
 umount /mnt/.volumes

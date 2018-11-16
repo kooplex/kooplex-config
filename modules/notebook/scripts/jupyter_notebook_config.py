@@ -22,7 +22,7 @@ c.NotebookApp.token = 'aiSiga1aiFai2AiZu1veeWein5gijei8yeLay2Iecae3ahkiekeisheeg
 c.FileContentsManager.delete_to_trash = False
 
 # This will enable the option to switch between conda envs in the notebook-server
-c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
+#c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
 
 c.LatexConfig.latex_command = 'pdflatex'
 
