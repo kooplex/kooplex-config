@@ -39,7 +39,7 @@ RUN pip3 install psycopg2
 # Add crontab file in the cron directory
 COPY crontab /etc/cron.d/monitor-cron
 COPY stat.py /usr/local/bin/stat.py
-
+ADD runstat.sh /runstat.sh
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/monitor-cron
 

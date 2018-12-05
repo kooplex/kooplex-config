@@ -7,6 +7,12 @@ def insert_item(table, col_name, value):
     cur.execute(sqlc)
     conn.commit()
 
+def update_item(table, col_name, value, exist_col_name, exist_value):
+    sqlc = "UPDATE %s SET %s = '%s' WHERE %s = '%s';" % (table, col_name, value, exist_col_name, exist_value)
+    print(sqlc)
+    cur.execute(sqlc)
+    conn.commit()
+
 def get_item(table, col_name, value):
     sqlc = "select * from %s where %s ='%s';" % (table, col_name, value)
     cur.execute(sqlc)
@@ -35,7 +41,7 @@ def check_last_changed(table_name, hubuser_id, container_id, col_name, value, th
                 #print(hubuser_id, container_id, col_name[0], res[icol], cols[col_name[0]], abs(cols[col_name[0]] - res[icol])/change[col_name[0]])
                 if ( res[icol] == 0 ) or ( s_type == 'c' and value > threshold ) or\
                         ( s_type == 'a' and abs(value - res[icol]) > threshold ):
-                    #print('Ins', hubuser_id, container_id, value, threshold, abs(value - res[icol]))
+                    #print('Ins', col_name, hubuser_id, container_id, value, threshold, abs(value - res[icol]))
                     #print()
                     return True
     else:
@@ -54,13 +60,13 @@ conn = psycopg2.connect("dbname=monitor user=postgres")
 cur = conn.cursor()
 
 client = docker.from_env()
-
 container_list = client.containers.list()
 for cont in container_list:
     #Get container name
     container_name = cont.attrs['Name']
-    if container_name.split("-")[0] == '/nb':
 
+#    if container_name.split("-")[0] == '/nb':
+    if 1==1:
         #Query for project, if it does not exist then insert it
         project_name = get_project_name(cont)
 
@@ -73,8 +79,10 @@ for cont in container_list:
 
         #Query for container_name, if it does not exist then insert it
         res = get_item('container', 'container_name', container_name)
+        if res and not res[1]:
+            update_item('container', 'project_id', "%d"%project_id, 'container_name', container_name)
         if not res:
-            insert_item('container', 'container_name', container_name)
+            insert_item('container', 'project_id, container_name', "%d', '%s"%(project_id, container_name))
             res = get_item('container', 'container_name', container_name)
         container_id = res[0]
 
@@ -94,7 +102,9 @@ for cont in container_list:
         stat = cont.stats(decode=True, stream=False)
 
         memoryusage = stat['memory_stats']['usage']
-        cpuload = int(stat['cpu_stats']['cpu_usage']['total_usage']/stat['cpu_stats']['system_cpu_usage']*10000+0.5)
+        cpudelta = stat['cpu_stats']['cpu_usage']['total_usage']-stat['precpu_stats']['cpu_usage']['total_usage']
+        precpudelta = stat['cpu_stats']['system_cpu_usage']-stat['precpu_stats']['system_cpu_usage']
+        cpuload = (cpudelta/precpudelta)*100*len(stat['cpu_stats']['cpu_usage']['percpu_usage'])
         pids = stat['pids_stats']['current']
 
         net_i = sum([ stat['networks'][interface]['rx_bytes'] for interface in stat['networks'].keys()])

@@ -2,9 +2,8 @@ FROM ##PREFIX##-notebookbase
 
 RUN apt update && \
     apt install -y curl && \
-    curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-    apt install --yes nodejs npm && \
-    npm install -g bower
+    curl --silent --location https://deb.nodesource.com/setup_10.x | sudo bash - && \
+    apt install --yes nodejs 
 
 RUN apt install -y tmux zip curlftpfs
 RUN apt install -y liblapack-dev libblas-dev
@@ -34,11 +33,12 @@ RUN chmod a+wrx $CONDA_DIR
 # Install conda
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-$CONDA_VER-Linux-x86_64.sh && \
-    # echo "9ea57c0fdf481acf89d816184f969b04bc44dea27b258c4e86b1e3a25ff26aa0 *Miniconda3-3.19.0-Linux-x86_64.sh" | sha256sum -c - && \
-    /bin/bash Miniconda3-$CONDA_VER-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-$CONDA_VER-Linux-x86_64.sh 
-RUN conda update -n base conda
+    wget --quiet https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh && \
+    # echo "09f53738b0cd3bb96f5b1bac488e5528df9906be2480fe61df40e0e0d19e3d48 *Anaconda3-5.2.0-Linux-x86_64.sh" | sha256sum -c - && \
+    /bin/bash Anaconda3-5.2.0-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Anaconda3-5.2.0-Linux-x86_64.sh
+
+#RUN conda update -n base conda
 
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
 RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console 
@@ -58,13 +58,15 @@ RUN apt install -y libblacs-mpi-dev libscalapack-mpi-dev
  
 
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge ipywidgets=7.0 traittypes
-RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge bqplot
+RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge bqplot ase sisl
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 RUN $CONDA_DIR/bin/conda install -v --yes  -c conda-forge parso=0.1.0
 
 
 RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise pivottablejs
+
+RUN conda update -y -n base conda
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge ipyleaflet folium
 RUN $CONDA_DIR/bin/conda install --quiet --yes seaborn pandas
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge altair branca vega vincent 
@@ -86,11 +88,7 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
 
-
-
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
-RUN $CONDA_DIR/bin/conda install -v --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
-
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge ipyvolume=0.4.5 ipywebrtc=0.3.0 plotly
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex

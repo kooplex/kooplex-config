@@ -74,6 +74,11 @@ create table containerstats_block_o (
   block_o        bigint not null  -- byte
 );
 
+create table number_of_ipykernels (
+  id             serial primary key, 
+  last_read      timestamp not null default now(),
+  ipykernels     int not null  -- # of ipykernels
+);
 
 -- TODO: host metrikák
 
