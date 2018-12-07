@@ -17,8 +17,9 @@ case $VERB in
         mkdir -p $RF/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
-        cp scripts/{jupyterlab.png,kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir
-        cp etc/* DockerFile-pieces/* ${RF}/$imagedir
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir
+        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rsession.conf,rserver.conf,rstudio-nginx.conf}  ${RF}/$imagedir
+        cp DockerFile-pieces/* ${RF}/$imagedir
 
 #####
   printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
