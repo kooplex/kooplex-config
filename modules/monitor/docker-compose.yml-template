@@ -12,9 +12,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-monitordb:/var/lib/postgresql/data:rw
-      - /sys:/sys:ro 
-      - /var/lib/docker/:/var/lib/docker:ro 
-      - /dev/disk/:/dev/disk:ro 
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     privileged: true
     environment:

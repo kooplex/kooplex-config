@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RF=$SRV/_monitoring
+RF=$BUILDDIR/monitor
+mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
