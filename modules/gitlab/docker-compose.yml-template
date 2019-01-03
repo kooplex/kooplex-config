@@ -1,0 +1,73 @@
+version: "3"
+
+services:
+  ##PREFIX##-gitlab:
+    container_name: ##PREFIX##-gitlab
+    image: ##PREFIX##-gitlab
+    depends_on:
+      - ##PREFIX##-gitlabdb
+    build:
+      context: .
+      dockerfile: Dockerfile.gitlab
+    networks:
+      - ##PREFIX##-net
+      - ##GITLABNET##
+    ports:
+      - "22222:22"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-gitlab-etc:/etc/gitlab/:rw
+      - ##PREFIX##-gitlab-log:/var/log/gitlab/:rw
+      - ##PREFIX##-gitlab-opt:/var/opt/gitlab/:rw      
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ##PREFIX##-gitlabdb:
+    container_name: ##PREFIX##-gitlabdb
+    image: postgres:10.3-alpine
+    networks:
+      ##GITLABNET##:
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-gitlabdb:/var/lib/postgresql/data:rw
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=##GITLABDBPW##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    user: postgres
+#    command: >
+#      /bin/bash -c "
+#        docker-entrypoint.sh postgres &
+#        sleep 10
+#        while ! psql -lqt | cut -d \| -f 1 | grep -qw gitlabhq_production
+#        do
+#          createdb gitlabhq_production;
+#          sleep 1500;
+#        done
+#        echo Connected!;
+#        R=`ps axu | grep docker-entrypoint.sh  | grep -v sleep | grep -v grep| awk '{print $2}'`
+#        wait $R
+#      "
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##GITLABNET##:
+    external: false
+
+volumes:
+  ##PREFIX##-gitlabdb:
+    external: true
+  ##PREFIX##-gitlab-etc:
+    external: true
+  ##PREFIX##-gitlab-log:
+    external: true
+  ##PREFIX##-gitlab-opt:
+    external: true
+

@@ -1,0 +1,27 @@
+
+ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
+RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
+
+# Add local files as late as possible to avoid cache busting
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
+RUN chmod a+x /usr/local/bin/start-notebook.sh
+ADD kooplex-logo.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/kooplex-logo.png
+ADD kooplex-logo.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/jupyterlab.png
+
+RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
+
+########## add the rest
+RUN mkdir -p /init
+
+ADD 01-startnslcd.sh /init/01-startnslcd.sh
+ADD 02-mountuserhome.sh /init/02-mountuserhome.sh
+ADD 03-startinotify.sh /init/03-startinotify.sh
+ADD 99-startnotebookserver.sh /init/99-startnotebookserver.sh
+ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
+ADD nslcd.conf /etc/nslcd.conf
+ADD ldap.conf /etc/ldap/ldap.conf
+ADD nsswitch.conf /etc/nsswitch.conf
+
+ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
+RUN chmod +x /usr/local/sbin/manage_mount.sh 
+

@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Change UID of NB_USER to NB_UID if it does not match 
+if [ "$NB_UID" != $(id -u $NB_USER) ] ; then
+    usermod -u $NB_UID $NB_USER
+fi
+
+# Enable sudo if requested
+if [ ! -z "$GRANT_SUDO" ]; then
+    echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
+fi
+
+for gid in $(echo $MNT_GIDS | sed 's/,/ /')
+do
+   addgroup --gid=$gid g$gid
+   addgroup $NB_USER g$gid
+
+done
+
+# debug
+env
+
+id $NB_USER
+
+#FIXME: gid hardcoded
+#chown ${NB_USER}:9998 $USER_HOSTKEYS
+
+
+# manage symbolic links under user's conda env directory
+CONDA_ENVS=/home/$NB_USER/.conda/envs
+if [ ! -d $CONDA_ENVS ] ; then 
+  echo "recreating $CONDA_ENVS"
+  mkdir -p $CONDA_ENVS
+fi
+# SO THAT WE DON'T GET A WARNING WHEN ENTERING CONDA TAB
+[ -e /opt/conda/ $CONDA_ENVS/conda ] || ln -s /opt/conda/ $CONDA_ENVS/conda 
+#FIXME: gid hardcoded, left here to lazy set formerly screwed permissions
+chown -R $NB_USER:9998 /home/$NB_USER/.conda
+for d in /vol/*/condaenvs/*/ ; do
+  volname=$(echo $d | cut -f3 -d\/)
+  LINK=$CONDA_ENVS/$volname
+  if [ ! -e $LINK ] ; then
+      echo "creating symlink $LINK"
+      ln -s $d $LINK
+  elif [ -h $LINK ] ; then
+      if [ $(realpath $LINK) != $(echo $d | sed s/'\/$'//) ] ; then
+          echo "link $LINK exists and points to somewhere else, randomize the name"
+          ln -s $d ${LINK}.$(mktemp -u | sed s/[^\.]*\.//)
+      fi
+  else
+      echo "file or dir $LINK exists, randomize the name"
+      ln -s $d ${LINK}.$(mktemp -u | sed s/[^\.]*\.//)
+  fi
+done
+
+# Start the notebook server
+exec su $NB_USER -c "cd ; env PATH=$PATH jupyter notebook-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10 --EnvironmentKernelSpecManager.display_name_template=\" {}\" "
+
+# clean up
+umount /mnt/.volumes
+umount /home/${NB_USER}/share
+umount /home/${NB_USER}

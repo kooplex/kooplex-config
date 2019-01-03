@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  ##PREFIX##-outer-nginx:
+    container_name: ##PREFIX##-outer-nginx
+    image: nginx
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##DIR##/etc/nginx/sites-enabled:/etc/nginx/conf.d:ro
+      - ##DIR##/etc/nginx/keys:/etc/nginx/keys:ro
+      - ##DIR##/var:/var/log/nginx:rw
+    restart: unless-stopped
+    ports:
+      - 443:443
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+

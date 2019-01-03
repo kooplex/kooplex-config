@@ -1,0 +1,41 @@
+FROM ##PREFIX##-base
+
+RUN apt-get update && apt-get install -y \
+		gcc cron \
+		gettext \
+		mysql-client libmysqlclient-dev \
+		postgresql-client libpq-dev \
+                vim less \
+                ssh git\
+		python3-pip python3-dev\
+	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+ENV DJANGO_VERSION 1.11
+
+RUN pip3 install --upgrade pip
+RUN pip3 install setuptools
+RUN pip3 install mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"
+RUN pip3 install ldap3
+RUN pip3 install pwgen
+RUN pip3 install "python-social-auth[django]" "social-auth-core[openidconnect]"
+RUN pip3 install django-tables2 django-bootstrap3 unidecode
+
+# It is very important that the following command 'git clone...' cannot be cached
+# (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
+ARG CACHE_DATE=2016-01-02
+#RUN git clone -b devnew https://github.com/kooplex/kooplex-hub.git /kooplexhub
+#COPY settings.py /kooplexhub/kooplexhub/kooplex/settings.py
+
+RUN apt-get install -y openssh-server openssh-sftp-server vim
+RUN apt update
+RUN apt-get install  -y tzdata
+
+COPY runserver.sh /runserver.sh
+RUN chmod a+x /runserver.sh
+
+RUN ln -sf  /usr/share/zoneinfo/Europe/Budapest  /etc/localtime
+RUN dpkg-reconfigure tzdata
+
+EXPOSE 80
+
+ENTRYPOINT [ "/runserver.sh" ]

@@ -1,0 +1,15 @@
+FROM ##PREFIX##-base-for-notebooks
+
+######################################################################
+# Data mining extra
+######################################################################
+RUN $CONDA_DIR/bin/conda install  --quiet --yes tensorflow
+RUN $CONDA_DIR/bin/conda install  --quiet --yes keras
+RUN $CONDA_DIR/bin/conda install  --quiet --yes -c conda-forge xgboost
+RUN $CONDA_DIR/bin/conda install  --quiet --yes opencv
+RUN $CONDA_DIR/bin/conda install  --quiet --yes h5py
+RUN $CONDA_DIR/bin/conda install  --quiet --yes graphviz 
+RUN pip install graphviz 
+######################################################################
+
+

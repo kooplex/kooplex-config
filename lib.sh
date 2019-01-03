@@ -2,6 +2,11 @@
 
 # IP address functions
 
+ldapquery () {
+echo ldapsearch -x -H ldap://${PREFIX}-ldap -D cn=admin,$LDAPORG -b ou=users,$LDAPORG -s one "objectclass=top" -w $LDAPPW
+}
+
+
 ip_ip2dec () {
   local a b c d ip=$@
   IFS=. read -r a b c d <<< "$ip"
@@ -35,22 +40,71 @@ ip_addip () {
 
 # LDAP functions
 
+ldap_ldapconfig() {
+    echo "
+BASE   $LDAPORG
+URI    ldap://$PREFIX-ldap/
+
+# TLS certificates (needed for GnuTLS)
+TLS_CACERT      /etc/ssl/certs/ca-certificates.crt
+"
+}
+
+ldap_nsswitchconfig() {
+  echo "
+passwd:         ldap compat
+group:          ldap compat
+shadow:         ldap compat
+gshadow:        files
+
+hosts:          files dns
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+netgroup:       nis
+  "
+}
+
 ldap_nslcdconfig () {
-  LDAPPASS=$(getsecret ldap)
+#  LDAPPW=$(getsecret ldap)
   echo "uid nslcd
 gid nslcd
 
-uri ldap://$PROJECT-ldap/
+uri ldap://$PREFIX-ldap/
 
 base $LDAPORG
 scope subtree
 
 binddn cn=admin,$LDAPORG
-bindpw $LDAPPASS
-rootpwmoddn cn=admin,$LDAPORG
-rootpwmodpw $LDAPPASS
+bindpw $HUBLDAP_PW
+#rootpwmoddn cn=admin,$LDAPORG
+#rootpwmodpw $HUBLDAP_PW
 
 "
+}
+
+ldap_makeconfig () {
+  SVC=$1
+  
+  mkdir -p $SRV/$SVC/etc/ldap
+  printf "$(ldap_ldapconfig)\n\n" > $SRV/$SVC/etc/ldap/ldap.conf
+  printf "$(ldap_nsswitchconfig)\n\n" > $SRV/$SVC/etc/nsswitch.conf
+  printf "$(ldap_nslcdconfig)\n\n" > $SRV/$SVC/etc/nslcd.conf
+  chown root $SRV/$SVC/etc/nslcd.conf
+  chmod 0600 $SRV/$SVC/etc/nslcd.conf
+}
+
+ldap_makebinds () {
+  SVC=$1
+  
+  echo "-v $SRV/$SVC/etc/ldap/ldap.conf:/etc/ldap.conf
+  -v $SRV/$SVC/etc/nslcd.conf:/etc/nslcd.conf
+  -v $SRV/$SVC/etc/nsswitch.conf:/etc/nsswitch.conf
+  -v $SRV/$SVC/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py"
 }
 
 ldap_fdqn2cn () {
@@ -71,6 +125,12 @@ ldap_fdqn2cn () {
 ldap_add() {
   local ldappass=$(getsecret ldap)
   printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
+}
+
+ldap_del() {
+  local ldappass=$(getsecret ldap)
+  echo $LDAPORG
+  printf "uid=%s,ou=users,$LDAPORG " "$1" | ldapdelete -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass" -v 
 }
 
 ldap_nextuid() {
@@ -121,6 +181,13 @@ shadowMin: 8
 shadowMax: 999999
 shadowLastChange: 10877
 "
+
+  ldap_add "dn: cn=$username,ou=groups,$LDAPORG
+objectClass: top
+objectClass: posixGroup
+gidNumber: $uid
+memberUid: $uid
+"
 }
 
 ldap_addgroup() {
@@ -142,10 +209,22 @@ gidNumber: $uid
   
 }
 
+# Home functions
+
+home_makensfmount() {
+  echo "#/bin/sh
+echo \"Mounting home...\"
+mount -t nfs $PREFIX-home:/exports/home /home"
+}
+
+home_makebinds() {
+  echo "-v $SRV/home:/home"
+}
+
 # Gitlab functions
 
 gitlab_exec() {
-  docker $DOCKERARGS exec $PROJECT-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
+  docker $DOCKERARGS exec $PREFIX-gitlab /opt/gitlab/bin/gitlab-rails r "$1"
 }
 
 gitlab_adduser() {
@@ -173,6 +252,17 @@ i.extern_uid = \"uid=$username,ou=users,$LDAPORG\"
 i.user = u
 i.user_id = u.id
 i.save!
+"
+}
+
+gitlab_deluser() {
+  local username=$1
+
+  echo "Deleting Gitlab user $username..."
+  
+  gitlab_exec "
+  u = User.find_by_username(\"$username\") 
+  u.destroy
 "
 }
 
@@ -236,14 +326,6 @@ print(a.uid, \" \", a.secret, \"\\n\")
 "
 }
 
-getmodules() {
-  if [ $# -lt 2 ] || [ "$2" = "all" ]; then
-    echo "$ALLMODULES"
-  else
-    local args=($@)
-	echo "${args[@]:1}"
-  fi
-}
 
 reverse() {
   echo "$@" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }'
@@ -259,16 +341,6 @@ createsecret() {
 getsecret() {
   local name=$1
   cat $SECRETS/$name.secret
-}
-
-cpetc() {
-  printf "$(ldap_nslcdconfig)\n\n" > ../../etc/nslcd.conf
-  mkdir etc
-  cp -R ../../etc/* etc/
-}
-
-rmetc() {
-  rm -R etc
 }
 
 adduser() {
@@ -294,23 +366,40 @@ adduser() {
   # Create home directory
   mkdir -p $SRV/home/$username
   
-  # Create jupyter config
-  mkdir -p $SRV/home/$username/.jupyter
-  cp $KOOPLEXWD/modules/notebook/jupyter_notebook_config.py $SRV/home/$username/.jupyter/
+
   
   # Generate git private key
   SSHKEYPASS=$(getsecret sshkey)
   mkdir -p $SRV/home/$username/.ssh
-  rm $SRV/home/$username/.ssh/gitlab.key
-  ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
+  rm -f $SRV/home/$username/.ssh/gitlab.key
+  #ssh-keygen -N "$SSHKEYPASS" -f $SRV/home/$username/.ssh/gitlab.key
+  ssh-keygen -N "" -f $SRV/home/$username/.ssh/gitlab.key
 
   # Register key in Gitlab
   gitlab_addsshkey $username $pass
   
   # Set home owner
   chown -R $uid:$uid $SRV/home/$username
-  # TODO set permissions
+  setfacl -R -m d:u:$uid:rwx $SRV/home/$username
+
+  # Set user quota
+#  setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
   
+    # Create Data directory which can be accessed through ownCloud
+  echo "Initializing OwnCloud folders for  $uid $username"
+  PATH_OWNCLOUD=$SRV/ownCloud
+  if [ ! -d $PATH_OWNCLOUD ]; then
+     mkdir -p $PATH_OWNCLOUD/
+  fi
+  mkdir -p $PATH_OWNCLOUD/$username/
+  mkdir -p $PATH_OWNCLOUD/$username/files/
+  chown -R www-data:www-data $PATH_OWNCLOUD/$username/
+  mkdir -p $SRV/home/$username/Data
+  chown -R www-data:www-data  $SRV/home/$username/Data
+  sleep 10
+  docker $DOCKERARGS exec $PREFIX-owncloud bash -c "cd /var/www/html/;chown root console.php config/config.php; php ./console.php files:scan --unscanned --all; chown www-data console.php config/config.php"
+
+
   echo "New user created: $uid $username"
 }
 
@@ -323,9 +412,13 @@ modifyuser() {
 
 deleteuser() {
   # TODO: implement
+  local username=$1
+  
+  echo "Deleting LDAP user ($username)..."
 
-  echo Not implemented >&2
-  exit 2
+  ldap_del $username 
+  gitlab_deluser $username
+  rm -r $SRV/home/$username/
 }
 
 resetpass() {
@@ -350,15 +443,17 @@ config() {
   
   KOOPLEXWD=`pwd`
   
-  SRV=$ROOT/$PROJECT/srv 
-  SRC=$ROOT/$PROJECT/src
-  SECRETS=$SRV/.secrets
+#  SRV=$ROOT/$PREFIX
+#  SECRETS=$SRV/.secrets
+
+  SSHLOC=`which ssh`
 
   ADMINIP=$(ip_addip "$SUBNET" 2)
   
   LDAPIP=$(ip_addip "$SUBNET" 3)
-  LDAPORG=$(ldap_fdqn2cn "$DOMAIN")
-  LDAPSERV=$PROJECT-ldap
+  LDAPORG=$(ldap_fdqn2cn "$LDAPDOMAIN")
+  echo $LDAPORG
+  LDAPSERV=$PREFIX-ldap
   LDAPPORT=389
 
   HOMEIP=$(ip_addip "$SUBNET" 4)
@@ -375,6 +470,31 @@ config() {
   
   NGINXIP=$(ip_addip "$SUBNET" 16)
   
+  HUBIP=$(ip_addip "$SUBNET" 18)
+  MONITORIP=$(ip_addip "$SUBNET" 20)
+  
+  SMTPIP=$(ip_addip "$SUBNET" 25)
+  
+  MYSQLIP=$(ip_addip "$SUBNET" 19)
+
+  MYSQLPASS=$HUBDBPW
+  
+  GITLABDBIP=$(ip_addip "$SUBNET" 32)
+
+  GITLABDBPASS=$GITLABDBPW
+
+  DASHBOARDSIP=$(ip_addip "$SUBNET" 21)
+  DASHBOARDSDIR=$SRV"/_report"
+  
+#  DOCKERPORT=${DOCKERARGS##*:}
+
+  IPPOOLB=$(ip_addip "$SUBNET" 5121)
+  IPPOOLE=$(ip_addip "$SUBNET" 5375) 
+
+  PROXYTOKEN=$(createsecret proxy)
+
+ 
+
   if [ $(isindocker) -eq 1 ]; then
     echo "Process is running inside a docker container."
   else

@@ -1,5 +1,5 @@
 # Based on:  https://docs.docker.com/engine/examples/running_ssh_service/
-FROM debian:jessie
+FROM ##PREFIX##-base
 
 MAINTAINER COMPARE-WIGNER-NODE
 
@@ -10,7 +10,7 @@ ARG LDAPORG
 
 RUN apt-get update
 RUN apt-get install -y \
-    apt-transport-https ca-certificates
+    apt-transport-https ca-certificates vim
     
 # Install OS and docker packages
 

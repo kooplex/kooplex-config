@@ -1,19 +1,31 @@
 #!/bin/bash
 
 case $VERB in
+  "build")
+     docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
+     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
+    
+#     docker $DOCKERARGS build -t ${PREFIX}-home  .
+  ;;
   "install")
-  
-    docker $DOCKERARGS create \
+  cont_exist=`docker $DOCKERARGS ps -a | grep $PROJECT-home | awk '{print $2}'`
+    if [ ! $cont_exist ]; then
+    docker $DOCKERARGS run -d -it \
       --name $PROJECT-home \
       --hostname $PROJECT-home \
       --net $PROJECT-net \
       --ip $HOMEIP \
       --privileged \
-      -v $SRV/home:/exports/home \
-      cpuguy83/nfs-server /exports/home
+      --log-opt max-size=1m --log-opt max-file=3 \
+      -v /etc/localtime:/etc/localtime:ro \
+      -v $SRV/home:/home \
+       ${PREFIX}-home bash
+    else
+     echo "$PROJECT-home is already installed"
+    fi
   ;;
   "start")
-    echo "Starting nfs home $PROJECT-home [$HOMEIP]"
+    echo "Starting $PROJECT-home [$HOMEIP]"
     docker $DOCKERARGS start $PROJECT-home
   ;;
   "init")
@@ -29,6 +41,13 @@ case $VERB in
   ;;
   "purge")
     echo "Purging nfs home $PROJECT-home [$HOMEIP]"
-    mkdir -p $SRV/home
+#    rm -R $SRV/home
+    docker $DOCKERARGS volume rm ${PREFIX}-home
+    docker $DOCKERARGS volume rm ${PREFIX}-share
+  ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-home"
+    rm -R -f $SRV/home 
+
   ;;
 esac

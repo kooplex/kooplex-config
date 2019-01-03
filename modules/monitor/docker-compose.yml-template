@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  ##PREFIX##-monitordb:
+    container_name: ##PREFIX##-monitordb
+    image: ##PREFIX##-monitordb
+    build:
+      context: .
+      dockerfile: Dockerfile.monitordb
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-monitordb:/var/lib/postgresql/data:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - POSTGRES_PASSWORD=##POSTGRESDBPW##
+    ports:
+      - "15432:5432"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    user: root
+
+
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-monitordb:
+    external: true
+

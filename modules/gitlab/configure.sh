@@ -1,91 +1,108 @@
 #!/bin/bash
 
+RF=$BUILDDIR/gitlab
+
+mkdir -p $RF
+
+DOCKER_HOST=$DOCKERARGS
+DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+
+
 case $VERB in
-  "install")
-    echo "Installing gitlab $PROJECT-gitlab [$GITLABIP]"
-    
-    mkdir -p $SRV/gitlab/etc
-    mkdir -p $SRV/gitlab/log
-    mkdir -p $SRV/gitlab/opt
-    
-    GITLABRB=$SRV/gitlab/etc/gitlab.rb
-    echo "
-external_url 'http://$DOMAIN/gitlab'
+  "build")
+    echo "1. Configuring ${PREFIX}-gitlab..."
 
-gitlab_rails['gitlab_email_from'] = '$EMAIL'
-gitlab_rails['gitlab_email_display_name'] = '$PROJECT gitlab'
-gitlab_rails['gitlab_email_reply_to'] = '$EMAIL'
-gitlab_rails['smtp_enable'] = true
-gitlab_rails['smtp_address'] = '$SMTP'
+    mkdir -p $SRV/_gitlabdb
+    mkdir -p $SRV/_gitlab/etc_gitlab
+    mkdir -p $SRV/_gitlab/var_log_gitlab
+    mkdir -p $SRV/_gitlab/var_opt_gitlab
 
-gitlab_rails['gitlab_signup_enabled'] = false
-gitlab_rails['gitlab_signin_enabled'] = false
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlabdb -o o=bind ${PREFIX}-gitlabdb
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlab/etc_gitlab -o o=bind ${PREFIX}-gitlab-etc
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlab/var_log_gitlab -o o=bind ${PREFIX}-gitlab-log
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitlab/var_opt_gitlab -o o=bind ${PREFIX}-gitlab-opt
 
-gitlab_rails['ldap_enabled'] = true
-gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block with 'EOS' below
-  main:
-    label: 'LDAP'
-    host: '$PROJECT-ldap'
-    port: 389
-    uid: 'uid'
-    method: 'plain'
-    bind_dn: 'cn=admin,$LDAPORG'
-    password: '$LDAPPASS'
-    active_directory: false
-    allow_username_or_email_login: false
-    block_auto_created_users: false
-    base: 'ou=users,$LDAPORG'
-    user_filter: '(objectClass=posixAccount)'
-    attributes:
-      username: ['uid', 'userid', 'sAMAccountName']
-      email:    ['mail', 'email', 'userPrincipalName']
-      name:       'cn'
-      first_name: 'givenName'
-      last_name:  'sn'
-EOS
+#    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
 
-" > $GITLABRB
-    
-    docker $DOCKERARGS create \
-      --name $PROJECT-gitlab \
-      --hostname $PROJECT-gitlab \
-      --net $PROJECT-net \
-      --ip $GITLABIP \
-      -v $SRV/gitlab/etc:/etc/gitlab \
-      -v $SRV/gitlab/log:/var/log/gitlab \
-      -v $SRV/gitlab/opt:/var/opt/gitlab \
-      gitlab/gitlab-ce:latest
-      
-  ;;
-  "start")
-    echo "Starting gitlab $PROJECT-gitlab [$GITLABIP]"
-    docker $DOCKERARGS start $PROJECT-gitlab
-    echo "Waiting 30 seconds for the Gitlab application to start..."
-    sleep 30
-  ;;
-  "init")
-    echo "Initializing gitlab $PROJECT-gitlab [$GITLABIP]"
-    echo "Creating Gitlab admin user..."
-    
     # Generate Gitlab and keyfile random password
     GITLABPASS=$(createsecret gitlab)
     SSHKEYPASS=$(createsecret sshkey)
+  
+    GITLABNET=${PREFIX}-gitlab-privatenet
+  
+    cp Dockerfile.gitlab $RF
+    cp scripts/docker-entrypoint.sh $RF    
+    sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##GITLABDBPW##/$GITLABDBPW/" \
+        -e "s/##GITLABNET##/$GITLABNET/" \
+        -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+    sed -e "s/##HOST##/$OUTERHOST/" etc/nginx-gitlab-http.conf.erb > $RF/nginx-gitlab-http.conf.erb
+    
+    sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##LDAPORG##/$LDAPORG/" \
+        -e "s/##LDAPPW##/$LDAPPW/" \
+        -e "s/##LDAPPORT##/${LDAPPORT}/" \
+        -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/"  \
+        -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+        -e "s/##OUTERHOST##/${OUTERHOST}/" \
+        -e "s/##EMAIL##/${EMAIL}/" \
+        -e "s/##SMTP##/${SMTP}/" \
+        -e "s/##GITLABDB##/${PREFIX}-gitlabdb/" \
+        -e "s/##GITLABDBPW##/${GITLABDBPW}/" etc/gitlab.rb > $RF/gitlab.rb
+    sed -e "s/##LDAPORG##/$LDAPORG/" \
+        -e "s/##LDAPPW##/$LDAPPW/" \
+        -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##INNERHOST##/$INNERHOST/" \
+        -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
+        -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" scripts/make_admin.sh-template > $RF/make_admin.sh
+   echo "2. Building ${PREFIX}-gitlab..."
+   docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
 
-    adduser gitlabadmin Gitlab Admin "admin@$DOMAIN" "$GITLABPASS" 10001
-    gitlab_makeadmin gitlabadmin
+ ;;
+  "install")
+    echo "Installing gitlab $PREFIX-gitlab [$GITLABIP]"
 
-    # TODO: disable standard login and self-registration via Gitlab
+  ;;
+  "start")
+    echo "Starting container ${PREFIX}-gitlab"
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+
+
+  ;;
+  "init")
+    docker $DOCKERARGS exec --user postgres $PREFIX-gitlabdb bash -c 'createdb gitlabhq_production'
+
+   
+#    chmod 600 $SRV/gitlab/etc/ssh_host_*
+  ;;
+  "admin")
+     echo "Creating Gitlab admin user..."
+     docker $DOCKERARGS exec ${PREFIX}-impersonator bash -c /create_admin.sh 
+     sleep 2 
+     docker $DOCKERARGS exec ${PREFIX}-gitlab bash -c /make_admin.sh
+     echo "MAKE SURE THAT GITLABADMIN IS ADMIN!!!!"
   ;;
   "stop")
-    echo "Stopping gitlab $PROJECT-gitlab [$GITLABIP]"
-    docker $DOCKERARGS stop $PROJECT-gitlab
+      echo "Stopping container ${PREFIX}-gitlab"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
+    
   "remove")
-    echo "Removing gitlab $PROJECT-gitlab [$GITLABIP]"
-    docker $DOCKERARGS rm $PROJECT-gitlab
+      echo "Removing $DOCKER_COMPOSE_FILE"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      
   ;;
+  "cleandata")
+    echo "Cleaning data ${PREFIX}-gitlab"
+    docker $DOCKERARGS volume rm ${PREFIX}-gitlabdb
+    rm -R -f $SRV/_gitlabdb
+    
+  ;;
+
   "purge")
-    echo "Purging gitlab $PROJECT-gitlab [$GITLABIP]"
-    rm -R $SRV/gitlab
+    echo "Removing $RF" 
+    rm -R -f $RF
+    docker $DOCKERARGS volume rm ${PREFIX}-gitlabdb
   ;;
 esac

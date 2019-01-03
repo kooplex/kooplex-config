@@ -1,75 +1,76 @@
 #!/bin/bash
 
+RF=$BUILDDIR/notebooks
+    echo "Building image $PREFIX-notebooks $EXTRA"
+
 case $VERB in
   "build")
-    echo "Building image kooplex-notebook"
+    echo "Building image $PREFIX-notebooks $EXTRA"
+
+
+     mkdir -p $RF
+     
+#     for imagedir in ./image-*
+     for i in $EXTRA
+     do
+        imagedir="./image-"$i
+        mkdir -p $RF/$imagedir
+        sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
+        sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir
+        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rsession.conf,rserver.conf,rstudio-nginx.conf}  ${RF}/$imagedir
+        cp DockerFile-pieces/* ${RF}/$imagedir
+
+#####
+  printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
+  printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/$imagedir/nsswitch.conf
+  printf "$(ldap_nslcdconfig)\n\n" > ${RF}/$imagedir/nslcd.conf
+  chown root ${RF}/$imagedir/nslcd.conf
+  chmod 0600 ${RF}/$imagedir/nslcd.conf
+
+######NOTE: jupyter_report_config.py not in the image
+
+        docfile=${imagedir}/Dockerfile
+        imgname=${imagedir#*image-}
+
+
+
+     	echo "Building image from $docfile"
+        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
+        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
+       
+     done
+
     
-    cpetc
-    docker $DOCKERARGS build -t kooplex-notebook .
-    rmetc
   ;;
   "install")
-    echo "Installing notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    
-    cpetc
-    
-    mkdir -p $SRV/notebook/etc
-    cp etc/nslcd.conf $SRV/notebook/etc
-    
-    mkdir -p $SRV/notebook/init
-    # NFS mount for home
-    echo "#/bin/sh
-echo \"Mounting home...\"
-mount -t nfs $PROJECT-home:/exports/home /home" \
-      > $SRV/notebook/init/0.sh
-    # Start jupyter
-    echo "#/bin/sh
-echo \"Starting notebook for \$NB_USER...\"
-cd /home/\$NB_USER
-. start-notebook.sh --NotebookApp.base_url=\$NB_URL --NotebookApp.port=\$NB_PORT " \
-      > $SRV/notebook/init/1.sh
-    
-    # TODO: we create a notebook container here for testing but
-    # individual containers will later be created for single
-    # users
-    docker $DOCKERARGS create \
-      --name $PROJECT-notebook \
-      --hostname $PROJECT-notebook \
-      --net $PROJECT-net \
-      --ip $NOTEBOOKIP \
-      --privileged \
-      -v $SRV/notebook/etc/nslcd.conf:/etc/nslcd.conf \
-      -v $SRV/notebook/init:/init \
-      -e NB_USER=test \
-      -e NB_UID=10002 \
-      -e NB_GID=10002 \
-      -e NB_URL=/notebook/test/ \
-      -e NB_PORT=8888 \
-      kooplex-notebook
-    
-    rmetc
   ;;
+    
   "start")
     # TODO: we have a single notebook server now, perhaps there will
     # one per user later or more if we scale out
-    echo "Starting notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    docker $DOCKERARGS start $PROJECT-notebook
+    # echo "Starting notebook $PROJECT-notebook [$NOTEBOOKIP]"
+    # docker $DOCKERARGS start $PROJECT-notebook
   ;;
   "init")
     
   ;;
   "stop")
     echo "Stopping notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    docker $DOCKERARGS stop $PROJECT-notebook
+#    docker $DOCKERARGS stop $PROJECT-notebook
   ;;
   "remove")
     echo "Removing notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    docker $DOCKERARGS rm $PROJECT-notebook
+#    docker $DOCKERARGS rm $PROJECT-notebook
   ;;
   "purge")
     echo "Purging notebook $PROJECT-notebook [$NOTEBOOKIP]"
     rm -R $SRV/notebook
-    echo "Purging base image kooplex-notebook"
-    docker $DOCKERARGS rmi kooplex-notebook
+  ;;
+  "clean")
+    echo "Cleaning base image $PREFIX-notebook"
+#    docker $DOCKERARGS rmi $PREFIX-notebook
+#FIXME: hard coded
+    docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi
   ;;
 esac

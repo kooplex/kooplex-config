@@ -1,0 +1,12 @@
+#! /bin/bash
+
+mv /etc/fstab /etc/fstab.old
+touch /etc/fstab
+getent passwd | cut -d: -f1,3 | while read l ; do
+  uname=$(echo $l | cut -f1 -d:)
+  uid=$(echo $l | cut -f2 -d:)
+  [ $uid -lt ##MINUID## ] && continue
+  [ $uname = nobody ] && continue
+  echo "http://##PREFIX##-nginx/ownCloud/remote.php/webdav/ /home/$uname/oc davfs user,rw,auto 0 0" >> /etc/fstab
+  addgroup $uname davfs2
+done 

@@ -1,0 +1,45 @@
+ldap_adduser () {
+  local username=##GITLABADMIN##  
+  local firstname=Gitlab
+  local lastname=Admin
+  local email="admin@##INNERHOST##" 
+  local pass=##GITLABADMINPW## 
+  local uid=9999
+  
+  echo "Adding LDAP user $firstname $lastname ($username)..."
+
+  echo "dn: uid=$username,ou=users,##LDAPORG##
+objectClass: simpleSecurityObject
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+sn: $lastname
+givenName: $firstname
+cn: $username
+displayName: $firstname $lastname
+uidNumber: $uid
+gidNumber: $uid
+loginShell: /bin/bash
+homeDirectory: /home/$username
+mail: $email
+userPassword: $pass
+shadowExpire: -1
+shadowFlag: 0
+shadowWarning: 7
+shadowMin: 8
+shadowMax: 999999
+shadowLastChange: 10877
+"  | /usr/bin/ldapadd -h ##PREFIX##-ldap -p ##LDAPPORT## -D "cn=admin,##LDAPORG##" -w "##LDAPPW##"
+
+  echo "dn: cn=$username,ou=groups,##LDAPORG##
+objectClass: top
+objectClass: posixGroup
+gidNumber: $uid
+memberUid: $uid
+" | /usr/bin/ldapadd -h ##PREFIX##-ldap -p ##LDAPPORT## -D "cn=admin,##LDAPORG##" -w "##LDAPPW##"
+}
+
+ldap_adduser

@@ -1,60 +1,67 @@
 #!/bin/bash
 
+RF=$BUILDDIR/nginx
+
+mkdir -p $RF
+
+DOCKER_HOST=$DOCKERARGS
+DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+
+
 case $VERB in
-  "install")
-    echo "Installing nginx $PROJECT-nginx [$NGINXIP]"
-    
-    mkdir -p $SRV/nginx/etc/
-    cp etc/nginx.conf $SRV/nginx/etc/
-    
-    docker $DOCKERARGS create \
-      --name $PROJECT-nginx \
-      --hostname $PROJECT-nginx \
-      --net $PROJECT-net \
-      --ip $NGINXIP \
-      -p 8080:80 \
-      -v $SRV/nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
-      -v $SRV/nginx/etc/sites.conf:/etc/nginx/sites.conf:ro \
-      nginx
+
+  "build")
+    echo "1. Configuring ${PREFIX}-impersonator..."
+
+    if [ $REWRITEPROTO = "http" ]; then
+      EXTRACONFIG="ports:\n      - 80:80"
+    fi
+
+      cp Dockerfile $RF
+      cp etc/nginx.conf $RF
+      sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+          -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##OUTERHOST##/$OUTERHOST/" \
+          -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
+          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $RF/sites.conf
       
-    echo "
-server {
-  listen 80;
-  server_name $DOMAIN;
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-  location /gitlab {
-    proxy_set_header Host \$http_host;
-    proxy_pass http://$GITLABIP;
-  }
-  
-  #location /hub {
-  #  proxy_pass http://$PROJECT-jupyterhub:8000;
-  #}
-  
-  location /owncloud {
-    proxy_pass http://$OWNCLOUDIP;
-  }
-}
-" > $SRV/nginx/etc/sites.conf
-
+      echo "2. Building ${PREFIX}-nginx..."
+      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
+
+  "install")
+  ;;
+
   "start")
-    echo "Starting nginx $PROJECT-nginx [$NGINXIP]"
-    docker $DOCKERARGS start $PROJECT-nginx
+    echo "Starting nginx ${PREFIX}-nginx"
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
   ;;
+
+  "restart")
+    echo "Restarting nginx ${PREFIX}-nginx"
+    docker $DOCKERARGS restart $PREFIX-nginx
+  ;;
+
   "init")
+  ;;
     
-  ;;
   "stop")
-    echo "Stopping nginx $PROJECT-nginx [$NGINXIP]"
-    docker $DOCKERARGS stop $PROJECT-nginx
+    echo "Stopping nginx ${PREFIX}-nginx"
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
+    
   "remove")
-    echo "Removing network $PROJECT-net [$SUBNET]"
-    docker $DOCKERARGS rm $PROJECT-nginx
+    echo "Removing nginx ${PREFIX}-net"
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
+    
   "purge")
-    echo "Purging nginx $PROJECT-nginx [$NGINXIP]"
-    rm -R $SRV/nginx/etc/
+    echo "Purging nginx ${PREFIX}-nginx"
+    rm -R $RF
   ;;
+    
 esac
