@@ -41,7 +41,7 @@ def check_last_changed(table_name, hubuser_id, container_id, col_name, value, th
                 #print(hubuser_id, container_id, col_name[0], res[icol], cols[col_name[0]], abs(cols[col_name[0]] - res[icol])/change[col_name[0]])
                 if ( res[icol] == 0 ) or ( s_type == 'c' and value > threshold ) or\
                         ( s_type == 'a' and abs(value - res[icol]) > threshold ):
-                    #print('Ins', hubuser_id, container_id, value, threshold, abs(value - res[icol]))
+                    #print('Ins', col_name, hubuser_id, container_id, value, threshold, abs(value - res[icol]))
                     #print()
                     return True
     else:
@@ -76,18 +76,6 @@ for cont in container_list:
             res = get_item('project', 'project', project_name)
         project_id = res[0]
 
-
-        #Query for container_name, if it does not exist then insert it
-        res = get_item('container', 'container_name', container_name)
-        if res and not res[1]:
-            update_item('container', 'project_id', "%d"%project_id, 'container_name', container_name)
-        if not res:
-            insert_item('container', 'project_id, container_name', "%d', '%s"%(project_id, container_name))
-            res = get_item('container', 'container_name', container_name)
-        container_id = res[0]
-
-
-
         #Query for hubuser, if it does not exist then insert it
         username = get_user_name(cont)
 
@@ -96,6 +84,19 @@ for cont in container_list:
             insert_item('hubuser', 'username', username)
             res = get_item('hubuser', 'username', username)
         hubuser_id = res[0]
+
+        #Query for container_name, if it does not exist then insert it
+        res = get_item('container', 'container_name', container_name)
+        if res and not res[1]:
+            update_item('container', 'project_id', "%d"%project_id, 'container_name', container_name, 'hubuser',"%d"%hubuser_id)
+        if not res:
+            insert_item('container', 'project_id, container_name, hubuser', "%d', '%s', '%d"%(project_id, container_name, hubuser_id))
+            res = get_item('container', 'container_name', container_name)
+        container_id = res[0]
+
+
+
+
 
 
         #Get statistics from container
@@ -110,9 +111,12 @@ for cont in container_list:
         net_i = sum([ stat['networks'][interface]['rx_bytes'] for interface in stat['networks'].keys()])
         net_o = sum([ stat['networks'][interface]['tx_bytes'] for interface in stat['networks'].keys()])
 
-        block_i = stat['blkio_stats']['io_service_bytes_recursive'][5]['value']
-        block_o = stat['blkio_stats']['io_service_bytes_recursive'][6]['value']
-
+        try:
+            block_i = stat['blkio_stats']['io_service_bytes_recursive'][5]['value']
+            block_o = stat['blkio_stats']['io_service_bytes_recursive'][6]['value']
+        except:
+            print(stat)
+            print(stat['blkio_stats']['io_service_bytes_recursive'])
         
         #check first whether anything changed and then insert new numbers
         values = { 'cpuload' : cpuload,

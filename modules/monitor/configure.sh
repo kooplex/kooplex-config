@@ -29,6 +29,8 @@ case $VERB in
   "start")
      echo "Start monitoring $PROJECT-monitor [$MONITORIP]"
      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-monitordb
+     #FIXME
+     echo "Manually start cron and import scheme!!!!!!!!!!!!"
   ;;
   "init")
   
