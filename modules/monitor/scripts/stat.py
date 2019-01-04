@@ -88,9 +88,9 @@ for cont in container_list:
         #Query for container_name, if it does not exist then insert it
         res = get_item('container', 'container_name', container_name)
         if res and not res[1]:
-            update_item('container', 'project_id', "%d"%project_id, 'container_name', container_name, 'hubuser',"%d"%hubuser_id)
+            update_item('container', 'project_id', "%d"%project_id, 'container_name', container_name, 'hubuser_id',"%d"%hubuser_id)
         if not res:
-            insert_item('container', 'project_id, container_name, hubuser', "%d', '%s', '%d"%(project_id, container_name, hubuser_id))
+            insert_item('container', 'project_id, container_name, hubuser_id', "%d', '%s', '%d"%(project_id, container_name, hubuser_id))
             res = get_item('container', 'container_name', container_name)
         container_id = res[0]
 
