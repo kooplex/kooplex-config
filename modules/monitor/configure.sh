@@ -14,7 +14,7 @@ case $VERB in
     mkdir -p $SRV/_monitordb
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_monitordb -o o=bind ${PREFIX}-monitordb
     cp scripts/* $RF
-    cp etc/crontab $RF
+    cp etc/* $RF
     cp Dockerfile.monitordb $RF
     
     sed -e "s/##PREFIX##/$PREFIX/" \
@@ -33,6 +33,7 @@ case $VERB in
      echo "Manually start cron and import scheme!!!!!!!!!!!!"
   ;;
   "init")
+     docker exec ${PREFIX}-monitordb bash -c /etc/monitordb/create_scheme.sh
   
   ;;
   "stop")

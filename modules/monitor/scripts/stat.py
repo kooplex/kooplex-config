@@ -30,9 +30,9 @@ def get_user_name(container):
         if "NB_USER" in i:
             return i.split('=')[1]
 
-def check_last_changed(table_name, hubuser_id, container_id, col_name, value, threshold, s_type):
-    sqlc = "select * from %s where hubuser_id = %d and container_id = %d \
-      order by last_read desc limit 1;" % (table_name, hubuser_id, container_id)
+def check_last_changed(table_name,  container_id, col_name, value, threshold, s_type):
+    sqlc = "select * from %s where container_id = %d \
+      order by last_read desc limit 1;" % (table_name, container_id)
     cur.execute(sqlc)
     res = cur.fetchone()
     if res:
@@ -49,9 +49,9 @@ def check_last_changed(table_name, hubuser_id, container_id, col_name, value, th
 
     return False
 
-def insert_new_row(table_name, hubuser_id, container_id, col_name, value):
-    sqlc = "INSERT INTO %s (hubuser_id, container_id, %s) VALUES (%d, %d, %s);" % \
-           (table_name, col_name, hubuser_id, container_id, value)
+def insert_new_row(table_name, container_id, col_name, value):
+    sqlc = "INSERT INTO %s (container_id, %s) VALUES (%d, %s);" % \
+           (table_name, col_name, container_id, value)
     #print(sqlc)
     res = cur.execute(sqlc)
     conn.commit()
@@ -100,23 +100,24 @@ for cont in container_list:
 
 
         #Get statistics from container
-        stat = cont.stats(decode=True, stream=False)
-
-        memoryusage = stat['memory_stats']['usage']
-        cpudelta = stat['cpu_stats']['cpu_usage']['total_usage']-stat['precpu_stats']['cpu_usage']['total_usage']
-        precpudelta = stat['cpu_stats']['system_cpu_usage']-stat['precpu_stats']['system_cpu_usage']
-        cpuload = (cpudelta/precpudelta)*100*len(stat['cpu_stats']['cpu_usage']['percpu_usage'])
-        pids = stat['pids_stats']['current']
-
-        net_i = sum([ stat['networks'][interface]['rx_bytes'] for interface in stat['networks'].keys()])
-        net_o = sum([ stat['networks'][interface]['tx_bytes'] for interface in stat['networks'].keys()])
+        stat = cont.stats(stream=False)
 
         try:
-            block_i = stat['blkio_stats']['io_service_bytes_recursive'][5]['value']
-            block_o = stat['blkio_stats']['io_service_bytes_recursive'][6]['value']
-        except:
+           memoryusage = stat['memory_stats']['usage']
+           cpudelta = stat['cpu_stats']['cpu_usage']['total_usage']-stat['precpu_stats']['cpu_usage']['total_usage']
+           precpudelta = stat['cpu_stats']['system_cpu_usage']-stat['precpu_stats']['system_cpu_usage']
+           cpuload = (cpudelta/precpudelta)*100*len(stat['cpu_stats']['cpu_usage']['percpu_usage'])
+           pids = stat['pids_stats']['current']
+   
+           net_i = sum([ stat['networks'][interface]['rx_bytes'] for interface in stat['networks'].keys()])
+           net_o = sum([ stat['networks'][interface]['tx_bytes'] for interface in stat['networks'].keys()])
+   
+           block_i = stat['blkio_stats']['io_service_bytes_recursive'][5]['value']
+           block_o = stat['blkio_stats']['io_service_bytes_recursive'][6]['value']
+        except Exception as e:
+            print(e)
+            print(container_name)
             print(stat)
-            print(stat['blkio_stats']['io_service_bytes_recursive'])
         
         #check first whether anything changed and then insert new numbers
         values = { 'cpuload' : cpuload,
@@ -154,10 +155,10 @@ for cont in container_list:
 
         col_names = values.keys()
         for col_name in col_names:
-           if check_last_changed(table_names[col_name], hubuser_id, container_id, col_name, values[col_name],\
+           if check_last_changed(table_names[col_name], container_id, col_name, values[col_name],\
                   threshold[col_name], s_type[col_name]):
                1==1
-               insert_new_row(table_names[col_name], hubuser_id, container_id, col_name, values[col_name])
+               insert_new_row(table_names[col_name], container_id, col_name, values[col_name])
 
         
 

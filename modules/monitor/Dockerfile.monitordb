@@ -37,15 +37,24 @@ RUN pip3 install psycopg2
 
 # Based on https://github.com/Ekito/docker-cron/blob/master/Dockerfile
 # Add crontab file in the cron directory
-COPY crontab /etc/cron.d/monitor-cron
+COPY monitor-cron /etc/cron.d/monitor-cron
 COPY stat.py /usr/local/bin/stat.py
-ADD runstat.sh /runstat.sh
+
+RUN mkdir -p /etc/monitordb
+COPY create_scheme.sh /etc/monitordb/create_scheme.sh
+RUN chmod a+x /etc/monitordb/create_scheme.sh
+
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/monitor-cron
 
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
 
-COPY docker-entrypoint.sh /usr/local/bin/
+RUN mkdir -p /init
+
+COPY docker-entrypoint.sh  /usr/local/bin/docker-entrypoint.sh
+#ADD 02-setupdatabase.sh  /init/02-setupdatabase.sh
+ADD 03-startcron.sh  /init/03-startcron.sh
+
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 

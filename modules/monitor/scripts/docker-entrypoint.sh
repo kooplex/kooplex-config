@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+
+for SCRIPT in /init/*
+do
+  echo "Running init script: $SCRIPT"
+  . $SCRIPT
+done
+
+echo "Setting up Postgres" 
+
 # Run the command on container startup
 #cron && tail -f /var/log/cron.log
 
@@ -145,4 +154,15 @@ if [ "$1" = 'postgres' ]; then
 	fi
 fi
 
-exec "$@"
+if [ $? == 0 ]; then
+        echo "SUCCESS !"
+else
+        echo "Something went wrong!"
+
+fi
+
+
+
+
+exec "$@" 
+
