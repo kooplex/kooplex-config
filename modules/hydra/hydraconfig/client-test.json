@@ -1,0 +1,19 @@
+{
+        "client_name": "kooplex-test-hub",
+        "grant_types": [
+                "client_credentials",
+					 "authorization_code"
+        ],
+        "id": "kooplex-test-hub",
+		  "description": "Kooplex Test HUB",
+        "redirect_uris": [
+                "https://kooplex-test.elte.hu/hub/oauth/complete/hydraoidc/"
+        ],
+        "response_types": [
+					 "id_token",
+                "token",
+                "code"
+        ],
+        "scope": "hydra.keys.get openid offline profile email",
+		  "public":true
+}

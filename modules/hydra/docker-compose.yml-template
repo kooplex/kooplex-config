@@ -1,0 +1,108 @@
+version: "3"
+
+services:
+  ##PREFIX##-hydra:
+    container_name: ##PREFIX##-hydra
+    image: ##PREFIX##-hydra
+    depends_on:
+      - ##PREFIX##-hydra-postgresql
+    build:
+      context: .
+      dockerfile: Dockerfile.hydra
+    networks:
+      - ##PREFIX##-hydra-privatenet
+      - ##PREFIX##-service-net
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - LANG=en_US.UTF-8
+      - PREFIX=##PREFIX##
+      - DATABASE_URL=postgres://postgres:##HYDRADB_PW##@##PREFIX##-hydra-postgresql:5432/##HYDRADB##?sslmode=disable
+      - SYSTEM_SECRET=##HYDRASYSTEM_SECRET##
+      - ISSUER=https://##PREFIX##-hydra:4444
+      - CONSENT_URL=https://##OUTERHOST##/consent
+      - FORCE_ROOT_CLIENT_CREDENTIALS=admin:##HYDRA_ADMINPW##
+      - HTTPS_TLS_CERT_PATH=/etc/hydra.crt
+      - HTTPS_TLS_KEY_PATH=/etc/hydra.key
+      - DISABLE_TELEMETRY=1
+
+#      - DATABASE_URL=postgres://##HYDRADB_USER##:##HYDRADB_PW##@##PREFIX##-hydra-postgresql:5432/##HYDRADB##?sslmode=disable
+  ##PREFIX##-hydra-postgresql:
+    container_name: ##PREFIX##-hydra-postgresql
+    image: postgres:10.3
+    networks:
+      - ##PREFIX##-hydra-privatenet
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-hydradb:/var/lib/postgresql/data:rw
+    restart: unless-stopped
+    environment:
+      -  POSTGRES_PASSWORD=##HYDRADB_PW##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ##PREFIX##-hydraconsent:
+    container_name: ##PREFIX##-hydraconsent
+    image: ##PREFIX##-hydraconsent
+    depends_on:
+      - ##PREFIX##-hydraconsent-mysql
+    build:
+      context: .
+      dockerfile: Dockerfile.hydraconsent
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-hydracode:/srv/:rw
+    networks:
+      - ##PREFIX##-net
+      - ##PREFIX##-hydra-privatenet
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - LANG=en_US.UTF-8
+      - PREFIX=##PREFIX##
+      - DOMAIN=##OUTERHOST##
+
+  ##PREFIX##-hydraconsent-mysql:
+    container_name: ##PREFIX##-hydraconsent-mysql
+    image: ##PREFIX##-hydraconsent-mysql 
+    build:
+      context: .
+      dockerfile: Dockerfile.hydraconsentdb
+    networks:
+      - ##PREFIX##-hydra-privatenet
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-hydraconsentdb:/var/lib/mysql/:rw
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=##HYDRACONSENTDB_PW##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##PREFIX##-hydra-privatenet:
+    external: false
+  ##PREFIX##-service-net:
+    external: true
+
+volumes:
+  ##PREFIX##-hydradb:
+    external: true
+  ##PREFIX##-hydraconsentdb:
+    external: true
+  ##PREFIX##-hydracode:
+    external: true
+
+

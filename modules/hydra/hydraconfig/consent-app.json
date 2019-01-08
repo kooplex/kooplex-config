@@ -1,0 +1,11 @@
+{
+        "client_name": "Hydra consent client",
+        "grant_types": [
+                "client_credentials"
+        ],
+        "id": "consent-app",
+        "response_types": [
+                "token"
+        ],
+        "scope": "hydra.consent"
+}
