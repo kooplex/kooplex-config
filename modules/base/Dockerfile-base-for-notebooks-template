@@ -11,7 +11,7 @@ RUN apt install -y tmux zip curlftpfs
 RUN apt install -y liblapack-dev libblas-dev
 RUN apt install -y gfortran libfreetype6* pkg-config
 RUN apt install -y git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake
-RUN apt install -y inotify-tools
+RUN apt install -y inotify-tools lsof gawk
 RUN apt install -y autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends 
 RUN apt install -y libfontconfig1 libxrender1 libxrender-dev
 RUN apt install -y g++-5 libicu-dev libxml2-dev
