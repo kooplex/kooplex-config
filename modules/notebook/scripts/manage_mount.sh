@@ -4,13 +4,14 @@
 
 set -v
 
-exec >> /tmp/mount.conf
+exec >> /tmp/mount.log
 exec 2>&1
 
 date
 
 #FIXME: start script should write pid in pidfile and we read it. Now command is hardcoded for jupyter
 JUPYTERPID=$(ps axu | awk '/bash.*cd.*env.*jupyter/ { print $2; exit}')
+echo "Server PID: $JUPYTERPID" >&2
 
 ROOTDIR=/home/
 EMPTYDIR=/tmp/.empty
@@ -67,7 +68,10 @@ echo Showing $VOLDIR
 while IFS=':' read -r vol sdir tdir <&3 ; do
     src=$VOLDIR/$vol/$sdir
     dst=$(echo $ROOTDIR/$vol/$tdir | sed s,//*,/,g)
-
+    if [ ! -d $src ] ; then
+        echo "ERROR: Missing $src" >&2
+        continue
+    fi
     if [ -n "$(grep $dst $_CONF)" ] ; then
         echo "Already mounted $src -> $dst" >&2
         sed -i "s,$dst.*,," $_CONF
@@ -76,17 +80,8 @@ while IFS=':' read -r vol sdir tdir <&3 ; do
         echo "Mounting $src -> $dst" >&2
         mkdir -p $dst
     fi
-    if [ -d $src ] ; then
-        /bin/mount -o bind $src $dst
-    else
-        echo "ERROR: Missing $src" >&2
-        do_rmdir $dst
-    fi
+    /bin/mount -o bind $src $dst
 done 3< $CONF
-
-# get rid of home
-dst=$(echo $ROOTDIR/$NB_USER | sed s,//*,/,g)
-sed -i "s,$dst.*,," $_CONF
 
 # get rid of home
 dst=$(echo $ROOTDIR/$NB_USER | sed s,//*,/,g)
