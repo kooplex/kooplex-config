@@ -2,9 +2,7 @@
 # Author: József Stéger
 # Summary: Remount volumes in the proper folderstructure
 
-set -v
-
-exec >> /tmp/mount.log
+exec > /tmp/_mount.log
 exec 2>&1
 
 date
