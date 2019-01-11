@@ -88,7 +88,7 @@ dst=$(echo $ROOTDIR/$NB_USER | sed s,//*,/,g)
 sed -i "s,$dst.*,," $_CONF
 
 # Umount unused voulumes
-if [ $(grep -v "^$" _CONF | wc -c) -gt 0 ] ; then
+if [ $(grep -v "^$" $_CONF | wc -c) -gt 0 ] ; then
     echo "Stop service" >&2
     kill -SIGSTOP $JUPYTERPID
     for dir in $(cat $_CONF) ; do
