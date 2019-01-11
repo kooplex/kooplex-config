@@ -64,7 +64,11 @@ echo Showing $VOLDIR
 
 # Mount new volumes
 while IFS=':' read -r vol src <&3 ; do
-    dst=$(echo $ROOTDIR/$vol/$(basename $src) | sed s,//*,/,g)
+    if [ $vol = 'home' ] ; then
+        dst=$(echo $ROOTDIR/$(basename $src) | sed s,//*,/,g)
+    else
+        dst=$(echo $ROOTDIR/$vol/$(basename $src) | sed s,//*,/,g)
+    fi
     if [ ! -d $src ] ; then
         echo "ERROR: Missing $src" >&2
         continue
