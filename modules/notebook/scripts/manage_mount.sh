@@ -65,9 +65,9 @@ fi
 echo Showing $VOLDIR
 
 # Mount new volumes
-while IFS=':' read -r vol sdir tdir <&3 ; do
-    src=$VOLDIR/$vol/$sdir
-    dst=$(echo $ROOTDIR/$vol/$tdir | sed s,//*,/,g)
+while IFS=':' read -r vol dir <&3 ; do
+    src=$VOLDIR/$vol/$dir
+    dst=$(echo $ROOTDIR/$vol/$dir | sed s,//*,/,g)
     if [ ! -d $src ] ; then
         echo "ERROR: Missing $src" >&2
         continue
