@@ -1,16 +1,33 @@
 # Start with an existing Jupyter image with some Python libs preinstalled
-FROM kooplex-notebook-basic 
+FROM kooplex-fiek-notebook-basic 
 
 # Add the kernel gateway
 RUN conda install -y psycopg2
 RUN conda install -c conda-forge -y jupyter_kernel_gateway==2.1.0
+
+RUN pip install bokeh==1.0.4 holoviews
+RUN apt install cron
+RUN service cron start
+
+COPY collect_data /etc/cron.d/collect_data
+RUN chmod 0644 /etc/cron.d/collect_data
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
 
 # Make the gateway the container entrypoint, put it in HTTP mode, and
 # have it listen on all interfaces in the container.
 ENTRYPOINT ["tini", "--", "jupyter", "kernelgateway", "--KernelGatewayApp.api=notebook-http", "--KernelGatewayApp.ip=0.0.0.0", "--KernelGatewayApp.allow_origin=*"]
 
 # Add the scotch notebook
+COPY daily.py /srv/notebooks/
+COPY hourly.py /srv/notebooks/
+COPY monitor.py /srv/notebooks/
+COPY top-user-project.py /srv/notebooks/
 COPY Monitordb-API.ipynb /srv/notebooks/
 
+WORKDIR /srv/notebooks/
+
 # Tell the kernel gateway to load the scotch notebook by default
-CMD ["--KernelGatewayApp.seed_uri=/srv/notebooks/Monitordb-API.ipynb"]
+CMD ["--KernelGatewayApp.seed_uri=Monitordb-API.ipynb"]
+

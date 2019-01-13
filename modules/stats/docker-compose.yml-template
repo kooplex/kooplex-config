@@ -16,7 +16,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=##POSTGRESDBPW##
     ports:
+      - "8888:8888"
       - "8889:8889"
+      - "8890:8890"
     logging:
       options:
         max-size: "10m"
