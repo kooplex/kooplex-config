@@ -11,7 +11,17 @@ case $VERB in
       --driver bridge \
       --subnet $SUBNET $PREFIX-net
    fi
-  ;;
+    
+   if docker  $DOCKERARGS network ls | grep " $PREFIX-service-net"; then 
+     echo "$PREFIX-service-net exists, moving on..."
+    else
+     docker $DOCKERARGS network create \
+      --driver bridge \
+      --subnet $SERVICESUBNET $PREFIX-service-net
+   fi
+
+ 
+   ;;
   "start")
     
   ;;
@@ -24,6 +34,7 @@ case $VERB in
   "remove")
     echo "Removing network $PREFIX-net [$SUBNET]"
     docker $DOCKERARGS network rm $PREFIX-net
+    docker $DOCKERARGS network rm $PREFIX-service-net
   ;;
   "purge")
 
