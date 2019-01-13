@@ -20,6 +20,13 @@ create table container (
   container_name varchar(64) not null
 );
 
+create table system (
+id serial primary key,  
+total_cpu        bigint not null, -- tizezrelek
+total_mem     bigint not null, -- byte
+last_read      timestamp not null default now()
+);
+
 create table containerstats_mem (
   id serial      primary key, 
   container_id   int references container (id),
@@ -32,6 +39,13 @@ create table containerstats_cpuload (
   container_id   int references container (id),
   last_read      timestamp not null default now(),
   cpuload        int not null -- tizezrelek
+);
+
+create table containerstats_total_cpu (
+  id serial      primary key, 
+  container_id   int references container (id),
+  total_cpu      bigint not null, -- tizezrelek
+  last_read      timestamp not null default now()
 );
 
 create table containerstats_pids (

@@ -35,6 +35,8 @@ RUN pip3 install docker
 #RUN pip3 install mysqlclient
 RUN pip3 install psycopg2
 
+RUN apt install time
+
 # Based on https://github.com/Ekito/docker-cron/blob/master/Dockerfile
 # Add crontab file in the cron directory
 COPY monitor-cron /etc/cron.d/monitor-cron
