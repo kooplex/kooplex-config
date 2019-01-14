@@ -10,8 +10,8 @@ services:
     networks:
       - ##PREFIX##-net
     volumes:
-      - ##PREFIX##-home:/home:rw
-      - ##PREFIX##-git:/git:rw
+      - ##PREFIX##-home:/mnt/.volumes/home:rw
+      - ##PREFIX##-git:/mnt/.volumes/git:rw
     privileged: true
     restart: unless-stopped
 
