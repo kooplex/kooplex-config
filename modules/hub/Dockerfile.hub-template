@@ -19,6 +19,8 @@ RUN pip3 install ldap3
 RUN pip3 install pwgen
 RUN pip3 install "python-social-auth[django]" "social-auth-core[openidconnect]"
 RUN pip3 install django-tables2 django-bootstrap3 unidecode
+RUN pip3 install PyGithub
+RUN pip3 install python-gitlab
 
 # It is very important that the following command 'git clone...' cannot be cached
 # (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)

@@ -15,7 +15,8 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-hub..."
       
       mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html \
-         $SRV/_report/dashboard $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment
+         $SRV/_report/dashboard $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
+         $SRV/_workdir $SRV/_git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
@@ -24,13 +25,15 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.garbage -o o=bind ${PREFIX}-garbage
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hubcode_ -o o=bind ${PREFIX}-hubcode
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_workdir -o o=bind ${PREFIX}-workdir
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
 
       DIR=$SRV/_hubcode_
       if [ -d $DIR/.git ] ; then
           echo $DIR
           #cd $DIR && git pull && cd -
       else
-          git clone -b devnew https://github.com/kooplex/kooplex-hub.git $DIR
+          git clone https://github.com/kooplex/kooplex-hub.git $DIR
       fi
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
