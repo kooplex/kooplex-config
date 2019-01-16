@@ -1,3 +1,4 @@
-20,40,58 * * * * root /usr/bin/python3 /srv/notebook/daily.py
-* * * * * root /usr/bin/python3 /srv/notebook/hourly.py
+20,40,58 * * * * root /opt/conda/bin/python3 /srv/notebooks/daily.py
+* * * * * root /opt/conda/bin/python3 /srv/notebooks/hourly.py
+5 8,16 * * * root /opt/conda/bin/python3 /srv/notebooks/top-user-project.py
 # Don't remove the empty line at the end of this file. It is required to run the cron job
