@@ -11,11 +11,13 @@ case $VERB in
     echo "Building image $PREFIX-stats"
 
     cp scripts/* $RF
-    #cp etc/crontab $RF
+    cp etc/collect_data-cron $RF/etc/collect_data
     cp Dockerfile.stats $RF
     
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##POSTGRESDBPW##/$GITLABDBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
+    sed -e "s/##PREFIX##/$PREFIX/" scripts/monitor.py-template > $RF/monitor.py
 
     docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     

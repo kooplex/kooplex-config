@@ -50,7 +50,7 @@ properties = { 'cpuload' : {'table_name' :'containerstats_cpuload',
 
 
 def connect_to_database():
-    conn = psycopg2.connect("host=kooplex-monitordb dbname=monitor user=usage_viewer password=whatisusage")
+    conn = psycopg2.connect("host=##PREFIX##-monitordb dbname=monitor user=usage_viewer password=whatisusage")
     return conn
     
 class Container():
@@ -156,9 +156,9 @@ class Usage_Data():
         return tdf
 
     def get_all_containers(self):
-        sqlc = "select ff.id, project, username, container_name, running from (select conts.id, project, hubuser, \
-        container_name, running from container as conts inner join project as proj on conts.project_id = proj.id) \
-        as ff inner join hubuser on ff.hubuser = hubuser.id;"
+        sqlc = "select ff.id, project, username, container_name, running from \
+               (select conts.id, conts.project_id, conts.hubuser_id,conts.container_name, conts.running, proj.project from container as conts \
+               inner join project as proj on conts.project_id = proj.id) as ff  inner join hubuser on ff.hubuser_id = hubuser.id;"
         self.containers_info = pd.read_sql(sqlc, connect_to_database())
         self.selected_containers = list(self.containers_info.id)        
         

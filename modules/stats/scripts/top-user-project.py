@@ -21,7 +21,7 @@ for user_name in Usage.list_all_users:
     stat = {'user_name': user_name, 'Total_CPU_Usage': cpu}
     top_users = top_users.append(stat,  ignore_index=True)
     
-top_users.to_pickle('Top_users.p')
+top_users.to_pickle('/srv/notebooks/Top_users.p')
 
 
 
@@ -44,4 +44,4 @@ for project_name in Usage.list_all_projects:
     stat = {'project_name': project_name, 'Total_CPU_Usage': cpu}
     top_projects = top_projects.append(stat,  ignore_index=True)
 
-top_projects.to_pickle('Top_projects.p')
+top_projects.to_pickle('/srv/notebooks/Top_projects.p')

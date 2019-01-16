@@ -26,4 +26,5 @@ for cid in Usage.selected_containers:
 # sys_df['user_name'] = 'SYSTEM'
 # daily_usage = daily_usage.append(stat)
 #daily_usage.to_json('daily_usage.json')
-daily_usage.to_pickle('hourly_usage.p')
+daily_usage.to_pickle('/srv/notebooks/hourly_usage.p')
+

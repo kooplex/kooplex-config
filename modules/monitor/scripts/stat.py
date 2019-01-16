@@ -31,9 +31,9 @@ def get_user_name(container):
         if "NB_USER" in i:
             return i.split('=')[1]
 
-def check_last_changed(table_name, hubuser_id, container_id, col_name, value, threshold, s_type):
-    sqlc = "select * from %s where hubuser_id = %d and container_id = %d \
-      order by last_read desc limit 1;" % (table_name, hubuser_id, container_id)
+def check_last_changed(table_name,  container_id, col_name, value, threshold, s_type):
+    sqlc = "select * from %s where container_id = %d \
+      order by last_read desc limit 1;" % (table_name, container_id)
     cur.execute(sqlc)
     res = cur.fetchone()
     if res:
@@ -50,9 +50,9 @@ def check_last_changed(table_name, hubuser_id, container_id, col_name, value, th
 
     return False
 
-def insert_new_row(table_name, hubuser_id, container_id, col_name, value):
-    sqlc = "INSERT INTO %s (hubuser_id, container_id, %s) VALUES (%d, %d, %s);" % \
-           (table_name, col_name, hubuser_id, container_id, value)
+def insert_new_row(table_name, container_id, col_name, value):
+    sqlc = "INSERT INTO %s ( container_id, %s) VALUES (%d, %s);" % \
+           (table_name, col_name, container_id, value)
     #print(sqlc)
     res = cur.execute(sqlc)
     conn.commit()
@@ -129,7 +129,7 @@ for ic, cont in enumerate(container_list):
         #Get statistics from container
         T = datetime.datetime.now()
         print((T-T0).total_seconds())
-        stat = cont.stats(decode=True, stream=False)
+        stat = cont.stats(stream=False)
 
         memoryusage = stat['memory_stats']['usage']
         #percpu = array(stat['cpu_stats']['cpu_usage']['percpu_usage'])-array(stat['precpu_stats']['cpu_usage']['percpu_usage'])
@@ -195,10 +195,10 @@ for ic, cont in enumerate(container_list):
 
         col_names = values.keys()
         for col_name in col_names:
-           if check_last_changed(table_names[col_name], hubuser_id, container_id, col_name, values[col_name],\
+           if check_last_changed(table_names[col_name], container_id, col_name, values[col_name],\
                   threshold[col_name], s_type[col_name]):
                1==1
-               insert_new_row(table_names[col_name], hubuser_id, container_id, col_name, values[col_name])
+               insert_new_row(table_names[col_name], container_id, col_name, values[col_name])
 
 
         if ic == 0:

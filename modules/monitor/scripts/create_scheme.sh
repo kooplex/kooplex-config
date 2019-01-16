@@ -17,7 +17,8 @@ create table container (
   id serial primary key, 
   project_id     int references project (id),
   hubuser_id     int references hubuser (id),
-  container_name varchar(64) not null
+  container_name varchar(64) not null,
+  running        boolean
 );
 
 create table system (
