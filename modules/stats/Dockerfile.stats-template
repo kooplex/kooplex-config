@@ -1,0 +1,27 @@
+# Start with an existing Jupyter image with some Python libs preinstalled
+FROM ##PREFIX##-fiek-notebook-basic 
+
+# Add the kernel gateway
+RUN conda install -y psycopg2
+
+COPY collect_data /etc/cron.d/collect_data
+RUN chmod 0644 /etc/cron.d/collect_data
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+
+
+COPY daily.py /srv/notebooks/
+COPY hourly.py /srv/notebooks/
+COPY monitor.py /srv/notebooks/
+COPY top-user-project.py /srv/notebooks/
+COPY Monitordb-API.ipynb /srv/notebooks/
+
+WORKDIR /srv/notebooks/
+
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["tini", "--"]
+CMD ["/bin/bash", "/entrypoint.sh"]
+

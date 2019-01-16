@@ -18,6 +18,7 @@ case $VERB in
         -e "s/##POSTGRESDBPW##/$GITLABDBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
     sed -e "s/##PREFIX##/$PREFIX/" scripts/monitor.py-template > $RF/monitor.py
+    sed -e "s/##PREFIX##/$PREFIX/" Dockerfile.stats-template > $RF/Dockerfile.stats
 
     docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     
