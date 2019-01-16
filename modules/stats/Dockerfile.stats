@@ -15,11 +15,7 @@ RUN chmod 0644 /etc/cron.d/collect_data
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
 
-# Make the gateway the container entrypoint, put it in HTTP mode, and
-# have it listen on all interfaces in the container.
-ENTRYPOINT ["tini", "--", "jupyter", "kernelgateway", "--KernelGatewayApp.api=notebook-http", "--KernelGatewayApp.ip=0.0.0.0", "--KernelGatewayApp.allow_origin=*"]
 
-# Add the scotch notebook
 COPY daily.py /srv/notebooks/
 COPY hourly.py /srv/notebooks/
 COPY monitor.py /srv/notebooks/
@@ -28,6 +24,9 @@ COPY Monitordb-API.ipynb /srv/notebooks/
 
 WORKDIR /srv/notebooks/
 
-# Tell the kernel gateway to load the scotch notebook by default
-CMD ["--KernelGatewayApp.seed_uri=Monitordb-API.ipynb"]
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["tini", "--"]
+CMD ["/bin/bash", "/entrypoint.sh"]
 

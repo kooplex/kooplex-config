@@ -11,7 +11,7 @@ case $VERB in
     echo "Building image $PREFIX-stats"
 
     cp scripts/* $RF
-    cp etc/collect_data-cron $RF/etc/collect_data
+    cp etc/collect_data-cron $RF/collect_data
     cp Dockerfile.stats $RF
     
     sed -e "s/##PREFIX##/$PREFIX/" \
