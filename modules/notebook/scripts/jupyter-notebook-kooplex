@@ -42,6 +42,10 @@ edit_template = """
 {% block logo %}
 {% endblock %}
   {% block headercontainer %}
+<span id="save_widget" class="pull-left save_widget">
+    <span class="filename"></span>
+    <span class="last_modified"></span>
+</span>
 
 """ + kooplex_logo + """
 """ + jupyter_logo + """

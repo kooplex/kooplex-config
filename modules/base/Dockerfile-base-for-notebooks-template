@@ -90,3 +90,8 @@ RUN jupyter labextension install jupyterlab_vim
 
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
 RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
+RUN $CONDA_DIR/bin/conda install -c conda-forge -y jupyter_kernel_gateway==2.1.0
+RUN pip install bokeh==1.0.4 holoviews
+RUN apt install cron
+
+

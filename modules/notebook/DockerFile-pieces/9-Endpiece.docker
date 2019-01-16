@@ -12,6 +12,7 @@ RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
 
 ########## add the rest
 RUN mkdir -p /init
+RUN mkdir -p /etc/scripts/
 
 ADD 01-startnslcd.sh /init/01-startnslcd.sh
 ADD 02-mountuserhome.sh /init/02-mountuserhome.sh
@@ -21,6 +22,7 @@ ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
 ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
+ADD kernel-gateway.sh /etc/scripts/kernel-gateway.s
 
 ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
 RUN chmod +x /usr/local/sbin/manage_mount.sh 

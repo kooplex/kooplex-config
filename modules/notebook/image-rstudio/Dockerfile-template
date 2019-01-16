@@ -59,10 +59,12 @@ ENV SSH_AUTH_SOCK /tmp/my_sshagent_sock
 
 RUN mv /init /init.sh
 
-ENV PASSWORD alma
+ENV PASSWORD rstudio 
 ADD entrypoint-rstudio.sh /entrypoint.sh
 ADD rserver.conf /etc/rstudio/rserver.conf
 ADD rstudio-nginx.conf /etc/nginx/sites-enabled/
+ADD rstudio-login.html /etc/rstudio/login.html
+RUN chmod a-w /etc/rstudio/login.html
 
 #Meg valamit ezzel is kezdeni kell /var/run/s6/services/rstudio/run
 
