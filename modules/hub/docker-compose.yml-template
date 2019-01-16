@@ -16,6 +16,8 @@ services:
       - ##PREFIX##-hubcode:/kooplexhub:rw
       - ##PREFIX##-home:/mnt/.volumes/home:rw
       - ##PREFIX##-course:/mnt/.volumes/course:rw
+      - ##PREFIX##-git:/mnt/.volumes/git:rw
+      - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
       - ##PREFIX##-usercourse:/mnt/.volumes/usercourse:rw
       - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
       - ##PREFIX##-share:/mnt/.volumes/share:rw
@@ -66,6 +68,10 @@ volumes:
   ##PREFIX##-hubcode:
     external: true
   ##PREFIX##-home:
+    external: true
+  ##PREFIX##-workdir:
+    external: true
+  ##PREFIX##-git:
     external: true
   ##PREFIX##-course:
     external: true
