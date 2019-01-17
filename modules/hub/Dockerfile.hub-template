@@ -32,6 +32,9 @@ RUN apt-get install -y openssh-server openssh-sftp-server vim
 RUN apt update
 RUN apt-get install  -y tzdata
 
+COPY rootCA.crt /etc/ssl/certs/rootCA.crt
+RUN update-ca-certificates
+
 COPY runserver.sh /runserver.sh
 RUN chmod a+x /runserver.sh
 

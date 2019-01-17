@@ -36,6 +36,8 @@ case $VERB in
           git clone https://github.com/kooplex/kooplex-hub.git $DIR
       fi
 
+      cp $BUILDDIR/CA/rootCA.crt $RF/
+
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
       sed -e "s/##PREFIX##/$PREFIX/" \

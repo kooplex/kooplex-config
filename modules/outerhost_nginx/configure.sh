@@ -12,22 +12,23 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-outer-nginx..."
        DIR=$SRV/_outer_nginx
-       mkdir -p $DIR
-       mkdir -p $DIR/etc $DIR/var
-       mkdir -p $DIR/etc/nginx/
-       mkdir -p $DIR/etc/nginx/keys/
-       mkdir -p $DIR/etc/nginx/sites-enabled
-       cp keys/* $DIR/etc/nginx/keys/
-       cp $KEYFILE $CERTFILE $DIR/etc/nginx/keys/
+#       mkdir -p $DIR
+#       mkdir -p $DIR/etc $DIR/var
+#       mkdir -p $DIR/etc/nginx/
+#       mkdir -p $DIR/etc/nginx/keys/
+#       mkdir -p $DIR/etc/nginx/sites-enabled
+#       cp -a keys $DIR/etc/nginx/
+#       cp $KEYFILE $CERTFILE $DIR/etc/nginx/keys/
+       cp -ar keys/* $RF/
     
-       sed -e "s/##PREFIX##/${PREFIX}/" \
-          -e "s@##DIR##@${DIR}@g" docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+       sed -e "s/##PREFIX##/${PREFIX}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+       sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
   
-       sed -e "s/##CERT##/${CERT}/" \
-           -e "s/##KEY##/${KEY}/" \
-           -e "s/##PREFIX##/${PREFIX}/" \
+       sed -e "s/##CERT##/${PREFIX}.crt/g" \
+           -e "s/##KEY##/${PREFIX}.key/g" \
+           -e "s/##PREFIX##/${PREFIX}/g" \
            -e "s/##OUTERHOST##/$OUTERHOST/" \
-           -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf_template > $RF/etc/nginx/sites-enabled/outerhost.conf
+           -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $RF/outerhost.conf
   	 
       echo "2. Building ${PREFIX}-outer-nginx.."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build

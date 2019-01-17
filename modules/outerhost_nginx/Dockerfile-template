@@ -1,0 +1,6 @@
+FROM nginx
+
+COPY outerhost.conf /etc/nginx/conf.d/outerhost.conf 
+COPY ##PREFIX##.crt  /etc/nginx/keys/##PREFIX##.crt
+COPY ##PREFIX##.key  /etc/nginx/keys/##PREFIX##.key
+ 

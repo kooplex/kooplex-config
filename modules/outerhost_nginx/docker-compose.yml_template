@@ -3,14 +3,15 @@ version: "3"
 services:
   ##PREFIX##-outer-nginx:
     container_name: ##PREFIX##-outer-nginx
-    image: nginx
+    image: ##PREFIX##-outer-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
     networks:
       - ##PREFIX##-net
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ##DIR##/etc/nginx/sites-enabled:/etc/nginx/conf.d:ro
-      - ##DIR##/etc/nginx/keys:/etc/nginx/keys:ro
-      - ##DIR##/var:/var/log/nginx:rw
+#      - ##DIR##/var:/var/log/nginx:rw
     restart: unless-stopped
     ports:
       - 443:443
