@@ -8,8 +8,6 @@ if [ ! -f $lockfile ]; then
     echo "Migrated"
 fi
 
-hydra host
-
-hydra --help
+hydra host --dangerous-force-http
 
 sleep 1000000
