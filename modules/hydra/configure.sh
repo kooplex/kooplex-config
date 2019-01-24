@@ -54,6 +54,7 @@ case $VERB in
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/" \
 	  -e "s/##HYDRASYSTEM_SECRET##/$HYDRASYSTEM_SECRET/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
           -e "s/##HYDRACONSENTDB##/${HYDRACONSENTDB}/g" \
           -e "s/##HYDRACONSENTDB_USER##/${HYDRACONSENTDB_USER}/g" \
           -e "s/##HYDRACONSENTDB_PW##/${HYDRACONSENTDB_PW}/g" \
