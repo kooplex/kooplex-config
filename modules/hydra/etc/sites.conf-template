@@ -9,12 +9,15 @@ server {
   error_log /var/log/nginx/##PREFIX##-hydraconsent-error.log;
   
   location /consent {
-  	alias /srv/consent/public;
-	  index index.php;
+    alias /srv/consent/public/; 
+    index index.php; 
+    if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions)) { 
+      rewrite ^/(.*)$ /index.php/$1 last; 
+    } 
   }
 
   location ~ \.php/$ {
-    rewrite /index.php/$ /consent/index.php permanent;
+    rewrite /index.php/$ /index.php last;
   }
 
   location ~ \.php {
@@ -22,9 +25,8 @@ server {
     fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
   }
 
-
-  location @missing {
-    rewrite ^/(.*) $scheme://$host/consent/index.php/$1 permanent;
-  }
+#  location @missing {
+#    rewrite ^/(.*) $scheme://$host/consent/index.php/$1 permanent;
+#  }
 
 }

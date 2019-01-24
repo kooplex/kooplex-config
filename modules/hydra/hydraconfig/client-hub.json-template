@@ -2,18 +2,18 @@
         "client_name": "##PREFIX##-hub",
         "grant_types": [
                 "client_credentials",
-					 "authorization_code"
+                "authorization_code"
         ],
-        "id": "kooplex-test-hub",
-		  "description": "Kooplex Test HUB",
+        "id": "##PREFIX##-hub",
+		  "description": "##PREFIX## HUB",
         "redirect_uris": [
                 "##REWRITEPROTO##://##OUTERHOST##/hub/oauth/complete/hydraoidc/"
         ],
         "response_types": [
-					 "id_token",
+                "id_token",
                 "token",
                 "code"
         ],
         "scope": "hydra.keys.get openid offline profile email",
-		  "public":true
+		 "public":true
 }

@@ -1,15 +1,16 @@
-FROM oryd/hydra
+FROM oryd/hydra:v0.11.6-alpine
 
 RUN apk add --no-cache openssl
+RUN apk add --no-cache ca-certificates
 
-# self sigbed certificate without a prompt
 COPY rootCA.key /etc/rootCA.key
-COPY rootCA.crt /etc/ssl/certs/rootCA.crt
+COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
 RUN update-ca-certificates
 RUN openssl genrsa -out /etc/hydra.key 2048
 RUN openssl req -new -sha256 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=##PREFIX##-hydra" -key /etc/hydra.key -out /etc/hydra.csr
-RUN openssl x509 -req -in /etc/hydra.csr -CA /etc/ssl/certs/rootCA.crt -CAkey /etc/rootCA.key -CAcreateserial -out /etc/hydra.crt -days 1024 -sha256
-RUN rm /etc/rootCA.key
+RUN openssl x509 -req -in /etc/hydra.csr -CA /usr/local/share/ca-certificates/rootCA.crt -CAkey /etc/rootCA.key -CAcreateserial -out /tmp/hydra.crt -days 1024 -sha256
+RUN cat /tmp/hydra.crt /usr/local/share/ca-certificates/rootCA.crt > /etc/hydra.crt
+RUN rm /etc/rootCA.key /tmp/hydra.crt
 
 COPY client-hub.json /etc/hydraconfig/client-hub.json
 COPY client-policy-hub.json /etc/hydraconfig/client-policy-hub.json

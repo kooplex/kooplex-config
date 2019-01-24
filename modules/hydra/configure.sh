@@ -87,11 +87,25 @@ case $VERB in
 	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "create database $HYDRACONSENTDB;"
 	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "GRANT ALL  privileges on $HYDRACONSENTDB.* to $HYDRACONSENTDB_USER;"
 
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create --skip-tls-verify -f /etc/hydraconfig/public-policy.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import --skip-tls-verify /etc/hydraconfig/client-hub.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import --skip-tls-verify /etc/hydraconfig/consent-app.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create --skip-tls-verify -f /etc/hydraconfig/consent-app-policy.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create --skip-tls-verify -f /etc/hydraconfig/client-policy-hub.json"
+	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/public-policy.json"
+	docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/client-hub.json"
+	PWFILE=$RF/consent-app.pw
+	if [ ! -f $PWFILE ] ; then
+		docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-app.json > /consent-app.pw" && \
+			docker cp  ${PREFIX}-hydra:/consent-app.pw $PWFILE
+	fi
+	CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
+        sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+            -e "s/##OUTERHOST##/$OUTERHOST/" \
+            -e "s/##CONSENTPASSWORD##/$HYDRA_ADMINPW/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
+
+#	hydra 0.x esetén:
+	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/consent-app-policy.json"
+	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/client-policy-hub.json"
+
+#	hydra 1.x esetén:
+#	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/consent-app-policy.json"
+#	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/client-policy-hub.json"
 
 
 #\c monitor

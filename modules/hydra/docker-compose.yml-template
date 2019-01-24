@@ -12,6 +12,7 @@ services:
     networks:
       - ##PREFIX##-hydra-privatenet
       - ##PREFIX##-service-net
+      - ##PREFIX##-net
     restart: unless-stopped
     logging:
       options:
@@ -22,8 +23,9 @@ services:
       - PREFIX=##PREFIX##
       - DATABASE_URL=postgres://postgres:##HYDRADB_PW##@##PREFIX##-hydra-postgresql:5432/##HYDRADB##?sslmode=disable
       - SYSTEM_SECRET=##HYDRASYSTEM_SECRET##
-      - ISSUER=https://##PREFIX##-hydra:4444
-      - CONSENT_URL=https://##OUTERHOST##/consent
+#      - ISSUER=https://##PREFIX##-hydra:4444
+      - ISSUER=##REWRITEPROTO##://##OUTERHOST##/hydra
+      - CONSENT_URL=##REWRITEPROTO##://##OUTERHOST##/consent/consent
       - FORCE_ROOT_CLIENT_CREDENTIALS=admin:##HYDRA_ADMINPW##
       - HTTPS_TLS_CERT_PATH=/etc/hydra.crt
       - HTTPS_TLS_KEY_PATH=/etc/hydra.key
