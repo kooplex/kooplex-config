@@ -17,10 +17,7 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconsentdb -o o=bind ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
 
-
-#Lehuzzuk a hydrat a repobol
-#git clone vmi
-#      cp -r /srv/hydra-consent/ $SRV/_hydracode/consent
+      cp -r src.consent $SRV/_hydracode/consent
 
       cp etc/* Dockerfile.hydraconsentdb $RF/
       cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
