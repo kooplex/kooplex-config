@@ -28,7 +28,10 @@ case $VERB in
       cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json} $RF/
       cp -a $BUILDDIR/CA/rootCA.{key,crt} $RF/
 
-      
+      ENCFILE=$RF/hydraconsent.enckey
+      if [ ! -f $ENCFILE ] ; then
+	 hexdump -n 16 -e '"%08X"' /dev/random > $ENCFILE
+      fi
 
 
 
@@ -45,6 +48,9 @@ case $VERB in
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
           -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $RF/config.php
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/"  etc/hydra.yml-template > $RF/hydra.yml
       sed -e "s/##PREFIX##/$PREFIX/" \
