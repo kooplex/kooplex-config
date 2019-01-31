@@ -1,7 +1,7 @@
 FROM nginx
 
 RUN apt update
-RUN apt install --no-install-recommends -y php7.0 php7.0-mysql php7.0-fpm php7.0-curl nginx-full vim less
+RUN apt install --no-install-recommends -y php7.0 php7.0-mysql php7.0-fpm php7.0-curl nginx-full vim less php7.0-dom
 
 RUN mkdir -p /srv/
 #ADD src/consent  /srv/consent
