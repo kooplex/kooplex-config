@@ -10,7 +10,7 @@ server {
   location / {
     alias /srv/consent/public/; 
     index index.php; 
-    if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions)) { 
+    if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions|simplesaml)) { 
       rewrite ^/(.*)$ /index.php/$1 last; 
     } 
   }
@@ -23,6 +23,22 @@ server {
     include snippets/fastcgi-php.conf;
     fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
   }
+
+  location ^~ /simplesaml {
+        alias /srv/consent/public/simplesaml;
+        location ~ ^(/simplesaml)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ { 
+            include fastcgi_params; 
+            fastcgi_pass unix:/var/run/php/php7.0-fpm.sock; 
+            fastcgi_index index.php; 
+            fastcgi_param SCRIPT_FILENAME $document_root$phpfile; 
+ 
+            # Must be prepended with the baseurlpath 
+            fastcgi_param SCRIPT_NAME /simplesaml$phpfile; 
+
+            fastcgi_param PATH_INFO $pathinfo if_not_empty;
+        }
+  }
+
 
 #  location @missing {
 #    rewrite ^/(.*) $scheme://$host/consent/index.php/$1 permanent;
