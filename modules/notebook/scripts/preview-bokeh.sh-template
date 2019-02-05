@@ -1,0 +1,11 @@
+if [ ! $1 ]; then
+
+        echo "No directory specified, so assuming this one"
+        /opt/conda/bin/bokeh serve  ./ --prefix /${NB_URL}/report --allow-websocket-origin kooplex-test.elte.hu --port 9000
+
+else
+
+        /opt/conda/bin/bokeh serve  $1 --prefix /${NB_URL}/report --allow-websocket-origin kooplex-test.elte.hu --port 9000
+
+fi
+
