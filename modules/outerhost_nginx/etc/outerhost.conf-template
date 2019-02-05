@@ -27,7 +27,7 @@ server {
    }
 
   location /hydra/ {
-        proxy_pass            http://##PREFIX##-hydra:4444/;
+        proxy_pass            https://##PREFIX##-hydra:4444/;
   }
 
   location /consent/ {
