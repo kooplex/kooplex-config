@@ -22,9 +22,9 @@ ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
 ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
-ADD kernel-gateway.sh /usr/local/bin/kernel-gateway.sh
+ADD preview-nb-api.sh  /usr/local/bin/preview-nb-api.sh
 ADD preview-bokeh.sh /usr/local/bin/preview-bokeh.sh
-RUN chmod a+x /usr/local/bin/kernel-gateway.sh /usr/local/bin/preview-bokeh.sh
+RUN chmod a+x /usr/local/bin/preview-nb-api.sh /usr/local/bin/preview-bokeh.sh
 
 ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
 RUN chmod +x /usr/local/sbin/manage_mount.sh 

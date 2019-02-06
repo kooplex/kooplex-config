@@ -8,8 +8,11 @@ case $VERB in
     echo "Building image $PREFIX-notebooks $EXTRA"
 
 
-     mkdir -p $RF
+    mkdir -p $RF
      
+    sed -e "s/##REWRITEPROTO##/${REWRITEPROTO}/"\
+	   -e "s/##OUTERHOST##/${OUTERHOST}/" scripts/bokeh-serve.sh-template > $RF/$imagedir/bokeh-serve.sh
+
 #     for imagedir in ./image-*
      for i in $EXTRA
      do
@@ -18,7 +21,7 @@ case $VERB in
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
         sed -e "s/##PREFIX##/${PREFIX}/"  scripts/preview-bokeh.sh-template > $RF/$imagedir/preview-bokeh.sh
-        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex,kernel-gateway.sh} ${RF}/$imagedir
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex,preview-nb-api.sh} ${RF}/$imagedir
         cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rsession.conf,rstudio-login.html,rserver.conf,rstudio-nginx.conf}  ${RF}/$imagedir
         cp DockerFile-pieces/* ${RF}/$imagedir
 
