@@ -65,10 +65,23 @@ echo Showing $VOLDIR
 # Mount new volumes
 while IFS=':' read -r vol src <&3 ; do
     if [ $vol = 'home' ] ; then
-        dst=$(echo $ROOTDIR/$(basename $src) | sed s,//*,/,g)
+        dst=$ROOTDIR/$(basename $src)
+    elif [ $vol = 'garbage' ] ; then
+	dst=$ROOTDIR/garbage
+    elif [ $vol = 'course' ] ; then
+	dst=$ROOTDIR/course
+    elif [ $vol = 'usercourse' ] ; then
+	dst=$ROOTDIR/workdir
+    elif [ $vol = 'assignment' ] ; then
+	ass=$(basename $src | cut -f2 -d-)
+	usr=$(basename $src | cut -f3 -d-)
+	dst=$ROOTDIR/feedback/$ass/$usr
+    elif [ $vol = 'report' ] ; then
+	dst=$ROOTDIR/report
     else
-        dst=$(echo $ROOTDIR/$vol/$(basename $src) | sed s,//*,/,g)
+        dst=$ROOTDIR/$vol/$(basename $src)
     fi
+    dst=$(echo $dst | sed s,//*,/,g)
     if [ ! -d $src ] ; then
         echo "ERROR: Missing $src" >&2
         continue
