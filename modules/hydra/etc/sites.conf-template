@@ -7,10 +7,11 @@ server {
   access_log /var/log/nginx/##PREFIX##-hydraconsent-access.log;
   error_log /var/log/nginx/##PREFIX##-hydraconsent-error.log;
   
-  location / {
+  location /consent {
     alias /srv/consent/public/; 
     index index.php; 
     if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions|simplesaml)) { 
+#    if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions)) { 
       rewrite ^/(.*)$ /index.php/$1 last; 
     } 
   }
