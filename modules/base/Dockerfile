@@ -9,12 +9,13 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
+# Install NFS client ACL manipulation
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     wget \
     bzip2 \
     ca-certificates \
     sudo vim\
-    locales
+    locales nfs-common acl nfs4-acl-tools
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
@@ -42,9 +43,6 @@ ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package
 
-# Install NFS client ACL manipulation
-RUN apt-get install -q -y nfs-common acl nfs4-acl-tools
-    
 # Patch bashrc
 COPY bashrc_tail /tmp
 RUN cat /tmp/bashrc_tail >> /etc/bash.bashrc

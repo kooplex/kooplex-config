@@ -7,16 +7,16 @@ RUN apt install -y curl && \
     apt install --yes nodejs 
 
 RUN apt update 
-RUN apt install -y tmux zip curlftpfs
-RUN apt install -y liblapack-dev libblas-dev
-RUN apt install -y gfortran libfreetype6* pkg-config
-RUN apt install -y git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake
-RUN apt install -y inotify-tools lsof gawk
-RUN apt install -y autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends 
-RUN apt install -y libfontconfig1 libxrender1 libxrender-dev
-RUN apt install -y g++-5 libicu-dev libxml2-dev
-RUN apt install -y libblacs-mpi-dev libscalapack-mpi-dev
-RUN apt install -y texlive-xetex texlive-lang-european texlive-science
+RUN apt install -y tmux zip curlftpfs\
+ liblapack-dev libblas-dev \
+ gfortran libfreetype6* pkg-config \
+ git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake \
+ inotify-tools \
+ autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends \
+ libfontconfig1 libxrender1 libxrender-dev \
+ g++-5 libicu-dev libxml2-dev \
+ libblacs-mpi-dev libscalapack-mpi-dev \
+ texlive-xetex texlive-lang-european texlive-science
 
 #RUN chmod u+s /usr/sbin/mount.davfs
 
@@ -47,8 +47,7 @@ RUN cd /tmp && \
 RUN /opt/conda/bin/conda update -y conda
 
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
-RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console 
-RUN $CONDA_DIR/bin/conda install --quiet --yes  notebook widgetsnbextension
+RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console   notebook widgetsnbextension
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
      jupyter dashboards quick-setup --sys-prefix
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
@@ -57,25 +56,19 @@ RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
 # TO SWITCH BETWEEN CONDA ENVS
 RUN pip install environment_kernels
 
-RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge ipywidgets=7.0 traittypes
-RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge bqplot
+
+#RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels  -c conda-forge parso=0.1.0 
+
+RUN  $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge ipywidgets=7.0 traittypes bqplot ipyleaflet folium altair branca vega vincent jupyterlab
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
-RUN $CONDA_DIR/bin/conda install -v --yes  -c conda-forge parso=0.1.0
-
 RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise pivottablejs
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge ipyleaflet folium
-RUN $CONDA_DIR/bin/conda install --quiet --yes seaborn pandas
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge altair branca vega vincent 
 
-RUN $CONDA_DIR/bin/conda update -y notebook
-RUN $CONDA_DIR/bin/conda update -y jupyter_client
+RUN $CONDA_DIR/bin/conda update -y notebook jupyter_client
 
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyterlab
-RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels
+RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge jupyterlab jupyter_nbextensions_configurator jupyter_contrib_nbextensions
+RUN $CONDA_DIR/bin/conda install --quiet --yes nb_conda nb_conda_kernels nodejs networkx seaborn pandas
 
-RUN $CONDA_DIR/bin/conda install -v --quiet --yes nodejs
-RUN $CONDA_DIR/bin/conda install -v --quiet --yes networkx
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager #@0.33
 RUN pip install jupyterlab_latex && jupyter serverextension enable --sys-prefix jupyterlab_latex && jupyter labextension install @jupyterlab/latex
@@ -87,11 +80,5 @@ RUN jupyter labextension install jupyterlab_vim
 # pip install jupyterlab-discovery
 #jupyter labextension install @mflevine/jupyterlab_html
 #jupyter labextension install knowledgelab
-
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator
-RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_contrib_nbextensions
-RUN $CONDA_DIR/bin/conda install -c conda-forge -y jupyter_kernel_gateway==2.1.0
-RUN pip install bokeh==1.0.4 holoviews
-RUN apt install cron
 
 
