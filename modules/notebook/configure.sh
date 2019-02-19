@@ -17,6 +17,8 @@ case $VERB in
         mkdir -p $RF/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
+        sed -e "s/##OUTERHOSTNAME##/${OUTERHOSTNAME}/"\
+	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/rstudio-login.html-template > $RF/$imagedir/rstudio-login.html
 	mkdir -p ${RF}/$imagedir/init
         cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
         cp scripts/??-*.sh ${RF}/$imagedir/init
