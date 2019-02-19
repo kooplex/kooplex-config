@@ -1,1 +1,0 @@
-/opt/conda/bin/bokeh serve  $2 --prefix $1 --allow-websocket-origin=##REWRITEPROTO##://##OUTERHOST## --port 9000 --dev $3

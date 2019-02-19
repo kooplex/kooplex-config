@@ -10,17 +10,17 @@ case $VERB in
 
      mkdir -p $RF
      
-     for imagedir in ./image-*
-#     for i in $EXTRA
+#     for imagedir in ./image-*
+     for i in $EXTRA
      do
-#        imagedir="./image-"$i
+        imagedir="./image-"$i
         mkdir -p $RF/$imagedir
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
 	mkdir -p ${RF}/$imagedir/init
         cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
         cp scripts/??-*.sh ${RF}/$imagedir/init
-        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rsession.conf,rserver.conf,rstudio-nginx.conf}  ${RF}/$imagedir/
+        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rstudio-user-settings,rsession.conf,rserver.conf,rstudio-nginx.conf}  ${RF}/$imagedir/
         cp DockerFile-pieces/* ${RF}/$imagedir
 
 #####

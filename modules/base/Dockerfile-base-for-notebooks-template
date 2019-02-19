@@ -6,7 +6,6 @@ RUN apt install -y curl && \
     curl -sL https://deb.nodesource.com/setup_10.x |  bash - && \
     apt install --yes nodejs 
 
-RUN apt update 
 RUN apt install -y tmux zip curlftpfs\
  liblapack-dev libblas-dev \
  gfortran libfreetype6* pkg-config \
@@ -47,10 +46,10 @@ RUN cd /tmp && \
 RUN /opt/conda/bin/conda update -y conda
 
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
-RUN $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console   notebook widgetsnbextension
-RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
+RUN  $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console   notebook widgetsnbextension
+RUN  $CONDA_DIR/bin/conda install --quiet --yes -override-channels -c conda-forge jupyter_dashboards && \
      jupyter dashboards quick-setup --sys-prefix
-RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
+RUN  $CONDA_DIR/bin/conda install --quiet --yes -override-channels -c conda-forge jupyter_cms && \
      jupyter cms quick-setup --sys-prefix
 
 # TO SWITCH BETWEEN CONDA ENVS

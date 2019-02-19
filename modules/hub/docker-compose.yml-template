@@ -16,12 +16,13 @@ services:
     volumes:
       - ##PREFIX##-hubcode:/kooplexhub:rw
       - ##PREFIX##-home:/mnt/.volumes/home:rw
-      - ##PREFIX##-course:/mnt/.volumes/course:rw
-      - ##PREFIX##-git:/mnt/.volumes/git:rw
       - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
+      - ##PREFIX##-share:/mnt/.volumes/share:rw
+      - ##PREFIX##-report:/mnt/.volumes/report:rw
+      - ##PREFIX##-git:/mnt/.volumes/git:rw
+      - ##PREFIX##-course:/mnt/.volumes/course:rw
       - ##PREFIX##-usercourse:/mnt/.volumes/usercourse:rw
       - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
-      - ##PREFIX##-share:/mnt/.volumes/share:rw
       - ##PREFIX##-garbage:/mnt/.volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
@@ -41,6 +42,7 @@ services:
       - HUBDB_USER=##HUBDB_USER##
       - HUBDB_PW=##HUBDB_PW##
       - HUBDBROOT_PW=##HUBDBROOT_PW##
+      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
   ##PREFIX##-hub-mysql:
     container_name: ##PREFIX##-hub-mysql
@@ -73,6 +75,8 @@ volumes:
   ##PREFIX##-home:
     external: true
   ##PREFIX##-workdir:
+    external: true
+  ##PREFIX##-report:
     external: true
   ##PREFIX##-git:
     external: true
