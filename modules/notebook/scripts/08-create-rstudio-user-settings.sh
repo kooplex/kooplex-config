@@ -1,3 +1,17 @@
+# CREATE rserver.conf and rsession.conf
+cat << EOF > /etc/rstudio/rserver.conf
+server-user=rstudio
+rsession-which-r=/usr/local/bin/R
+server-working-dir=/home
+rsession-config-file=/home/$NB_USER
+EOF
+
+cat << EOL > /etc/rstudio/rsession.conf
+user-identity=$NB_USER
+allow-terminal-websockets=0
+session-default-working-dir=/home
+EOL
+
 # IN ORDER TO BE ABLE TO USE TERMINALS
 # AND HAVE THE RIGHT WORKING DIRECTORY IN RSTUDIO
 

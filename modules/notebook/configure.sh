@@ -22,7 +22,7 @@ case $VERB in
 	mkdir -p ${RF}/$imagedir/init
         cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
         cp scripts/??-*.sh ${RF}/$imagedir/init
-        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rstudio-user-settings,rsession.conf,rserver.conf,rstudio-nginx.conf}  ${RF}/$imagedir/
+        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
         cp DockerFile-pieces/* ${RF}/$imagedir
 
 #####

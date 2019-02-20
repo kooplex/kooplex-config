@@ -83,8 +83,6 @@ RUN mv /init /init.sh
 
 #ENV PASSWORD rstudio 
 ADD entrypoint-rstudio.sh /entrypoint.sh
-ADD rserver.conf /etc/rstudio/rserver.conf
-ADD rsession.conf /etc/rstudio/rsession.conf
 ADD rstudio-nginx.conf /etc/nginx/sites-enabled/
 ADD rstudio-login.html /etc/rstudio/login.html
 ADD rstudio-user-settings /etc/rstudio/user-settings
