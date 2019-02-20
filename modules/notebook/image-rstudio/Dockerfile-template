@@ -42,7 +42,7 @@ RUN pam-auth-update --package
 # Install NFS client ACL manipulation
 RUN apt-get install -q -y nfs-common acl nfs4-acl-tools
 RUN apt install -y nginx
-
+RUN apt install -y inotify-tools
 # ADD Shiny server
 #  apt-get update && apt-get -y install \
 #    gdebi-core \

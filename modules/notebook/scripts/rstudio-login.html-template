@@ -1,2 +1,8 @@
-<h1> Please use the credentials that are given in the <a href="##REWRITEPROTO##://##OUTERHOSTNAME##/hub/user/manage/project:list"> manage secrets menu</a> next to the login/logout button</h1>
+<br>
+<br>
+<h1> 
+Please use the credentials that were given to you when you clicked the Start button. 
+<br>
+In case you missed to take note of the password then please restart the container!
+  </h1>
 
