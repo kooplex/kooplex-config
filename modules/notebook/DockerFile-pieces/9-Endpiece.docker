@@ -18,6 +18,9 @@ ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
 ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
+ADD preview-bokeh.sh /usr/local/sbin/preview-bokeh.sh
+ADD preview-nb-api.sh /usr/local/sbin/preview-nb-api.sh
+RUN chmod a+x /usr/local/sbin/preview-bokeh.sh /usr/local/sbin/preview-nb-api.sh
 
 ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
 RUN chmod +x /usr/local/sbin/manage_mount.sh 

@@ -21,6 +21,10 @@ c.NotebookApp.allow_remote_access=True
 c.NotebookApp.token = 'aiSiga1aiFai2AiZu1veeWein5gijei8yeLay2Iecae3ahkiekeisheegh2ahgee'
 c.FileContentsManager.delete_to_trash = False
 
+c.MappingKernelManager.cull_connected = True
+c.MappingKernelManager.cull_interval = 5000
+c.MappingKernelManager.cull_idle_timeout = 10000
+
 # This will enable the option to switch between conda envs in the notebook-server
 #c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
 

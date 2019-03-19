@@ -12,7 +12,6 @@ case $VERB in
 
     cp scripts/* $RF
     cp etc/collect_data-cron $RF/collect_data
-    cp Dockerfile.stats $RF
     
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##POSTGRESDBPW##/$GITLABDBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE

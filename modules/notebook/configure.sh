@@ -19,6 +19,10 @@ case $VERB in
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
         sed -e "s/##OUTERHOSTNAME##/${OUTERHOSTNAME}/"\
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/rstudio-login.html-template > $RF/$imagedir/rstudio-login.html
+        sed -e "s/##OUTERHOST##/${OUTERHOST}/"\
+	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-bokeh.sh-template > $RF/$imagedir/preview-bokeh.sh
+        sed -e "s/##OUTERHOST##/${OUTERHOST}/"\
+	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-nb-api.sh-template > $RF/$imagedir/preview-nb-api.sh
 	mkdir -p ${RF}/$imagedir/init
         cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
         cp scripts/??-*.sh ${RF}/$imagedir/init

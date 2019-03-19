@@ -10,11 +10,14 @@ case $VERB in
 
     mkdir -p $SECRETS
     cp  scripts/* $RF
+    cp requirements.txt $RF
     cp Dockerfile $RF
-    sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-for-notebooks-template > $RF/Dockerfile-base-for-notebooks-template
+    sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
+    sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda
  
     docker $DOCKERARGS build -t ${PREFIX}-base  $RF
-    docker $DOCKERARGS build -t ${PREFIX}-base-for-notebooks -f $RF/Dockerfile-base-for-notebooks-template  $RF 
+    docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
+    docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $RF/Dockerfile-base-conda  $RF 
     echo "Generating secrets..."
 
   ;;
