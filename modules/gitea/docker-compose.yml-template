@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  ##PREFIX##-gitea:
+    image: gitea/gitea:latest
+    container_name: ##PREFIX##-gitea
+    depends_on:
+      - ##PREFIX##-gitea-mysql
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=mysql
+      - DB_HOST=db:3306
+      - DB_NAME=##GITEADB##
+      - DB_USER=##GITEADB_USER##
+      - DB_PASSWD=##GITEADB_PW##
+      - ROOT_URL=##ROOTURL##
+    restart: unless-stopped
+    networks:
+      - ##PREFIX##-net
+      - ##GITEANET##
+    volumes:
+      - ##PREFIX##-gitea-data:/data:rw      
+    ports:
+      - "3030:3000"
+      - "222:22"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ##PREFIX##-gitea-mysql:
+    image: mysql:5.7
+    container_name: ##PREFIX##-gitea-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=##GITEADB_ROOTPW##
+      - MYSQL_USER=##GITEADB_USER##
+      - MYSQL_PASSWORD=##GITEADB_PW##
+      - MYSQL_DATABASE=##GITEADB##
+    networks:
+      - ##GITEANET##
+    volumes:
+      - ##PREFIX##-gitea-db:/var/lib/mysql:rw      
+
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##GITEANET##:
+    external: false
+
+volumes:
+  ##PREFIX##-gitea-data:
+    external: true
+  ##PREFIX##-gitea-db:
+    external: true
+
