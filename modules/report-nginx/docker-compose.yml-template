@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  ##PREFIX##-report-nginx:
+    container_name: ##PREFIX##-report-nginx
+    image: ##PREFIX##-report-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - ##PREFIX##-report:/srv/report
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ##EXTRACONFIG##
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-report:
+    external: true
+

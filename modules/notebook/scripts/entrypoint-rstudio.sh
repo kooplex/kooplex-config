@@ -9,7 +9,6 @@
 ## this was motivated due to this issue:
 ## - https://github.com/just-containers/s6-overlay/issues/108
 ##
-rm /init/03-startinotify.sh
 rm /init/99-startnotebookserver.sh
 
 for SCRIPT in /init/*

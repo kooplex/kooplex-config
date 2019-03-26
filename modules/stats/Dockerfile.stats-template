@@ -1,8 +1,17 @@
 # Start with an existing Jupyter image with some Python libs preinstalled
-FROM ##PREFIX##-fiek-notebook-basic 
+#FROM ##PREFIX##-base-for-notebooks 
+FROM ##PREFIX##-base-conda 
+
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge ipyleaflet folium 
+RUN $CONDA_DIR/bin/conda install --quiet --yes seaborn pandas
 
 # Add the kernel gateway
-RUN conda install -y psycopg2
+RUN $CONDA_DIR/bin/conda install -y psycopg2
+RUN $CONDA_DIR/bin/conda install -c conda-forge -y jupyter_kernel_gateway==2.1.0
+
+RUN pip install bokeh==1.0.4 holoviews
+RUN pip install matplotlib 
+RUN apt install cron
 
 COPY collect_data /etc/cron.d/collect_data
 RUN chmod 0644 /etc/cron.d/collect_data
@@ -22,6 +31,6 @@ WORKDIR /srv/notebooks/
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["tini", "--"]
-CMD ["/bin/bash", "/entrypoint.sh"]
+#ENTRYPOINT ["tini", "--"]
+#CMD ["/bin/bash", "/entrypoint.sh"]
 
