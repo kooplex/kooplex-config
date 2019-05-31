@@ -1,5 +1,10 @@
 #!/bin/bash
 
+replace_slash() {
+	echo $1 | sed 's/\//\\\//g'
+}
+
+
 RF=$BUILDDIR/notebooks
     echo "Building image $PREFIX-notebooks $EXTRA"
 
@@ -15,6 +20,7 @@ case $VERB in
      do
         imagedir="./image-"$i
         mkdir -p $RF/$imagedir
+	[ -e $imagedir/conda-requirements.txt] &&  cp -p $imagedir/conda-requirements.txt $RF/$imagedir/conda-requirements.txt
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
         sed -e "s/##OUTERHOSTNAME##/${OUTERHOSTNAME}/"\
@@ -23,10 +29,14 @@ case $VERB in
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-bokeh.sh-template > $RF/$imagedir/preview-bokeh.sh
         sed -e "s/##OUTERHOST##/${OUTERHOST}/"\
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-nb-api.sh-template > $RF/$imagedir/preview-nb-api.sh
+
 	mkdir -p ${RF}/$imagedir/init
-        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,??-*.sh,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
-        cp scripts/??-*.sh ${RF}/$imagedir/init
-        cp scripts/{entrypoint-rstudio.sh,bashrc_tail,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
+	echo $(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)
+	sed -e "s/##FUNCTIONAL_VOLUME_MOUNT_POINT##/$(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)/" scripts/11_init_bashrcs-template > $RF/$imagedir/init/11_init_bashrcs
+        sed -e "s/##FUNCTIONAL_VOLUME_MOUNT_POINT##/$(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)/" scripts/12_conda_envs-template > $RF/$imagedir/init/12_conda_envs
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
+	cp scripts/{0?-*.sh,9?-*.sh} ${RF}/$imagedir/init
+        cp scripts/{entrypoint-rstudio.sh,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
         cp DockerFile-pieces/* ${RF}/$imagedir
 
 #####
