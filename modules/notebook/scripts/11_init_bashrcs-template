@@ -1,0 +1,7 @@
+
+# source bash initialisation fragments from volumes attached to the container
+if [ -d ##FUNCTIONAL_VOLUME_MOUNT_POINT## ] ; then
+    for rc in ##FUNCTIONAL_VOLUME_MOUNT_POINT##/*/bashrc ; do
+        [ -f $rc ] && . $rc
+    done
+fi

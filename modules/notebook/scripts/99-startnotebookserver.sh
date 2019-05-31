@@ -9,5 +9,5 @@ elif [ "$REPORT_TYPE" == "service" ] ; then
     nice -n 19 /usr/local/sbin/preview-nb-api.sh $REPORT_INDEX
 else
     echo "Starting notebook for $NB_USER..."
-    nice -n 19 start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN
+    nice -n 19 start-notebook.sh --config=/etc/jupyter_notebook_config.py --log-level=DEBUG --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN --EnvironmentKernelSpecManager.display_name_template=\" {}\" 
 fi
