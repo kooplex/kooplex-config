@@ -25,10 +25,6 @@ case $VERB in
 	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" bootstrap.py-template > $RF/bootstrap.py
 
-    sed -e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
-	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $RF/ccnet.conf
-    
    echo "2. Building ${PREFIX}-seafile..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
  ;;

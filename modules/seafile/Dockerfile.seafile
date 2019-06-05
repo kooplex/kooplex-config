@@ -1,6 +1,5 @@
 FROM seafileltd/seafile:latest
 
 COPY $RF/bootstrap.py /scripts/
-COPY $RF/ccnet.conf /shared/seafile/conf/ccnet.conf_
 
 
