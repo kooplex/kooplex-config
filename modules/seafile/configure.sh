@@ -21,10 +21,9 @@ case $VERB in
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
     
-    sed -e "s/##SEAHUB_SECRET_KEY##/$SEAFILE_SECRET/" \
-	-e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
+    sed -e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
 	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" conf/seahub_settings.py-template > $RF/seahub_settings.py
+        -e "s/##OUTERHOST##/$OUTERHOST/" bootstrap.py-template > $RF/bootstrap.py
 
     sed -e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
 	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \

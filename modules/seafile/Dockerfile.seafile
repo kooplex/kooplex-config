@@ -1,6 +1,6 @@
 FROM seafileltd/seafile:latest
 
-COPY $RF/seahub_settings.py /shared/seafile/conf/seahub_settings.py_
+COPY $RF/bootstrap.py /scripts/
 COPY $RF/ccnet.conf /shared/seafile/conf/ccnet.conf_
 
 
