@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  ##PREFIX##-seafile:
+    image: ##PREFIX##-seafile
+    container_name: ##PREFIX##-seafile
+    build:
+      context: .
+      dockerfile: Dockerfile.seafile
+    environment:
+      - SEAFILE_SERVER_HOSTNAME=##OUTERHOST##
+    restart: unless-stopped
+    networks:
+      - ##PREFIX##-net
+    volumes:
+      - ##PREFIX##-seafile-data:/shared:rw      
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-seafile-data:
+    external: true
+
