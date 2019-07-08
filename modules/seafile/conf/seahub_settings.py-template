@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-SECRET_KEY = "##SEAHUB_SECRET_KEY##"
+SECRET_KEY = "##DJANGO_SECRET_KEY##"
 
 DATABASES = {
     'default': {
@@ -7,7 +7,7 @@ DATABASES = {
         'NAME': 'seahub_db',
         'USER': 'seafile',
         'PASSWORD': '##SEAFILEDB_PW##',
-        'HOST': '127.0.0.1',
+        'HOST': '##PRFIX##-seafile-mysql',
         'PORT': '3306'
     }
 }
@@ -16,13 +16,15 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-        'LOCATION': '127.0.0.1:11211',
+        'LOCATION': '##PREFIX##-memcached:11211',
     },
     'locmem': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
 }
 COMPRESS_CACHE_BACKEND = 'locmem'
+TIME_ZONE = 'Etc/UTC'
+
 FILE_SERVER_ROOT = "##REWRITEPROTO##://##OUTERHOST##/seafhttp"
 
 SERVE_STATIC = True
@@ -31,4 +33,53 @@ COMPRESS_URL = MEDIA_URL
 STATIC_URL = MEDIA_URL + 'assets/'
 SITE_ROOT = '/seafile/'
 LOGIN_URL = '/seafile/accounts/login/'
+LOGIN_REDIRECT_URL = '/seafile/'
+LOGOUT_URL = '/seafile/accounts/logout/'
+LOGOUT_REDIRECT_URL = None
+
+ENABLE_OAUTH = True
+OAUTH_CLIENT_ID = '##HYDRA_CLIENTID##'
+OAUTH_CLIENT_SECRET = '##HYDRA_CLIENTSECRET##'
+
+OAUTH_REDIRECT_URL = '##REWRITEPROTO##://##OUTERHOST##/seafile/oauth/callback/'
+OAUTH_PROVIDER_DOMAIN = '##URL_HYDRA##'
+OAUTH_AUTHORIZATION_URL = '##URL_HYDRA##/oauth2/auth'
+OAUTH_TOKEN_URL = "##URL_HYDRA##/oauth2/token"
+OAUTH_USER_INFO_URL = "##URL_HYDRA##/userinfo"
+OAUTH_SCOPE = ["profile","email"]
+OAUTH_ATTRIBUTE_MAP = {
+    "primary_mail": (True, "email"),
+    "id": (False, "not used"),
+    "displayName": (False, "name"),
+}
+
+ENABLE_SIGNUP = True
+
+####################### CUT HERE WHEN IN PRODUCTION #################
+DEBUG = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+       'verbose': {
+            'format': '%(levelname)s[%(asctime)s]\t%(module)s:%(funcName)s:%(lineno)s -- %(message)s'
+        },
+    },
+    'handlers': {
+        'dfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['dfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+   }
+}
 

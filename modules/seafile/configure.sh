@@ -12,22 +12,35 @@ case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-seafile..."
 
+    mkdir -p $SRV/_seafile-mysql
     mkdir -p $SRV/_seafile-data
 
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_seafile-mysql -o o=bind ${PREFIX}-seafile-mysql
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_seafile-data -o o=bind ${PREFIX}-seafile-data
 
     cp Dockerfile.seafile $RF/
-    cp views.patch $RF/
 
     sed -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+        -e "s/##OUTERHOST##/$OUTERHOST/" \
+	-e "s/##SEAFILE_MYSQL_ROOTPW##/$DUMMYPASS/" \
+	-e "s/##SEAFILE_ADMIN##/admin@kooplex/" \
+	-e "s/##SEAFILE_ADMINPW##/$DUMMYPASS/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
     
-    sed -e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
-	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" bootstrap.py-template > $RF/bootstrap.py
+    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $RF/views.py.patch
 
-    sed -e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
-	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+        -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" \
+        -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
+        -e "s/##URL_HYDRA##/$URL_HYDRA/" \
+        -e "s/##HYDRA_CLIENTID##/$HYDRA_SEAHUBCLIENTID/" \
+        -e "s/##DJANGO_SECRET_KEY##/$DJANGO_SECRET_KEY/" \
+        -e "s/##HYDRA_CLIENTSECRET##/$HYDRA_SEAHUBCLIENTSECRET/" conf/seahub_settings.py-template > $RF/seahub_settings.py
+    
+    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+        -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $RF/ccnet.conf
     
    echo "2. Building ${PREFIX}-seafile..."

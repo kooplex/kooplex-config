@@ -1,29 +1,55 @@
-version: "3"
-
+version: '2.0'
 services:
+  ##PREFIX##-seafile-mysql:
+    image: mariadb:10.1
+    container_name: ##PREFIX##-seafile-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=##SEAFILE_MYSQL_ROOTPW##
+      - MYSQL_LOG_CONSOLE=true
+    volumes:
+      - ##PREFIX##-seafile-mysql:/var/lib/mysql
+    networks:
+      - ##PREFIX##-seafile-privatenet
+
+  ##PREFIX##-seafile-memcached:
+    image: memcached:1.5.6
+    container_name: ##PREFIX##-seafile-memcached
+    entrypoint: memcached -m 256
+    networks:
+      - ##PREFIX##-seafile-privatenet
+          
   ##PREFIX##-seafile:
     image: ##PREFIX##-seafile
-    container_name: ##PREFIX##-seafile
     build:
       context: .
       dockerfile: Dockerfile.seafile
-    environment:
-      - SEAFILE_SERVER_HOSTNAME=##OUTERHOST##
-    restart: unless-stopped
-    networks:
-      - ##PREFIX##-net
+    container_name: ##PREFIX##-seafile
     volumes:
-      - ##PREFIX##-seafile-data:/shared:rw      
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
+      - ##PREFIX##-seafile-data:/shared
+      - /etc/localtime:/etc/localtime:ro
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+    environment:
+      - DB_HOST=##PREFIX##-seafile-mysql
+      - DB_ROOT_PASSWD=##SEAFILE_MYSQL_ROOTPW##
+      - SEAFILE_ADMIN_EMAIL=##SEAFILE_ADMIN##
+      - SEAFILE_ADMIN_PASSWORD=##SEAFILE_ADMINPW##
+      - SEAFILE_SERVER_LETSENCRYPT=false
+      - SEAFILE_SERVER_HOSTNAME=##OUTERHOST##
+    depends_on:
+      - ##PREFIX##-seafile-mysql
+      - ##PREFIX##-seafile-memcached
+    networks:
+      - ##PREFIX##-seafile-privatenet
+      - ##PREFIX##-net
 
 networks:
+  ##PREFIX##-seafile-privatenet:
+    external: false
   ##PREFIX##-net:
     external: true
 
 volumes:
+  ##PREFIX##-seafile-mysql:
+    external: true
   ##PREFIX##-seafile-data:
     external: true
-

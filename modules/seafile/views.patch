@@ -1,8 +1,0 @@
-208a209,215
-> ###
->     if isinstance(name, list):
->         name = name.pop(0)
->     if isinstance(contact_email, list):
->         contact_emai = contact_email.pop(0)
-> ###
-> 
