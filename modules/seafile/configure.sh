@@ -17,6 +17,7 @@ case $VERB in
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_seafile-data -o o=bind ${PREFIX}-seafile-data
 
     cp Dockerfile.seafile $RF/
+    cp views.patch $RF/
 
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE

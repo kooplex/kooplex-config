@@ -4,4 +4,9 @@ COPY $RF/bootstrap.py /scripts/
 COPY $RF/seahub_settings.py /shared/seafile/conf/seahub_settings.py_
 COPY $RF/ccnet.conf /shared/seafile/conf/ccnet.conf_
 
+RUN ln -s /opt/seafile/seafile-server-6.3.4/seahub/static/scripts/app/ /opt/seafile/seafile-server-6.3.4/seahub/media/assets/scripts/app/
+COPY $RF/views.patch /tmp
+RUN cp /opt/seafile/seafile-server-6.3.4/seahub/seahub/oauth/views.py /opt/seafile/seafile-server-6.3.4/seahub/seahub/oauth/views.py-orig
+RUN patch /opt/seafile/seafile-server-6.3.4/seahub/seahub/oauth/views.py < /tmp/views.patch
+
 
