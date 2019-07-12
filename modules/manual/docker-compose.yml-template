@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  ##PREFIX##-manual:
+    container_name: ##PREFIX##-manual
+    image: ##PREFIX##-manual
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - LANG=en_US.UTF-8
+      - PREFIX=##PREFIX##
+    volumes:
+      - ##PREFIX##-manual:/gitbook
+
+networks:
+  ##PREFIX##-net:
+    external: true
+
+volumes:
+  ##PREFIX##-manual:
+    external: true
+
+
