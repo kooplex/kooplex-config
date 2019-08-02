@@ -16,7 +16,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-        'LOCATION': '##PREFIX##-memcached:11211',
+        'LOCATION': '##PREFIX##-seafile-memcached:11211',
     },
     'locmem': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -24,6 +24,9 @@ CACHES = {
 }
 COMPRESS_CACHE_BACKEND = 'locmem'
 TIME_ZONE = 'Etc/UTC'
+
+SESSION_COOKIE_NAME = "seafile_sessionid"
+
 
 FILE_SERVER_ROOT = "##REWRITEPROTO##://##OUTERHOST##/seafhttp"
 
