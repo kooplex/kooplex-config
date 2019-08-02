@@ -7,13 +7,13 @@
         "id": "##PREFIX##-gitea",
 		  "description": "##PREFIX## GITEA",
         "redirect_uris": [
-                "##REWRITEPROTO##://##OUTERHOST##/gitea/user/oauth2/##PREFIX##/callback"
+                "##REWRITEPROTO##://##OUTERHOST##/gitea/user/login/openid/"
         ],
         "response_types": [
                 "id_token",
                 "token",
                 "code"
         ],
-        "scope": "hydra.keys.get openid offline",
-		 "public":true
-}
+        "scope": "hydra.keys.get openid offline profile email",
+                 "public":true
+
