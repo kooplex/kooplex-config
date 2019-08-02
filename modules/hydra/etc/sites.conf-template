@@ -7,17 +7,16 @@ server {
   access_log /var/log/nginx/##PREFIX##-hydraconsent-access.log;
   error_log /var/log/nginx/##PREFIX##-hydraconsent-error.log;
   
-  location /consent {
+  location / {
     alias /srv/consent/public/; 
     index index.php; 
     if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions|simplesaml)) { 
-#    if ($request_uri !~ ^/(index\.php/?|assets|files|robots\.txt|css|images|themes|ci3_sessions)) { 
       rewrite ^/(.*)$ /index.php/$1 last; 
     } 
   }
 
   location ~ \.php/$ {
-    rewrite /index.php/$ /index.php last;
+    rewrite /index.php/$ /consent/index.php permanent;
   }
 
   location ~ \.php {
@@ -41,8 +40,8 @@ server {
   }
 
 
-#  location @missing {
-#    rewrite ^/(.*) $scheme://$host/consent/index.php/$1 permanent;
-#  }
+  location @missing {
+    rewrite ^/(.*) $scheme://$host/consent/index.php/$1 permanent;
+  }
 
 }

@@ -23,5 +23,7 @@ COPY hydra.yml /root/.hydra.yml
 ADD hydra-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+EXPOSE 4444
+
 ENTRYPOINT ["/entrypoint.sh"]
 
