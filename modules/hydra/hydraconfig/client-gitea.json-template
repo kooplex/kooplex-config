@@ -1,0 +1,19 @@
+{
+        "client_name": "##PREFIX##-gitea",
+        "grant_types": [
+                "client_credentials",
+                "authorization_code"
+        ],
+        "id": "##PREFIX##-gitea",
+		  "description": "##PREFIX## GITEA",
+        "redirect_uris": [
+                "##REWRITEPROTO##://##OUTERHOST##/gitea/user/oauth2/##PREFIX##/callback"
+        ],
+        "response_types": [
+                "id_token",
+                "token",
+                "code"
+        ],
+        "scope": "hydra.keys.get openid offline",
+		 "public":true
+}
