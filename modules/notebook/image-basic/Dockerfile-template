@@ -23,24 +23,24 @@ ENV GOPATH ${HOME}/go
 ENV PATH /usr/local/go/bin:${PATH}:${GOPATH}/bin
 WORKDIR /opt
 
-### Go dep for singularity > 3.0
-#RUN git clone https://github.com/golang/dep.git
-#RUN cp -r dep/cmd/dep/ /usr/local/go/src/
+## Go dep for singularity > 3.0
+RUN git clone https://github.com/golang/dep.git
+RUN cp -r dep/cmd/dep/ /usr/local/go/src/
 #
 ## or another tag or branch if you like 
-#ENV VERSION v3.0.3 
-#RUN git clone https://github.com/sylabs/singularity.git
-#RUN env 
-## omit this command to install the latest bleeding edge code from master
-#RUN cd singularity && \
-#    git fetch && \
-#    git checkout $VERSION && \
-#    mkdir -p /usr/local/go/src/github.com/sylabs/ && \
-#    cd .. && \
-#    cp -r singularity /usr/local/go/src/github.com/sylabs/
-#
-#WORKDIR /usr/local/go/src/github.com/sylabs/singularity
-#RUN  ./mconfig && cd builddir && make && make install
+ENV VERSION v3.0.3 
+RUN git clone https://github.com/sylabs/singularity.git
+RUN env 
+# omit this command to install the latest bleeding edge code from master
+RUN cd singularity && \
+    git fetch && \
+    git checkout $VERSION && \
+    mkdir -p /usr/local/go/src/github.com/sylabs/ && \
+    cd .. && \
+    cp -r singularity /usr/local/go/src/github.com/sylabs/
 
-#RUN useradd -ms /bin/bash aaa
+WORKDIR /usr/local/go/src/github.com/sylabs/singularity
+RUN  ./mconfig && cd builddir && make && make install
+
+RUN useradd -ms /bin/bash aaa
 

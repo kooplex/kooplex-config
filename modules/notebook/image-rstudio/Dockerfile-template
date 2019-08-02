@@ -1,4 +1,4 @@
-FROM rocker/verse
+FROM rocker/verse:latest
 
 USER root
 
@@ -31,8 +31,8 @@ RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/  
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
 
-RUN apt update
-RUN apt install --yes systemd
+RUN apt update &&  apt install --yes systemd
+
 # Do not run nslcd as a daemon
 RUN systemctl disable nslcd
 
@@ -40,9 +40,7 @@ RUN systemctl disable nslcd
 RUN pam-auth-update --package
 
 # Install NFS client ACL manipulation
-RUN apt-get install -q -y nfs-common acl nfs4-acl-tools
-RUN apt install -y nginx
-RUN apt install -y inotify-tools
+RUN apt-get install -q -y nfs-common acl nfs4-acl-tools  nginx inotify-tools
 # ADD Shiny server
 #  apt-get update && apt-get -y install \
 #    gdebi-core \
