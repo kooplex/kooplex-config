@@ -1,0 +1,5 @@
+FROM vanessa/sregistry_nginx
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY uwsgi_params.par /etc/nginx/uwsgi_params.par
+

@@ -1,0 +1,147 @@
+version: "3"
+
+services:
+  ##PREFIX##-singularity-db:
+    image: postgres
+    container_name: ##PREFIX##-singularity-db
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-singularity-db:/var/lib/postgresql/data:rw
+    restart: unless-stopped
+    environment:
+      -  POSTGRES_PASSWORD=##SINGULARITYDB_PW##
+    networks:
+      - ##PREFIX##-singularity-privatenet
+      - ##PREFIX##-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  ##PREFIX##-singularity-uwsgi:
+    restart: always
+    image: vanessa/sregistry
+    container_name: ##PREFIX##-singularity-uwsgi
+    links:
+      - ##PREFIX##-singularity-redis
+      - ##PREFIX##-singularity-db
+    networks:
+      - ##PREFIX##-singularity-privatenet
+      - ##PREFIX##-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-singularity-uwsgi:/var/www/
+      - ##PREFIX##-singularity-code:/code
+#      - ./static:/var/www/static
+#      - ./images:/var/www/images
+#       uncomment for PAM auth
+#      - /etc/passwd:/etc/passwd 
+#      - /etc/shadow:/etc/shadow
+    restart: unless-stopped
+    environment:
+      -  POSTGRES_PASSWORD=##SINGULARITYDB_PW##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  
+  ##PREFIX##-singularity-nginx:
+    restart: always
+    image: ##PREFIX##-singularity-nginx
+    container_name: ##PREFIX##-singularity-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+#    ports:
+#      - "80:80"
+    volumes:
+      - ##PREFIX##-singularity-code:/code
+      - ##PREFIX##-singularity-uwsgi:/var/www/
+      - /etc/localtime:/etc/localtime:ro
+    links:
+      - ##PREFIX##-singularity-uwsgi
+      - ##PREFIX##-singularity-db
+    networks:
+      - ##PREFIX##-singularity-privatenet
+      - ##PREFIX##-net
+    restart: unless-stopped
+    environment:
+      -  POSTGRES_PASSWORD=##SINGULARITYDB_PW##
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  ##PREFIX##-singularity-redis:
+    restart: always
+    image: redis:latest
+    container_name: ##PREFIX##-singularity-redis
+    networks:
+      - ##PREFIX##-singularity-privatenet
+      - ##PREFIX##-net
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=##PREFIX##-singularity-redis
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  ##PREFIX##-singularity-scheduler:
+    image: vanessa/sregistry
+    container_name: ##PREFIX##-singularity-scheduler
+    command: python /code/manage.py rqscheduler
+    volumes:
+      - ##PREFIX##-singularity-code:/code
+    links:
+      - ##PREFIX##-singularity-redis
+      - ##PREFIX##-singularity-db
+    networks:
+      - ##PREFIX##-singularity-privatenet
+      - ##PREFIX##-net
+    environment:
+      - LANG=en_US.UTF-8
+      - REDIS_URL=redis://##PREFIX##-singularity-redis
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  ##PREFIX##-singularity-worker:
+    image: vanessa/sregistry
+    container_name: ##PREFIX##-singularity-worker
+    command: python /code/manage.py rqworker default
+    volumes:
+      - ##PREFIX##-singularity-code:/code
+    links:
+      - ##PREFIX##-singularity-redis
+      - ##PREFIX##-singularity-db
+    networks:
+      - ##PREFIX##-singularity-privatenet
+      - ##PREFIX##-net
+    environment:
+      - LANG=en_US.UTF-8
+      - SECRET_KEY='almafa'
+      - REDIS_URL=redis://##PREFIX##-singularity-redis
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##PREFIX##-singularity-privatenet:
+    external: false
+
+volumes:
+  ##PREFIX##-singularity-db:
+    external: true
+  ##PREFIX##-singularity-uwsgi:
+    external: true
+  ##PREFIX##-singularity-code:
+    external: true
+
