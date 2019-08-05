@@ -23,6 +23,7 @@ RUN pip3 install PyGithub
 RUN pip3 install python-gitlab
 RUN pip3 install social-auth-app-django==2.1.0 social-auth-core==1.7.0 pyjwkest==1.4.0
 RUN pip install pandas django_pandas
+RUN pip3 install python-seafile-api
 
 # It is very important that the following command 'git clone...' cannot be cached
 # (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
