@@ -105,10 +105,24 @@ server {
   }
 ###### Manual end
 
+###### Report nginx
+  location /report {
+    proxy_pass http://kooplex-##PREFIX##-report-nginx/;
+    proxy_http_version    1.1;
+    proxy_set_header      Upgrade $http_upgrade;
+    proxy_set_header      Connection "upgrade";
+    proxy_read_timeout    86400;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Connection keep-alive;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+  }
+###### Report nginx end
+
 
 ###### Overleaf
   location /overleaf/ {
-        set $s           http://kooplex-test-overleaf/;
+        set $s           http://kooplex-##PREFIX##-overleaf/;
         proxy_pass       $s;
         proxy_set_header   Host $host;
         proxy_http_version    1.1;

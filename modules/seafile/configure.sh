@@ -7,6 +7,28 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+# COMMENTS
+# CCNET.conf
+# https://lins05.gitbooks.io/seafile-docs/config/ccnet-conf.html
+
+# How to use API
+# seaf-cli list-remote -s  http://kooplex-test-seafile/seafile/ -u j@https://kooplex-test.elte.hu/hydra -p ALMAFA321
+
+# install client into notebooks ubunut bionic!!!
+# apt update                                                             
+# apt-get install software-properties-common python3-software-properties
+# add-apt-repository ppa:seafile/seafile-client
+# apt install seafile-cli
+# mkdir ~/seafile-client
+# seaf-cli init -d ~/seafile-client
+# seaf-cli start
+
+# get admin token 
+# curl  -d "username=admin@kooplex&password=ALMAFA321" http://kooplex-test-seafile/seafile/api2/auth-token/
+
+# SEADRIVE?
+# https://help.seafile.com/en/drive_client/drive_client_for_linux.html
+
 
 case $VERB in
   "build")

@@ -11,7 +11,7 @@ case $VERB in
     mkdir -p $SECRETS
     cp  scripts/* $RF
 #    cp requirements.txt $RF
-    cp etc/conda-requirements.txt $RF
+    cp etc/conda-requirements*.txt $RF
     cp Dockerfile $RF
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda

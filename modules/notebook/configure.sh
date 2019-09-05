@@ -34,7 +34,7 @@ case $VERB in
 	echo $(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)
 	sed -e "s/##FUNCTIONAL_VOLUME_MOUNT_POINT##/$(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)/" scripts/11_init_bashrcs-template > $RF/$imagedir/init/11_init_bashrcs
         sed -e "s/##FUNCTIONAL_VOLUME_MOUNT_POINT##/$(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)/" scripts/12_conda_envs-template > $RF/$imagedir/init/12_conda_envs
-        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
+        cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,jupyter_report_config.py,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
 	cp scripts/{0?-*.sh,9?-*.sh} ${RF}/$imagedir/init
         cp scripts/{entrypoint-rstudio.sh,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
         cp DockerFile-pieces/* ${RF}/$imagedir
