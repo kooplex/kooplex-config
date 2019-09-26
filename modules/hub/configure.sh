@@ -14,8 +14,8 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html \
-         $SRV/_report/dashboard $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
+      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report \
+         $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
          $SRV/_workdir $SRV/_git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
@@ -30,14 +30,14 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report -o o=bind ${PREFIX}-report
 
       DIR=$SRV/_hubcode_
-      if [ -d $DIR/.git ] ; then
-          echo $DIR
-          #cd $DIR && git pull && cd -
-      else
-          git clone https://github.com/kooplex/kooplex-hub.git $DIR
-      fi
+#      if [ -d $DIR/.git ] ; then
+#          echo $DIR
+#          #cd $DIR && git pull && cd -
+#      else
+#          git clone https://github.com/kooplex/kooplex-hub.git $DIR
+#      fi
 
-      cp $BUILDDIR/CA/rootCA.crt $RF/
+#      cp $BUILDDIR/CA/rootCA.crt $RF/
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
@@ -66,6 +66,7 @@ case $VERB in
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
+          -e "s/##HYDRA_OIDC_SECRET_HUB##/${HYDRA_OIDC_SECRET_HUB}/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
           -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
           -e "s/##HUB_USER##/${HUB_USER}/g" \

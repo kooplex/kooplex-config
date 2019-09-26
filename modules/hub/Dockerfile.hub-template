@@ -22,11 +22,6 @@ RUN pip3 install  mysqlclient psycopg2 docker-py django-threadlocals GitPython n
    pandas django_pandas  python-seafile-api kubernetes
 
 RUN pip3 install social-auth-core==1.7.0  #separated otherwise install the newer one
-# It is very important that the following command 'git clone...' cannot be cached
-# (Based on https://github.com/docker/docker/issues/22832#issuecomment-220314032)
-ARG CACHE_DATE=2016-01-02
-RUN git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git /kooplexhub
-RUN cd /kooplexhub && git checkout -b kubernetes; git pull
 
 COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
 RUN update-ca-certificates
