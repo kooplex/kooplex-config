@@ -26,6 +26,7 @@ RUN chmod 600 /etc/nslcd.conf
 COPY start.sh /init
 COPY 03-startinotify.sh /init
 COPY 04-start-seafileclient.sh /init
+COPY api.py /init
 COPY init-ssh-agent.sh /usr/local/bin
 RUN rmdir /home
 RUN ln -s /mnt/.volumes/home /home
