@@ -7,27 +7,12 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-# COMMENTS
-# CCNET.conf
-# https://lins05.gitbooks.io/seafile-docs/config/ccnet-conf.html
+# TODO sed instead of patch
+# Ekkor valamiert a conatc_email is az idp_user lesz
+# in /opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py 
+# 143        user_info['idp_user'] = user_info_json['idp_user']
+# 168 email = user_info['idp_user']
 
-# How to use API
-# seaf-cli list-remote -s  http://kooplex-test-seafile/seafile/ -u j@https://kooplex-test.elte.hu/hydra -p ALMAFA321
-
-# install client into notebooks ubunut bionic!!!
-# apt update                                                             
-# apt-get install software-properties-common python3-software-properties
-# add-apt-repository ppa:seafile/seafile-client
-# apt install seafile-cli
-# mkdir ~/seafile-client
-# seaf-cli init -d ~/seafile-client
-# seaf-cli start
-
-# get admin token 
-# curl  -d "username=admin@kooplex&password=ALMAFA321" http://kooplex-test-seafile/seafile/api2/auth-token/
-
-# SEADRIVE?
-# https://help.seafile.com/en/drive_client/drive_client_for_linux.html
 
 
 case $VERB in
@@ -41,6 +26,9 @@ case $VERB in
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_seafile-data -o o=bind ${PREFIX}-seafile-data
 
     cp Dockerfile.seafile $RF/
+    cp Dockerfile.seafile_pw $RF/
+    cp entrypoint.sh_pw $RF/
+    cp set_password.py $RF/
 
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" \
