@@ -68,8 +68,10 @@ class mySeafile:
             pass
         cmd = [ "seaf-daemon", "--daemon", "-c", self.seaf_conf_dir, "-d", self.seaf_data_dir, "-w", self.seaf_path ]
         proc = subprocess.Popen(cmd, env = dict(os.environ))
-        logger.info('starting daemon for {}'.format(self._u))
-        return proc.wait()
+        logger.info('starting daemon for {} -- {}'.format(self._u, cmd))
+        proc_ret = proc.wait()
+        logger.info('process response: {}'.format(proc_ret))
+        return proc_ret
 
     def seaf_stop(self):
         self.client.shutdown()
@@ -170,6 +172,7 @@ class mySeafile:
                           relay_addr,
                           relay_port,
                           email, random_key, enc_version, more_info)
+        logger.info('Synchronizing {} for {}'.format(folder, self._u))
         return folder
 
     def desync(self, libraryid):
