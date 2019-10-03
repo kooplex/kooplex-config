@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
+import sys
+import logging
 from flask import Flask, jsonify
 from flask_httpauth import HTTPBasicAuth
-import logging
 
 from seafile_functions import start_sync, stop_sync
 
-logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
-
-# extensions
 auth = HTTPBasicAuth()
 
 @auth.verify_password
@@ -42,4 +40,12 @@ def get_sync_desync(username, libraryid):
 
 
 if __name__ == '__main__':
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
     app.run(debug = True, host = '0.0.0.0')

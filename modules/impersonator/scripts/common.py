@@ -34,7 +34,7 @@ def sudo(F):
     def wrapper(*args, **kwargs):
         username = args[0]
         uid = lookupuid(username)
-        logger.info(username, uid, F, args, kwargs)
+        logger.info('sudo {} ({}) calls {}({}, {})'.format(username, uid, F, args, kwargs))
         q = queue.Queue()
         def worker():
             logger.debug('thread started, changing uid {}'.format(uid))

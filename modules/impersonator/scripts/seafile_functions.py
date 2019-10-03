@@ -27,7 +27,7 @@ class mySeafile:
         self._mkdir(self.seaf_data_dir)
         with open(self.seaf_ini, 'w') as fp:
             fp.write(self.seaf_data_dir)
-            logger.debug('updtaed file {}'.format(self.seaf_ini))
+            logger.debug('updated file {}'.format(self.seaf_ini))
         self._devid = None
 
     def _mkdir(self, f):
@@ -119,7 +119,7 @@ class mySeafile:
             headers = { 'X-SEAFILE-OTP': tfa, }
         else:
             headers = None
-        token_json = urlopen("%s/api2/auth-token/" % self.URL, data = data, headers = headers)
+        token_json = urlopen("{}/api2/auth-token/".format(self.URL), data = data, headers = headers)
         logger.debug('token for {} retrieved'.format(self._u))
         return json.loads(token_json)['token']
 
@@ -130,7 +130,7 @@ class mySeafile:
 
     def sync(self, password, libraryid, librarypassword):
         token = self.get_token(password)
-        tmp = self.get_repo_download_info("{}/api2/repos/{}/download-info/" % (self.URL, libraryid), token)
+        tmp = self.get_repo_download_info("{}/api2/repos/{}/download-info/".format(self.URL, libraryid), token)
         folder = os.path.join(self.seaf_path, tmp['repo_name'])
         self._mkdir(folder)
         encrypted = tmp['encrypted']
@@ -208,7 +208,6 @@ def start_sync(username, password, libraryid, librarypassword):
     sfo = mySeafile(username)
     sfo.start()
     #FIXME: check if already syncing
-    print ('before')
     #for t in sfo.clone_tasks():
     #    print (t)
     #print ('vege')
