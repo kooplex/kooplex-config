@@ -20,7 +20,7 @@ case $VERB in
      do
         imagedir="./image-"$i
         mkdir -p $RF/$imagedir
-	[ -e $imagedir/conda-requirements.txt] &&  cp -p $imagedir/conda-requirements.txt $RF/$imagedir/conda-requirements.txt
+	[ -e $imagedir/conda-requirements.txt ] &&  cp -p $imagedir/conda-requirements.txt $RF/$imagedir/conda-requirements.txt
         sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
         sed -e "s/##OUTERHOSTNAME##/${OUTERHOSTNAME}/"\
