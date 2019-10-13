@@ -39,6 +39,12 @@ case $VERB in
         cp scripts/{entrypoint-rstudio.sh,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
         cp DockerFile-pieces/* ${RF}/$imagedir
 
+	# copy necessary files from other module builds
+	for nec_file in `ls $BUILDDIR/*/$NOTEBOOK_DOCKER_EXTRA/*`
+	do
+		cp $nec_file ${RF}/$imagedir/
+	done
+
 #####
   printf "$(ldap_ldapconfig)\n\n" > ${RF}/$imagedir/ldap.conf
   printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/$imagedir/nsswitch.conf
@@ -54,7 +60,12 @@ case $VERB in
 
 
      	echo "Building image from $docfile"
-        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
+	for docker_piece in `ls ${RF}/${imagedir}/*-Docker-piece`
+	do
+		cat $docker_piece >> ${RF}/$docfile
+	done
+
+#        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
         docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
        
      done

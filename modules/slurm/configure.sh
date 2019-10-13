@@ -3,6 +3,7 @@
 RF=$BUILDDIR/slurm
 
 mkdir -p $RF
+mkdir -p $RF/$NOTEBOOK_DOCKER_EXTRA
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
@@ -22,6 +23,9 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 #     set nss-config-dir=/etc/pki/nssdb/
 #
 # and 'scontrol reconfigure'
+#
+# munge.key needs to be generated from somewhere
+#
 
 case $VERB in
   "build")
@@ -46,7 +50,9 @@ case $VERB in
 #          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
       sed -e "s/##PREFIX##/$PREFIX/" etc/slurm.conf-template > $SRV/_slurm_etc/slurm/slurm.conf
       sed -e "s/##PREFIX##/$PREFIX/" etc/slurmdbd.conf-template > $SRV/_slurm_etc/slurm/slurmdbd.conf
-      cp $SRV/_slurm_etc/slurm/slurm.conf $SRV/_slurm_etc/slurm/slurmdbd.conf $BUILDDIR/notebooks/
+
+      # Create key for munge
+      dd if=/dev/urandom bs=1 count=1024 > $SRV/_slurm_etc/munge/munge.key
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
           -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
@@ -59,6 +65,7 @@ case $VERB in
 
 
       #TODO need munge.key and slurm.conf in notebook containers and compute nodes too
+      cp $SRV/_slurm_etc/slurm/slurm.conf $SRV/_slurm_etc/munge/munge.key etc/slurm-Docker-piece $RF/$NOTEBOOK_DOCKER_EXTRA/
   ;;
 
   "install")

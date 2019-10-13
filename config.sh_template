@@ -25,6 +25,11 @@ else
  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP:$DOCKERPORT"
 fi
 
+
+CERTFILE=""
+KEYFILE=""
+
+
 ROOT="/srv/"$PREFIX
 SRV=$ROOT/$PREFIX
 BUILDDIR=$ROOT"/build"
@@ -90,6 +95,8 @@ SINGULARITYDB_PW=
 SINGULARITY_SECRET=
 
 
+me of the directory in each module of the Docker extra lines when building the notebook images
+NOTEBOOK_DOCKER_EXTRA=notebook-ext
 
 MINUID=10000
 
