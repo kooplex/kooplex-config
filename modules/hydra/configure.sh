@@ -17,7 +17,8 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconsentdb -o o=bind ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
 
-      cp -r src.consent $SRV/_hydracode/consent
+#      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
+#      cp -r src.consent $SRV/_hydracode/consent
 
       cp etc/* Dockerfile.hydraconsentdb $RF/
       cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
@@ -43,11 +44,12 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php
+          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $SRV/_hydracode/consent/application/config/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $RF/config.php
+          -e "s/##OUTERHOST##/$OUTERHOST/" \
+	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $SRV/_hydracode/consent/application/config/config.php
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/"  etc/hydra.yml-template > $RF/hydra.yml
       sed -e "s/##PREFIX##/$PREFIX/" \
@@ -107,7 +109,7 @@ case $VERB in
 	CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
         sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
             -e "s/##OUTERHOST##/$OUTERHOST/" \
-            -e "s/##CONSENTPASSWORD##/$HYDRA_ADMINPW/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
+            -e "s/##CONSENTPASSWORD##/$CONSENTAPPPASSWORD/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
 
 #	hydra 0.x esetén:
 	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/consent-app-policy.json"
