@@ -183,27 +183,33 @@ class mySeafile:
 
 
 
-def seaf_listremote(username, password):
-    url = 'http://kooplex-test-seafile/seafile'
-    fs = FS(username)
-    seafile_rpc = seafile.RpcClient(fs.seaf_sock)
-    username__ = "j@https://kooplex-test.elte.hu/hydra" #FIXME
-    token = get_token(url, username__, password, None, fs)
-    return get_repo_download_info("%s/api2/repos/" % (url), token)
-
-
-def seaf_listlocal(username):
-    fs = FS(username)
-    seafile_rpc = seafile.RpcClient(fs.seaf_sock)
-    return seafile_rpc.get_repo_list(-1, -1)
-
-
-
+#def seaf_listremote(username, password):
+#    url = 'http://kooplex-test-seafile/seafile'
+#    fs = FS(username)
+#    seafile_rpc = seafile.RpcClient(fs.seaf_sock)
+#    username__ = "j@https://kooplex-test.elte.hu/hydra" #FIXME
+#    token = get_token(url, username__, password, None, fs)
+#    return get_repo_download_info("%s/api2/repos/" % (url), token)
+#
+#
+#def seaf_listlocal(username):
+#    fs = FS(username)
+#    seafile_rpc = seafile.RpcClient(fs.seaf_sock)
+#    return seafile_rpc.get_repo_list(-1, -1)
 
 
 
 
 
+
+
+def mkdir_parent(username):
+    f = os.path.join(mySeafile.D_PARENT, username)
+    U = pwd.getpwnam(username)
+    if not os.path.exists(f):
+        os.mkdir(f)
+        os.chown(f, U.pw_uid, U.pw_gid)
+        logger.info('Created {}'.format(f))
 
 
 @sudo
