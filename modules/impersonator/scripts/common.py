@@ -4,8 +4,10 @@ import os
 import urllib
 import urllib2
 import pwd
-import threading
-import Queue as queue
+#import threading
+import multiprocessing
+#import Queue as queue
+from multiprocessing import Queue as queue
 import random
 import time
 import logging
@@ -48,9 +50,12 @@ def sudo(F):
                 logger.warn('executed {} -- exception {}'.format(F, e))
                 q.put_nowait((1, e))
             logger.debug("thread ended")
-        t = threading.Thread(target = worker)
-        t.start()
-        t.join()
+        #t = threading.Thread(target = worker)
+        #t.start()
+        #t.join()
+        p = multiprocessing.Process(target = worker)
+        p.start()
+        p.join()
         status, result = q.get_nowait()
         if status != 0:
             raise result

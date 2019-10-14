@@ -5,7 +5,8 @@ import logging
 from flask import Flask, jsonify
 from flask_httpauth import HTTPBasicAuth
 
-from seafile_functions import start_sync, stop_sync
+from seafile_functions import start_sync, stop_sync, mkdir_parent
+from git_functions import clone_repo, mkdir_repo
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
@@ -24,8 +25,10 @@ def get_alive():
 @auth.login_required
 def get_sync_sync(username, password, libraryid, librarypassword):
     try:
+        mkdir_parent(username)
         response = start_sync(username, password, libraryid, librarypassword)
     except Exception as e:
+        logger.error(e)
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response) })
 
@@ -34,6 +37,17 @@ def get_sync_sync(username, password, libraryid, librarypassword):
 def get_sync_desync(username, libraryid):
     try:
         response = stop_sync(username, libraryid)
+    except Exception as e:
+        return jsonify({ 'error': str(e) })
+    return jsonify({ 'response': str(response) })
+
+
+@app.route('/api/versioncontrol/clone/<username>/<reponame>/<backend>/<server>/<port>')
+@auth.login_required
+def get_versioncontrol_clone(username, reponame, backend, server, port):
+    try:
+        mkdir_repo(username, backend, port, server, reponame)
+        response = clone_repo(username, backend, server, port, reponame)
     except Exception as e:
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response) })
