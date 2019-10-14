@@ -5,6 +5,7 @@ import subprocess
 import logging
 import json
 import seafile
+import pwd
 
 from common import randstring, sudo, urlopen
 
