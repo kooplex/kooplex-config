@@ -23,6 +23,9 @@ RUN pip3 install  mysqlclient psycopg2 docker-py django-threadlocals GitPython n
 
 RUN pip3 install social-auth-core==1.7.0  #separated otherwise install the newer one
 
+RUN pip3 install parse
+RUN pip3 install git+https://github.com/arount/pytea
+
 COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
 RUN update-ca-certificates
 
