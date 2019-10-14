@@ -4,10 +4,7 @@ import os
 import urllib
 import urllib2
 import pwd
-#import threading
 import multiprocessing
-#import Queue as queue
-from multiprocessing import Queue as queue
 import random
 import time
 import logging
@@ -37,7 +34,7 @@ def sudo(F):
         username = args[0]
         uid = lookupuid(username)
         logger.info('sudo {} ({}) calls {}({}, {})'.format(username, uid, F, args, kwargs))
-        q = queue.Queue()
+        q = multiprocessing.Queue()
         def worker():
             logger.debug('thread started, changing uid {}'.format(uid))
             os.setgid(1000)
@@ -50,9 +47,6 @@ def sudo(F):
                 logger.warn('executed {} -- exception {}'.format(F, e))
                 q.put_nowait((1, e))
             logger.debug("thread ended")
-        #t = threading.Thread(target = worker)
-        #t.start()
-        #t.join()
         p = multiprocessing.Process(target = worker)
         p.start()
         p.join()
