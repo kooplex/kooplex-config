@@ -22,6 +22,7 @@ RUN mkdir /local
 COPY api.py /local
 COPY common.py /local
 COPY seafile_functions.py /local
+COPY git_functions.py /local
 COPY init-ssh-agent.sh /usr/local/bin
 RUN rmdir /home
 RUN ln -s /mnt/.volumes/home /home
