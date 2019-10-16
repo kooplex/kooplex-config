@@ -2,7 +2,7 @@
 
 import sys
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 
 from seafile_functions import start_sync, stop_sync, mkdir_parent
@@ -42,13 +42,21 @@ def get_sync_desync(username, libraryid):
     return jsonify({ 'response': str(response) })
 
 
-@app.route('/api/versioncontrol/clone/<username>/<reponame>/<backend>/<server>/<port>')
+@app.route('/api/versioncontrol/clone/<username>')
 @auth.login_required
-def get_versioncontrol_clone(username, reponame, backend, server, port):
+def get_versioncontrol_clone(username):
     try:
-        mkdir_repo(username, backend, port, server, reponame)
-        response = clone_repo(username, backend, server, port, reponame)
+        assert username == request.args.get('username'), 'hacker go away'
+        url_clone_repo = request.args.get('clone')
+        port = request.args.get('port')
+        prefix = request.args.get('prefix')
+        folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
+        if folder.endswith('.git'):
+            folder = folder[:-4]
+        mkdir_repo(username, folder)
+        response = clone_repo(username, url_clone_repo, port, folder)
     except Exception as e:
+        logger.error(e)
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response) })
 
