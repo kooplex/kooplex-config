@@ -174,13 +174,13 @@ class mySeafile:
                           relay_port,
                           email, random_key, enc_version, more_info)
         logger.info('Synchronizing {} for {}'.format(folder, self._u))
+        if folder.startswith(self.D_PARENT):
+            folder = folder[(len(self.D_PARENT) + 1):]
         return folder
 
     def desync(self, libraryid):
         self.client.remove_repo(libraryid)
         return "OK" #FIXME: return folder
-
-
 
 
 

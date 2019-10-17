@@ -30,7 +30,7 @@ def get_sync_sync(username, password, libraryid, librarypassword):
     except Exception as e:
         logger.error(e)
         return jsonify({ 'error': str(e) })
-    return jsonify({ 'response': str(response) })
+    return jsonify({ 'response': str(response), 'sync_folder': response })
 
 @app.route('/api/sync/desync/<username>/<libraryid>')
 @auth.login_required
