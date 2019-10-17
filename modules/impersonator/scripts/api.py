@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 
 from seafile_functions import start_sync, stop_sync, mkdir_parent
-from git_functions import clone_repo, mkdir_repo
+from git_functions import clone_repo, rmdir_repo, mkdir_repo
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
@@ -51,15 +51,31 @@ def get_versioncontrol_clone(username):
         port = request.args.get('port')
         prefix = request.args.get('prefix')
         folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
+        rsa = request.args.get('rsa_file')
         if folder.endswith('.git'):
             folder = folder[:-4]
         mkdir_repo(username, folder)
-        response = clone_repo(username, url_clone_repo, port, folder)
+        response = clone_repo(username, rsa, url_clone_repo, port, folder)
     except Exception as e:
         logger.error(e)
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response) })
 
+@app.route('/api/versioncontrol/removecache/<username>')
+@auth.login_required
+def get_versioncontrol_removecache(username):
+    try:
+        assert username == request.args.get('username'), 'hacker go away'
+        url_clone_repo = request.args.get('clone')
+        prefix = request.args.get('prefix')
+        folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
+        if folder.endswith('.git'):
+            folder = folder[:-4]
+        rmdir_repo(folder)
+    except Exception as e:
+        logger.error(e)
+        return jsonify({ 'error': str(e) })
+    return jsonify({ 'response': 'removed folder {}'.format(folder) })
 
 if __name__ == '__main__':
     logger = logging.getLogger()

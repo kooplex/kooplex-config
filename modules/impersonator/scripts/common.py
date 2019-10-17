@@ -8,8 +8,19 @@ import multiprocessing
 import random
 import time
 import logging
+import psutil
 
 logger = logging.getLogger(__name__)
+
+def list_processes_by_name(process_name, username = None):
+    pnl = process_name.lower()
+    for p in psutil.process_iter():
+        pd = p.as_dict(attrs = ['username', 'status', 'cmdline', 'name', 'pid'])
+        if pnl in pd['name'].lower():
+            if username is None:
+                yield pd
+            elif pd['username'] == username:
+                yield pd
 
 def lookupuid(username):
     return pwd.getpwnam(username).pw_uid

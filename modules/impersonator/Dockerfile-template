@@ -8,9 +8,10 @@ RUN apt update && \
 RUN add-apt-repository ppa:seafile/seafile-client
 RUN apt install -y --no-install-recommends curl git ssh-client davfs2 inotify-tools \
                                            python3-software-properties \
-                                           seafile-cli python-pip
+                                           seafile-cli python-pip \
+                                           python-wheel libpython-dev
 RUN apt clean
-RUN pip install flask flask-httpauth psutil
+RUN pip install flask flask-httpauth python-setuptools psutil
 
 COPY nsswitch.conf /etc
 COPY nslcd.conf /etc
