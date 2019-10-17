@@ -10,7 +10,7 @@ RUN apt install -y --no-install-recommends curl git ssh-client davfs2 inotify-to
                                            python3-software-properties \
                                            seafile-cli python-pip
 RUN apt clean
-RUN pip install flask flask-httpauth
+RUN pip install flask flask-httpauth psutil
 
 COPY nsswitch.conf /etc
 COPY nslcd.conf /etc
