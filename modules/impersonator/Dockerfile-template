@@ -2,23 +2,21 @@ FROM ##PREFIX##-base
 MAINTAINER Kooplex Team <kooplex@complex.elte.hu
 
 
-#FIXME: inotify-tools and nsswitch, nslcd conf should be part of base
 RUN apt update && \
     apt install -y --no-install-recommends software-properties-common
 RUN add-apt-repository ppa:seafile/seafile-client
-RUN apt install -y --no-install-recommends curl git ssh-client davfs2 inotify-tools \
+RUN apt update && \
+    apt install -y --no-install-recommends curl git ssh-client davfs2 inotify-tools \
                                            python3-software-properties \
                                            seafile-cli python-pip \
                                            python-wheel libpython-dev
 RUN apt clean
-RUN pip install flask flask-httpauth python-setuptools psutil
+RUN pip install flask flask-httpauth setuptools psutil
 
 COPY nsswitch.conf /etc
 COPY nslcd.conf /etc
 RUN chmod 600 /etc/nslcd.conf
 COPY start.sh /init
-COPY 03-startinotify.sh /init
-COPY 04-start-seafileclient.sh /init
 RUN mkdir /local
 COPY api.py /local
 COPY common.py /local
@@ -28,7 +26,9 @@ COPY init-ssh-agent.sh /usr/local/bin
 RUN rmdir /home
 RUN ln -s /mnt/.volumes/home /home
 
-
+#FIXME: inotify-tools and nsswitch, nslcd conf should be part of base
+## COPY 03-startinotify.sh /init
+## COPY 04-start-seafileclient.sh /init
 ## COPY patch-gitconfig.sh /usr/local/bin
 ## COPY patch-davfs.sh /usr/local/bin
 ## COPY share.sh /usr/local/bin
