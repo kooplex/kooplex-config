@@ -12,8 +12,9 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-impersonator..."
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-template > $RF/Dockerfile
 
-      cp scripts/start.sh $RF
-      cp scripts/init-ssh-agent.sh $RF
+      cp scripts/01-nslcd-start.sh $RF
+      cp scripts/02-api-start.sh $RF
+      cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
 
 ###  printf "$(ldap_ldapconfig)\n\n" > ${RF}/ldap.conf
 
@@ -22,12 +23,11 @@ case $VERB in
   chown root ${RF}/nslcd.conf
   chmod 0600 ${RF}/nslcd.conf
 
+      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 ###      cp etc/nsswitch.conf $RF
 ###      cp scripts/create_user_userdb.sh $RF
-      cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
-      cp scripts/03-startinotify.sh $RF
-      cp scripts/04-start-seafileclient.sh $RF
-      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+##      cp scripts/03-startinotify.sh $RF
+##      cp scripts/04-start-seafileclient.sh $RF
 ###      sed -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
 ###          -e "s/##PREFIX##/$PREFIX/" \
 ###          -e "s/##MINUID##/$MINUID/" scripts/patch-davfs.sh-template > $RF/patch-davfs.sh
