@@ -19,6 +19,7 @@ COPY nslcd.conf /etc
 RUN chmod 600 /etc/nslcd.conf
 COPY 01-nslcd-start.sh /init
 COPY 02-api-start.sh /init
+RUN chmod +x /init/02-api-start.sh
 RUN mkdir /local
 COPY api.py /local
 COPY common.py /local
