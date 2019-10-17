@@ -59,7 +59,7 @@ def get_versioncontrol_clone(username):
     except Exception as e:
         logger.error(e)
         return jsonify({ 'error': str(e) })
-    return jsonify({ 'response': str(response) })
+    return jsonify({ 'response': str(response), 'clone_folder': folder })
 
 @app.route('/api/versioncontrol/removecache/<username>')
 @auth.login_required
