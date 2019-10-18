@@ -28,7 +28,7 @@ def get_sync_sync(username, password, libraryid, librarypassword):
         mkdir_parent(username)
         response = start_sync(username, password, libraryid, librarypassword)
     except Exception as e:
-        logger.error(e)
+        logger.error('oops start sync: {} for {} -- {}'.format(libraryid, username, e))
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response), 'sync_folder': response })
 

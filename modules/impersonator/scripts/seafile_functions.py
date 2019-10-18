@@ -6,6 +6,7 @@ import logging
 import json
 import seafile
 import pwd
+import pysearpc
 
 from common import randstring, sudo, urlopen
 
@@ -30,6 +31,7 @@ class mySeafile:
             fp.write(self.seaf_data_dir)
             logger.debug('updated file {}'.format(self.seaf_ini))
         self._devid = None
+        logger.debug('initialized for {}'.format(username))
 
     def _mkdir(self, f):
         if os.path.exists(f): 
@@ -136,6 +138,7 @@ class mySeafile:
         tmp = self.get_repo_download_info("{}/api2/repos/{}/download-info/".format(self.URL, libraryid), token)
         folder = os.path.join(self.seaf_path, tmp['repo_name'])
         self._mkdir(folder)
+        logger.debug('folder {}'.format(folder))
         encrypted = tmp['encrypted']
         magic = tmp.get('magic', None)
         enc_version = tmp.get('enc_version', None)
@@ -163,7 +166,8 @@ class mySeafile:
             repo_passwd = librarypassword
         else:
             repo_passwd = None
-        self.client.clone(libraryid,
+        try:
+            self.client.clone(libraryid,
                           version,
                           relay_id,
                           repo_name.encode('utf-8'),
@@ -173,6 +177,11 @@ class mySeafile:
                           relay_addr,
                           relay_port,
                           email, random_key, enc_version, more_info)
+        except pysearpc.common.SearpcError as e:
+            if str(e) == 'Repo already exists':
+                logger.warning('{} for {} already exists'.format(libraryid, self._u))
+            else:
+                raise
         logger.info('Synchronizing {} for {}'.format(folder, self._u))
         if folder.startswith(self.D_PARENT):
             folder = folder[(len(self.D_PARENT) + 1):]
@@ -180,7 +189,6 @@ class mySeafile:
 
     def desync(self, libraryid):
         self.client.remove_repo(libraryid)
-        return "OK" #FIXME: return folder
 
 
 
