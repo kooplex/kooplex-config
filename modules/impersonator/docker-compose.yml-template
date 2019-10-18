@@ -15,6 +15,9 @@ services:
       - ##PREFIX##-cache-seafile:/mnt/.volumes/seafile:rw
     privileged: true
     restart: unless-stopped
+    environment:
+      - BASE_URL_SEAFILE=http://##PREFIX##-seafile
+      - MNT_VOL_SYNC=/mnt/.volumes/seafile
 
 networks:
   ##PREFIX##-net:

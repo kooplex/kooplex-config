@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 # seafile daemon manipulation
 ###########################################
 class mySeafile:
-    D_PARENT = '/mnt/.volumes/seafile'
-    URL = 'http://kooplex-test-seafile/seafile' # FIXME: os.getenv()
-    BASE_URL = 'http://kooplex-test-seafile' # FIXME: os.getenv()
+    D_PARENT = os.getenv('MNT_VOL_SYNC', '/tmp')
+    BASE_URL = os.getenv('BASE_URL_SEAFILE', 'http://localhost')
+    URL = BASE_URL + '/seafile'
 
     def __init__(self, username): 
         self._u = username
