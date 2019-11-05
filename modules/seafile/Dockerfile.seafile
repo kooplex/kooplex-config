@@ -1,7 +1,7 @@
-FROM seafileltd/seafile-mc:latest
+FROM seafileltd/seafile-mc:7.0.2
 
 COPY $RF/views.py.patch /tmp
-RUN patch /opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py < /tmp/views.py.patch
+#RUN patch /opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py < /tmp/views.py.patch
 
 COPY $RF/seahub_settings.py /shared/seafile/conf/seahub_settings.py
 COPY $RF/ccnet.conf /shared/seafile/conf/ccnet.conf
