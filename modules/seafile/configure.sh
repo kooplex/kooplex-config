@@ -20,8 +20,10 @@ case $VERB in
     echo "1. Configuring ${PREFIX}-seafile..."
 
     mkdir -p $SRV/_seafile-mysql
+    mkdir -p /kooplex-big/_cache-seafile/
     mkdir -p $SRV/_seafile-data
 
+    docker $DOCKERARGS volume create -o type=none -o device=/kooplex-big/_cache-seafile -o o=bind ${PREFIX}-cache-seafile
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_seafile-mysql -o o=bind ${PREFIX}-seafile-mysql
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_seafile-data -o o=bind ${PREFIX}-seafile-data
 

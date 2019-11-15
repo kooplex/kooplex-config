@@ -59,7 +59,7 @@ OAUTH_ATTRIBUTE_MAP = {
 ENABLE_SIGNUP=True
 
 ##############################
-#FILE_SERVER_ROOT = "##REWRITEPROTO##://##OUTERHOST##/seafhttp"
+FILE_SERVER_ROOT = "##REWRITEPROTO##://##OUTERHOST##/seafhttp"
 
 ####################### CUT HERE WHEN IN PRODUCTION #################
 DEBUG = True
