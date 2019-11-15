@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  ##PREFIX##-node-exporter:
+    container_name: ##PREFIX##-node-exporter
+#    image: ##PREFIX##-node-exporter
+    image: prom/node-exporter
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+      - ##PREFIX##-monitoring-net
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-node-exporter-etc:/etc/node-exporter:rw
+    restart: unless-stopped
+#    ports:
+#      - 8082:8080
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points'
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+      - '--collector.textfile.directory=/etc/node-exporter/'                    
+      - '--collector.conntrack'
+      - '--collector.diskstats'
+      - '--collector.entropy'
+      - '--collector.filefd'
+      - '--collector.filesystem'
+      - '--collector.loadavg'
+      - '--collector.mdadm'
+      - '--collector.meminfo'
+      - '--collector.netdev'
+      - '--collector.netstat'
+      - '--collector.stat'
+      - '--collector.textfile'
+      - '--collector.time'
+      - '--collector.vmstat'
+      - '--collector.ipvs'
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ##EXTRACONFIG##
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##PREFIX##-monitoring-net:
+    external: true
+
+volumes:
+  ##PREFIX##-node-exporter-etc:
+    external: true

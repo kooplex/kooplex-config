@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  ##PREFIX##-prometheus:
+    container_name: ##PREFIX##-prometheus
+#    image: ##PREFIX##-prometheus
+    image: prom/prometheus
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    networks:
+      - ##PREFIX##-net
+      - ##PREFIX##-monitoring-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ##SRV_PROMETHEUS##/etc/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ##PREFIX##-prometheus-log:/var/log
+      - ##PREFIX##-prometheus-data:/prometheus/data
+    restart: unless-stopped
+#    ports:
+#      - 9090:9090
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ##EXTRACONFIG##
+
+networks:
+  ##PREFIX##-net:
+    external: true
+  ##PREFIX##-monitoring-net:
+    external: true
+
+volumes:
+  ##PREFIX##-prometheus-data:
+    external: true
+  ##PREFIX##-prometheus-log:
+    external: true
+
