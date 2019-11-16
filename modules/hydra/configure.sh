@@ -7,6 +7,10 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+# After consent install
+# /consent/install and click the button
+# sed 'files'; #### --> 'database'; ####
+#
 
 case $VERB in
   "build")
@@ -18,12 +22,17 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
 
 #      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
-#      cp -r src.consent $SRV/_hydracode/consent
+#      Magically put the code into $SRV/_hydracode/consent
 
-      cp etc/* Dockerfile.hydraconsentdb $RF/
-      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
+      cp Dockerfile.hydraconsentdb $RF/
+      cp etc/mysql.cnf $RF/
+      cp etc/nginx.conf $RF/
+      cp etc/*entrypoint.sh $RF/
+
+#      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
       #cp -ar src $SRV/_hydracode 
       cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json} $RF/
+
       cp -a $BUILDDIR/CA/rootCA.{key,crt} $RF/
 
       ENCFILE=$RF/hydraconsent.enckey
@@ -40,11 +49,16 @@ case $VERB in
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $RF/client-hub.json
 
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
+
+      sed -e "s/##PREFIX##/${PREFIX}/"\
+          -e "s/##OUTERHOST##/$OUTERHOST/" \
+          -e "s/##MAIL_SERVER_HOSTNAME##/$MAIL_SERVER_HOSTNAME/" \
+	      Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/$PREFIX/"  etc/sites.conf-template > $RF/sites.conf
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $SRV/_hydracode/consent/application/config/database.php
+          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php # $SRV/_hydracode/consent/application/config/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
@@ -119,6 +133,8 @@ case $VERB in
 #	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/consent-app-policy.json"
 #	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/client-policy-hub.json"
 
+## This might give an error first. It might be that first we need to load the site first in browser
+	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW $HYDRACONSENTDB -e  "update bf_settings set value = 'noreply@elte.hu' where name = 'sender_email';"
 
 #\c monitor
 #GRANT readaccess TO usage_viewer;

@@ -394,7 +394,7 @@ $config['sess_table_name']		= 'sessions';
 $config['sess_match_useragent'] = true; // May duplicate sessions for Safari users when true.
 */
 // CI 3 Session Variables
-$config['sess_driver'] = 'database';
+$config['sess_driver'] = 'files'; ####
 $config['sess_regenerate_destroy'] = false;
 $config['sess_save_path'] = 'ci3_sessions';
 
