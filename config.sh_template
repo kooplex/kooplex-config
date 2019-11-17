@@ -4,16 +4,16 @@ MODULES="base net ldap proxy nginx impersonator hub notebook"  #overleaf gitea s
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOST=$OUTERHOSTNAME
 
-OUTERHOSTPORT=""
-if [[ -z "${OUTERHOSTPORT}" ]]; then
- OUTERHOST=$OUTERHOSTNAME
-else
- OUTERHOST=$OUTERHOSTNAME":"$OUTERHOSTPORT
-fi
 
 INNERHOST="192.168.0.25"
 
+INTERNAL_SSL=false
+
 PREFIX=""
+
+MAIL_SERVER_HOSTNAME="mail.example.com"
+
+KEYS=
 
 
 DOCKERIP="/var/run/docker.sock"
@@ -26,9 +26,6 @@ else
 fi
 
 
-CERTFILE=""
-KEYFILE=""
-
 
 ROOT="/srv/"$PREFIX
 SRV=$ROOT/$PREFIX
@@ -36,6 +33,7 @@ BUILDDIR=$ROOT"/build"
 
 SUBNET="172.20.0.0/16"
 SERVICESUBNET="172.16.0.0/16"
+MONITORINGSUBNET="172.18.0.0/16"
 
 LDAPDOMAIN=$OUTERHOST
 SMTP="smtp"
@@ -70,6 +68,7 @@ GITEADB=${PREFIX}_gitea
 GITEAUSER=gitea
 GITEADBPW=${DUMMYPASS}
 
+# GITLAB
 GITLABDB=${PREFIX}_gitlabdb
 GITLABDBPW=${DUMMYPASS}
 GITLABADMIN=gitlabadmin
@@ -84,7 +83,10 @@ HYDRADB_PW=
 HYDRADB=hydradb
 HYDRA_ADMINPW=
 HYDRASYSTEM_SECRET= #(pwgen 32)
+URL_HYDRA=https://$OUTERHOST/hydra
 
+#OIDC SECRETS
+HYDRA_OIDC_SECRET_HUB=""
 # SEAFILE
 SEAFILE_SECRET=
 SEAFILEDB_PW=${DUMMYPASS}
@@ -95,12 +97,19 @@ SINGULARITYDB_PW=
 SINGULARITY_SECRET=
 
 
-me of the directory in each module of the Docker extra lines when building the notebook images
+# name of the directory in each module of the Docker extra lines when building the notebook images
 NOTEBOOK_DOCKER_EXTRA=notebook-ext
+
+# Where should the docker volumes be created?
+DOCKER_VOLUME_DIR=
 
 MINUID=10000
 
 SECRETS=$SRV/.secrets
 
-# DEPRECATED
-PROJECT=${PREFIX}
+
+# MOUNTPOINTS
+# where to find mounted storage and functional volumes
+
+FUNCTIONAL_VOLUME_MOUNT_POINT=/vol
+STORAGE_VOLUME_MOUNT_POINT=/mnt

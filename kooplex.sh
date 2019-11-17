@@ -25,19 +25,19 @@ fi
 echo $VERB
 mkdir -p $BUILDDIR
 
-case $VERB in
-  "CA")
-    CA_DIR=$BUILDDIR/CA
-    if [ -d $CA_DIR ] ; then
-        echo "$CA_DIR already present; will not generate ca" >&2
-        exit 1
-    fi
+
+CA_DIR=$BUILDDIR/CA
+if [ -d $CA_DIR ] ; then
+    echo "$CA_DIR already present; will not generate ca" >&2
+else 
+    echo "generate CA"
     set -e
     mkdir $CA_DIR
     openssl genrsa -out $CA_DIR/rootCA.key 4096
     openssl req -x509 -new -nodes -key $CA_DIR/rootCA.key -sha256 -days 1024 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=$OUTERHOST" -out $CA_DIR/rootCA.crt
-    exit 0
-  ;;
+fi
+
+case $VERB in
 
   "build")
     set -e

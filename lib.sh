@@ -6,6 +6,10 @@ ldapquery () {
 echo ldapsearch -x -H ldap://${PREFIX}-ldap -D cn=admin,$LDAPORG -b ou=users,$LDAPORG -s one "objectclass=top" -w $LDAPPW
 }
 
+replace_slash() {
+	        echo $1 | sed 's/\//\\\//g'
+}
+
 
 ip_ip2dec () {
   local a b c d ip=$@
@@ -87,127 +91,127 @@ bindpw $HUBLDAP_PW
 "
 }
 
-ldap_makeconfig () {
-  SVC=$1
-  
-  mkdir -p $SRV/$SVC/etc/ldap
-  printf "$(ldap_ldapconfig)\n\n" > $SRV/$SVC/etc/ldap/ldap.conf
-  printf "$(ldap_nsswitchconfig)\n\n" > $SRV/$SVC/etc/nsswitch.conf
-  printf "$(ldap_nslcdconfig)\n\n" > $SRV/$SVC/etc/nslcd.conf
-  chown root $SRV/$SVC/etc/nslcd.conf
-  chmod 0600 $SRV/$SVC/etc/nslcd.conf
-}
-
-ldap_makebinds () {
-  SVC=$1
-  
-  echo "-v $SRV/$SVC/etc/ldap/ldap.conf:/etc/ldap.conf
-  -v $SRV/$SVC/etc/nslcd.conf:/etc/nslcd.conf
-  -v $SRV/$SVC/etc/nsswitch.conf:/etc/nsswitch.conf
-  -v $SRV/$SVC/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py"
-}
-
-ldap_fdqn2cn () {
-  local aa q fdqn=$@
-  IFS=. read -ra aa <<< "$fdqn"
-  q=0
-  for i in "${aa[@]}"
-  do
-    if test $q -gt 0
-    then
-     printf ','
-    fi
-    printf 'dc=%s' "$i"
-	q=$((q + 1))
-  done
-}
-
-ldap_add() {
-  local ldappass=$(getsecret ldap)
-  printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
-}
-
-ldap_del() {
-  local ldappass=$(getsecret ldap)
-  echo $LDAPORG
-  printf "uid=%s,ou=users,$LDAPORG " "$1" | ldapdelete -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass" -v 
-}
-
-ldap_nextuid() {
-
-  local ldappass=$(getsecret ldap)
-
-  local maxid=`ldapsearch -h $LDAPIP -p $LDAPPORT \
-    -D "cn=admin,$LDAPORG" -w "$ldappass" \
-    -b "ou=users,$LDAPORG" -s one \
-    "objectclass=posixAccount" uidnumber | \
-    grep uidNumber | awk '{ if ($1 != "#") print $2 }' | sort | tail -n 1`
-
-  printf "%d" $((maxid + 1))
-}
-
-ldap_adduser() {
-  local username=$1
-  local firstname=$2
-  local lastname=$3
-  local email=$4
-  local pass=$5
-  local uid=$6
-  
-  echo "Adding LDAP user $firstname $lastname ($username)..."
-
-  ldap_add "dn: uid=$username,ou=users,$LDAPORG
-objectClass: simpleSecurityObject
-objectClass: organizationalPerson
-objectClass: person
-objectClass: top
-objectClass: inetOrgPerson
-objectClass: posixAccount
-objectClass: shadowAccount
-sn: $lastname
-givenName: $firstname
-cn: $username
-displayName: $firstname $lastname
-uidNumber: $uid
-gidNumber: $uid
-loginShell: /bin/bash
-homeDirectory: /home/$username
-mail: $email
-userPassword: $pass
-shadowExpire: -1
-shadowFlag: 0
-shadowWarning: 7
-shadowMin: 8
-shadowMax: 999999
-shadowLastChange: 10877
-"
-
-  ldap_add "dn: cn=$username,ou=groups,$LDAPORG
-objectClass: top
-objectClass: posixGroup
-gidNumber: $uid
-memberUid: $uid
-"
-}
-
-ldap_addgroup() {
-
-  local name=$1
-  local uid=$2
-  
-  local ldappass=$(getsecret ldap)
-  
-  echo "Adding LDAP group $name"
-
-  echo "dn: cn=$name,ou=groups,$LDAPORG
-objectClass: top
-objectClass: posixGroup
-cn: $name
-gidNumber: $uid
-" | \
-  ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
-  
-}
+#ldap_makeconfig () {
+#  SVC=$1
+#  
+#  mkdir -p $SRV/$SVC/etc/ldap
+#  printf "$(ldap_ldapconfig)\n\n" > $SRV/$SVC/etc/ldap/ldap.conf
+#  printf "$(ldap_nsswitchconfig)\n\n" > $SRV/$SVC/etc/nsswitch.conf
+#  printf "$(ldap_nslcdconfig)\n\n" > $SRV/$SVC/etc/nslcd.conf
+#  chown root $SRV/$SVC/etc/nslcd.conf
+#  chmod 0600 $SRV/$SVC/etc/nslcd.conf
+#}
+#
+#ldap_makebinds () {
+#  SVC=$1
+#  
+#  echo "-v $SRV/$SVC/etc/ldap/ldap.conf:/etc/ldap.conf
+#  -v $SRV/$SVC/etc/nslcd.conf:/etc/nslcd.conf
+#  -v $SRV/$SVC/etc/nsswitch.conf:/etc/nsswitch.conf
+#  -v $SRV/$SVC/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py"
+#}
+#
+#ldap_fdqn2cn () {
+#  local aa q fdqn=$@
+#  IFS=. read -ra aa <<< "$fdqn"
+#  q=0
+#  for i in "${aa[@]}"
+#  do
+#    if test $q -gt 0
+#    then
+#     printf ','
+#    fi
+#    printf 'dc=%s' "$i"
+#	q=$((q + 1))
+#  done
+#}
+#
+#ldap_add() {
+#  local ldappass=$(getsecret ldap)
+#  printf "%s" "$1" | ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
+#}
+#
+#ldap_del() {
+#  local ldappass=$(getsecret ldap)
+#  echo $LDAPORG
+#  printf "uid=%s,ou=users,$LDAPORG " "$1" | ldapdelete -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass" -v 
+#}
+#
+#ldap_nextuid() {
+#
+#  local ldappass=$(getsecret ldap)
+#
+#  local maxid=`ldapsearch -h $LDAPIP -p $LDAPPORT \
+#    -D "cn=admin,$LDAPORG" -w "$ldappass" \
+#    -b "ou=users,$LDAPORG" -s one \
+#    "objectclass=posixAccount" uidnumber | \
+#    grep uidNumber | awk '{ if ($1 != "#") print $2 }' | sort | tail -n 1`
+#
+#  printf "%d" $((maxid + 1))
+#}
+#
+#ldap_adduser() {
+#  local username=$1
+#  local firstname=$2
+#  local lastname=$3
+#  local email=$4
+#  local pass=$5
+#  local uid=$6
+#  
+#  echo "Adding LDAP user $firstname $lastname ($username)..."
+#
+#  ldap_add "dn: uid=$username,ou=users,$LDAPORG
+#objectClass: simpleSecurityObject
+#objectClass: organizationalPerson
+#objectClass: person
+#objectClass: top
+#objectClass: inetOrgPerson
+#objectClass: posixAccount
+#objectClass: shadowAccount
+#sn: $lastname
+#givenName: $firstname
+#cn: $username
+#displayName: $firstname $lastname
+#uidNumber: $uid
+#gidNumber: $uid
+#loginShell: /bin/bash
+#homeDirectory: /home/$username
+#mail: $email
+#userPassword: $pass
+#shadowExpire: -1
+#shadowFlag: 0
+#shadowWarning: 7
+#shadowMin: 8
+#shadowMax: 999999
+#shadowLastChange: 10877
+#"
+#
+#  ldap_add "dn: cn=$username,ou=groups,$LDAPORG
+#objectClass: top
+#objectClass: posixGroup
+#gidNumber: $uid
+#memberUid: $uid
+#"
+#}
+#
+#ldap_addgroup() {
+#
+#  local name=$1
+#  local uid=$2
+#  
+#  local ldappass=$(getsecret ldap)
+#  
+#  echo "Adding LDAP group $name"
+#
+#  echo "dn: cn=$name,ou=groups,$LDAPORG
+#objectClass: top
+#objectClass: posixGroup
+#cn: $name
+#gidNumber: $uid
+#" | \
+#  ldapadd -h $LDAPIP -p $LDAPPORT -D "cn=admin,$LDAPORG" -w "$ldappass"
+#  
+#}
 
 # Home functions
 
