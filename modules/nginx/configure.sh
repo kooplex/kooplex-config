@@ -11,7 +11,7 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 case $VERB in
 
   "build")
-    echo "1. Configuring ${PREFIX}-impersonator..."
+    echo "1. Configuring ${PREFIX}-nginx..."
 
     if [ $REWRITEPROTO = "http" ]; then
       EXTRACONFIG="ports:\n      - 80:80"
@@ -19,6 +19,7 @@ case $VERB in
 
       cp Dockerfile $RF
       cp etc/nginx.conf $RF
+      cp etc/custom* $RF
       sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
@@ -54,7 +55,7 @@ case $VERB in
   ;;
     
   "remove")
-    echo "Removing nginx ${PREFIX}-net"
+    echo "Removing nginx ${PREFIX}-nginx"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
