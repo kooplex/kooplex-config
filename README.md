@@ -1,4 +1,6 @@
-# Kooplex configuration scripts
+Visit the [Kooplex page](https://kooplex.github.io/) for further informations!
+
+## Kooplex configuration scripts
 
 To install a kooplex instance, follow steps below. Substitute $PROJECT with your project name and
 $SRV with the kooplex root directory on your host machine.
