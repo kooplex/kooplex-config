@@ -54,6 +54,8 @@ case $VERB in
         -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $RF/ccnet.conf
+
+
     
    echo "2. Building ${PREFIX}-seafile..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
@@ -65,6 +67,7 @@ case $VERB in
   "start")
     echo "Starting container ${PREFIX}-seafile"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-seafile > $NGINX_DIR/conf/conf/seafile
   ;;
 
   "init")
@@ -78,6 +81,7 @@ case $VERB in
   "stop")
       echo "Stopping container ${PREFIX}-seafile"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm $NGINX_DIR/conf/conf/seafile
   ;;
     
   "remove")

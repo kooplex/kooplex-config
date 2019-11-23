@@ -1,6 +1,12 @@
 FROM nginx
 
+RUN apt update && apt install -y  vim iputils-ping
+
+EXPOSE 80
+EXPOSE 443
+
 COPY outerhost.conf /etc/nginx/conf.d/outerhost.conf 
-COPY ##PREFIX##.crt  /etc/nginx/keys/##PREFIX##.crt
-COPY ##PREFIX##.key  /etc/nginx/keys/##PREFIX##.key
- 
+#COPY ##PREFIX##.crt  /etc/nginx/keys/##PREFIX##.crt
+#COPY ##PREFIX##.key  /etc/nginx/keys/##PREFIX##.key
+COPY custom_502.html /usr/share/nginx/html/custom_502.html 
+COPY custom_404.html /usr/share/nginx/html/custom_404.html 

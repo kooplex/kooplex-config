@@ -39,6 +39,7 @@ case $VERB in
         cp scripts/{entrypoint-rstudio.sh,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
         cp DockerFile-pieces/* ${RF}/$imagedir
 
+
 	# copy necessary files from other module builds
 	for nec_file in `ls $BUILDDIR/*/$NOTEBOOK_DOCKER_EXTRA/*`
 	do
@@ -70,6 +71,7 @@ case $VERB in
        
      done
 
+        sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-notebooks > $NGINX_DIR/conf/conf/notebooks
     
   ;;
   "install")

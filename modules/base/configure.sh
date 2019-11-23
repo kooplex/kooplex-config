@@ -3,13 +3,19 @@
 RF=$BUILDDIR/base
 mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
+KEYS=$SRV/_keys
 
 case $VERB in
   "build")
     echo "Building base image ${PREFIX}-base"
 
     mkdir -p $SECRETS
+    mkdir -p $KEYS
+    cp $ORIGINAL_KEYS/*crt $ORIGINAL_KEYS/*key $KEYS/
+    
     cp  scripts/* $RF
+
+    ## CREATE BASE IMAGE
 #    cp requirements.txt $RF
     cp etc/conda-requirements*.txt $RF
     cp Dockerfile $RF

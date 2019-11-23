@@ -47,6 +47,7 @@ case $VERB in
         -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" nginx.conf-template > $RF/nginx.conf
     
+    
    echo "2. Building ${PREFIX}-singularity..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
  ;;
@@ -57,6 +58,7 @@ case $VERB in
   "start")
     echo "Starting container ${PREFIX}-singularity"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-singularity > $NGINX_DIR/conf/conf/singularity
   ;;
 
   "init")
@@ -70,6 +72,7 @@ case $VERB in
   "stop")
       echo "Stopping container ${PREFIX}-singularity"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm $NGINX_DIR/conf/conf/singularity
   ;;
     
   "remove")

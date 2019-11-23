@@ -33,6 +33,7 @@ case $VERB in
         -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" Dockerfile_template  > $RF/Dockerfile
 
+
 #    sed -e "s/##SEAFILEDB_PW##/$SEAFILEDBPW/" \
 #	-e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
 #        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $RF/ccnet.conf
@@ -47,6 +48,7 @@ case $VERB in
   "start")
     echo "Starting container ${PREFIX}-overleaf"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-overleaf > $NGINX_DIR/conf/conf/overleaf
   ;;
 
   "init")
@@ -64,6 +66,7 @@ case $VERB in
   "stop")
       echo "Stopping container ${PREFIX}-overleaf"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm $NGINX_DIR/conf/conf/overleaf
   ;;
     
   "remove")

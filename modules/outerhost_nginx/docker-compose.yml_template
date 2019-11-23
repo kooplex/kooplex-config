@@ -11,7 +11,10 @@ services:
       - ##PREFIX##-net
     volumes:
       - /etc/localtime:/etc/localtime:ro
-#      - ##DIR##/var:/var/log/nginx:rw
+      - ##PREFIX##-outernginx-log:/var/log/nginx:rw
+      - ##PREFIX##-outernginx-keys:/etc/nginx/keys:ro
+      - ##PREFIX##-outernginx-html:/usr/share/nginx/html:ro
+      - ##PREFIX##-outernginx-conf:/etc/nginx/conf.d/:ro
     restart: unless-stopped
     ports:
       - 80:80
@@ -25,4 +28,13 @@ networks:
   ##PREFIX##-net:
     external: true
 
+volumes:
+  ##PREFIX##-outernginx-log:
+    external: true
+  ##PREFIX##-outernginx-keys:
+    external: true
+  ##PREFIX##-outernginx-html:
+    external: true
+  ##PREFIX##-outernginx-conf:
+    external: true
 

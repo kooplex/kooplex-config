@@ -78,6 +78,8 @@ case $VERB in
           -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
           -e "s/##HYDRADB_PW##/${HYDRADB_PW}/g" \
           -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
+
   	 
       echo "2. Building ${PREFIX}-hydra..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
@@ -93,6 +95,7 @@ case $VERB in
 #       docker exec ${PREFIX}-hydra-mysql /initdb.sh
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra
+      sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-hydra > $NGINX_DIR/conf/conf/hydra
   ;;
 
   "init")
@@ -153,6 +156,7 @@ case $VERB in
   "stop")
       echo "Stopping containers of ${PREFIX}-hydra"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm $NGINX_DIR/conf/conf/hydra
   ;;
 
   "remove")

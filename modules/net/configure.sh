@@ -20,6 +20,13 @@ case $VERB in
       --subnet $SERVICESUBNET $PREFIX-service-net
    fi
 
+   if docker  $DOCKERARGS network ls | grep " $PREFIX-monitoring-net"; then 
+     echo "$PREFIX-monitoring-net exists, moving on..."
+    else
+     docker $DOCKERARGS network create \
+      --driver bridge \
+      --subnet $MONITORINGSUBNET $PREFIX-monitoring-net
+   fi
  
    ;;
   "start")
@@ -35,6 +42,7 @@ case $VERB in
     echo "Removing network $PREFIX-net [$SUBNET]"
     docker $DOCKERARGS network rm $PREFIX-net
     docker $DOCKERARGS network rm $PREFIX-service-net
+    docker $DOCKERARGS network rm $PREFIX-monitoring-net
   ;;
   "purge")
 

@@ -40,6 +40,8 @@ case $VERB in
 	  -e "s/##PROTOCOL##/$REWRITEPROTO/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
+      sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-grafana > $NGINX_DIR/conf/conf/grafana
+
       echo "2. Building ${PREFIX}-grafana..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;

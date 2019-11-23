@@ -1,19 +1,21 @@
 echo "You can check the result under ##REWRITEPROTO##://##OUTERHOST##/${NB_URL}/report"
 
+NUMEXPR_MAX_THREADS=1
+
 if [ -z "$REPORT_PORT" ]; then
 	REPORT_PORT=9000
 	echo "serving report on $REPORT_PORT"
 fi
 
-#if [ ! $1 ]; then
+if [ ! $1 ]; then
 
         echo "No directory specified, so assuming this one"
         cd $REPORT_DIR
         /opt/conda/bin/bokeh serve  ./ --prefix /${NB_URL}/report --allow-websocket-origin ##OUTERHOST## --port $REPORT_PORT
 
-#else
+else
 
-#        /opt/conda/bin/bokeh serve  $1 --prefix /${NB_URL}/report --allow-websocket-origin ##OUTERHOST## --port $REPORT_PORT
+        /opt/conda/bin/bokeh serve  $1 --prefix /${NB_URL}/report --allow-websocket-origin ##OUTERHOST## --port $REPORT_PORT
 
-#fi
+fi
 

@@ -7,10 +7,13 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+# INIT for openid
+# gitea admin auth add-oauth --name kooplex-test --provider openidConnect --auto-discover-url https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration --key kooplex-test-gitea --secret vmi
+
 
 case $VERB in
   "build")
-    echo "1. Configuring ${PREFIX}-gitlab..."
+    echo "1. Configuring ${PREFIX}-gitea..."
 
     mkdir -p $SRV/_gitea-data $SRV/_gitea-db
 
@@ -27,39 +30,31 @@ case $VERB in
         -e "s/##GITEADB_USER##/$GITEAUSER/" \
         -e "s/##GITEADB_PW##/$GITEADBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
     
-###    cp scripts/docker-entrypoint.sh $RF    
-###    sed -e "s/##HOST##/$OUTERHOST/" etc/nginx-gitlab-http.conf.erb > $RF/nginx-gitlab-http.conf.erb
-    
-   echo "2. Building ${PREFIX}-gitlab..."
+
+   echo "2. Building ${PREFIX}-gitea..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
 
  ;;
   "install")
-###    echo "Installing gitlab $PREFIX-gitlab [$GITLABIP]"
 
   ;;
   "start")
     echo "Starting container ${PREFIX}-gitea"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-gitea > $NGINX_DIR/conf/conf/gitea
 
 
   ;;
   "init")
-###    docker $DOCKERARGS exec --user postgres $PREFIX-gitlabdb bash -c 'createdb gitlabhq_production'
 
    
-#    chmod 600 $SRV/gitlab/etc/ssh_host_*
   ;;
   "admin")
-###     echo "Creating Gitlab admin user..."
-###     docker $DOCKERARGS exec ${PREFIX}-impersonator bash -c /create_admin.sh 
-###     sleep 2 
-###     docker $DOCKERARGS exec ${PREFIX}-gitlab bash -c /make_admin.sh
-###     echo "MAKE SURE THAT GITLABADMIN IS ADMIN!!!!"
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-gitea"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm  $NGINX_DIR/conf/conf/gitea
   ;;
     
   "remove")
@@ -78,8 +73,5 @@ case $VERB in
   ;;
 
   "purge")
-###    echo "Removing $RF" 
-###    rm -R -f $RF
-###    docker $DOCKERARGS volume rm ${PREFIX}-gitlabdb
   ;;
 esac
