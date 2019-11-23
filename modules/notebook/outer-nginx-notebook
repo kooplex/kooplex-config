@@ -1,0 +1,22 @@
+
+
+  # websocket manipulation for jupyter notebook
+  location ~* /notebook/[^/]+/(api/kernels/[^/]+/(channels|iopub|shell|stdin)|terminals/websocket)/? {
+    proxy_pass            http://##PREFIX##-proxy:8000;
+    proxy_http_version    1.1;
+    proxy_set_header      Host $http_host;
+    proxy_set_header      Upgrade $http_upgrade;
+    proxy_set_header      Connection "upgrade";
+    proxy_read_timeout    86400;
+  }
+
+  # websocket manipulation for report preview
+  location ~* /notebook/[^/]+/report/[^/]+/ws {
+    proxy_pass            http://##PREFIX##-proxy:8000;
+    proxy_http_version    1.1;
+    proxy_set_header      Host $http_host;
+    proxy_set_header      Upgrade $http_upgrade;
+    proxy_set_header      Connection "upgrade";
+    proxy_read_timeout    86400;
+  }
+

@@ -1,0 +1,13 @@
+
+####### Hydra 
+  location /hydra/ {
+     ## hydra host --dangerous-force-http , otherwise https
+        set $s           ##PREFIX##-hydra;
+        proxy_pass       http://$s:4444/;
+  }
+
+  location /consent/ {
+        set $s           ##PREFIX##-hydraconsent;
+        proxy_pass       http://$s/;
+  }
+####### Hydra end

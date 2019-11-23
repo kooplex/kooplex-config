@@ -13,7 +13,7 @@ PREFIX=""
 
 MAIL_SERVER_HOSTNAME="mail.example.com"
 
-KEYS=
+ORIGINAL_KEYS=
 
 
 DOCKERIP="/var/run/docker.sock"
@@ -107,6 +107,7 @@ MINUID=10000
 
 SECRETS=$SRV/.secrets
 
+NGINX_DIR=$SRV/_outernginx/
 
 # MOUNTPOINTS
 # where to find mounted storage and functional volumes

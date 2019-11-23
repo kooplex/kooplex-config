@@ -25,6 +25,7 @@ services:
       - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
       - ##PREFIX##-garbage:/mnt/.volumes/garbage:rw
       - /var/run/docker.sock:/var/run/docker.sock
+      - ##PREFIX##-hub-log:/var/log/hub:rw
     restart: unless-stopped
     privileged: true
     logging:
@@ -43,6 +44,7 @@ services:
       - HUBDB_USER=##HUBDB_USER##
       - HUBDB_PW=##HUBDB_PW##
       - HUBDBROOT_PW=##HUBDBROOT_PW##
+      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
       - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
       - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
 
@@ -93,5 +95,7 @@ volumes:
   ##PREFIX##-garbage:
     external: true
   ##PREFIX##-hubdb:
+    external: true
+  ##PREFIX##-hub-log:
     external: true
 

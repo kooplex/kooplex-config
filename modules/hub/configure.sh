@@ -16,7 +16,7 @@ case $VERB in
       
       mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report \
          $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
-         $SRV/_workdir $SRV/_git
+         $SRV/_workdir $SRV/_git $SRV/_hub-log
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
@@ -28,16 +28,17 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_workdir -o o=bind ${PREFIX}-workdir
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report -o o=bind ${PREFIX}-report
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub-log -o o=bind ${PREFIX}-hub-log
 
       DIR=$SRV/_hubcode_
-#      if [ -d $DIR/.git ] ; then
-#          echo $DIR
-#          #cd $DIR && git pull && cd -
-#      else
-#          git clone https://github.com/kooplex/kooplex-hub.git $DIR
-#      fi
+      if [ -d $DIR/.git ] ; then
+          echo $DIR
+          #cd $DIR && git pull && cd -
+      else
+          git clone https://github.com/kooplex/kooplex-hub.git $DIR
+      fi
 
-#      cp $BUILDDIR/CA/rootCA.crt $RF/
+      cp $BUILDDIR/CA/rootCA.crt $RF/
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
@@ -64,6 +65,7 @@ case $VERB in
           -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERPORT##/$DOCKERPORT/" \
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
+          -e "s/##DOCKER_VOLUME_DIR##/$(echo $DOCKER_VOLUME_DIR | sed s"/\//\\\\\//"g)/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
           -e "s/##HYDRA_OIDC_SECRET_HUB##/${HYDRA_OIDC_SECRET_HUB}/" \
@@ -73,6 +75,7 @@ case $VERB in
           -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
           -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
   	 
+
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
@@ -85,14 +88,17 @@ case $VERB in
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub-mysql
 #       docker exec ${PREFIX}-hub-mysql /initdb.sh
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub
+       sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-hub > $NGINX_DIR/conf/conf/hub
   ;;
 
   "init")
-       docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
-       if [ ! $? -eq 0 ];then
+       #docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
+#       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
+#       if [ ! $? -eq 0 ];then
           docker exec ${PREFIX}-hub-mysql bash -c " echo \"CREATE DATABASE $HUBDB; CREATE USER '$HUBDB_USER'@'%' IDENTIFIED BY '$HUBDB_PW'; GRANT ALL ON $HUBDB.* TO '$HUBDB_USER'@'%';\" |  \
             mysql -u root --password=$HUBDBROOT_PW  -h $PREFIX-hub-mysql"
-       fi
+#       fi
+       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
        docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py createsuperuser
@@ -105,6 +111,7 @@ case $VERB in
   "stop")
       echo "Stopping containers of ${PREFIX}-hub"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm  $NGINX_DIR/conf/conf/hub
   ;;
 
   "remove")

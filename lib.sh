@@ -91,6 +91,21 @@ bindpw $HUBLDAP_PW
 "
 }
 
+ldap_fdqn2cn () {
+  local aa q fdqn=$@
+  IFS=. read -ra aa <<< "$fdqn"
+  q=0
+  for i in "${aa[@]}"
+  do
+    if test $q -gt 0
+    then
+     printf ','
+    fi
+    printf 'dc=%s' "$i"
+	q=$((q + 1))
+  done
+}
+
 #ldap_makeconfig () {
 #  SVC=$1
 #  
@@ -111,20 +126,6 @@ bindpw $HUBLDAP_PW
 #  -v $SRV/$SVC/etc/jupyter_notebook_config.py:/etc/jupyter_notebook_config.py"
 #}
 #
-#ldap_fdqn2cn () {
-#  local aa q fdqn=$@
-#  IFS=. read -ra aa <<< "$fdqn"
-#  q=0
-#  for i in "${aa[@]}"
-#  do
-#    if test $q -gt 0
-#    then
-#     printf ','
-#    fi
-#    printf 'dc=%s' "$i"
-#	q=$((q + 1))
-#  done
-#}
 #
 #ldap_add() {
 #  local ldappass=$(getsecret ldap)
