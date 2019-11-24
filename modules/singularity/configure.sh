@@ -1,73 +1,66 @@
 #!/bin/bash
-MODULE_NAME=seafile
-RF=$BUILDDIR/${MODULE_NAME}
+
+MODULE_NAME=${MODULE_NAME}
+RF=$BUILDDIR/$MODULE_NAME
 
 mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-# TODO sed instead of patch
-# Ekkor valamiert a conatc_email is az idp_user lesz
-# in /opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py 
-# 143        user_info['idp_user'] = user_info_json['idp_user']
-# 168 email = user_info['idp_user']
-
-
 
 case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-    mkdir -p $SRV/_${MODULE_NAME}-mysql
-    mkdir -p /kooplex-big/_cache-${MODULE_NAME}/
-    mkdir -p $SRV/_${MODULE_NAME}-data
+    mkdir -p $SRV/_${MODULE_NAME}-uwsgi
+    mkdir -p $SRV/_${MODULE_NAME}-db
 
-    docker $DOCKERARGS volume create -o type=none -o device=/kooplex-big/_cache-${MODULE_NAME} -o o=bind ${PREFIX}-cache-${MODULE_NAME}
-    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-mysql -o o=bind ${PREFIX}-${MODULE_NAME}-mysql
-    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-data -o o=bind ${PREFIX}-${MODULE_NAME}-data
+    SREGISTRY_CODEDIR=$SRV/_${MODULE_NAME}-code
+#    mkdir -p $SREGISTRY_CODEDIR
+    if [ ! -d $SREGISTRY_CODEDIR ] ; then
+            git clone https://github.com/singularityhub/sregistry $SREGISTRY_CODEDIR
+    fi
 
-    cp Dockerfile.${MODULE_NAME} $RF/
-    cp Dockerfile.${MODULE_NAME}_pw $RF/
-    cp entrypoint.sh_pw $RF/
-    cp set_password.py $RF/
+
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-db -o o=bind ${PREFIX}-${MODULE_NAME}-db
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-uwsgi -o o=bind ${PREFIX}-${MODULE_NAME}-uwsgi
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-code -o o=bind ${PREFIX}-${MODULE_NAME}-code
+
+    cp Dockerfile.nginx uwsgi_params.par $RF/
 
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" \
-	-e "s/##SEAFILE_MYSQL_ROOTPW##/$DUMMYPASS/" \
-	-e "s/##SEAFILE_ADMIN##/admin@kooplex/" \
+	-e "s/##SINGULARITYDB_PW##/$SINGULARITYDB_PW/" \
+	-e "s/##SINGULARITY_SECRET##/$SINGULARITY_SECRET/" \
 	-e "s/##SEAFILE_ADMINPW##/$DUMMYPASS/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
     
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $RF/views.py.patch
+	-e "s/##SINGULARITY_SECRET##/$SINGULARITY_SECRET/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" secrets.py-template > $SREGISTRY_CODEDIR/shub/settings/secrets.py
 
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
         -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" \
-        -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
-        -e "s,##URL_HYDRA##,$URL_HYDRA," \
-        -e "s/##HYDRA_CLIENTID##/$HYDRA_SEAHUBCLIENTID/" \
-	-e "s/##DJANGO_SECRET_KEY##/$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g')/" \
-        -e "s/##HYDRA_CLIENTSECRET##/$HYDRA_SEAHUBCLIENTSECRET/" conf/seahub_settings.py-template > $RF/seahub_settings.py
+	-e "s/##SINGULARITYDB_PW##/$SINGULARITYDB_PW/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" config.py-template > $SREGISTRY_CODEDIR/config.py
     
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
         -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $RF/ccnet.conf
-
-
+        -e "s/##OUTERHOST##/$OUTERHOST/" nginx.conf-template > $RF/nginx.conf
+    
+    
    echo "2. Building ${PREFIX}-${MODULE_NAME}..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
  ;;
 
   "install")
-  	 
+
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
-    
+
       PWFILE=$RF/consent-${MODULE_NAME}.pw
       if [ ! -f $PWFILE ] ; then
   	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
@@ -90,7 +83,7 @@ case $VERB in
 
   "admin")
      echo "Creating Seafile admin user..."
-	docker $DOCKERARGS exec -it ${PREFIX}-${MODULE_NAME} /opt/seafile/seafile-server-latest/reset-admin.sh
+	docker $DOCKERARGS exec -it ${PREFIX}-${MODULE_NAME} /opt/singularity/singularity-server-latest/reset-admin.sh
   ;;
 
   "stop")

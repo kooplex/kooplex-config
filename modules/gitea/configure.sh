@@ -1,6 +1,6 @@
 #!/bin/bash
-
-RF=$BUILDDIR/gitea
+MODULE_NAME=gitea
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -8,40 +8,54 @@ DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 # INIT for openid
-# gitea admin auth add-oauth --name kooplex-test --provider openidConnect --auto-discover-url https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration --key kooplex-test-gitea --secret vmi
+# ${MODULE_NAME} admin auth add-oauth --name kooplex-test --provider openidConnect --auto-discover-url https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration --key kooplex-test-${MODULE_NAME} --secret vmi
 
 
 case $VERB in
   "build")
-    echo "1. Configuring ${PREFIX}-gitea..."
+    echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-    mkdir -p $SRV/_gitea-data $SRV/_gitea-db
+    mkdir -p $SRV/_${MODULE_NAME}-data $SRV/_${MODULE_NAME}-db
 
-    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitea-data -o o=bind ${PREFIX}-gitea-data
-    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_gitea-db -o o=bind ${PREFIX}-gitea-db
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-data -o o=bind ${PREFIX}-${MODULE_NAME}-data
+    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-db -o o=bind ${PREFIX}-${MODULE_NAME}-db
 
-    GITEANET=${PREFIX}-gitea-privatenet
+    GITEANET=${PREFIX}-${MODULE_NAME}-privatenet
   
     sed -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##ROOTURL##/https:\/\/kooplex-test.elte.hu\/gitea/" \
+        -e "s/##ROOTURL##/https:\/\/kooplex-test.elte.hu\/${MODULE_NAME}/" \
         -e "s/##GITEANET##/$GITEANET/" \
         -e "s/##GITEADB_ROOTPW##/$GITEAADMINPW/" \
         -e "s/##GITEADB##/$GITEADB/" \
         -e "s/##GITEADB_USER##/$GITEAUSER/" \
         -e "s/##GITEADB_PW##/$GITEADBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
     
-
-   echo "2. Building ${PREFIX}-gitea..."
+   echo "2. Building ${PREFIX}-${MODULE_NAME}..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
 
  ;;
   "install")
 
+  	 
+#For hydra
+      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
+
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      if [ ! -f $PWFILE ] ; then
+  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
+          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+      fi
+      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
+
+      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
   ;;
   "start")
-    echo "Starting container ${PREFIX}-gitea"
+    echo "Starting container ${PREFIX}-${MODULE_NAME}"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-gitea > $NGINX_DIR/conf/conf/gitea
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME} > $NGINX_DIR/conf/conf/${MODULE_NAME}
 
 
   ;;
@@ -52,9 +66,9 @@ case $VERB in
   "admin")
   ;;
   "stop")
-      echo "Stopping container ${PREFIX}-gitea"
+      echo "Stopping container ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm  $NGINX_DIR/conf/conf/gitea
+      rm  $NGINX_DIR/conf/conf/${MODULE_NAME}
   ;;
     
   "remove")
@@ -64,11 +78,11 @@ case $VERB in
       
   ;;
   "cleandata")
-    echo "Cleaning data ${PREFIX}-gitea"
-    docker $DOCKERARGS volume rm ${PREFIX}-gitea-data
-    rm -R -f $SRV/_giteadata
-    docker $DOCKERARGS volume rm ${PREFIX}-gitea-db
-    rm -R -f $SRV/_giteadb
+    echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
+    docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
+    rm -R -f $SRV/_${MODULE_NAME}data
+    docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-db
+    rm -R -f $SRV/_${MODULE_NAME}db
     
   ;;
 

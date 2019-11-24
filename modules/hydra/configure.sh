@@ -16,10 +16,11 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hydra..."
       
-      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode
+      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode $HYDRA_CONFIG
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydradb -o o=bind ${PREFIX}-hydradb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconsentdb -o o=bind ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconfig -o o=bind ${PREFIX}-hydraconfig
 
 #      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
 #      Magically put the code into $SRV/_hydracode/consent
@@ -31,7 +32,7 @@ case $VERB in
 
 #      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
       #cp -ar src $SRV/_hydracode 
-      cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json} $RF/
+      cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json}   $HYDRA_CONFIG/
 
       cp -a $BUILDDIR/CA/rootCA.{key,crt} $RF/
 
@@ -43,11 +44,6 @@ case $VERB in
 
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-hub.json-template > $RF/client-policy-hub.json
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $RF/client-hub.json
-
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
 
       sed -e "s/##PREFIX##/${PREFIX}/"\
