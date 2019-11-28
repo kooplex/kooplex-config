@@ -7,7 +7,7 @@
         "id": "##PREFIX##-gitea",
 		  "description": "##PREFIX## GITEA",
         "redirect_uris": [
-                "##REWRITEPROTO##://##OUTERHOST##/gitea/user/login/openid/"
+                "##REWRITEPROTO##://##OUTERHOST##/gitea/user/oauth2/##PREFIX##/callback"
         ],
         "response_types": [
                 "id_token",

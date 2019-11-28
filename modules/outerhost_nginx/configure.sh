@@ -7,16 +7,19 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 NGINX_HTML=$NGINX_DIR/html
-NGINX_CONF=$NGINX_DIR/conf
+NGINX_LOG=$LOG_DIR/outer_nginx
+NGINX_CONF=$CONF_DIR/outer_nginx
 
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-outer-nginx..."
       mkdir -p $NGINX_HTML 
-      mkdir -p $NGINX_CONF/conf
+      mkdir -p $NGINX_LOG
+      mkdir -p $NGINX_CONF/sites-enabled
 
-      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-nginx-html
-      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_CONF  -o o=bind ${PREFIX}-nginx-conf
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-outernginx-html
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-outernginx-log
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_CONF  -o o=bind ${PREFIX}-outernginx-conf
 #       mkdir -p $DIR
 #       mkdir -p $DIR/etc $DIR/var
 #       mkdir -p $DIR/etc/nginx/

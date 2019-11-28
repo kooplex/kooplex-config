@@ -12,7 +12,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-outernginx-log:/var/log/nginx:rw
-      - ##PREFIX##-outernginx-keys:/etc/nginx/keys:ro
+      - ##PREFIX##-keys:/etc/nginx/keys:ro
       - ##PREFIX##-outernginx-html:/usr/share/nginx/html:ro
       - ##PREFIX##-outernginx-conf:/etc/nginx/conf.d/:ro
     restart: unless-stopped
@@ -31,7 +31,7 @@ networks:
 volumes:
   ##PREFIX##-outernginx-log:
     external: true
-  ##PREFIX##-outernginx-keys:
+  ##PREFIX##-keys:
     external: true
   ##PREFIX##-outernginx-html:
     external: true

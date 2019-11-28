@@ -38,7 +38,7 @@ server {
 ####### Custom pages end 
 
 
- include /etc/nginx/conf.d/conf/*;
+ include /etc/nginx/conf.d/sites-enabled/*;
 
   # -----------------------------------------------------------
 }

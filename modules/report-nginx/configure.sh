@@ -33,6 +33,9 @@ case $VERB in
   ;;
 
   "install")
+# OUTER-NGINX
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+#        docker $DOCKERARGS restart $PREFIX-outer-nginx
   ;;
 
   "start")

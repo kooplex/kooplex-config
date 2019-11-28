@@ -62,6 +62,9 @@ case $VERB in
 
   "install")
   	 
+# OUTER-NGINX
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
       sed -e "s/##PREFIX##/${PREFIX}/" \
@@ -70,8 +73,8 @@ case $VERB in
     
       PWFILE=$RF/consent-${MODULE_NAME}.pw
       if [ ! -f $PWFILE ] ; then
-  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
-          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" 
+        #  docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
       fi
       CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
 
@@ -103,6 +106,10 @@ case $VERB in
       echo "Removing $DOCKER_COMPOSE_FILE"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm    
+
+      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      rm $PWFILE
   ;;
 
   "cleandata")

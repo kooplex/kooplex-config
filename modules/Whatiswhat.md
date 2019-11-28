@@ -12,8 +12,7 @@ Core modules
  * proxy: configurable-http-proxy for notebooks
  * prometheus, cadvisor, node_exporter, grafana 
  * hydra: central authenticating system
- * nginx: world-facing nginx reverse-proxy
- * outerhost_nginx: nginx-webserver to route to components, this or the above is not needed
+ * outerhost_nginx:  world-facing nginx reverse-proxy to route to components, this or the above is not needed
  * report-nginx: nginx-webserver to route to reports
  * singularityhub: for singularity, for user environment customization
  * admin (not used): tools for managing the software stack
@@ -33,3 +32,4 @@ dashboard (not used):
 dockssh (not used): direct terminal in a container
 syscheck (not used): for checking system components
 userdb (not used): to run databases for users in containers
+nginx (deprecated): world-facing nginx reverse-proxy

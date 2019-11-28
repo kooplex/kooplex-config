@@ -35,7 +35,8 @@ case $VERB in
 
  ;;
   "install")
-
+# OUTER-NGINX
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
   	 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
@@ -45,17 +46,22 @@ case $VERB in
 
       PWFILE=$RF/consent-${MODULE_NAME}.pw
       if [ ! -f $PWFILE ] ; then
-  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
-          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" 
       fi
       CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
 
       docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
+
+# We need to add the oauth provider to gitea mysql
+# use kooplex-test_gitea
+# update login_source set cfg = '{"Provider":"openidConnect","ClientID":"kooplex-test-gitea","ClientSecret":"LbIiHbIKpDsd","OpenIDConnectAutoDiscoveryURL":"https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration","CustomURLMapping":null}' where id = 2;
+
+# The "name" in this line should be the same as the string in the calback url before the "/callback"
+
   ;;
   "start")
     echo "Starting container ${PREFIX}-${MODULE_NAME}"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME} > $NGINX_DIR/conf/conf/${MODULE_NAME}
 
 
   ;;
@@ -76,6 +82,9 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
       
+      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      rm $PWFILE
   ;;
   "cleandata")
     echo "Cleaning data ${PREFIX}-${MODULE_NAME}"

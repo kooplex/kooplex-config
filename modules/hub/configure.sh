@@ -7,6 +7,8 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+HUB_LOG=$LOG_DIR/hub
+
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
 
@@ -16,7 +18,7 @@ case $VERB in
       
       mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report \
          $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
-         $SRV/_workdir $SRV/_git $SRV/_hub-log
+         $SRV/_workdir $SRV/_git $HUB_LOG
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
@@ -28,7 +30,7 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_workdir -o o=bind ${PREFIX}-workdir
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report -o o=bind ${PREFIX}-report
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub-log -o o=bind ${PREFIX}-hub-log
+      docker $DOCKERARGS volume create -o type=none -o device=$HUB_LOG -o o=bind ${PREFIX}-hub-log
 
       DIR=$SRV/_hubcode_
       if [ -d $DIR/.git ] ; then
@@ -86,6 +88,25 @@ case $VERB in
   ;;
 
   "install")
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-hub-template > $CONF_DIR/outer_nginx/sites-enabled/hub
+
+#For hydra
+      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
+
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      if [ ! -f $PWFILE ] ; then
+  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
+          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+      fi
+      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
+
+      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
   ;;
 
   "start")
@@ -93,7 +114,6 @@ case $VERB in
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub-mysql
 #       docker exec ${PREFIX}-hub-mysql /initdb.sh
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub
-       sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-hub > $NGINX_DIR/conf/conf/hub
   ;;
 
   "init")
@@ -123,6 +143,10 @@ case $VERB in
       echo "Removing containers of ${PREFIX}-hub"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+
+      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      rm $PWFILE
   ;;
 
   "purge")

@@ -25,11 +25,13 @@ case $VERB in
   
   ;;
   "install")
+# OUTER-NGINX
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+#        docker $DOCKERARGS restart $PREFIX-outer-nginx
   ;;
   "start")
      echo "Starting proxy ${PREFIX}-proxy "
      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-     sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-proxy > $NGINX_DIR/conf/conf/proxy
   ;;
   "restart")
     echo "Restarting proxy ${PREFIX}-proxy"
@@ -42,7 +44,6 @@ case $VERB in
   "stop")
     echo "Stopping proxy ${PREFIX}-proxy "
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-    rm  $NGINX_DIR/conf/conf/proxy
   ;;
   "remove")
     echo "Removing proxy ${PREFIX}-proxy "

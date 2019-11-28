@@ -3,7 +3,6 @@
 RF=$BUILDDIR/base
 mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
-KEYS=$SRV/_keys
 
 case $VERB in
   "build")
@@ -11,13 +10,17 @@ case $VERB in
 
     mkdir -p $SECRETS
     mkdir -p $KEYS
+    mkdir -p $CONF_DIR
+    mkdir -p $LOG_DIR
     cp $ORIGINAL_KEYS/*crt $ORIGINAL_KEYS/*key $KEYS/
     
+    docker $DOCKERARGS volume create -o type=none -o device=$KEYS -o o=bind ${PREFIX}-keys
+
     cp  scripts/* $RF
 
     ## CREATE BASE IMAGE
 #    cp requirements.txt $RF
-    cp etc/conda-requirements*.txt $RF
+#    cp etc/conda-requirements*.txt $RF
     cp Dockerfile $RF
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda

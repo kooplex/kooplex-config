@@ -4,13 +4,12 @@ replace_slash() {
 	echo $1 | sed 's/\//\\\//g'
 }
 
-
+MODULE_NAME=notebook
 RF=$BUILDDIR/notebooks
-    echo "Building image $PREFIX-notebooks $EXTRA"
 
 case $VERB in
   "build")
-    echo "Building image $PREFIX-notebooks $EXTRA"
+    echo "Building image $PREFIX-${MODULE_NAME} $EXTRA"
 
 
      mkdir -p $RF
@@ -67,14 +66,16 @@ case $VERB in
 	done
 
 #        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
-        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-notebook-${imgname} ${RF}/$imagedir
+        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname} ${RF}/$imagedir
        
      done
-
-        sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-notebooks > $NGINX_DIR/conf/conf/notebooks
-    
   ;;
   "install")
+
+# OUTER-NGINX
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+        docker $DOCKERARGS restart $PREFIX-outer-nginx
+    
   ;;
     
   "start")
@@ -87,21 +88,21 @@ case $VERB in
     
   ;;
   "stop")
-    echo "Stopping notebook $PROJECT-notebook [$NOTEBOOKIP]"
+    echo "Stopping ${MODULE_NAME} $PROJECT-${MODULE_NAME} [$NOTEBOOKIP]"
 #    docker $DOCKERARGS stop $PROJECT-notebook
   ;;
   "remove")
-    echo "Removing notebook $PROJECT-notebook [$NOTEBOOKIP]"
+    echo "Removing ${MODULE_NAME} $PROJECT-${MODULE_NAME} [$NOTEBOOKIP]"
 #    docker $DOCKERARGS rm $PROJECT-notebook
   ;;
   "purge")
-    echo "Purging notebook $PROJECT-notebook [$NOTEBOOKIP]"
-    rm -R $SRV/notebook
+    echo "Purging ${MODULE_NAME} $PROJECT-${MODULE_NAME} [$NOTEBOOKIP]"
+    rm -R $SRV/${MODULE_NAME}
   ;;
   "clean")
-    echo "Cleaning base image $PREFIX-notebook"
+    echo "Cleaning base image $PREFIX-${MODULE_NAME}"
 #    docker $DOCKERARGS rmi $PREFIX-notebook
 #FIXME: hard coded
-    docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi
+#    docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi
   ;;
 esac
