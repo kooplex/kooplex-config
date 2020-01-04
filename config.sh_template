@@ -25,8 +25,6 @@ else
  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP:$DOCKERPORT"
 fi
 
-
-
 ROOT="/srv/"$PREFIX
 SRV=$ROOT/$PREFIX
 BUILDDIR=$ROOT"/build"
@@ -100,11 +98,9 @@ HYDRA_OIDC_SECRET_HUB=""
 SEAFILE_SECRET=
 SEAFILEDB_PW=${DUMMYPASS}
 
-
 # SINGULARITY
 SINGULARITYDB_PW=
 SINGULARITY_SECRET=
-
 
 # name of the directory in each module of the Docker extra lines when building the notebook images
 NOTEBOOK_DOCKER_EXTRA=notebook-ext
