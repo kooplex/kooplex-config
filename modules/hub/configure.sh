@@ -1,6 +1,7 @@
 #!/bin/bash
 
 RF=$BUILDDIR/hub
+MODULE_NAME=hub
 
 mkdir -p $RF
 

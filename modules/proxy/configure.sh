@@ -1,6 +1,6 @@
 #!/bin/bash
-
-RF=$BUILDDIR/proxy
+MODULE_NAME=proxy
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -26,7 +26,7 @@ case $VERB in
   ;;
   "install")
 # OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
 #        docker $DOCKERARGS restart $PREFIX-outer-nginx
   ;;
   "start")
