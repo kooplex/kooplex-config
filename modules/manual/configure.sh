@@ -24,13 +24,14 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-      sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-manual > $NGINX_DIR/conf/conf/manual
-
       echo "2. Building ${PREFIX}-manual..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
 
   "install")
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-manual-template > $CONF_DIR/outer_nginx/sites-enabled/manual
   ;;
 
   "start")
