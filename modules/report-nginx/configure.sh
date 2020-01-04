@@ -1,6 +1,6 @@
 #!/bin/bash
-
-RF=$BUILDDIR/report-nginx
+MODULE_NAME=report-nginx
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
