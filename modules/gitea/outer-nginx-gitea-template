@@ -1,7 +1,6 @@
 
 ####### Gitea end
   location /gitea/ {
-        set $s           ##PREFIX##-gitea;
-        proxy_pass       http://$s:3000/;
+        proxy_pass       http://##PREFIX##-gitea:3000/;
   }
 ####### Gitea end

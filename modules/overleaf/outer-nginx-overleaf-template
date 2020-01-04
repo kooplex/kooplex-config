@@ -1,8 +1,7 @@
 
 ###### Overleaf
   location /overleaf/ {
-        set $s          kooplex-##PREFIX##-overleaf;
-        proxy_pass      http://$s/;
+        proxy_pass      http://kooplex-##PREFIX##-overleaf/;
         proxy_set_header   Host $host;
         proxy_http_version    1.1;
         proxy_set_header   X-Real-IP $remote_addr;
