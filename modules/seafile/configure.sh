@@ -85,7 +85,6 @@ case $VERB in
   "start")
     echo "Starting container ${PREFIX}-${MODULE_NAME}"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME} > $NGINX_DIR/conf/conf/${MODULE_NAME}
   ;;
 
   "init")
