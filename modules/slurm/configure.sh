@@ -26,7 +26,9 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 #
 # munge.key needs to be generated from somewhere
 #
-
+# if node is down
+# check whether munge.key was changed or not: service munge restart
+# scontrol update nodename=node001 state=resume
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-slurm..."
