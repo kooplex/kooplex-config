@@ -1,3 +1,7 @@
+FROM ##BASE##
+
+RUN TZ=Europe/Budapest
+RUN ln -snf  /usr/share/zoneinfo/$TZ /etc/localtime
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
@@ -5,8 +9,8 @@ RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 RUN chmod a+x /usr/local/bin/start-notebook.sh
-ADD kooplex-logo.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/kooplex-logo.png
-ADD kooplex-logo.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/jupyterlab.png
+ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
+ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
 
 RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
 

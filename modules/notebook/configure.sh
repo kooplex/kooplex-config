@@ -5,7 +5,7 @@ replace_slash() {
 }
 
 MODULE_NAME=notebook
-RF=$BUILDDIR/notebooks
+RF=$BUILDDIR/${MODULE_NAME}
 
 case $VERB in
   "build")
@@ -58,15 +58,16 @@ case $VERB in
         imgname=${imagedir#*image-}
 
 
+        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
 
      	echo "Building image from $docfile"
 	for docker_piece in `ls ${RF}/${imagedir}/*-Docker-piece`
 	do
-		cat $docker_piece >> ${RF}/$docfile
+		sed -e "s/##BASE##/${PREFIX}-${MODULE_NAME}-${imgname}-base/" $docker_piece >> ${RF}/$docfile-final
 	done
 
 #        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
-        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname} ${RF}/$imagedir
+        docker $DOCKERARGS build -f ${RF}/$docfile-final -t ${PREFIX}-${MODULE_NAME}-${imgname} ${RF}/$imagedir
        
      done
   ;;
