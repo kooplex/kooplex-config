@@ -4,6 +4,7 @@ server {
   listen [::]:80;
   server_name ##PREFIX##.elte.hu;
   return 301 https://$host$request_uri;
+  client_max_body_size 0;
 }
 
 server {
