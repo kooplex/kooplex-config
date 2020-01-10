@@ -20,7 +20,6 @@ case $VERB in
         imagedir="./image-"$i
         mkdir -p $RF/$imagedir
 	[ -e $imagedir/conda-requirements.txt ] &&  cp -p $imagedir/conda-requirements.txt $RF/$imagedir/conda-requirements.txt
-        sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
         sed -e "s/##OUTERHOSTNAME##/${OUTERHOSTNAME}/"\
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/rstudio-login.html-template > $RF/$imagedir/rstudio-login.html
@@ -57,8 +56,13 @@ case $VERB in
         docfile=${imagedir}/Dockerfile
         imgname=${imagedir#*image-}
 
-
-        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
+        if [ ! ${IMAGES_FROM_REGISTRY} ]; then
+		fdfd
+             sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
+             docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
+     else
+	     echo "Using base image ${PREFIX}-${MODULE_NAME}-${imgname}-base form pulled source"
+     fi
 
      	echo "Building image from $docfile"
 	for docker_piece in `ls ${RF}/${imagedir}/*-Docker-piece`
