@@ -14,6 +14,10 @@ e.g.:
 * docker tag kooplex-fiek-notebook-dataexp-base kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
 * docker push kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
 
-Then on the other instance it can be pulled by
-docker pull kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
-dk tag kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base kooplex-temp-notebook-dataexp-base
+# Then on the other instance it can be pulled by
+* docker pull kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
+* dk tag kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base kooplex-temp-notebook-dataexp-base
+
+# Then build the top, system specific layer onto it
+* bash kooplex.sh build notebook dataexp
+
