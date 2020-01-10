@@ -5,8 +5,7 @@
   }
 
   location /seafile {
-        set $s           ##PREFIX##-seafile;
-        proxy_pass       http://$s:80;
+        proxy_pass       http://##PREFIX##-seafile:80;
         proxy_set_header   Host $host;
         proxy_set_header   X-Real-IP $remote_addr;
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -20,8 +19,7 @@
 
     location /seafhttp {
         rewrite          ^/seafhttp(.*)$ $1 break;
-        set $s           ##PREFIX##-seafile;
-        proxy_pass       http://$s:8082;
+        proxy_pass       http://##PREFIX##-seafile:8082;
         client_max_body_size 0;
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_connect_timeout  36000s;

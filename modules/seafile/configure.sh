@@ -63,7 +63,7 @@ case $VERB in
   "install")
   	 
 # OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
@@ -85,7 +85,6 @@ case $VERB in
   "start")
     echo "Starting container ${PREFIX}-${MODULE_NAME}"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME} > $NGINX_DIR/conf/conf/${MODULE_NAME}
   ;;
 
   "init")

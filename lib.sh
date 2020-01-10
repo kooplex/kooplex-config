@@ -444,7 +444,7 @@ isindocker() {
 }
 
 config() {
-  source config.sh
+  source ${KOOPLEX_DIR}config.sh
   
   KOOPLEXWD=`pwd`
   

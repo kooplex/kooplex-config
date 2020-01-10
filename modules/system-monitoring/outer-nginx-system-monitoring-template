@@ -1,0 +1,6 @@
+
+
+  location /grafana/ {
+    proxy_pass http://##PREFIX##-grafana:3000/;
+    proxy_set_header Host $host;
+  }

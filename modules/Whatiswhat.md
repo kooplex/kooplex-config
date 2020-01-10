@@ -10,7 +10,7 @@ Core modules
  * net: configures docker bridge network
  * notebook: jupyter notebook base docker image
  * proxy: configurable-http-proxy for notebooks
- * prometheus, cadvisor, node_exporter, grafana 
+ * system-monitoring: prometheus, cadvisor, node_exporter, grafana 
  * hydra: central authenticating system
  * outerhost_nginx:  world-facing nginx reverse-proxy to route to components, this or the above is not needed
  * report-nginx: nginx-webserver to route to reports

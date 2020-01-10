@@ -22,13 +22,23 @@ case $VERB in
 
     GITEANET=${PREFIX}-${MODULE_NAME}-privatenet
   
+    cp Dockerfile.gitea $RF/
+
     sed -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##ROOTURL##/https:\/\/kooplex-test.elte.hu\/${MODULE_NAME}/" \
+        -e "s/##ROOTURL##/${REWRITEPROTO}:\/\/$OUTERHOST\/gitea/" \
         -e "s/##GITEANET##/$GITEANET/" \
         -e "s/##GITEADB_ROOTPW##/$GITEAADMINPW/" \
         -e "s/##GITEADB##/$GITEADB/" \
         -e "s/##GITEADB_USER##/$GITEAUSER/" \
         -e "s/##GITEADB_PW##/$GITEADBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
+    sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" \
+        -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+        -e "s/##GITEADB_ROOTPW##/$GITEAADMINPW/" \
+        -e "s/##GITEADB##/$GITEADB/" \
+        -e "s/##GITEADB_USER##/$GITEAUSER/" \
+        -e "s/##GITEADB_PW##/$GITEADBPW/" etc/app.ini-template > $RF/app.ini
     
    echo "2. Building ${PREFIX}-${MODULE_NAME}..."
    docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
@@ -36,7 +46,7 @@ case $VERB in
  ;;
   "install")
 # OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer-nginx/sites-enabled/${MODULE_NAME}
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
   	 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json

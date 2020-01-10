@@ -2,19 +2,24 @@ version: "3"
 
 services:
   ##PREFIX##-gitea:
-    image: gitea/gitea:latest
+    container_name: ##PREFIX##-gitea
+    image: ##PREFIX##-gitea
     container_name: ##PREFIX##-gitea
     depends_on:
       - ##PREFIX##-gitea-mysql
+    build:
+      context: .
+      dockerfile: Dockerfile.gitea
     environment:
       - USER_UID=1000
       - USER_GID=1000
       - DB_TYPE=mysql
-      - DB_HOST=db:3306
+      - DB_HOST=##PREFIX##-gitea-mysql:3306
       - DB_NAME=##GITEADB##
       - DB_USER=##GITEADB_USER##
       - DB_PASSWD=##GITEADB_PW##
       - ROOT_URL=##ROOTURL##
+      - DISABLE_REGISTRATION=TRUE
     restart: unless-stopped
     networks:
       - ##PREFIX##-net
@@ -22,8 +27,8 @@ services:
     volumes:
       - ##PREFIX##-gitea-data:/data:rw      
     ports:
-      - "3030:3000"
       - "222:22"
+#      - "3030:3000"
     logging:
       options:
         max-size: "10m"

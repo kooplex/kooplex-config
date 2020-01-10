@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y \
 		gettext \
 		mysql-client libmysqlclient-dev \
 		postgresql-client libpq-dev \
-                vim less \
+                vim less libssl-dev \
                 ssh git tzdata\
 		python3-pip python3-dev\
                 openssh-server openssh-sftp-server vim \
