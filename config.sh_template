@@ -60,6 +60,8 @@ CHECK_LOG="check.log"
 #EXECUTABLES
 DOCKER_COMPOSE="docker-compose"
 
+IMAGES_FROM_REGISTRY=True
+
 ### INHERITED NAMES (or not )
 HUBDB=kooplexhub
 HUBDB_USER=kooplexhub
