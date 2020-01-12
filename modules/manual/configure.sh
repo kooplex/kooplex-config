@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RF=$BUILDDIR/manual
+MODULE_NAME=manual
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -31,7 +32,7 @@ case $VERB in
   "install")
 
       sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-manual-template > $CONF_DIR/outer_nginx/sites-enabled/manual
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
   ;;
 
   "start")
