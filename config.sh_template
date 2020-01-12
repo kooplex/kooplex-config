@@ -4,7 +4,6 @@ MODULES="base net ldap proxy nginx impersonator hub notebook"  #overleaf gitea s
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOST=$OUTERHOSTNAME
 
-
 INNERHOST="192.168.0.25"
 
 INTERNAL_SSL=false
@@ -14,7 +13,6 @@ PREFIX=""
 MAIL_SERVER_HOSTNAME="mail.example.com"
 
 ORIGINAL_KEYS=
-
 
 DOCKERIP="/var/run/docker.sock"
 DOCKERPORT=""
