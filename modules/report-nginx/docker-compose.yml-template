@@ -10,7 +10,7 @@ services:
     networks:
       - ##PREFIX##-net
     volumes:
-      - ##PREFIX##-report:/srv/report
+      - ##PREFIX##-report:/srv/
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     logging:

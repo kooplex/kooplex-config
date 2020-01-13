@@ -4,12 +4,7 @@
 #@ https://github.com/alash3al/dockssh                                                                                                                                                                             │
 																										   # SETUP redis for storing passwords                                                                                                                                                                                │
 #SET PASSWORD                                                                                                                                                                                                      
-docker exec -it dockssh-redis bash                                                                                                                                                                                
-redis-cli                                                                                                                                                                                                          
-set dockssh:container1:pass "passw"    
 
-# RUN dockssh connected to redis                                                                                                                                                                                  
-#wget https://github.com/alash3al/dockssh/releases/download/v1.1.0/dockssh_linux_amd64                                      
 
 RF=$BUILDDIR/dockssh
 
@@ -24,8 +19,8 @@ case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-dockssh..."
 
-    mkdir -p $SRV/_dockssh-redis-db
-    docker $DOCKERARGS volume create -o type=none -o device=/$SRV/_dockssh-redis-db -o o=bind dockssh-redis-db 
+#    mkdir -p $SRV/_dockssh-redis-db
+#    docker $DOCKERARGS volume create -o type=none -o device=/$SRV/_dockssh-redis-db -o o=bind dockssh-redis-db 
 
       cp  entrypoint.sh $RF/
       sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \

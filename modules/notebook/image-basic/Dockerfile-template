@@ -42,5 +42,6 @@ RUN cd singularity && \
 WORKDIR /usr/local/go/src/github.com/sylabs/singularity
 RUN  ./mconfig && cd builddir && make && make install
 
-RUN useradd -ms /bin/bash aaa
+
+RUN pip install jupyterthemes
 

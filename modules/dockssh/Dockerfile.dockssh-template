@@ -3,14 +3,10 @@ FROM ##PREFIX##-base
 RUN apt update && apt install -y ssh docker.io
 RUN ssh-keygen -P ""  -f /root/.ssh/id_rsa
 
-#ADD dockssh_linux_amd64 /usr/local/bin/dockssh_linux_amd64
-RUN wget https://github.com/alash3al/dockssh/releases/download/v1.1.0/dockssh_linux_amd64 &&  \
-     mv dockssh_linux_amd64 /usr/local/bin/dockssh_linux_amd64 && chmod a+x /usr/local/bin/dockssh_linux_amd64
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod a+x entrypoint.sh
 
-#CMD ["./dockssh_linux_amd64","-entrypoint","\"/bin/bash\"","-redis","\"redis://dockssh-redis:6379/0\""]
 
-#CMD ["sleep","10000"]
-CMD ["/entrypoint.sh"]
+CMD ["sleep","10000"]
+#CMD ["/entrypoint.sh"]

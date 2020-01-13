@@ -20,26 +20,26 @@ _CONF=/tmp/.mount.conf
 
 function do_rmdir () {
     # Remove folder and parent if empty
-    dir=$1
-    rmdir $1
-    parent=$(dirname $dir)
+    dir="$@"
+    rmdir "$dir"
+    parent=$(dirname "$dir")
     if [ -z "$(ls -A $parent)" ] ; then
         rmdir $parent
     fi
 }
 
 function do_umount () {
-    dir=$1
+    dir="$@"
     # kill any process related to mount
     echo "Killing..." >&2    
-    lsof -Fp +d $dir | \
+    lsof -Fp +d "$dir" | \
       awk '/^p([[:digit:]]+)$/ { print "kill -9 "gensub("p", "", 1, $0) }' | \
       tee -a /dev/stderr | \
       /bin/bash
     # umount
     echo "Umounting $dir" >&2
-    /bin/umount $dir
-    do_rmdir $dir
+    /bin/umount "$dir"
+    do_rmdir "$dir"
 }
 
 # Make sure configuration file is present
@@ -73,28 +73,28 @@ while IFS=':' read -r vol src <&3 ; do
     elif [ $vol = 'usercourse' ] ; then
 	dst=$ROOTDIR/workdir
     elif [ $vol = 'assignment' ] ; then
-	ass=$(basename $src | cut -f2 -d-)
-	usr=$(basename $src | cut -f3 -d-)
+	ass=$(basename "$src" | cut -f2 -d-)
+	usr=$(basename "$src" | cut -f3 -d-)
 	dst=$ROOTDIR/feedback/$ass/$usr
     elif [ $vol = 'report' ] ; then
 	dst=$ROOTDIR/report
     else
-        dst=$ROOTDIR/$vol/$(basename $src)
+        dst=$ROOTDIR/$vol/$(basename "$src")
     fi
     dst=$(echo $dst | sed s,//*,/,g)
-    if [ ! -d $src ] ; then
+    if [ ! -d "$src" ] ; then
         echo "ERROR: Missing $src" >&2
         continue
     fi
-    if [ -n "$(grep $dst $_CONF)" ] ; then
+    if [ -n "$(grep \"$dst\" $_CONF)" ] ; then
         echo "Already mounted $src -> $dst" >&2
         sed -i "s,$dst.*,," $_CONF
         continue
     else
         echo "Mounting $src -> $dst" >&2
-        mkdir -p $dst
+        mkdir -p "$dst"
     fi
-    /bin/mount -o bind $src $dst
+    /bin/mount -o bind "$src" "$dst"
 done 3< $CONF
 
 # get rid of home
@@ -107,7 +107,7 @@ if [ $(grep -v "^$" $_CONF | wc -c) -gt 0 ] ; then
     kill -SIGSTOP $JUPYTERPID
     for dir in $(cat $_CONF) ; do
         echo "Umounting $dir" >&2
-        do_umount $dir
+        do_umount "$dir"
     done
     echo "Continue service" >&2
     kill -SIGCONT $JUPYTERPID

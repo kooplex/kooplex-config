@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 MAINTAINER Kooplex Team <kooplex@complex.elte.hu>
 
@@ -37,7 +37,9 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
 
 # Do not run nslcd as a daemon
+RUN apt install -y systemd 
 RUN systemctl disable nslcd
+#RUN service nslcd disable
 
 ADD entrypoint.sh /entrypoint.sh
 

@@ -1,6 +1,6 @@
 #!/bin/bash
-
-RF=$BUILDDIR/proxy
+MODULE_NAME=proxy
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -12,21 +12,26 @@ case $VERB in
     echo "1. Configuring ${PREFIX}-proxy..."
 
       cp Dockerfile $RF
-      sed -e "s/##PUBLICIP##/${PREFIX}-proxy/" \
-          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
+#      sed -e "s/##PUBLICIP##/${PREFIX}-proxy/" \
+#          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
+      cp  scripts/entrypoint.sh  $RF/entrypoint.sh
       
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
 
       echo "2. Building ${PREFIX}-proxy..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   
   ;;
   "install")
+# OUTER-NGINX
+    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
+#        docker $DOCKERARGS restart $PREFIX-outer-nginx
   ;;
   "start")
-    echo "Starting proxy ${PREFIX}-proxy "
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+     echo "Starting proxy ${PREFIX}-proxy "
+     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
   ;;
   "restart")
     echo "Restarting proxy ${PREFIX}-proxy"

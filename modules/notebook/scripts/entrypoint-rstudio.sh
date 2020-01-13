@@ -22,6 +22,8 @@ nohup nginx
 IDD=`id -u $NB_USER`
 usermod -u $IDD -o -d /home/$NB_USER rstudio
 
-export PATH=${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+CONDA_DIR=/opt/conda
+
+export PATH=${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CONDA_DIR/bin
 /etc/s6/init/init-stage1 $@
 

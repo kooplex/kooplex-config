@@ -12,8 +12,12 @@ services:
     volumes:
       - ##PREFIX##-home:/mnt/.volumes/home:rw
       - ##PREFIX##-git:/mnt/.volumes/git:rw
+      - ##PREFIX##-cache-seafile:/mnt/.volumes/seafile:rw
     privileged: true
     restart: unless-stopped
+    environment:
+      - BASE_URL_SEAFILE=http://##PREFIX##-seafile
+      - MNT_VOL_SYNC=/mnt/.volumes/seafile
 
 networks:
   ##PREFIX##-net:
@@ -23,5 +27,7 @@ volumes:
   ##PREFIX##-home:
     external: true
   ##PREFIX##-git:
+    external: true
+  ##PREFIX##-cache-seafile:
     external: true
 

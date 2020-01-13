@@ -7,22 +7,36 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+# After consent install
+# /consent/install and click the button
+# sed 'files'; #### --> 'database'; ####
+#
+
+CONSENT_LOG=$LOG_DIR/hydraconsent
 
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hydra..."
       
-      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode
+      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode $HYDRA_CONFIG $CONSENT_LOG
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydradb -o o=bind ${PREFIX}-hydradb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconsentdb -o o=bind ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
+      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconfig -o o=bind ${PREFIX}-hydraconfig
+      docker $DOCKERARGS volume create -o type=none -o device=$CONSENT_LOG -o o=bind ${PREFIX}-hydraconsent-log
 
-      cp -r src.consent $SRV/_hydracode/consent
+#      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
+#      Magically put the code into $SRV/_hydracode/consent
 
-      cp etc/* Dockerfile.hydraconsentdb $RF/
-      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
+      cp Dockerfile.hydraconsentdb $RF/
+      cp etc/mysql.cnf $RF/
+      cp etc/nginx.conf $RF/
+      cp etc/*entrypoint.sh $RF/
+
+#      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
       #cp -ar src $SRV/_hydracode 
-      cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json} $RF/
+      cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json}   $HYDRA_CONFIG/
+
       cp -a $BUILDDIR/CA/rootCA.{key,crt} $RF/
 
       ENCFILE=$RF/hydraconsent.enckey
@@ -33,21 +47,23 @@ case $VERB in
 
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-hub.json-template > $RF/client-policy-hub.json
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $RF/client-hub.json
-
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
+      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
+
+      sed -e "s/##PREFIX##/${PREFIX}/"\
+          -e "s/##OUTERHOST##/$OUTERHOST/" \
+          -e "s/##MAIL_SERVER_HOSTNAME##/$MAIL_SERVER_HOSTNAME/" \
+	      Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/$PREFIX/"  etc/sites.conf-template > $RF/sites.conf
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php
+          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php # $SRV/_hydracode/consent/application/config/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $RF/config.php
+          -e "s/##OUTERHOST##/$OUTERHOST/" \
+	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $SRV/_hydracode/consent/application/config/config.php
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/"  etc/hydra.yml-template > $RF/hydra.yml
       sed -e "s/##PREFIX##/$PREFIX/" \
@@ -62,12 +78,15 @@ case $VERB in
           -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
           -e "s/##HYDRADB_PW##/${HYDRADB_PW}/g" \
           -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
+
   	 
       echo "2. Building ${PREFIX}-hydra..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
   "install")
+      sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-hydra-template > $CONF_DIR/outer_nginx/sites-enabled/hydra
   ;;
 
   "start")
@@ -77,6 +96,7 @@ case $VERB in
 #       docker exec ${PREFIX}-hydra-mysql /initdb.sh
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra
+       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-keto
   ;;
 
   "init")
@@ -107,7 +127,7 @@ case $VERB in
 	CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
         sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
             -e "s/##OUTERHOST##/$OUTERHOST/" \
-            -e "s/##CONSENTPASSWORD##/$HYDRA_ADMINPW/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
+            -e "s/##CONSENTPASSWORD##/$CONSENTAPPPASSWORD/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
 
 #	hydra 0.x esetén:
 	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/consent-app-policy.json"
@@ -117,6 +137,8 @@ case $VERB in
 #	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/consent-app-policy.json"
 #	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/client-policy-hub.json"
 
+## This might give an error first. It might be that first we need to load the site first in browser
+	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW $HYDRACONSENTDB -e  "update bf_settings set value = 'noreply@elte.hu' where name = 'sender_email';"
 
 #\c monitor
 #GRANT readaccess TO usage_viewer;
@@ -135,6 +157,7 @@ case $VERB in
   "stop")
       echo "Stopping containers of ${PREFIX}-hydra"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm $NGINX_DIR/conf/conf/hydra
   ;;
 
   "remove")
@@ -147,12 +170,7 @@ case $VERB in
       echo "Removing $RF" 
       rm -R -f $RF
       
-      docker $DOCKERARGS volume rm ${PREFIX}-home
-      docker $DOCKERARGS volume rm ${PREFIX}-course
-      docker $DOCKERARGS volume rm ${PREFIX}-usercourse
-      docker $DOCKERARGS volume rm ${PREFIX}-share
       docker $DOCKERARGS volume rm ${PREFIX}-hydradb
-      docker $DOCKERARGS volume rm ${PREFIX}-garbage
   ;;
   "cleandata")
     echo "Cleaning data ${PREFIX}-hydradb"

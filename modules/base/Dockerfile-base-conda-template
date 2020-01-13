@@ -19,41 +19,13 @@ RUN chmod a+wrx $CONDA_DIR
 # Install conda
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
-    wget --quiet https://repo.anaconda.com/archive/Anaconda3-5.3.0-Linux-x86_64.sh && \
+    ANACONDA="Anaconda3-2019.07-Linux-x86_64.sh" && \
+    wget --quiet https://repo.anaconda.com/archive/${ANACONDA} && \
     # echo "09f53738b0cd3bb96f5b1bac488e5528df9906be2480fe61df40e0e0d19e3d48 *Anaconda3-5.2.0-Linux-x86_64.sh" | sha256sum -c - && \
-    /bin/bash Anaconda3-5.3.0-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Anaconda3-5.3.0-Linux-x86_64.sh
+    /bin/bash ${ANACONDA} -f -b -p $CONDA_DIR && \
+    rm ${ANACONDA}
 
 RUN /opt/conda/bin/conda update -y conda
 # WE NEED THIS TO BE ABLE TO RUN NOTEBOOK-SERVER WITHOUT ANY EXTERNAL VOLUME/MODUL etc...
 
-ADD conda-requirements.txt /tmp/requirements.yml
-#RUN $CONDA_DIR/bin/conda config --add channels conda-forge damianavila82 anaconda pypi
-RUN $CONDA_DIR/bin/conda env update -f /tmp/requirements.yml
 
-
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core==4.4.0 jupyter_client==5.2.4 jupyter_console   notebook==5.7.4 widgetsnbextension==3.0.8 ipywidgets==7.0.5 
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
-#     jupyter dashboards quick-setup --sys-prefix
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
-#     jupyter cms quick-setup --sys-prefix
-
-# TO SWITCH BETWEEN CONDA ENVS
-#RUN pip install environment_kernels
-
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge traittypes bqplot jupyter_nbextensions_configurator jupyter_contrib_nbextensions
-#RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
-#RUN $CONDA_DIR/bin/conda install -c anaconda --quiet --yes nb_conda nb_conda_kernels 
-#RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge ipyleaflet folium altair branca vega vincent jupyter_kernel_gateway==2.1.0
-#RUN $CONDA_DIR/bin/conda install --quiet --yes nodejs networkx seaborn pandas tqdm
-#RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise pivottablejs
-RUN $CONDA_DIR/bin/conda install -c conda-forge -y ipyvolume==0.4.5 ipywebrtc==0.3.0  
-
-RUN apt update
-RUN apt-get install -y libgtk2.0-0
-RUN $CONDA_DIR/bin/conda install --quiet --yes "poppler<0.62"
-
-RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge jupyter_kernel_gateway==2.1.0
-
-
-RUN rm -r $CONDA_DIR/pkgs

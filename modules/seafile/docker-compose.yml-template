@@ -42,6 +42,27 @@ services:
       - ##PREFIX##-seafile-privatenet
       - ##PREFIX##-net
 
+  ##PREFIX##-seafile-memcached:
+    image: memcached:1.5.6
+    container_name: ##PREFIX##-seafile-memcached
+    entrypoint: memcached -m 256
+    networks:
+      - ##PREFIX##-seafile-privatenet
+          
+  ##PREFIX##-seafile-pw:
+    image: ##PREFIX##-seafilepw
+    build:
+      context: .
+      dockerfile: Dockerfile.seafile_pw
+    container_name: ##PREFIX##-seafile-pw
+    environment:
+      - MYSQL_ROOT_PASSWORD=##SEAFILE_MYSQL_ROOTPW##
+      - MYSQL_HOST=##PREFIX##-seafile-mysql
+      - PYTHONPATH=/usr/lib/python2.7/site-packages
+    networks:
+      - ##PREFIX##-seafile-privatenet
+      - ##PREFIX##-net
+
 networks:
   ##PREFIX##-seafile-privatenet:
     external: false

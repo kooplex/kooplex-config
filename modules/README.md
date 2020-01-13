@@ -1,12 +1,9 @@
-admin: tools for managing the software stack
-base:  docker image with LDAP and NFS-client
-binder: to delete
-gitlab: gitlab with LDAP authentication
-home: NFS-server
-jupyterhub: to delete
-ldap: openldap server
-net: configures docker bridge network
-nginx: world-facing nginx reverse-proxy
-notebook: jupyter notebook base docker image
-owncloud: to be replaced with nextcloud
-proxy: configurable-http-proxy for notebooks
+## Documentation of each module
+
+ * [Hub](hub/README.md): the main portal
+ * [NGINX](nginx/README.md): webserver
+ * [Outer NGINX](outerhost-nginx/README.md): webserver
+ * [Hydra](hydra/README.md): Authentication layer
+ * [Impersonator](impersonator/README.md): background services
+
+ * [Manual](manual/README.md): User documentation

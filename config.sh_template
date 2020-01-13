@@ -4,17 +4,15 @@ MODULES="base net ldap proxy nginx impersonator hub notebook"  #overleaf gitea s
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOST=$OUTERHOSTNAME
 
-OUTERHOSTPORT=""
-if [[ -z "${OUTERHOSTPORT}" ]]; then
- OUTERHOST=$OUTERHOSTNAME
-else
- OUTERHOST=$OUTERHOSTNAME":"$OUTERHOSTPORT
-fi
-
 INNERHOST="192.168.0.25"
+
+INTERNAL_SSL=false
 
 PREFIX=""
 
+MAIL_SERVER_HOSTNAME="mail.example.com"
+
+ORIGINAL_KEYS=
 
 DOCKERIP="/var/run/docker.sock"
 DOCKERPORT=""
@@ -29,13 +27,21 @@ ROOT="/srv/"$PREFIX
 SRV=$ROOT/$PREFIX
 BUILDDIR=$ROOT"/build"
 
+LOG_DIR=$SRV/log
+CONF_DIR=$SRV/conf
+KEYS=$SRV/_keys
+
 SUBNET="172.20.0.0/16"
 SERVICESUBNET="172.16.0.0/16"
+MONITORINGSUBNET="172.18.0.0/16"
 
 LDAPDOMAIN=$OUTERHOST
 SMTP="smtp"
 SMTPPORT=25
-EMAIL=
+EMAIL_HOST=
+EMAIL_FROM=
+EMAIL_USER="No-reply"
+EMAIL_SUBJECT_PREFIX=
 
 DUMMYPASS=""
 HUBLDAP_PW=${DUMMYPASS}
@@ -52,6 +58,8 @@ CHECK_LOG="check.log"
 #EXECUTABLES
 DOCKER_COMPOSE="docker-compose"
 
+IMAGES_FROM_REGISTRY=True
+
 ### INHERITED NAMES (or not )
 HUBDB=kooplexhub
 HUBDB_USER=kooplexhub
@@ -65,6 +73,7 @@ GITEADB=${PREFIX}_gitea
 GITEAUSER=gitea
 GITEADBPW=${DUMMYPASS}
 
+# GITLAB
 GITLABDB=${PREFIX}_gitlabdb
 GITLABDBPW=${DUMMYPASS}
 GITLABADMIN=gitlabadmin
@@ -79,21 +88,34 @@ HYDRADB_PW=
 HYDRADB=hydradb
 HYDRA_ADMINPW=
 HYDRASYSTEM_SECRET= #(pwgen 32)
+URL_HYDRA=https://$OUTERHOST/hydra
 
+HYDRA_CONFIG=$CONF_DIR/hydra
+
+#OIDC SECRETS
+HYDRA_OIDC_SECRET_HUB=""
 # SEAFILE
 SEAFILE_SECRET=
 SEAFILEDB_PW=${DUMMYPASS}
-
 
 # SINGULARITY
 SINGULARITYDB_PW=
 SINGULARITY_SECRET=
 
+# name of the directory in each module of the Docker extra lines when building the notebook images
+NOTEBOOK_DOCKER_EXTRA=notebook-ext
 
+# Where should the docker volumes be created?
+DOCKER_VOLUME_DIR=
 
 MINUID=10000
 
 SECRETS=$SRV/.secrets
 
-# DEPRECATED
-PROJECT=${PREFIX}
+NGINX_DIR=$SRV/_outernginx/
+
+# MOUNTPOINTS
+# where to find mounted storage and functional volumes
+
+FUNCTIONAL_VOLUME_MOUNT_POINT=/vol
+STORAGE_VOLUME_MOUNT_POINT=/mnt

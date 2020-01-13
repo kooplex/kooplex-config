@@ -1,11 +1,14 @@
 #!/bin/bash
 
-RF=$BUILDDIR/hub
+MODULE_NAME=hub
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+
+HUB_LOG=$LOG_DIR/hub
 
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
@@ -14,9 +17,9 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report/html \
-         $SRV/_report/dashboard $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
-         $SRV/_workdir $SRV/_git
+      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report \
+         $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
+         $SRV/_workdir $SRV/_git $HUB_LOG
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
@@ -28,6 +31,7 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_workdir -o o=bind ${PREFIX}-workdir
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report -o o=bind ${PREFIX}-report
+      docker $DOCKERARGS volume create -o type=none -o device=$HUB_LOG -o o=bind ${PREFIX}-hub-log
 
       DIR=$SRV/_hubcode_
       if [ -d $DIR/.git ] ; then
@@ -37,7 +41,7 @@ case $VERB in
           git clone https://github.com/kooplex/kooplex-hub.git $DIR
       fi
 
-      cp $BUILDDIR/CA/rootCA.crt $RF/
+#      cp $BUILDDIR/CA/rootCA.crt $RF/
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
@@ -64,19 +68,46 @@ case $VERB in
           -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERPORT##/$DOCKERPORT/" \
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
+          -e "s/##DOCKER_VOLUME_DIR##/$(echo $DOCKER_VOLUME_DIR | sed s"/\//\\\\\//"g)/" \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
+          -e "s/##HYDRA_OIDC_SECRET_HUB##/${HYDRA_OIDC_SECRET_HUB}/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
           -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
           -e "s/##HUB_USER##/${HUB_USER}/g" \
           -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
           -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
   	 
+#For hydra
+      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-hub.json-template > $HYDRA_CONFIG/client-policy-hub.json
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $HYDRA_CONFIG/client-hub.json
+
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
   "install")
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-hub-template > $CONF_DIR/outer_nginx/sites-enabled/hub
+
+#For hydra
+      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
+
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      if [ ! -f $PWFILE ] ; then
+  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
+          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+      fi
+      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
+
+      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
   ;;
 
   "start")
@@ -87,11 +118,13 @@ case $VERB in
   ;;
 
   "init")
-       docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
-       if [ ! $? -eq 0 ];then
+       #docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
+#       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
+#       if [ ! $? -eq 0 ];then
           docker exec ${PREFIX}-hub-mysql bash -c " echo \"CREATE DATABASE $HUBDB; CREATE USER '$HUBDB_USER'@'%' IDENTIFIED BY '$HUBDB_PW'; GRANT ALL ON $HUBDB.* TO '$HUBDB_USER'@'%';\" |  \
             mysql -u root --password=$HUBDBROOT_PW  -h $PREFIX-hub-mysql"
-       fi
+#       fi
+       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
        docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py createsuperuser
@@ -104,12 +137,17 @@ case $VERB in
   "stop")
       echo "Stopping containers of ${PREFIX}-hub"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      rm  $NGINX_DIR/conf/conf/hub
   ;;
 
   "remove")
       echo "Removing containers of ${PREFIX}-hub"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+
+      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
+      PWFILE=$RF/consent-${MODULE_NAME}.pw
+      rm $PWFILE
   ;;
 
   "purge")

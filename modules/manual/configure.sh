@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RF=$BUILDDIR/manual
+MODULE_NAME=manual
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -18,7 +19,8 @@ case $VERB in
 
 
       cp Dockerfile etc/entrypoint.sh $RF
-#      cp -r etc/* $SRV/_manual
+      # git clone https://github.com/kooplex/Manual.git $SRV/_manual
+      #      cp -r etc/* $SRV/_manual
       
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
@@ -28,6 +30,9 @@ case $VERB in
   ;;
 
   "install")
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
   ;;
 
   "start")

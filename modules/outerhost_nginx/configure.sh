@@ -6,12 +6,20 @@ mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
+NGINX_HTML=$NGINX_DIR/html
+NGINX_LOG=$LOG_DIR/outer_nginx
+NGINX_CONF=$CONF_DIR/outer_nginx
 
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-outer-nginx..."
-       DIR=$SRV/_outer_nginx
+      mkdir -p $NGINX_HTML 
+      mkdir -p $NGINX_LOG
+      mkdir -p $NGINX_CONF/sites-enabled
+
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-outernginx-html
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-outernginx-log
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_CONF  -o o=bind ${PREFIX}-outernginx-conf
 #       mkdir -p $DIR
 #       mkdir -p $DIR/etc $DIR/var
 #       mkdir -p $DIR/etc/nginx/
@@ -19,7 +27,9 @@ case $VERB in
 #       mkdir -p $DIR/etc/nginx/sites-enabled
 #       cp -a keys $DIR/etc/nginx/
 #       cp $KEYFILE $CERTFILE $DIR/etc/nginx/keys/
-       cp -ar keys/* $RF/
+#       cp -ar $KEYS/* $RF/
+
+      cp etc/custom* $NGINX_HTML/
     
        sed -e "s/##PREFIX##/${PREFIX}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
        sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
@@ -28,7 +38,7 @@ case $VERB in
            -e "s/##KEY##/${PREFIX}.key/g" \
            -e "s/##PREFIX##/${PREFIX}/g" \
            -e "s/##OUTERHOST##/$OUTERHOST/" \
-           -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $RF/outerhost.conf
+           -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $NGINX_CONF/outerhost.conf
   	 
       echo "2. Building ${PREFIX}-outer-nginx.."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build

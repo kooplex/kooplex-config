@@ -1,0 +1,27 @@
+
+  location /hub {
+    proxy_set_header Host $http_host;
+    proxy_pass http://##PREFIX##-hub;
+  }
+
+  location /accounts {
+    proxy_set_header Host $http_host;
+    proxy_pass http://##PREFIX##-hub/accounts;
+  }
+
+ 
+  location /admin {
+    proxy_set_header Host $http_host;
+    proxy_pass http://##PREFIX##-hub/admin;
+  }
+
+
+  location / {
+    rewrite / ##REWRITEPROTO##://##OUTERHOST##/hub permanent;
+  }
+
+ location /static/ {
+    proxy_set_header Host $http_host;
+    proxy_pass http://##PREFIX##-hub/static/;
+  }
+

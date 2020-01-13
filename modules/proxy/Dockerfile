@@ -1,4 +1,4 @@
-FROM jupyter/configurable-http-proxy:3.1.1
+FROM jupyterhub/configurable-http-proxy:3.1.1
 
 MAINTAINER Kooplex Team <kooplex@complex.elte.hu>
 
