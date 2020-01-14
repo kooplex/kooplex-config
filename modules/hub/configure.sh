@@ -1,7 +1,7 @@
 #!/bin/bash
 
-RF=$BUILDDIR/hub
 MODULE_NAME=hub
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 

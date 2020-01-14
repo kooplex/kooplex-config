@@ -47,6 +47,8 @@ case $VERB in
 
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" etc/prometheus.yml-template > $SRV_PROMETHEUS/etc/prometheus.yml
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" etc/grafana.ini-template > $SRV_GRAFANA/etc/grafana.ini
 
       echo "2. Building ${PREFIX}-grafana..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
