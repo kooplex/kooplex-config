@@ -58,12 +58,13 @@ case $VERB in
         imgname=${imagedir#*image-}
 
 
-        docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
+        docker $DOCKERARGS build -f ${RF}/$docfile -t ${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
+        echo "FROM ${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
 
      	echo "Building image from $docfile"
 	for docker_piece in `ls ${RF}/${imagedir}/*-Docker-piece`
 	do
-		sed -e "s/##BASE##/${PREFIX}-${MODULE_NAME}-${imgname}-base/" $docker_piece >> ${RF}/$docfile-final
+		cat $docker_piece >> ${RF}/$docfile-final
 	done
 
 #        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
