@@ -4,3 +4,8 @@
     proxy_pass http://##PREFIX##-grafana:3000/;
     proxy_set_header Host $host;
   }
+
+  location /prometheus/ {
+    proxy_pass http://##PREFIX##-prometheus:9090/;
+    proxy_set_header Host $host;
+  }
