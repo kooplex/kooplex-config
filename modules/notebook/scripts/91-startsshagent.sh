@@ -6,6 +6,8 @@ if [ -z "$REPORT_TYPE" ] ; then
 	fi
         exec su $NB_USER -c "ssh-agent -a $SSH_AUTH_SOCK"
 	echo "ssh-agent started"
+echo "VMI"
 else
 	echo "ssh-agent not started"
 fi
+

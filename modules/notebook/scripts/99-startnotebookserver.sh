@@ -5,7 +5,8 @@ if [ -z "$REPORT_TYPE" ] ; then
     nice -n 19 start-notebook.sh --config=/etc/jupyter_notebook_config.py --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN --EnvironmentKernelSpecManager.display_name_template=\" {}\" 
 elif [ "${REPORT_TYPE}" == "bokeh" ]; then 
     echo "Starting Report Bokeh Server"
-    nice -n 19 /usr/local/sbin/preview-bokeh.sh $REPORT_DIR
+    cd $REPORT_DIR
+    nice -n 19 /usr/local/sbin/preview-bokeh.sh $REPORT_INDEX
 elif [ "${REPORT_TYPE}" == "service" ]; then 
     echo "Starting Report KernelGateway Server"
     cd $REPORT_DIR

@@ -6,6 +6,10 @@ if [ -z "$REPORT_PORT" ]; then
 	REPORT_PORT=9000
 	echo "serving report on $REPORT_PORT"
 fi
+if [ -z "$REPORT_DIR" ]; then
+	REPORT_DIR="./"
+	echo "serving report from $REPORT_DIR"
+fi
 
 if [ ! $1 ]; then
 
