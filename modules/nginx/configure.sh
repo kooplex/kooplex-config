@@ -1,68 +1,75 @@
 #!/bin/bash
 
-RF=$BUILDDIR/nginx
+RF=$BUILDDIR/outer-nginx
 
 mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
+NGINX_HTML=$DATA_DIR/nginx
+NGINX_LOG=$LOG_DIR/nginx
+NGINX_CONF=$CONF_DIR/nginx
 
 case $VERB in
-
   "build")
-    echo "1. Configuring ${PREFIX}-nginx..."
+      echo "1. Configuring ${PREFIX}-outer-nginx..."
+      mkdir -p $NGINX_HTML 
+      mkdir -p $NGINX_LOG
+      mkdir -p $NGINX_CONF
 
-    if [ $REWRITEPROTO = "http" ]; then
-      EXTRACONFIG="ports:\n      - 80:80"
-    fi
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-outernginx-html
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-outernginx-log
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_CONF  -o o=bind ${PREFIX}-outernginx-conf
+#       mkdir -p $DIR
+#       mkdir -p $DIR/etc $DIR/var
+#       mkdir -p $DIR/etc/nginx/
+#       mkdir -p $DIR/etc/nginx/keys/
+#       mkdir -p $DIR/etc/nginx/sites-enabled
+#       cp -a keys $DIR/etc/nginx/
+#       cp $KEYFILE $CERTFILE $DIR/etc/nginx/keys/
+#       cp -ar $KEYS/* $RF/
 
-      cp Dockerfile $RF
-      cp etc/nginx.conf $RF
-      cp etc/custom* $RF
-      sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-          -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
-          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $RF/sites.conf
-      
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      cp etc/custom* $NGINX_HTML/
+      cp scripts/* $RF/
 
-      echo "2. Building ${PREFIX}-nginx..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+       sed -e "s/##PREFIX##/${PREFIX}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+       sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
+  
+       sed -e "s/##CERT##/${PREFIX}.crt/g" \
+           -e "s/##KEY##/${PREFIX}.key/g" \
+           -e "s/##PREFIX##/${PREFIX}/g" \
+           -e "s/##OUTERHOST##/$OUTERHOST/" \
+           -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $NGINX_CONF/default.conf
+  	 
+      echo "2. Building ${PREFIX}-outer-nginx.."
+      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
   "install")
   ;;
 
   "start")
-    echo "Starting nginx ${PREFIX}-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+       echo "Starting containers of ${PREFIX}-outer-nginx"
+       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-outer-nginx
   ;;
 
-  "restart")
-    echo "Restarting nginx ${PREFIX}-nginx"
-    docker $DOCKERARGS restart $PREFIX-nginx
-  ;;
 
-  "init")
-  ;;
-    
   "stop")
-    echo "Stopping nginx ${PREFIX}-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Stopping containers of ${PREFIX}-outer-nginx"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
-    
+
   "remove")
-    echo "Removing nginx ${PREFIX}-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Removing containers of ${PREFIX}-outer-nginx"
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
-    
+
   "purge")
-    echo "Purging nginx ${PREFIX}-nginx"
-    rm -R $RF
+      echo "Removing $RF" 
+      rm -R -f $RF
+      
   ;;
-    
+
 esac
+
