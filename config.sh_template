@@ -59,6 +59,7 @@ CHECK_LOG="check.log"
 DOCKER_COMPOSE="docker-compose"
 
 IMAGES_FROM_REGISTRY=True
+IMAGE_REPOSITORY_URL
 
 ### INHERITED NAMES (or not )
 HUBDB=kooplexhub

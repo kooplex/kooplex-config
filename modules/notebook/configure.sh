@@ -1,8 +1,5 @@
 #!/bin/bash
 
-replace_slash() {
-	echo $1 | sed 's/\//\\\//g'
-}
 
 MODULE_NAME=notebook
 RF=$BUILDDIR/${MODULE_NAME}
@@ -19,6 +16,8 @@ case $VERB in
      do
         imagedir="./image-"$i
         mkdir -p $RF/$imagedir
+        full_imgname=${PREFIX}-${MODULE_NAME}-$imagedir
+
 	[ -e $imagedir/conda-requirements.txt ] &&  cp -p $imagedir/conda-requirements.txt $RF/$imagedir/conda-requirements.txt
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > $RF/$imagedir/start-notebook.sh
         sed -e "s/##OUTERHOSTNAME##/${OUTERHOSTNAME}/"\
@@ -29,9 +28,8 @@ case $VERB in
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-nb-api.sh-template > $RF/$imagedir/preview-nb-api.sh
 
 	mkdir -p ${RF}/$imagedir/init
-	echo $(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)
-	sed -e "s/##FUNCTIONAL_VOLUME_MOUNT_POINT##/$(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)/" scripts/11_init_bashrcs-template > $RF/$imagedir/init/11_init_bashrcs
-        sed -e "s/##FUNCTIONAL_VOLUME_MOUNT_POINT##/$(replace_slash $FUNCTIONAL_VOLUME_MOUNT_POINT)/" scripts/12_conda_envs-template > $RF/$imagedir/init/12_conda_envs
+	sed -e "s,##FUNCTIONAL_VOLUME_MOUNT_POINT##,$FUNCTIONAL_VOLUME_MOUNT_POINT," scripts/11_init_bashrcs-template > $RF/$imagedir/init/11_init_bashrcs
+        sed -e "s,##FUNCTIONAL_VOLUME_MOUNT_POINT##,$FUNCTIONAL_VOLUME_MOUNT_POINT," scripts/12_conda_envs-template > $RF/$imagedir/init/12_conda_envs
         cp scripts/{kooplex-logo.png,jupyter_notebook_config.py,jupyter_report_config.py,manage_mount.sh,jupyter-notebook-kooplex} ${RF}/$imagedir/
 	cp scripts/{0?-*.sh,9?-*.sh} ${RF}/$imagedir/init
         cp scripts/{entrypoint-rstudio.sh,rstudio-user-settings,rstudio-nginx.conf}  ${RF}/$imagedir/
@@ -57,16 +55,18 @@ case $VERB in
         imgname=${imagedir#*image-}
 
 
-        docker $DOCKERARGS build -f ${RF}/$docfile -t ${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
         echo "FROM ${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
 
         if [ ! ${IMAGES_FROM_REGISTRY} ]; then
-		fdfd
              sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
              docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
-     else
-	     echo "Using base image ${PREFIX}-${MODULE_NAME}-${imgname}-base form pulled source"
-     fi
+        else
+	     echo "Using base image ${MODULE_NAME}-${imgname}-base form pulled source"
+             docker $DOCKERARGS pull $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base
+             docker tag $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base ${MODULE_NAME}-$imgname-base
+        fi
+
+        echo "FROM ${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
 
      	echo "Building image from $docfile"
 	for docker_piece in `ls ${RF}/${imagedir}/*-Docker-piece`
@@ -76,6 +76,7 @@ case $VERB in
 
 #        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
         docker $DOCKERARGS build -f ${RF}/$docfile-final -t ${PREFIX}-${MODULE_NAME}-${imgname} ${RF}/$imagedir
+
        
      done
   ;;

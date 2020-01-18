@@ -11,15 +11,17 @@ if [ -z "$REPORT_DIR" ]; then
 	echo "serving report from $REPORT_DIR"
 fi
 
-if [ ! $1 ]; then
+cd $REPORT_DIR
 
-        echo "No directory specified, so assuming this one"
-        cd $REPORT_DIR
-        /opt/conda/bin/bokeh serve  ./ --prefix /${NB_URL}/report --allow-websocket-origin ##OUTERHOST## --port $REPORT_PORT
-
-else
-
-        /opt/conda/bin/bokeh serve  $1 --prefix /${NB_URL}/report --allow-websocket-origin ##OUTERHOST## --port $REPORT_PORT
-
+INDEX_FILE=$1
+if [ -z $1 ]; then
+   INDEX_FILE="./"
 fi
 
+### report url
+        /opt/conda/bin/bokeh serve  $INDEX_FILE --prefix /${NB_URL}/report --allow-websocket-origin ##OUTERHOST## --port $REPORT_PORT &
+
+### latest url
+if [ "$REPORT_TYPE" ]; then
+        /opt/conda/bin/bokeh serve  $INDEX_FILE --prefix /${REPORT_ABS}/report --allow-websocket-origin ##OUTERHOST## --port $NB_PORT
+fi
