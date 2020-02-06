@@ -58,8 +58,8 @@ CHECK_LOG="check.log"
 #EXECUTABLES
 DOCKER_COMPOSE="docker-compose"
 
-IMAGES_FROM_REGISTRY=True
-IMAGE_REPOSITORY_URL
+# Leave it blank if you build images locally
+IMAGE_REPOSITORY_URL=
 
 ### INHERITED NAMES (or not )
 HUBDB=kooplexhub

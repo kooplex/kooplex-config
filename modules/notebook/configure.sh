@@ -57,16 +57,16 @@ case $VERB in
 
         echo "FROM ${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
 
-        if [ ! ${IMAGES_FROM_REGISTRY} ]; then
-             sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
-             docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
-        else
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
 	     echo "Using base image ${MODULE_NAME}-${imgname}-base form pulled source"
              docker $DOCKERARGS pull $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base
              docker tag $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base ${MODULE_NAME}-$imgname-base
+        else
+             sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
+             docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
         fi
 
-        echo "FROM ${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
+        echo "FROM ${PREFIX}-${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
 
      	echo "Building image from $docfile"
 	for docker_piece in `ls ${RF}/${imagedir}/*-Docker-piece`

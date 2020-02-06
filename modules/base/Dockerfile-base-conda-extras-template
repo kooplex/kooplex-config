@@ -24,10 +24,9 @@ RUN apt update
 RUN apt-get install -y libgtk2.0-0
 #RUN $CONDA_DIR/bin/conda install --quiet --yes "poppler<0.62"
 
-RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge jupyter_kernel_gateway #==2.1.0
+RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge jupyter_kernel_gateway plotly #==2.1.0
 
 ##### RUN $CONDA_DIR/bin/conda install -c conda-forge -y ipyvolume==0.4.5 ipywebrtc==0.3.0  
 #RUN $CONDA_DIR/bin/conda install -c conda-forge -y ipywidgets  
 
-RUN $CONDA_DIR/bin/conda install -c conda-forge plotly
 
