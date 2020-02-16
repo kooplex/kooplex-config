@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RF=$BUILDDIR/outer-nginx
+MODULE_NAME=nginx
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -12,14 +13,14 @@ NGINX_CONF=$CONF_DIR/nginx
 
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-outer-nginx..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
       mkdir -p $NGINX_HTML 
       mkdir -p $NGINX_LOG
       mkdir -p $NGINX_CONF
 
-      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-outernginx-html
-      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-outernginx-log
-      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_CONF  -o o=bind ${PREFIX}-outernginx-conf
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-nginx-html
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-nginx-log
+      docker $DOCKERARGS volume create -o type=none -o device=$NGINX_CONF  -o o=bind ${PREFIX}-nginx-conf
 #       mkdir -p $DIR
 #       mkdir -p $DIR/etc $DIR/var
 #       mkdir -p $DIR/etc/nginx/
@@ -32,7 +33,8 @@ case $VERB in
       cp etc/custom* $NGINX_HTML/
       cp scripts/* $RF/
 
-       sed -e "s/##PREFIX##/${PREFIX}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+       sed -e "s/##PREFIX##/${PREFIX}/g" \
+           -e  "s/##MODULE_NAME##/${MODULE_NAME}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
        sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
   
        sed -e "s/##CERT##/${PREFIX}.crt/g" \
@@ -41,7 +43,7 @@ case $VERB in
            -e "s/##OUTERHOST##/$OUTERHOST/" \
            -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $NGINX_CONF/default.conf
   	 
-      echo "2. Building ${PREFIX}-outer-nginx.."
+      echo "2. Building ${PREFIX}-${MODULE_NAME}.."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
@@ -49,18 +51,18 @@ case $VERB in
   ;;
 
   "start")
-       echo "Starting containers of ${PREFIX}-outer-nginx"
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-outer-nginx
+       echo "Starting containers of ${PREFIX}-${MODULE_NAME}"
+       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-${MODULE_NAME}
   ;;
 
 
   "stop")
-      echo "Stopping containers of ${PREFIX}-outer-nginx"
+      echo "Stopping containers of ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
 
   "remove")
-      echo "Removing containers of ${PREFIX}-outer-nginx"
+      echo "Removing containers of ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;

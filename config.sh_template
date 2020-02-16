@@ -113,7 +113,7 @@ MINUID=10000
 
 SECRETS=$SRV/.secrets
 
-NGINX_DIR=$SRV/_outernginx/
+#NGINX_DIR=$SRV/_outernginx/
 
 # MOUNTPOINTS
 # where to find mounted storage and functional volumes

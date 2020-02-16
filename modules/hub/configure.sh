@@ -41,7 +41,7 @@ case $VERB in
           git clone https://github.com/kooplex/kooplex-hub.git $DIR
       fi
 
-#      cp $BUILDDIR/CA/rootCA.crt $RF/
+      cp $BUILDDIR/CA/rootCA.crt $RF/
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
@@ -78,11 +78,6 @@ case $VERB in
           -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
           -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
   	 
-#For hydra
-      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-hub.json-template > $HYDRA_CONFIG/client-policy-hub.json
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $HYDRA_CONFIG/client-hub.json
 
       echo "2. Building ${PREFIX}-hub..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
