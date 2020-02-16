@@ -10,6 +10,9 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 HUB_LOG=$LOG_DIR/hub
 
+### THAT IS UGLY. Kubernetes will sort it out
+NGINX_IP=`IP=$(docker $DOKERARGS inspect ${PREFIX}-nginx | grep "\"IPAddress\": \"172"); echo ${IP%*,} | sed -e 's/"//g' | awk '{print $2}'`
+
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
 
@@ -84,10 +87,12 @@ case $VERB in
   ;;
 
   "install")
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
 
       sed -e "s/##PREFIX##/$PREFIX/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-hub-template > $CONF_DIR/outer_nginx/sites-enabled/hub
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: test/ascii" -X POST -d @-
 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
@@ -113,12 +118,12 @@ case $VERB in
   ;;
 
   "init")
-       #docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
-#       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
-#       if [ ! $? -eq 0 ];then
+       docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql | grep  -q $HUBDB" ||\
+       if [ ! $? -eq 0 ];then
           docker exec ${PREFIX}-hub-mysql bash -c " echo \"CREATE DATABASE $HUBDB; CREATE USER '$HUBDB_USER'@'%' IDENTIFIED BY '$HUBDB_PW'; GRANT ALL ON $HUBDB.* TO '$HUBDB_USER'@'%';\" |  \
             mysql -u root --password=$HUBDBROOT_PW  -h $PREFIX-hub-mysql"
-#       fi
+       fi
+       echo "Created ${PREFIX}-hub database and user created" 
        docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
@@ -135,8 +140,13 @@ case $VERB in
       rm  $NGINX_DIR/conf/conf/hub
   ;;
 
+  "uninstall")
+      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
+
+  ;;
   "remove")
-      echo "Removing containers of ${PREFIX}-hub"
+      echo "Removing containers of ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
 

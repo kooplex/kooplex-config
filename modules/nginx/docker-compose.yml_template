@@ -14,8 +14,11 @@ services:
       - ##PREFIX##-nginx-log:/var/log/nginx:rw
       - ##PREFIX##-keys:/etc/nginx/keys:ro
       - ##PREFIX##-nginx-html:/usr/share/nginx/html:ro
-      - ##PREFIX##-nginx-conf:/etc/nginx/conf.d/:ro
+      - ##PREFIX##-nginx-conf:/etc/nginx/conf.d/:rw
     restart: unless-stopped
+    environment:
+      - NGINX_API_USER=##NGINX_API_USER##
+      - NGINX_API_PW=##NGINX_API_PW##
     ports:
       - 80:80
       - 443:443

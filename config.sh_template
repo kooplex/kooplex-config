@@ -113,7 +113,8 @@ MINUID=10000
 
 SECRETS=$SRV/.secrets
 
-#NGINX_DIR=$SRV/_outernginx/
+NGINX_API_USER=nginxuser
+NGINX_API_PW=nginxpw
 
 # MOUNTPOINTS
 # where to find mounted storage and functional volumes

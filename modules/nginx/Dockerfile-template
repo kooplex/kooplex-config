@@ -19,5 +19,5 @@ COPY entrypoint.sh /entrypoint.sh
 #COPY custom_502.html /usr/share/nginx/html/custom_502.html 
 ##COPY custom_404.html /usr/share/nginx/html/custom_404.html 
 
-ENTRYPOINT ["tini", "--"]
+#ENTRYPOINT ["tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]

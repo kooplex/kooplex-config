@@ -16,7 +16,7 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
       mkdir -p $NGINX_HTML 
       mkdir -p $NGINX_LOG
-      mkdir -p $NGINX_CONF
+      mkdir -p $NGINX_CONF/sites-enabled
 
       docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-nginx-html
       docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-nginx-log
@@ -34,7 +34,10 @@ case $VERB in
       cp scripts/* $RF/
 
        sed -e "s/##PREFIX##/${PREFIX}/g" \
-           -e  "s/##MODULE_NAME##/${MODULE_NAME}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+           -e "s/##NGINX_API_USER##/${NGINX_API_USER}/g" \
+           -e "s/##NGINX_API_PW##/${NGINX_API_PW}/g" \
+           -e "s/##MODULE_NAME##/${MODULE_NAME}/g"  docker-compose.yml_template > $DOCKER_COMPOSE_FILE
+
        sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
   
        sed -e "s/##CERT##/${PREFIX}.crt/g" \
