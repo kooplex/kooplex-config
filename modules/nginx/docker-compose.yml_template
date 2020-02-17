@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  ##PREFIX##-outer-nginx:
-    container_name: ##PREFIX##-outer-nginx
-    image: ##PREFIX##-outer-nginx
+  ##PREFIX##-##MODULE_NAME##:
+    container_name: ##PREFIX##-##MODULE_NAME##
+    image: ##PREFIX##-##MODULE_NAME##
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,11 +11,14 @@ services:
       - ##PREFIX##-net
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ##PREFIX##-outernginx-log:/var/log/nginx:rw
+      - ##PREFIX##-nginx-log:/var/log/nginx:rw
       - ##PREFIX##-keys:/etc/nginx/keys:ro
-      - ##PREFIX##-outernginx-html:/usr/share/nginx/html:ro
-      - ##PREFIX##-outernginx-conf:/etc/nginx/conf.d/:ro
+      - ##PREFIX##-nginx-html:/usr/share/nginx/html:ro
+      - ##PREFIX##-nginx-conf:/etc/nginx/conf.d/:rw
     restart: unless-stopped
+    environment:
+      - NGINX_API_USER=##NGINX_API_USER##
+      - NGINX_API_PW=##NGINX_API_PW##
     ports:
       - 80:80
       - 443:443
@@ -29,12 +32,12 @@ networks:
     external: true
 
 volumes:
-  ##PREFIX##-outernginx-log:
+  ##PREFIX##-nginx-log:
     external: true
   ##PREFIX##-keys:
     external: true
-  ##PREFIX##-outernginx-html:
+  ##PREFIX##-nginx-html:
     external: true
-  ##PREFIX##-outernginx-conf:
+  ##PREFIX##-nginx-conf:
     external: true
 

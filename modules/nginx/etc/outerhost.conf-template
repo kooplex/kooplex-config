@@ -19,10 +19,10 @@ server {
   ssl_certificate_key     /etc/nginx/keys/##KEY##;
 
 ### Logs
-  access_log /var/log/nginx/outerhost-access.log;
-  error_log /var/log/nginx/outerhost-error.log;
+  access_log /var/log/nginx/nginx-access.log;
+  error_log /var/log/nginx/nginx-error.log;
 
-  # outer nginx ------------------------------------------------
+  # nginx ------------------------------------------------
 
 ####### Custom pages 
    error_page 404 /custom_404.html;
