@@ -64,6 +64,8 @@ case $VERB in
         else
              sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
              docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
+             docker tag  ${PREFIX}-${MODULE_NAME}-$imgname-base "localhost:5000/"${MODULE_NAME}-$imgname-base
+             docker push "localhost:5000/"${MODULE_NAME}-$imgname-base
         fi
 
         echo "FROM ${PREFIX}-${MODULE_NAME}-${imgname}-base" > ${RF}/$docfile-final
