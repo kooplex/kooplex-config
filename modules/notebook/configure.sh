@@ -60,7 +60,9 @@ case $VERB in
         if [ ${IMAGE_REPOSITORY_URL} ]; then
 	     echo "Using base image ${MODULE_NAME}-${imgname}-base form pulled source"
              docker $DOCKERARGS pull $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base
-             docker tag $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base ${MODULE_NAME}-$imgname-base
+	     echo "Image PULLED from repository"
+             docker tag $IMAGE_REPOSITORY_URL"/"${MODULE_NAME}-$imgname-base ${PREFIX}-${MODULE_NAME}-$imgname-base
+	     echo "Image TAGGED from repository"
         else
              sed -e "s/##PREFIX##/${PREFIX}/" $imagedir/Dockerfile-template > $RF/$imagedir/Dockerfile
              docker $DOCKERARGS build -f ${RF}/$docfile -t ${PREFIX}-${MODULE_NAME}-${imgname}-base ${RF}/$imagedir
@@ -77,19 +79,21 @@ case $VERB in
 	done
 
 #        cat ${RF}/${imagedir}/9-Endpiece.docker >> ${RF}/$docfile
-        docker $DOCKERARGS build -f ${RF}/$docfile-final -t ${PREFIX}-${MODULE_NAME}-${imgname} ${RF}/$imagedir
+        docker $DOCKERARGS build --no-cache -f ${RF}/$docfile-final -t ${PREFIX}-${MODULE_NAME}-${imgname} ${RF}/$imagedir
 
        
      done
   ;;
+    
   "install")
 
-# OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
-        docker $DOCKERARGS restart $PREFIX-outer-nginx
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
     
   ;;
-    
   "start")
     # TODO: we have a single notebook server now, perhaps there will
     # one per user later or more if we scale out
@@ -102,6 +106,11 @@ case $VERB in
   "stop")
     echo "Stopping ${MODULE_NAME} $PROJECT-${MODULE_NAME} [$NOTEBOOKIP]"
 #    docker $DOCKERARGS stop $PROJECT-notebook
+  ;;
+  "uninstall")
+      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
+
   ;;
   "remove")
     echo "Removing ${MODULE_NAME} $PROJECT-${MODULE_NAME} [$NOTEBOOKIP]"

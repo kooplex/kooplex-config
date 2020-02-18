@@ -62,8 +62,12 @@ case $VERB in
 
   "install")
   	 
-# OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
@@ -71,14 +75,14 @@ case $VERB in
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
     
-      PWFILE=$RF/consent-${MODULE_NAME}.pw
-      if [ ! -f $PWFILE ] ; then
-  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" 
-        #  docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
-      fi
-      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
-
-      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
+#      PWFILE=$RF/consent-${MODULE_NAME}.pw
+#      if [ ! -f $PWFILE ] ; then
+#  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" 
+#        #  docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+#      fi
+#      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
+#
+#      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
 
   ;;
 
@@ -99,6 +103,11 @@ case $VERB in
       echo "Stopping container ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
       rm $NGINX_DIR/conf/conf/${MODULE_NAME}
+  ;;
+  "uninstall")
+      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
+
   ;;
     
   "remove")

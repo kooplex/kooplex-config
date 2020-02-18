@@ -10,9 +10,6 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 HUB_LOG=$LOG_DIR/hub
 
-### THAT IS UGLY. Kubernetes will sort it out
-NGINX_IP=`IP=$(docker $DOKERARGS inspect ${PREFIX}-nginx | grep "\"IPAddress\": \"172"); echo ${IP%*,} | sed -e 's/"//g' | awk '{print $2}'`
-
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
 
@@ -92,7 +89,7 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
-	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: test/ascii" -X POST -d @-
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
@@ -100,14 +97,14 @@ case $VERB in
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
 
-      PWFILE=$RF/consent-${MODULE_NAME}.pw
-      if [ ! -f $PWFILE ] ; then
-  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
-          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
-      fi
-      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
-
-      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
+#      PWFILE=$RF/consent-${MODULE_NAME}.pw
+#      if [ ! -f $PWFILE ] ; then
+#  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
+#          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
+#      fi
+#      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
+#
+#      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
   ;;
 
   "start")
@@ -128,6 +125,7 @@ case $VERB in
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
        docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
        docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py createsuperuser
+       docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py updatemodel 
   ;;
 
   "refresh")
