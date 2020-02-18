@@ -7,25 +7,37 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+REPORTNGINX_HTML=$DATA_DIR/${MODULE_NAME}
+REPORTNGINX_LOG=$LOG_DIR/${MODULE_NAME}
+REPORTNGINX_CONF=$CONF_DIR/${MODULE_NAME}
 
 case $VERB in
 
   "build")
     echo "1. Configuring ${PREFIX}-report-nginx..."
 
+      mkdir -p $REPORTNGINX_HTML 
+      mkdir -p $REPORTNGINX_LOG
+      mkdir -p $REPORTNGINX_CONF
+
+      docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_HTML  -o o=bind ${PREFIX}-${MODULE_NAME}-html
+      docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_LOG  -o o=bind ${PREFIX}-${MODULE_NAME}-log
+      docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_CONF  -o o=bind ${PREFIX}-${MODULE_NAME}-conf
 #    if [ $REWRITEPROTO = "http" ]; then
 #      EXTRACONFIG="ports:\n      - 80:80"
 #    fi
 
       cp Dockerfile $RF
-      cp etc/nginx.conf $RF
+      cp etc/custom* $REPORTNGINX_HTML/
+
       sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
-          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $RF/sites.conf
+          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $REPORTNGINX_CONF/sites.conf
       
       sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s,##REPORTNGINX_HTML##,$REPORTNGINX_HTML," \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       echo "2. Building ${PREFIX}-report-nginx..."
@@ -33,9 +45,11 @@ case $VERB in
   ;;
 
   "install")
-# OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
-#        docker $DOCKERARGS restart $PREFIX-outer-nginx
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
   ;;
 
   "start")
@@ -56,6 +70,11 @@ case $VERB in
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
     
+  "uninstall")
+      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
+
+  ;;
   "remove")
     echo "Removing report-nginx ${PREFIX}-net"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill

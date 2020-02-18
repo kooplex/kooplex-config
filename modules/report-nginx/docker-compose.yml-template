@@ -12,6 +12,9 @@ services:
     volumes:
       - ##PREFIX##-report:/srv/
       - /etc/localtime:/etc/localtime:ro
+      - ##PREFIX##-report-nginx-log:/var/log/nginx:rw
+      - ##PREFIX##-report-nginx-html:/usr/share/nginx/html:ro
+      - ##PREFIX##-report-nginx-conf:/etc/nginx/conf.d/:rw
     restart: unless-stopped
     logging:
       options:
@@ -24,6 +27,12 @@ networks:
     external: true
 
 volumes:
+  ##PREFIX##-report-nginx-log:
+    external: true
   ##PREFIX##-report:
+    external: true
+  ##PREFIX##-report-nginx-html:
+    external: true
+  ##PREFIX##-report-nginx-conf:
     external: true
 

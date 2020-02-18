@@ -8,7 +8,6 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-
 case $VERB in
 
   "build")
@@ -31,8 +30,11 @@ case $VERB in
 
   "install")
 
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
       sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
   ;;
 
   "start")
