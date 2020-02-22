@@ -10,12 +10,15 @@ services:
     networks:
       - ##PREFIX##-net
     volumes:
-      - ##PREFIX##-report:/srv/
+      - ##PREFIX##-report:/srv/report/
       - /etc/localtime:/etc/localtime:ro
       - ##PREFIX##-report-nginx-log:/var/log/nginx:rw
       - ##PREFIX##-report-nginx-html:/usr/share/nginx/html:ro
       - ##PREFIX##-report-nginx-conf:/etc/nginx/conf.d/:rw
     restart: unless-stopped
+    environment:
+      - NGINX_API_USER=##NGINX_API_USER##
+      - NGINX_API_PW=##NGINX_API_PW##
     logging:
       options:
         max-size: "10m"

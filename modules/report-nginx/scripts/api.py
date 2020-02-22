@@ -1,4 +1,5 @@
 import os, sys, subprocess
+import bcrypt, json
 import logging
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
@@ -8,6 +9,7 @@ app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
 auth = HTTPBasicAuth()
 
 CONF_DIR="/etc/nginx/conf.d/sites-enabled/"
+PW_DIR="/etc/passwords/"
 NGINX_USER=os.getenv("NGINX_API_USER")
 NGINX_PW=os.getenv("NGINX_API_PW")
 
@@ -43,9 +45,19 @@ def get_alive():
 @auth.login_required
 def create_new_service(service):
     try:
+        data = json.loads(request.data.decode().replace("\n","\\n"))
         service_conf = "%s/%s" % (CONF_DIR, service)
-        with open(service_conf, 'wb') as f:
-             f.write(request.data)
+        #write config
+        with open(service_conf, 'w') as f:
+             f.write(data['conf'])
+        #write password
+        username = data['username']
+#        password_e = data['password'].encode()
+#        pw = bcrypt.hashpw(password_e, bcrypt.gensalt( 12 ))
+        pw = "{PLAIN}%s"%data['password']
+        pw_filename = os.path.join(PW_DIR, service)
+        with open(pw_filename, 'w') as f:
+            f.write("%s:%s"%(username, pw))
     except Exception as e:
         logger.error('Creating conf file for %s failed %s' %(service, e))
         return jsonify({ 'error': str(e) })
@@ -54,19 +66,22 @@ def create_new_service(service):
     response = "Service %s started" % service
     return jsonify({ 'response': str(response), 'service add': response })
 
-@app.route('/api/remove/<service>')
+@app.route('/api/remove/<service>', methods = ['DELETE'])
 @auth.login_required
-def remove_new_service(service):
+def remove_service(service):
     try:
         service_conf = "%s/%s" % (CONF_DIR, service)
         os.remove(service_conf)    
+        pw_file = "%s/%s" % (PW_DIR, service)
+        os.remove(pw_file)
     except Exception as e:
         logger.error('Removing conf file for %s failed %s' %(service, e))
         return jsonify({ 'error': str(e) })
 
     reload_nginx_server()
     response = "Service %s ha been removed " % service
-    return jsonify({ 'response': str(response), 'service removalr': response })
+    return jsonify({ 'response': str(response), 'service removal': response })
+
 
 if __name__ == '__main__':
     logger = logging.getLogger()

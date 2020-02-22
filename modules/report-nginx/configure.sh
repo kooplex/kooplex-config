@@ -18,7 +18,7 @@ case $VERB in
 
       mkdir -p $REPORTNGINX_HTML 
       mkdir -p $REPORTNGINX_LOG
-      mkdir -p $REPORTNGINX_CONF
+      mkdir -p $REPORTNGINX_CONF/sites-enabled
 
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_HTML  -o o=bind ${PREFIX}-${MODULE_NAME}-html
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_LOG  -o o=bind ${PREFIX}-${MODULE_NAME}-log
@@ -28,6 +28,7 @@ case $VERB in
 #    fi
 
       cp Dockerfile $RF
+      cp scripts/* $RF/
       cp etc/custom* $REPORTNGINX_HTML/
 
       sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
@@ -38,6 +39,8 @@ case $VERB in
       
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s,##REPORTNGINX_HTML##,$REPORTNGINX_HTML," \
+          -e "s/##NGINX_API_USER##/${NGINX_API_USER}/g" \
+          -e "s/##NGINX_API_PW##/${NGINX_API_PW}/g" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
       echo "2. Building ${PREFIX}-report-nginx..."
