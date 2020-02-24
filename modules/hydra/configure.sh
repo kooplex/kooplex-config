@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RF=$BUILDDIR/hydra
+MODULE_NAME=hydra
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
@@ -86,7 +87,12 @@ case $VERB in
   ;;
 
   "install")
-      sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-hydra-template > $CONF_DIR/outer_nginx/sites-enabled/hydra
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
   ;;
 
   "start")
@@ -160,6 +166,11 @@ case $VERB in
       rm $NGINX_DIR/conf/conf/hydra
   ;;
 
+  "uninstall")
+      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
+
+  ;;
   "remove")
       echo "Removing containers of ${PREFIX}-hydra"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
