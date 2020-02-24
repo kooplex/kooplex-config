@@ -10,7 +10,5 @@ do
   fi
 done
 
-#nginx -g daemon off; 
-
 echo "Sleeping for infinity, press Ctrl+C ..."
 exec sleep infinity

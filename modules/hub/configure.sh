@@ -135,7 +135,6 @@ case $VERB in
   "stop")
       echo "Stopping containers of ${PREFIX}-hub"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm  $NGINX_DIR/conf/conf/hub
   ;;
 
   "uninstall")

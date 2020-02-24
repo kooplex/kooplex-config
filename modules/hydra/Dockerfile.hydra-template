@@ -13,11 +13,25 @@ RUN openssl x509 -req -in /etc/hydra.csr -CA /usr/local/share/ca-certificates/ro
 RUN cat /tmp/hydra.crt /usr/local/share/ca-certificates/rootCA.crt > /etc/hydra.crt
 RUN rm /etc/rootCA.key /tmp/hydra.crt
 
-COPY client-hub.json /etc/hydraconfig/client-hub.json
-COPY client-policy-hub.json /etc/hydraconfig/client-policy-hub.json
-COPY consent-app-policy.json /etc/hydraconfig/consent-app-policy.json
-COPY consent-app.json /etc/hydraconfig/consent-app.json
-COPY public-policy.json /etc/hydraconfig/public-policy.json
+RUN apk add python3 python3-pip
+RUN pip3 install flask flask_httpauth
+
+EXPOSE 5000
+
+COPY 02-api-start.sh /init/
+RUN chmod +x /init/02-api-start.sh
+RUN mkdir /local
+COPY api.py /local
+COPY entrypoint.sh /entrypoint.sh
+
+CMD ["/bin/bash", "/entrypoint.sh"]
+
+
+#COPY client-hub.json /etc/hydraconfig/client-hub.json
+#COPY client-policy-hub.json /etc/hydraconfig/client-policy-hub.json
+#COPY consent-app-policy.json /etc/hydraconfig/consent-app-policy.json
+#COPY consent-app.json /etc/hydraconfig/consent-app.json
+#COPY public-policy.json /etc/hydraconfig/public-policy.json
 
 COPY hydra.yml /root/.hydra.yml
 
