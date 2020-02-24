@@ -23,7 +23,7 @@ case $VERB in
 #    cp etc/conda-requirements*.txt $RF
     cp Dockerfile $RF
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
-    if [ ${IMAGE_REPOSITORY_URL} ]; then
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-extras-template > $RF/Dockerfile-base-conda-extras
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-slurm-template > $RF/Dockerfile-base-slurm
