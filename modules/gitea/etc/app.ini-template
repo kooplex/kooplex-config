@@ -51,6 +51,18 @@ ENABLE_FEDERATED_AVATAR       = true
 [attachment]
 PATH = /data/gitea/attachments
 
+[repository.upload]
+; Whether repository file uploads are enabled. Defaults to `true`
+ENABLED = true
+; Path for uploads. Defaults to `data/tmp/uploads` (tmp gets deleted on gitea restart)
+TEMP_PATH = data/tmp/uploads
+; One or more allowed types, e.g. image/jpeg|image/png. Nothing means any file type
+ALLOWED_TYPES =
+; Max size of each file in megabytes. Defaults to 3MB
+FILE_MAX_SIZE = 50
+; Max number of files per upload. Defaults to 5
+MAX_FILES = 5
+
 [log]
 ROOT_PATH = /data/gitea/log
 MODE      = file
@@ -82,4 +94,30 @@ ENABLED = false
 [openid]
 ENABLE_OPENID_SIGNIN = true
 ENABLE_OPENID_SIGNUP = false
+
+[markup.asciidoc]
+ENABLED = true
+FILE_EXTENSIONS = .adoc,.asciidoc
+RENDER_COMMAND = "asciidoctor -e -a leveloffset=-1 --out-file=- -"
+; Input is not a standard input but a file
+IS_INPUT_FILE = false
+
+[markup.jupyter]
+ENABLED = true
+FILE_EXTENSIONS = .ipynb
+RENDER_COMMAND = "jupyter nbconvert --stdout --to html --template basic "
+IS_INPUT_FILE = true
+
+[markup.restructuredtext]
+ENABLED = true
+FILE_EXTENSIONS = .rst
+RENDER_COMMAND = rst2html.py
+IS_INPUT_FILE = false
+
+[markup.sanitizer]
+; Pandoc renders TeX segments as <span>s with the "math" class, optionally
+; with "inline" or "display" classes depending on context.
+ELEMENT = span
+ALLOW_ATTR = class
+REGEXP = ^\s*((math(\s+|$)|inline(\s+|$)|display(\s+|$)))+
 
