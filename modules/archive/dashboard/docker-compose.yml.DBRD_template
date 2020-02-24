@@ -1,0 +1,24 @@
+  ##DASHBOARDS##:
+    container_name: ##DASHBOARDS##
+    image: ##PREFIX##-dashboards-##POSTFIX##
+    build:
+      context: .
+      dockerfile: ##DASHBOARDS_DOCKERFILE##
+    ports:
+      - "##DASHBOARDS_PORT##:3000"
+    networks:
+      - ##PREFIX##-net
+    depends_on:
+      - ##KERNELGATEWAY##
+    links:
+      - ##KERNELGATEWAY##
+    volumes:
+      - ##REPORTVOLUME##:/srv/app/data/:ro
+    environment:
+      PORT: 3000
+      KERNEL_GATEWAY_URL: http://##KERNELGATEWAY##:8888
+      BASE_URL: /db/##DASHBOARDS_PORT##
+      PUBLIC_LINK_PATTERN: http://localhost:3000
+      TRUST_PROXY: uniquelocal
+    restart: unless-stopped
+

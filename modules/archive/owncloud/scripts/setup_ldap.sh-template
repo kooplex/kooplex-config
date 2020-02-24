@@ -1,0 +1,45 @@
+#! /bin/bash
+
+cd /var/www/owncloud
+
+# ENABLE AND CONFIGURE LDAP
+
+./occ app:enable user_ldap
+dummy=$(./occ ldap:create-empty-config)
+LDAP_ID=$(echo ${dummy#*configID}| sed -e "s/'//g")
+./occ ldap:set-config $LDAP_ID ldapAgentName "cn=admin,##LDAPORG##"
+./occ ldap:set-config $LDAP_ID ldapBase "##LDAPORG##"
+./occ ldap:set-config $LDAP_ID ldapBaseGroups "##LDAPORG##"
+./occ ldap:set-config $LDAP_ID ldapBaseUsers "##LDAPORG##"
+./occ ldap:set-config $LDAP_ID ldapHost ##LDAPIP##
+./occ ldap:set-config $LDAP_ID ldapAgentPassword ##LDAPPW##
+./occ ldap:set-config $LDAP_ID ldapPort ##LDAPPORT##
+./occ ldap:set-config $LDAP_ID ldapLoginFilter "(&(|(objectclass=inetOrgPerson))(uid=%uid))"
+./occ ldap:set-config $LDAP_ID ldapUserDisplayName displayname
+./occ ldap:set-config $LDAP_ID ldapUserFilterObjectclass inetOrgPerson
+./occ ldap:set-config $LDAP_ID ldapEmailAttribute mail
+./occ ldap:set-config $LDAP_ID ldapUserFilter "(|(objectclass=inetOrgPerson))"
+./occ ldap:set-config $LDAP_ID hasMemberOfFilterSupport ""
+./occ ldap:set-config $LDAP_ID homeFolderNamingRule attr:uid
+./occ ldap:set-config $LDAP_ID ldapExpertUsernameAttr "uid"
+./occ ldap:set-config $LDAP_ID ldapConfigurationActive 1
+
+# CONFIGURE SERVICE
+
+./occ config:system:set 'overwritewebroot' --value '/ownCloud'
+./occ config:system:set 'overwrite.cli.url' --value  '##OWNCLOUD##'
+
+./occ config:system:set trusted_domains 0 --value  'localhost'
+./occ config:system:set trusted_domains 1 --value  '##OWNCLOUD##'
+./occ config:system:set trusted_domains 2 --value  '##NGINX##'
+./occ config:system:set trusted_domains 3 --value  '##OUTERHOST##'
+./occ config:system:set trusted_domains 4 --value  '##INNERHOST##'
+
+./occ config:system:set 'trusted_proxies' --value "[##OWNCLOUD##,##NGINX##]"
+./occ config:system:set 'overwritehost' --value '##OUTERHOST##'
+./occ config:system:set 'overwriteprotocol' --value '##REWRITEPROTO##'
+
+# GET RID OF SILLY FOLDERS
+
+rm -r core/skeleton/Photos/ core/skeleton/Documents/
+

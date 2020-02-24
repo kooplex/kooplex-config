@@ -1,5 +1,5 @@
 SYSMODULES="net base" # admin"
-MODULES="base net nginx ldap proxy impersonator report-nginx manual hub notebook"  #overleaf gitea seafile  hydra
+MODULES="base net nginx ldap proxy impersonator report-nginx manual hub notebook"  #overleaf gitea seafile hydra system-monitoring
 
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOST=$OUTERHOSTNAME

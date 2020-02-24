@@ -1,0 +1,32 @@
+gitlab_adduser() {
+  local username=##GITLABADMIN##  
+  local firstname=Gitlab
+  local lastname=Admin
+  local email="admin@##OUTERHOST##" 
+  local pass=##GITLABADMINPW## 
+  
+  echo "Adding Gitlab user $firstname $lastname ($username)..."
+  
+/opt/gitlab/bin/gitlab-rails r  "
+u = User.new
+u.name = \"$firstname $lastname\"
+u.username = \"$username\"
+u.password = \"$pass\"
+u.email = \"$email\"
+u.confirmed_at = Time.now
+u.confirmation_token = nil
+u.admin = true
+u.save!
+
+i = Identity.new
+i.provider = \"ldapmain\"
+i.extern_uid = \"uid=$username,ou=users,##LDAPORG##\"
+i.user = u
+i.user_id = u.id
+i.save!
+" 
+}
+
+gitlab_adduser
+
+
