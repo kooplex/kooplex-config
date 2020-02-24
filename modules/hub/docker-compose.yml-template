@@ -44,9 +44,9 @@ services:
       - HUBDB_USER=##HUBDB_USER##
       - HUBDB_PW=##HUBDB_PW##
       - HUBDBROOT_PW=##HUBDBROOT_PW##
-      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
+#      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
       - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
+#      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
 
   ##PREFIX##-hub-mysql:
     container_name: ##PREFIX##-hub-mysql
