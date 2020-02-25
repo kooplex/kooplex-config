@@ -1,0 +1,14 @@
+{
+        "id": "client-auth-policy",
+        "resources": [
+                "rn:hydra:keys:hydra.auth.<.*>"
+        ],
+        "actions": [
+                "get"
+        ],
+        "effect": "allow",
+        "subjects": [
+                "##PREFIX##-hub"
+        ]
+}
+

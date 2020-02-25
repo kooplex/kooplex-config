@@ -1,3 +1,3 @@
-#! /bin/bash
+#! /bin/sh
 
-cd /local && python3 api.py > /var/log/nginx/api.log &
+cd /local && python3 api.py > /var/log/api/api.log &

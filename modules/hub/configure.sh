@@ -12,6 +12,8 @@ HUB_LOG=$LOG_DIR/hub
 
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
+HYDRA_API_USER=hydrauser
+HYDRA_API_PW=hydrapw
 
 case $VERB in
   "build")
@@ -83,19 +85,25 @@ case $VERB in
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
-  "install")
+  "install-nginx")
       echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
 
       sed -e "s/##PREFIX##/$PREFIX/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
 	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
+ ;;
+  "install-hydra")
+      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
 
-#For hydra
-      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
-      sed -e "s/##PREFIX##/${PREFIX}/" \
+      sed -e "s/##PREFIX##/$PREFIX/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-${MODULE_NAME}.json
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-${MODULE_NAME}-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+	        ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-${MODULE_NAME}-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+	        ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
 
 #      PWFILE=$RF/consent-${MODULE_NAME}.pw
 #      if [ ! -f $PWFILE ] ; then
@@ -106,7 +114,12 @@ case $VERB in
 #
 #      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
   ;;
+  "uninstall-hydra")
+      echo "UnInstalling containers of ${PREFIX}-${MODULE_NAME}"
 
+      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+      curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-${MODULE_NAME}
+  ;;
   "start")
        echo "Starting containers of ${PREFIX}-hub"
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub-mysql

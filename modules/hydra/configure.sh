@@ -14,17 +14,20 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 #
 
 CONSENT_LOG=$LOG_DIR/hydraconsent
+HYDRA_LOG=$LOG_DIR/${MODULE_NAME}
+HYDRA_CONF=$CONF_DIR/${MODULE_NAME}
 
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hydra..."
       
-      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode $HYDRA_CONFIG $CONSENT_LOG
+      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode $HYDRA_CONF $CONSENT_LOG $HYDRA_LOG
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydradb -o o=bind ${PREFIX}-hydradb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconsentdb -o o=bind ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconfig -o o=bind ${PREFIX}-hydraconfig
       docker $DOCKERARGS volume create -o type=none -o device=$CONSENT_LOG -o o=bind ${PREFIX}-hydraconsent-log
+      docker $DOCKERARGS volume create -o type=none -o device=$HYDRA_LOG -o o=bind ${PREFIX}-hydra-log
+#      docker $DOCKERARGS volume create -o type=none -o device=$HYDRA_CONF -o o=bind ${PREFIX}-hydra-conf
 
 #      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
 #      Magically put the code into $SRV/_hydracode/consent
@@ -33,6 +36,7 @@ case $VERB in
       cp etc/mysql.cnf $RF/
       cp etc/nginx.conf $RF/
       cp etc/*entrypoint.sh $RF/
+      cp scripts/* $RF/
 
 #      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
       #cp -ar src $SRV/_hydracode 
@@ -49,7 +53,7 @@ case $VERB in
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
+#      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
 
       sed -e "s/##PREFIX##/${PREFIX}/"\
           -e "s/##OUTERHOST##/$OUTERHOST/" \
@@ -102,7 +106,7 @@ case $VERB in
 #       docker exec ${PREFIX}-hydra-mysql /initdb.sh
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-keto
+#       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-keto
   ;;
 
   "init")

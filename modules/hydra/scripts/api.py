@@ -1,5 +1,5 @@
 import os, sys, subprocess
-import bcrypt, json
+import json
 import logging
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
@@ -8,78 +8,97 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
 auth = HTTPBasicAuth()
 
-CONF_DIR="/etc/nginx/conf.d/sites-enabled/"
-PW_DIR="/etc/passwords/"
-NGINX_USER=os.getenv("NGINX_API_USER")
-NGINX_PW=os.getenv("NGINX_API_PW")
+CONF_DIR="/etc/hydraconfig/"
+SECRET_DIR="/etc/secrets/"
+HYDRA_USER=os.getenv("HYDRA_API_USER")
+HYDRA_USER="hydrauser"
+
+HYDRA_PW=os.getenv("HYDRA_API_PW")
+HYDRA_PW="hydrapw"
 
 @auth.verify_password
 def verify_password(username, password):
     # Note: token base example at https://blog.miguelgrinberg.com/post/restful-authentication-with-flask
-    return True if (username == NGINX_USER) and (password == NGINX_PW) else False
-
-def start_nginx_server():
-    command = 'service nginx start';
-    try:
-        subprocess.call(command, shell=True)
-    except Exception as e:
-        logger.error('Starting nginx failed with error %s' %( e))
-        return jsonify({ 'error': str(e) })
-
-def reload_nginx_server():
-    command = 'service nginx reload';
-    try:
-        subprocess.call(command, shell=True)
-    except Exception as e:
-        logger.error('Reloading nginx failed with error %s' %( e))
-        return jsonify({ 'error': str(e) })
-
-
+    return True if (username == HYDRA_USER) and (password == HYDRA_PW) else False
 
 @app.route('/')
 def get_alive():
-    return jsonify({'message': 'NGINX API server is running'})
+    return jsonify({'message': 'HYDRA API server is running'})
 
-            
-@app.route('/api/new/<service>', methods = ['POST'])
-@auth.login_required
-def create_new_service(service):
+def new_hydra_service(method, conffile):
+    command = 'hydra %s import %s'%(method, conffile);
     try:
-        data = json.loads(request.data.decode().replace("\n","\\n"))
-        service_conf = "%s/%s" % (CONF_DIR, service)
-        #write config
-        with open(service_conf, 'w') as f:
-             f.write(data['conf'])
-        #write password
-        username = data['username']
-#        password_e = data['password'].encode()
-#        pw = bcrypt.hashpw(password_e, bcrypt.gensalt( 12 ))
-        pw = "{PLAIN}%s"%data['password']
-        pw_filename = os.path.join(PW_DIR, service)
-        with open(pw_filename, 'w') as f:
-            f.write("%s:%s"%(username, pw))
+        output = subprocess.check_output(command, shell=True)
+        logger.debug(output)
+        return output
     except Exception as e:
-        logger.error('Creating conf file for %s failed %s' %(service, e))
+        logger.error('Importing %s %s  failed with error %s' %(method, conffile, e))
         return jsonify({ 'error': str(e) })
 
-    reload_nginx_server()
-    response = "Service %s started" % service
+def remove_hydra_service(method, service): 
+    command = 'hydra %s delete %s'%(method, service);     
+    try:                                                   
+        output = subprocess.check_output(command, shell=True)
+        logger.debug(output)
+    except Exception as e:      
+        logger.error('Removing %s %s  failed with error %s' %(method, service, e))       
+        return jsonify({ 'error': str(e) }) 
+            
+@app.route('/api/new-client/<service>', methods = ['POST'])
+@auth.login_required
+def create_client(service):
+    try:
+        data = request.data.decode()
+        client_file = os.path.join(CONF_DIR, service+"-client")
+        #write config
+        with open(client_file, 'w') as f:
+             f.write(data)
+        rtn = new_hydra_service('clients', client_file)
+        secret_file = os.path.join(SECRET_DIR, service+"-hydra.secret")
+        with open(secret_file, 'w') as f:
+             f.write(rtn.decode().split(":")[1].split()[0])
+    except Exception as e:
+        logger.error('Creating client file for %s failed %s' %(service, e))
+        return jsonify({ 'error': str(e) })
+
+    response = "Service %s is registered to hydra" % service
+    return jsonify({ 'response': str(response), 'service add': response })
+
+@app.route('/api/new-policy/<service>', methods = ['POST'])
+@auth.login_required
+def create_policy(service):
+    try:
+        data = request.data.decode()
+        policy_file = os.path.join(CONF_DIR, service+"-policy")
+        #write config
+        with open(policy_file, 'w') as f:
+             f.write(data)
+        new_hydra_service('policies', policy_file)
+    except Exception as e:
+        logger.error('Creating policy file for %s failed %s' %(service, e))
+        return jsonify({ 'error': str(e) })
+
+    response = "Service %s is registered to hydra" % service
     return jsonify({ 'response': str(response), 'service add': response })
 
 @app.route('/api/remove/<service>', methods = ['DELETE'])
 @auth.login_required
 def remove_service(service):
     try:
-        service_conf = "%s/%s" % (CONF_DIR, service)
-        os.remove(service_conf)    
-        pw_file = "%s/%s" % (PW_DIR, service)
-        os.remove(pw_file)
+        rtn = remove_hydra_service('policies', service)
+        rtn = remove_hydra_service('clients', service)
+
+        secret_file = os.path.join(SECRET_DIR, service+"-hydra.secret")
+        os.remove(secret_file)
+        client_file = os.path.join(CONF_DIR, service+"-client")
+        os.remove(client_file)
+        policy_file = os.path.join(CONF_DIR, service+"-policy")
+        os.remove(policy_file)
     except Exception as e:
         logger.error('Removing conf file for %s failed %s' %(service, e))
         return jsonify({ 'error': str(e) })
 
-    reload_nginx_server()
-    response = "Service %s ha been removed " % service
+    response = "Service %s has been removed " % service
     return jsonify({ 'response': str(response), 'service removal': response })
 
 
@@ -91,6 +110,5 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    start_nginx_server()
 
     app.run(debug = True, host = '0.0.0.0')

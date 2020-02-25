@@ -45,6 +45,12 @@ case $VERB in
   "install")
     set -e
   ;;
+  "install-nginx")
+    set -e
+  ;;
+  "install-hydra")
+    set -e
+  ;;
   "start")
 
     set -e

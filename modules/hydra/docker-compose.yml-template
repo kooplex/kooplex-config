@@ -14,6 +14,9 @@ services:
       - ##PREFIX##-service-net
       - ##PREFIX##-net
     restart: unless-stopped
+    volumes:
+      - ##PREFIX##-hydra-log:/var/log/api:rw
+      - ##PREFIX##-secrets:/etc/secrets:rw
     logging:
       options:
         max-size: "10m"
@@ -32,6 +35,7 @@ services:
       - DISABLE_TELEMETRY=1
 
 #      - DATABASE_URL=postgres://##HYDRADB_USER##:##HYDRADB_PW##@##PREFIX##-hydra-postgresql:5432/##HYDRADB##?sslmode=disable
+
   ##PREFIX##-hydra-postgresql:
     container_name: ##PREFIX##-hydra-postgresql
     image: postgres:10.3
@@ -105,6 +109,10 @@ volumes:
   ##PREFIX##-hydraconsentdb:
     external: true
   ##PREFIX##-hydracode:
+    external: true
+  ##PREFIX##-secrets:
+    external: true
+  ##PREFIX##-hydra-log:
     external: true
 
 
