@@ -1,13 +1,47 @@
 #! /bin/sh
 
+
+# registering to NGINX 
+register_nginx() {
+ MODULE_NAME=$1
+ echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
+ sed -e "s/##PREFIX##/$PREFIX/" \
+     -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+     -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
+}
+
+unregister_nginx() {
+ MODULE_NAME=$1
+ echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+ curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
+}
+
+# registering to HYDRA
+register_hydra() {
+ MODULE_NAME=$1
+ echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
+
+ sed -e "s/##PREFIX##/$PREFIX/" \
+     -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+     -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-${MODULE_NAME}-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+           ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
+
+ sed -e "s/##PREFIX##/$PREFIX/" \
+     -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-${MODULE_NAME}-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+        ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
+}
+
+unregister_hydra() {
+ MODULE_NAME=$1
+ echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
+ curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-${MODULE_NAME}
+}
 # IP address functions
 
 ldapquery () {
 echo ldapsearch -x -H ldap://${PREFIX}-ldap -D cn=admin,$LDAPORG -b ou=users,$LDAPORG -s one "objectclass=top" -w $LDAPPW
-}
-
-replace_slash() {
-	        echo $1 | sed 's/\//\\\//g'
 }
 
 

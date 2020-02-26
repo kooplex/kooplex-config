@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODULE_NAME=${MODULE_NAME}
+MODULE_NAME=singularity
 RF=$BUILDDIR/$MODULE_NAME
 
 mkdir -p $RF

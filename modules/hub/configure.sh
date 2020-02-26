@@ -85,40 +85,17 @@ case $VERB in
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
-  "install-nginx")
-      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
-	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
- ;;
   "install-hydra")
-      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-${MODULE_NAME}-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
-	        ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-${MODULE_NAME}-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
-	        ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
-
-#      PWFILE=$RF/consent-${MODULE_NAME}.pw
-#      if [ ! -f $PWFILE ] ; then
-#  	  docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-${MODULE_NAME}.json > /consent-${MODULE_NAME}.pw" && \
-#          docker cp  ${PREFIX}-hydra:/consent-${MODULE_NAME}.pw $PWFILE
-#      fi
-#      CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
-#
-#      docker $DOCKERARGS exec ${PREFIX}-hydra sh -c 'hydra policies import /etc/hydraconfig/client-policy-${MODULE_NAME}.json'
+    register_hydra $MODULE_NAME
   ;;
   "uninstall-hydra")
-      echo "UnInstalling containers of ${PREFIX}-${MODULE_NAME}"
-
-      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
-      curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-${MODULE_NAME}
+    unregister_hydra $MODULE_NAME
+  ;;
+  "install-nginx")
+    register_nginx $MODULE_NAME
+  ;;
+  "uninstall-nginx")
+    unregister_nginx $MODULE_NAME
   ;;
   "start")
        echo "Starting containers of ${PREFIX}-hub"
@@ -150,11 +127,6 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
   ;;
 
-  "uninstall")
-      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
-      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
-
-  ;;
   "remove")
       echo "Removing containers of ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill

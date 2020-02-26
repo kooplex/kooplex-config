@@ -24,13 +24,17 @@ case $VERB in
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   
   ;;
-  "install")
-      echo "Installing containers of ${PREFIX}-${MODULE_NAME}"
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-${MODULE_NAME}-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
-	        ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
+  "install-hydra")
+  #  register_hydra $MODULE_NAME
+  ;;
+  "uninstall-hydra")
+   # unregister_hydra $MODULE_NAME
+  ;;
+  "install-nginx")
+    register_nginx $MODULE_NAME
+  ;;
+  "uninstall-nginx")
+    unregister_nginx $MODULE_NAME
   ;;
   "start")
      echo "Starting proxy ${PREFIX}-proxy "
@@ -47,11 +51,6 @@ case $VERB in
   "stop")
     echo "Stopping proxy ${PREFIX}-proxy "
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-  ;;
-  "uninstall")
-      echo "Uninstalling containers of ${PREFIX}-${MODULE_NAME}"
-      curl -u ${NGINX_API_USER}:${NGINX_API_PW} ${NGINX_IP}:5000/api/remove/${MODULE_NAME}
-
   ;;
   "remove")
     echo "Removing proxy ${PREFIX}-proxy "
