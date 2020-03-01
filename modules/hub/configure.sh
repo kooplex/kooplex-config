@@ -132,9 +132,6 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
 
-      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
-      PWFILE=$RF/consent-${MODULE_NAME}.pw
-      rm $PWFILE
   ;;
 
   "purge")
@@ -142,8 +139,12 @@ case $VERB in
       rm -R -f $RF
       
       docker $DOCKERARGS volume rm ${PREFIX}-home
+      docker $DOCKERARGS volume rm ${PREFIX}-hubcode
+      docker $DOCKERARGS volume rm ${PREFIX}-hub-log
       docker $DOCKERARGS volume rm ${PREFIX}-course
+      docker $DOCKERARGS volume rm ${PREFIX}-assignment
       docker $DOCKERARGS volume rm ${PREFIX}-usercourse
+      docker $DOCKERARGS volume rm ${PREFIX}-workdir
       docker $DOCKERARGS volume rm ${PREFIX}-share
       docker $DOCKERARGS volume rm ${PREFIX}-hubdb
       docker $DOCKERARGS volume rm ${PREFIX}-garbage

@@ -24,14 +24,15 @@ case $VERB in
 #    cp etc/conda-requirements*.txt $RF
     cp Dockerfile $RF
     sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
+    docker $DOCKERARGS build -t ${PREFIX}-base  $RF
+    docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
+
     if [ ! ${IMAGE_REPOSITORY_URL} ]; then
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-extras-template > $RF/Dockerfile-base-conda-extras
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-slurm-template > $RF/Dockerfile-base-slurm
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-singularity-template > $RF/Dockerfile-base-singularity
  
-        docker $DOCKERARGS build -t ${PREFIX}-base  $RF
-        docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $RF/Dockerfile-base-conda  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-conda-extras -f $RF/Dockerfile-base-conda-extras  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-slurm -f $RF/Dockerfile-base-slurm  $RF 
@@ -55,11 +56,14 @@ case $VERB in
 
   ;;
   "purge")
-  echo "Cleaning base folder $SRV/; Remove aquota"
+    echo "Cleaning base folder $SRV/; Remove aquota"
 #  quotaoff -vu $SRV
 #  quotaoff -vg $SRV
 #  rm -f $SRV/aquota.*
-  rm -r $SRV/.secrets
+    rm -r $SRV/.secrets
+
+    docker $DOCKERARGS volume rm ${PREFIX}-secrets
+    docker $DOCKERARGS volume rm ${PREFIX}-keys
   ;;
   "clean")
     echo "Cleaning base image ${PREFIX}-base"

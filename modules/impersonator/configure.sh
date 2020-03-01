@@ -84,6 +84,8 @@ case $VERB in
   "purge")
     echo "Removing $RF" 
     rm -R -f $RF
+
+    docker $DOCKERARGS volume rm ${PREFIX}-git
   ;;
 
   "clean")

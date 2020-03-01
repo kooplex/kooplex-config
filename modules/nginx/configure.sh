@@ -73,6 +73,10 @@ case $VERB in
   "purge")
       echo "Removing $RF" 
       rm -R -f $RF
+
+      docker $DOCKERARGS volume rm ${PREFIX}-nginx-conf
+      docker $DOCKERARGS volume rm ${PREFIX}-nginx-log
+      docker $DOCKERARGS volume rm ${PREFIX}-nginx-html
       
   ;;
 

@@ -68,6 +68,8 @@ case $VERB in
   "purge")
     echo "Purging manual ${PREFIX}-manual"
     rm -R $RF
+
+    docker $DOCKERARGS volume rm ${PREFIX}-manual
   ;;
     
 esac

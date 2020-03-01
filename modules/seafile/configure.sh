@@ -96,9 +96,11 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm    
 
-      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
-      PWFILE=$RF/consent-${MODULE_NAME}.pw
-      rm $PWFILE
+  ;;
+  "purge")
+      docker $DOCKERARGS volume rm ${PREFIX}-seafile-data
+      docker $DOCKERARGS volume rm ${PREFIX}-seafile-mysql
+      docker $DOCKERARGS volume rm ${PREFIX}-cache-seafile
   ;;
 
   "cleandata")

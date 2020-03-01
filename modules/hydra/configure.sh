@@ -184,6 +184,10 @@ case $VERB in
       rm -R -f $RF
       
       docker $DOCKERARGS volume rm ${PREFIX}-hydradb
+      docker $DOCKERARGS volume rm ${PREFIX}-hydraconsentdb
+      docker $DOCKERARGS volume rm ${PREFIX}-hydraconsent-log
+      docker $DOCKERARGS volume rm ${PREFIX}-hydracode
+      docker $DOCKERARGS volume rm ${PREFIX}-hydraconfig
   ;;
   "cleandata")
     echo "Cleaning data ${PREFIX}-hydradb"

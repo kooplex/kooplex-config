@@ -87,6 +87,10 @@ case $VERB in
   "purge")
     echo "Purging report-nginx ${PREFIX}-report-nginx"
     rm -R $RF
+
+    docker $DOCKERARGS volume rm ${PREFIX}-report-nginx-conf
+    docker $DOCKERARGS volume rm ${PREFIX}-report-nginx-log
+    docker $DOCKERARGS volume rm ${PREFIX}-report-nginx-html
   ;;
     
 esac
