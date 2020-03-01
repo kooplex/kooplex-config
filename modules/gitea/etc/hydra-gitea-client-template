@@ -1,0 +1,19 @@
+{
+        "client_name": "kooplex-fiek-gitea",
+        "grant_types": [
+                "client_credentials",
+                "authorization_code"
+        ],
+        "id": "kooplex-fiek-gitea",
+		  "description": "kooplex-fiek GITEA",
+        "redirect_uris": [
+                "https://kooplex-fiek.elte.hu/gitea/user/oauth2/kooplex-fiek-gitea/callback"
+        ],
+        "response_types": [
+                "id_token",
+                "token",
+                "code"
+        ],
+        "scope": "hydra.keys.get openid offline profile email",
+		 "public":true
+}

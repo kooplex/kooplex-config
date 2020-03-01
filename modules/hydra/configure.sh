@@ -91,10 +91,12 @@ case $VERB in
   ;;
 
   "install-hydra")
-  #  register_hydra $MODULE_NAME
+    register_hydra "consent"
+    register_hydra "public"
   ;;
   "uninstall-hydra")
-   # unregister_hydra $MODULE_NAME
+    unregister_hydra "consent"
+    unregister_hydra "public"
   ;;
   "install-nginx")
     register_nginx $MODULE_NAME
