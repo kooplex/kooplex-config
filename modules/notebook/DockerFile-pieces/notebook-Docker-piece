@@ -23,8 +23,9 @@ ADD nslcd.conf /etc/nslcd.conf
 ADD ldap.conf /etc/ldap/ldap.conf
 ADD nsswitch.conf /etc/nsswitch.conf
 ADD preview-bokeh.sh /usr/local/sbin/preview-bokeh.sh
+ADD report-dash.sh /usr/local/sbin/report-dash.sh
 ADD preview-nb-api.sh /usr/local/sbin/preview-nb-api.sh
-RUN chmod a+x /usr/local/sbin/preview-bokeh.sh /usr/local/sbin/preview-nb-api.sh
+RUN chmod a+x /usr/local/sbin/*
 RUN chmod a+x /init/91-startsshagent.sh
 
 ADD manage_mount.sh /usr/local/sbin/manage_mount.sh

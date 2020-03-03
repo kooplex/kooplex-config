@@ -7,6 +7,10 @@ elif [ "${REPORT_TYPE}" == "bokeh" ]; then
     echo "Starting Report Bokeh Server"
     cd $REPORT_DIR
     nice -n 19 /usr/local/sbin/preview-bokeh.sh $REPORT_INDEX
+elif [ "${REPORT_TYPE}" == "plotly_dash" ]; then 
+    echo "Starting Report Plotly Dash"
+    cd $REPORT_DIR
+    nice -n 19 /bin/bash /usr/local/sbin/report-dash.sh $REPORT_INDEX
 elif [ "${REPORT_TYPE}" == "service" ]; then 
     echo "Starting Report KernelGateway Server"
     cd $REPORT_DIR
