@@ -26,6 +26,7 @@ services:
       - ##GITEANET##
     volumes:
       - ##PREFIX##-gitea-data:/data:rw      
+      - ##PREFIX##-gitea-conf:/data/gitea/templates:ro      
     ports:
       - "222:22"
 #      - "3030:3000"
@@ -59,5 +60,7 @@ volumes:
   ##PREFIX##-gitea-data:
     external: true
   ##PREFIX##-gitea-db:
+    external: true
+  ##PREFIX##-gitea-conf:
     external: true
 

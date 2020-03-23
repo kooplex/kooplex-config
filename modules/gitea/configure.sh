@@ -6,23 +6,27 @@ mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+GITEA_CONF=$CONF_DIR/${MODULE_NAME}
 
 # INIT for openid
 # ${MODULE_NAME} admin auth add-oauth --name kooplex-test --provider openidConnect --auto-discover-url https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration --key kooplex-test-${MODULE_NAME} --secret vmi
 
+# GITEA html templates from https://github.com/go-gitea/gitea.git
 
 case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-    mkdir -p $SRV/_${MODULE_NAME}-data $SRV/_${MODULE_NAME}-db
+    mkdir -p $SRV/_${MODULE_NAME}-data $SRV/_${MODULE_NAME}-db $GITEA_CONF 
 
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-data -o o=bind ${PREFIX}-${MODULE_NAME}-data
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-db -o o=bind ${PREFIX}-${MODULE_NAME}-db
+    docker $DOCKERARGS volume create -o type=none -o device=$GITEA_CONF  -o o=bind ${PREFIX}-${MODULE_NAME}-conf
 
     GITEANET=${PREFIX}-${MODULE_NAME}-privatenet
   
     cp Dockerfile.gitea $RF/
+    cp -r templates/* $GITEA_CONF/ 
 
     sed -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##ROOTURL##/${REWRITEPROTO}:\/\/$OUTERHOST\/gitea/" \
