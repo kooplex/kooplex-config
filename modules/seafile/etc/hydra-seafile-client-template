@@ -1,0 +1,19 @@
+{
+        "client_name": "kooplex-fiek-seafile",
+        "grant_types": [
+                "client_credentials",
+                "authorization_code"
+        ],
+        "id": "kooplex-fiek-seafile",
+		  "description": "kooplex-fiek-seafile",
+        "redirect_uris": [
+                "https://kooplex-fiek.elte.hu/seafile/oauth/callback/"
+        ],
+        "response_types": [
+                "id_token",
+                "token",
+                "code"
+        ],
+        "scope": "hydra.keys.get openid offline profile email",
+		 "public":true
+}
