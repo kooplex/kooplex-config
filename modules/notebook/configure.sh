@@ -25,6 +25,8 @@ case $VERB in
         sed -e "s/##OUTERHOST##/${OUTERHOST}/"\
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-bokeh.sh-template > $RF/$imagedir/preview-bokeh.sh
         sed -e "s/##OUTERHOST##/${OUTERHOST}/"\
+	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/report-dash.sh-template > $RF/$imagedir/report-dash.sh
+        sed -e "s/##OUTERHOST##/${OUTERHOST}/"\
 	    -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" scripts/preview-nb-api.sh-template > $RF/$imagedir/preview-nb-api.sh
 
 	mkdir -p ${RF}/$imagedir/init
