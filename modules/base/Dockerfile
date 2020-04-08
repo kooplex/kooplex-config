@@ -55,7 +55,7 @@ EXPOSE 111/udp
 RUN mkdir /init
 
 # we don't run apt-get clean, coz the apt-cache is useful when preparing new module volumes
-RUN rm -rf /var/lib/apt/lists/*
+#RUN rm -rf /var/lib/apt/lists/*
 
 ENV SSH_AUTH_SOCK /tmp/my_sshagent_sock
 

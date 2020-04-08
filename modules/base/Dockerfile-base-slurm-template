@@ -1,4 +1,4 @@
-FROM ##PREFIX##-base-conda-extras
+FROM ##PREFIX##-base-apt-packages
 
 RUN sed -i -e "s/bionic/xenial/g" /etc/apt/sources.list && apt update && apt install -y slurm-client
 RUN sed -i -e "s/xenial/bionic/g" /etc/apt/sources.list && apt update

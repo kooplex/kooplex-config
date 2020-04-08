@@ -1,32 +1,30 @@
 FROM ##PREFIX##-base-conda
 
 
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core==4.4.0 jupyter_client==5.2.4 jupyter_console   notebook==5.7.4 widgetsnbextension==3.0.8 ipywidgets==7.0.5 
 RUN  $CONDA_DIR/bin/conda install --quiet --yes  jupyter_core jupyter_client jupyter_console   notebook widgetsnbextension ipywidgets
-#RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_dashboards && \
-#     jupyter dashboards quick-setup --sys-prefix
 RUN  $CONDA_DIR/bin/conda install --quiet --yes -c conda-forge jupyter_cms && \
      jupyter cms quick-setup --sys-prefix
 
 # TO SWITCH BETWEEN CONDA ENVS
-RUN pip install environment_kernels
+RUN pip install environment_kernels jupyterthemes
 
-RUN  $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge  bqplot #traittypes
-RUN  $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge jupyter_nbextensions_configurator jupyter_contrib_nbextensions
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge bqplot jupyter_nbextensions_configurator jupyter_contrib_nbextensions ipyleaflet folium\
+      jupyter_kernel_gateway plotly tqdm shapely geopandas nodejs networkx seaborn pandas
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN $CONDA_DIR/bin/conda install -c anaconda --quiet --yes nb_conda nb_conda_kernels 
-RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge ipyleaflet folium 
-RUN $CONDA_DIR/bin/conda install --quiet --yes nodejs networkx seaborn pandas tqdm
+
 RUN $CONDA_DIR/bin/conda install --quiet --yes -c damianavila82 rise pivottablejs
+RUN apt update && apt install -y libssl-dev
+RUN conda install -c defaults -c conda-forge dash jupyterlab-dash   
+RUN pip install jupyter_plotly_dash dash-auth
+RUN pip install dash-bootstrap-components==0.8.3 dash-core-components==1.7.0  dash-renderer==1.2.3
+RUN $CONDA_DIR/bin/conda install --quiet --yes -c pyviz holoviews bokeh holoviews geoviews hvplot panel
 
+# Install BokehJS
+RUN wget http://cdn.pydata.org/bokeh/release/bokeh-1.3.4.min.js && \
+    wget http://cdn.pydata.org/bokeh/release/bokeh-widgets-1.3.4.min.js && \
+    wget http://cdn.pydata.org/bokeh/release/bokeh-tables-1.3.4.min.js && \
+    wget http://cdn.pydata.org/bokeh/release/bokeh-api-1.3.4.min.js
 
-RUN apt update
-RUN apt-get install -y libgtk2.0-0
-#RUN $CONDA_DIR/bin/conda install --quiet --yes "poppler<0.62"
-
-RUN $CONDA_DIR/bin/conda install --quiet --yes --override-channels -c conda-forge jupyter_kernel_gateway plotly #==2.1.0
-
-##### RUN $CONDA_DIR/bin/conda install -c conda-forge -y ipyvolume==0.4.5 ipywebrtc==0.3.0  
-#RUN $CONDA_DIR/bin/conda install -c conda-forge -y ipywidgets  
-
-
+RUN pip install dash-bootstrap-components==0.8.3 dash-core-components==1.7.0  dash-renderer==1.2.3
+RUN $CONDA_DIR/bin/conda install --quiet --yes  -c conda-forge pandas==1.0.1

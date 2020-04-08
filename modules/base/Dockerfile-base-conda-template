@@ -1,4 +1,4 @@
-FROM ##PREFIX##-base-apt-packages
+FROM ##PREFIX##-base-singularity
 
 # TODO add jupyter stuff
 # Configure environment

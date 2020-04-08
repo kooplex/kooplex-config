@@ -1,13 +1,12 @@
 
 RUN TZ=Europe/Budapest
 RUN ln -snf  /usr/share/zoneinfo/$TZ /etc/localtime
+RUN sed -ie 's/# hu/hu/g' /etc/locale.gen && echo "hu_HU ISO-8859-2" >> /etc/locale.gen && echo "hu_HU.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
-RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
 
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
-RUN chmod a+x /usr/local/bin/start-notebook.sh
 ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
 ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
 
@@ -25,10 +24,10 @@ ADD nsswitch.conf /etc/nsswitch.conf
 ADD preview-bokeh.sh /usr/local/sbin/preview-bokeh.sh
 ADD report-dash.sh /usr/local/sbin/report-dash.sh
 ADD preview-nb-api.sh /usr/local/sbin/preview-nb-api.sh
-RUN chmod a+x /usr/local/sbin/*
-RUN chmod a+x /init/91-startsshagent.sh
+
 
 ADD manage_mount.sh /usr/local/sbin/manage_mount.sh
-RUN chmod +x /usr/local/sbin/manage_mount.sh 
+RUN chmod a+x /init/91-startsshagent.sh /opt/conda/bin/jupyter-notebook-kooplex /usr/local/sbin/*\
+  /usr/local/sbin/manage_mount.sh  /usr/local/bin/start-notebook.sh
 
 WORKDIR /
