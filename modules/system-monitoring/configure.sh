@@ -11,13 +11,6 @@ SRV_GRAFANA=$SRV/_grafana
 SRV_PROMETHEUS=$SRV/_prometheus
 SRV_NODEEXPORTER=$SRV/_nodeexporter
 
-###
-# Setup grafana to receive data from prometheus
-# Add datasource prometheus
-# http://kooplex-test-prometheus:9090
-# Them import dashboard
-# https://grafana.com/grafana/dashboards/893
-
 case $VERB in
 
   "build")
@@ -48,8 +41,11 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" etc/prometheus.yml-template > $SRV_PROMETHEUS/etc/prometheus.yml
       sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" etc/prometheus.yml-template > $RF/prometheus.yml
+      sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" etc/grafana.ini-template > $SRV_GRAFANA/etc/grafana.ini
 
+      cp Dockerfile-prometheus $RF/Dockerfile-prometheus
       echo "2. Building ${PREFIX}-grafana..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;

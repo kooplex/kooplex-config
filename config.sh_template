@@ -3,8 +3,7 @@ MODULES="base net nginx ldap proxy impersonator report-nginx manual hub notebook
 
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOST=$OUTERHOSTNAME
-
-INNERHOST="192.168.0.25"
+OUTERHOSTPORT="443"
 
 INTERNAL_SSL=false
 
@@ -90,7 +89,8 @@ HYDRADB=hydradb
 HYDRA_ADMINPW=
 HYDRASYSTEM_SECRET= #(pwgen 32)
 URL_HYDRA=https://$OUTERHOST/hydra
-
+HYDRA_SEAHUBCLIENTID=${PREFIX}-seafile
+HYDRA_SEAHUBCLIENTSECRET=
 HYDRA_CONFIG=$CONF_DIR/hydra
 
 #OIDC SECRETS
@@ -115,6 +115,9 @@ SECRETS=$SRV/.secrets
 
 NGINX_API_USER=nginxuser
 NGINX_API_PW=nginxpw
+
+HYDRA_API_USER="hydrauser"
+HYDRA_API_PW="hydrapw"
 
 # MOUNTPOINTS
 # where to find mounted storage and functional volumes

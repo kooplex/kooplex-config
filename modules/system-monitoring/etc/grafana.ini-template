@@ -318,7 +318,7 @@ org_role = Viewer
 #################################### Generic OAuth ##########################
 [auth.generic_oauth]
 ;enabled = true
-;name = OAuth-fiek
+;name = OAuth-##PREFIX##
 ;allow_sign_up = true
 ;client_id = ##PREFIX##-grafana
 ;client_secret =  
@@ -326,10 +326,10 @@ org_role = Viewer
 ;scopes = openid profile email
 ;email_attribute_name = email:primary
 ;email_attribute_path =
-;auth_url = https://kooplex-fiek.elte.hu/hydra/oauth2/auth
-;token_url = https://kooplex-fiek.elte.hu/hydra/oauth2/token
-;api_url = https://kooplex-fiek.elte.hu/hydra/userinfo
-;allowed_domains = kooplex-fiek.elte.hu
+;auth_url = https://##OUTERHOST##/hydra/oauth2/auth
+;token_url = https://##OUTERHOST##/hydra/oauth2/token
+;api_url = https://##OUTERHOST##/hydra/userinfo
+;allowed_domains = ##OUTERHOST##
 ;;team_ids =
 ;;allowed_organizations =
 ;;tls_skip_verify_insecure = false

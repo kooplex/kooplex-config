@@ -1,12 +1,17 @@
 #!/bin/bash
 
-RF=$BUILDDIR/slurm
+MODULE_NAME=slurm
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 mkdir -p $RF/$NOTEBOOK_DOCKER_EXTRA
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
+
+SLURM_HTML=$DATA_DIR/${MODULE_NAME}
+SLURM_LOG=$LOG_DIR/${MODULE_NAME}
+SLURM_CONF=$CONF_DIR/${MODULE_NAME}
 
 # TODO
 # 1. /etc/hosts in slurmctld has to have the fqdn of compute nodes or something else
@@ -17,7 +22,7 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 #     set smtp=smtp://smtp.gmail.com:587
 #     set smtp-auth=login
 #     set smtp-auth-user=kooplex.ena@gmail.com
-#     set smtp-auth-password=appletree137
+#     set smtp-auth-password=pw
 #     set ssl-verify=ignore
 #     set smtp-use-starttls
 #     set nss-config-dir=/etc/pki/nssdb/
@@ -33,14 +38,14 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-slurm..."
       
-      mkdir -p $SRV/_slurm_mysql $SRV/_slurm_etc $SRV/_slurm_etc/munge $SRV/_slurm_etc/slurm $SRV/_slurm_etc/data \
-         $SRV/_slurm_etc/var_log_slurm   
+      mkdir -p $SRV/_slurm_mysql $SLURM_CONF/{munge,slurm,data} $SLURM_LOG
+          
 
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_slurm_etc/munge -o o=bind ${PREFIX}-etc-munge
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_slurm_etc/slurm -o o=bind ${PREFIX}-etc-slurm
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_slurm_etc/data -o o=bind ${PREFIX}-slurm-jobdir
+      docker $DOCKERARGS volume create -o type=none -o device=$SLURM_CONF/munge -o o=bind ${PREFIX}-etc-munge
+      docker $DOCKERARGS volume create -o type=none -o device=$SLURM_CONF/slurm -o o=bind ${PREFIX}-etc-slurm
+      docker $DOCKERARGS volume create -o type=none -o device=$SLURM_CONF/data -o o=bind ${PREFIX}-slurm-jobdir
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_slurm_mysql -o o=bind ${PREFIX}-slurmdb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_slurm_etc/var_log_slurm -o o=bind ${PREFIX}-var-log-slurm
+      docker $DOCKERARGS volume create -o type=none -o device=$SLURM_LOG -o o=bind ${PREFIX}-var-log-slurm
 
 
       cp Dockerfile $RF/
@@ -50,11 +55,11 @@ case $VERB in
 #          -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
 #          -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
 #          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
-      sed -e "s/##PREFIX##/$PREFIX/" etc/slurm.conf-template > $SRV/_slurm_etc/slurm/slurm.conf
-      sed -e "s/##PREFIX##/$PREFIX/" etc/slurmdbd.conf-template > $SRV/_slurm_etc/slurm/slurmdbd.conf
+      sed -e "s/##PREFIX##/$PREFIX/" etc/slurm.conf-template > $SLURM_CONF/slurm/slurm.conf
+      sed -e "s/##PREFIX##/$PREFIX/" etc/slurmdbd.conf-template > $SLURM_CONF/slurm/slurmdbd.conf
 
       # Create key for munge
-      dd if=/dev/urandom bs=1 count=1024 > $SRV/_slurm_etc/munge/munge.key
+      dd if=/dev/urandom bs=1 count=1024 > $SLURM_CONF/munge/munge.key
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
           -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
@@ -65,9 +70,9 @@ case $VERB in
       echo "2. Building ${PREFIX}-slurm..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
 
-
+      chown 999 $SLURM_CONF/munge/munge.key; chmod 500 $SLURM_CONF/munge/munge.key
       #TODO need munge.key and slurm.conf in notebook containers and compute nodes too
-      cp $SRV/_slurm_etc/slurm/slurm.conf $SRV/_slurm_etc/munge/munge.key etc/slurm-Docker-piece $RF/$NOTEBOOK_DOCKER_EXTRA/
+      cp $SLURM_CONF/slurm/slurm.conf $SLURM_CONF/munge/munge.key etc/slurm-Docker-piece $RF/$NOTEBOOK_DOCKER_EXTRA/
   ;;
 
   "install")

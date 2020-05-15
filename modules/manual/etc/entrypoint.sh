@@ -1,6 +1,8 @@
 #!/bin/sh
 
-gitbook init
+#gitbook init
 # This will install plugins inserted in the book.json
-gitbook install
-gitbook serve
+#gitbook install
+#gitbook serve
+sleep 10000
+

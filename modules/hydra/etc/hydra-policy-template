@@ -4,11 +4,11 @@
         ],
 		  "description": "Allow consent app to manage OAuth2 consent requests",
         "effect": "allow",
-        "id": "consent-app-policy",
+        "id": "##PREFIX##-consent-policy",
         "resources": [
                 "rn:hydra:oauth2:consent:requests:<.*>"
         ],
         "subjects": [
-                "consent-app"
+                "##PREFIX##-consent"
         ]
 }

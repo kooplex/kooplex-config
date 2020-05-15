@@ -1,0 +1,4 @@
+bash kooplex.sh build
+bash kooplex.sh build hydra
+bash kooplex.sh start hydra
+bash kooplex.sh  

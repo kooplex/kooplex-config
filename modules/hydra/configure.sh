@@ -15,7 +15,7 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 CONSENT_LOG=$LOG_DIR/hydraconsent
 HYDRA_LOG=$LOG_DIR/${MODULE_NAME}
-HYDRA_CONF=$CONF_DIR/${MODULE_NAME}
+#HYDRA_CONF=$CONF_DIR/${MODULE_NAME}
 
 case $VERB in
   "build")
@@ -38,9 +38,7 @@ case $VERB in
       cp etc/*entrypoint.sh $RF/
       cp scripts/* $RF/
 
-#      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
       #cp -ar src $SRV/_hydracode 
-      cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json}   $HYDRA_CONFIG/
 
       cp -a $BUILDDIR/CA/rootCA.{key,crt} $RF/
 
@@ -63,7 +61,8 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php # $SRV/_hydracode/consent/application/config/database.php
+          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template >  $SRV/_hydracode/consent/application/config/database.php
+#          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php # $SRV/_hydracode/consent/application/config/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
@@ -74,6 +73,8 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/" \
+          -e "s/##HYDRA_API_USER##/$HYDRA_API_USER/" \
+          -e "s/##HYDRA_API_PW##/$HYDRA_API_PW/" \
 	  -e "s/##HYDRASYSTEM_SECRET##/$HYDRASYSTEM_SECRET/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
           -e "s/##HYDRACONSENTDB##/${HYDRACONSENTDB}/g" \
@@ -91,12 +92,13 @@ case $VERB in
   ;;
 
   "install-hydra")
+    cat etc/public-policy.json  | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+           ${HYDRA_IP}:5000/api/new-client/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
     register_hydra "consent"
-    register_hydra "public"
   ;;
   "uninstall-hydra")
+    curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-public
     unregister_hydra "consent"
-    unregister_hydra "public"
   ;;
   "install-nginx")
     register_nginx $MODULE_NAME
@@ -117,40 +119,20 @@ case $VERB in
   "init")
 
   
-	docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "CREATE DATABASE $HYDRADB;"
-        docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "CREATE USER $HYDRADB_USER WITH PASSWORD '$HYDRADB_USER';"
-        docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "GRANT ALL ON DATABASE $HYDRADB TO $HYDRADB_USER;"
-        docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "GRANT CONNECT ON DATABASE $HYDRADB to $HYDRADB_USER;"
+	docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "CREATE DATABASE $HYDRADB;" ||\
+        if [ $? -eq 0 ];then
+          docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "CREATE USER $HYDRADB_USER WITH PASSWORD '$HYDRADB_USER';"
+          docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "GRANT ALL ON DATABASE $HYDRADB TO $HYDRADB_USER;"
+          docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "GRANT CONNECT ON DATABASE $HYDRADB to $HYDRADB_USER;"
 
-	docker restart ${PREFIX}-hydra
-	sleep 2
+  	  docker restart ${PREFIX}-hydra
+	  sleep 2
         
-        docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "create user $HYDRACONSENTDB_USER identified by '$HYDRACONSENTDB_PW';"
+        fi
+
+        docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "create user '$HYDRACONSENTDB_USER'@'%' identified by '$HYDRACONSENTDB_PW';"
 	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "create database $HYDRACONSENTDB;"
 	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "GRANT ALL  privileges on $HYDRACONSENTDB.* to $HYDRACONSENTDB_USER;"
-
-	echo "I need to sleep for 10 secs"
-	sleep 10
-
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/public-policy.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/client-hub.json"
-	PWFILE=$RF/consent-app.pw
-	if [ ! -f $PWFILE ] ; then
-		docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-app.json > /consent-app.pw" && \
-			docker cp  ${PREFIX}-hydra:/consent-app.pw $PWFILE
-	fi
-	CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
-        sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-            -e "s/##OUTERHOST##/$OUTERHOST/" \
-            -e "s/##CONSENTPASSWORD##/$CONSENTAPPPASSWORD/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
-
-#	hydra 0.x esetén:
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/consent-app-policy.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/client-policy-hub.json"
-
-#	hydra 1.x esetén:
-#	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/consent-app-policy.json"
-#	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/client-policy-hub.json"
 
 ## This might give an error first. It might be that first we need to load the site first in browser
 	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW $HYDRACONSENTDB -e  "update bf_settings set value = 'noreply@elte.hu' where name = 'sender_email';"
@@ -172,7 +154,6 @@ case $VERB in
   "stop")
       echo "Stopping containers of ${PREFIX}-hydra"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm $NGINX_DIR/conf/conf/hydra
   ;;
 
   "remove")
@@ -189,7 +170,8 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsent-log
       docker $DOCKERARGS volume rm ${PREFIX}-hydracode
-      docker $DOCKERARGS volume rm ${PREFIX}-hydraconfig
+#      docker $DOCKERARGS volume rm ${PREFIX}-hydraconfig
+#      rm  -r $HYDRA_CONF
   ;;
   "cleandata")
     echo "Cleaning data ${PREFIX}-hydradb"

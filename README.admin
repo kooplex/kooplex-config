@@ -11,12 +11,12 @@ There should be a Kooplex instance with docker image registry running
 
 And all the ${prefix}-notebook-${imagename}-base should be pushed to it
 e.g.: 
-* docker tag kooplex-fiek-notebook-dataexp-base kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
-* docker push kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
+* docker tag ##OTHER_KOOPLEX_HOST##-notebook-dataexp-base ##OTHER_KOOPLEX_HOST##:5000/##OTHER_KOOPLEX_HOST##-notebook-dataexp-base
+* docker push ##OTHER_KOOPLEX_HOST##:5000/##OTHER_KOOPLEX_HOST##-notebook-dataexp-base
 
 # Then on the other instance it can be pulled by
-* docker pull kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base
-* dk tag kooplex-fiek:5000/kooplex-fiek-notebook-dataexp-base kooplex-temp-notebook-dataexp-base
+* docker pull ##OTHER_KOOPLEX_HOST##:5000/##OTHER_KOOPLEX_HOST##-notebook-dataexp-base
+* dk tag ##OTHER_KOOPLEX_HOST##:5000/##OTHER_KOOPLEX_HOST##-notebook-dataexp-base ##PREFIX##-notebook-dataexp-base
 
 # Then build the top, system specific layer onto it
 * bash kooplex.sh build notebook dataexp

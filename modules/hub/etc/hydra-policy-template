@@ -1,5 +1,5 @@
 {
-        "id": "client-auth-policy",
+        "id": "##PREFIX##-hub-policy",
         "resources": [
                 "rn:hydra:keys:hydra.auth.<.*>"
         ],

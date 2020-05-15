@@ -74,28 +74,28 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  ##PREFIX##-c1:
-    image: giovtorres/slurm-docker-cluster
-    command: ["slurmd"]
-    hostname: c1
-    container_name: c1
-    volumes:
-      - ##PREFIX##-etc-munge:/etc/munge
-      - ##PREFIX##-etc-slurm:/etc/slurm
-      - ##PREFIX##-slurm-jobdir:/data
-      - ##PREFIX##-var-log-slurm:/var/log/slurm
-    networks:
-      - ##PREFIX##-net
-#      - ##PREFIX##-slurm-privatenet
-    expose:
-      - "6818"
-    depends_on:
-      - "##PREFIX##-slurmctld"
-    restart: unless-stopped
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
+#  ##PREFIX##-c1:
+#    image: giovtorres/slurm-docker-cluster
+#    command: ["slurmd"]
+#    hostname: c1
+#    container_name: c1
+#    volumes:
+#      - ##PREFIX##-etc-munge:/etc/munge
+#      - ##PREFIX##-etc-slurm:/etc/slurm
+#      - ##PREFIX##-slurm-jobdir:/data
+#      - ##PREFIX##-var-log-slurm:/var/log/slurm
+#    networks:
+#      - ##PREFIX##-net
+##      - ##PREFIX##-slurm-privatenet
+#    expose:
+#      - "6818"
+#    depends_on:
+#      - "##PREFIX##-slurmctld"
+#    restart: unless-stopped
+#    logging:
+#      options:
+#        max-size: "10m"
+#        max-file: "3"
 
 #  c2:
 #    image: slurm-docker-cluster:17.02.11

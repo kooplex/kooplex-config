@@ -7,12 +7,6 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-# TODO sed instead of patch
-# Ekkor valamiert a conatc_email is az idp_user lesz
-# in /opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py 
-# 143        user_info['idp_user'] = user_info_json['idp_user']
-# 168 email = user_info['idp_user']
-
 
 
 case $VERB in

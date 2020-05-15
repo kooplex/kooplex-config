@@ -26,11 +26,11 @@ register_hydra() {
 
  sed -e "s/##PREFIX##/$PREFIX/" \
      -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-     -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+     -e "s/##OUTERHOST##/${OUTERHOST}/g" etc/hydra-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
            ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
 
  sed -e "s/##PREFIX##/$PREFIX/" \
-     -e "s/##OUTERHOST##/${OUTERHOST}/" etc/hydra-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+     -e "s/##OUTERHOST##/${OUTERHOST}/g" etc/hydra-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
         ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
 }
 

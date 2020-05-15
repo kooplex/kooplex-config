@@ -1,3 +1,6 @@
+!!! Important
+delete hydracode/consent/application/config/installed.txt 
+
 All commands should be run from repositories root folder ```$KOOPLEX_CONFIG_DIR```
 
 ## BUILD

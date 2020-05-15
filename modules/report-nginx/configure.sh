@@ -34,8 +34,7 @@ case $VERB in
       sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
-          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $REPORTNGINX_CONF/sites.conf
+          -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" etc/sites.conf > $REPORTNGINX_CONF/sites.conf
       
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s,##REPORTNGINX_HTML##,$REPORTNGINX_HTML," \

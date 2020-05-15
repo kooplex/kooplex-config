@@ -79,17 +79,18 @@ services:
 
   ##PREFIX##-prometheus:
     container_name: ##PREFIX##-prometheus
-#    image: ##PREFIX##-prometheus
-    image: prom/prometheus
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
+    image: ##PREFIX##-prometheus
+#    image: prom/prometheus
+    build:
+      context: .
+      dockerfile: Dockerfile-prometheus
     networks:
       - ##PREFIX##-net
       - ##PREFIX##-monitoring-net
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ##SRV_PROMETHEUS##/etc/prometheus.yml:/etc/prometheus/prometheus.yml
+#      - ##SRV_PROMETHEUS##/etc/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+#      - ##SRV_PROMETHEUS##/etc/:/etc/prometheus
       - ##PREFIX##-prometheus-log:/var/log
       - ##PREFIX##-prometheus-data:/prometheus/data
     restart: unless-stopped

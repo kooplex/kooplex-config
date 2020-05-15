@@ -21,4 +21,4 @@ done
 hydra host --dangerous-force-http
 
 echo "Sleeping for infinity, press Ctrl+C ..."
-exec sleep infinity
+exec sleep 10000

@@ -2,7 +2,7 @@ ldap_adduser () {
   local username=##GITLABADMIN##  
   local firstname=Gitlab
   local lastname=Admin
-  local email="admin@##INNERHOST##" 
+  local email="admin@##PREFIX##" 
   local pass=##GITLABADMINPW## 
   local uid=9999
   

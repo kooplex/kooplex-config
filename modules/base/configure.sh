@@ -12,7 +12,7 @@ case $VERB in
     mkdir -p $KEYS
     mkdir -p $CONF_DIR
     mkdir -p $LOG_DIR
-    cp $ORIGINAL_KEYS/*crt $ORIGINAL_KEYS/*key $KEYS/ 
+    cp $ORIGINAL_KEYS/${PREFIX}.{crt,key} $KEYS/ 
     
     docker $DOCKERARGS volume create -o type=none -o device=$KEYS -o o=bind ${PREFIX}-keys
     docker $DOCKERARGS volume create -o type=none -o device=$SECRETS -o o=bind ${PREFIX}-secrets

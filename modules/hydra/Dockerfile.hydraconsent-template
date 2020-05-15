@@ -4,7 +4,8 @@ FROM nginx
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt update
-RUN apt install --no-install-recommends -y php7.0 php7.0-mysql php7.0-fpm php7.0-curl nginx-full vim less php7.0-dom php7.0-xml
+#RUN apt install --no-install-recommends -y php7.2 php7.2-mysql php7.2-fpm php7.2-curl nginx-full vim less php7.2-dom php7.2-xml
+RUN apt install --no-install-recommends -y php php-mysql php-fpm php-curl nginx-full vim less php-dom php-xml
 RUN apt install -y openssl ca-certificates
 
 ## FIXME

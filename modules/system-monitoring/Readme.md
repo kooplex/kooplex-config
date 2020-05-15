@@ -9,3 +9,13 @@ http://kooplex-test.elte.hu/grafana/dashboard/snapshot/UP5rekVtxxBIUvDgp0lx4A4sR
 
 OAUTH for grafana
 https://grafana.com/docs/grafana/latest/auth/generic-oauth/
+
+# How to setup
+###
+Setup grafana to receive data from prometheus
+Add datasource prometheus
+http://##PREFIX##-prometheus:9090
+e.g. http://kooplex-test-prometheus:9090
+Them import dashboard
+https://grafana.com/grafana/dashboards/893
+

@@ -16,6 +16,7 @@ services:
     restart: unless-stopped
     volumes:
       - ##PREFIX##-hydra-log:/var/log/api:rw
+#      - ##PREFIX##-hydra-conf:/etc/hydraconfig:ro
       - ##PREFIX##-secrets:/etc/secrets:rw
     logging:
       options:
@@ -33,6 +34,8 @@ services:
       - HTTPS_TLS_CERT_PATH=/etc/hydra.crt
       - HTTPS_TLS_KEY_PATH=/etc/hydra.key
       - DISABLE_TELEMETRY=1
+      - HYDRA_API_USER=##HYDRA_API_USER##
+      - HYDRA_API_PW=##HYDRA_API_PW##
 
 #      - DATABASE_URL=postgres://##HYDRADB_USER##:##HYDRADB_PW##@##PREFIX##-hydra-postgresql:5432/##HYDRADB##?sslmode=disable
 
@@ -110,6 +113,8 @@ volumes:
     external: true
   ##PREFIX##-hydracode:
     external: true
+#  ##PREFIX##-hydra-conf:
+#    external: true
   ##PREFIX##-secrets:
     external: true
   ##PREFIX##-hydra-log:

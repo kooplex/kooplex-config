@@ -8,11 +8,6 @@ DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 GITEA_CONF=$CONF_DIR/${MODULE_NAME}
 
-# INIT for openid
-# ${MODULE_NAME} admin auth add-oauth --name kooplex-test --provider openidConnect --auto-discover-url https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration --key kooplex-test-${MODULE_NAME} --secret vmi
-
-# GITEA html templates from https://github.com/go-gitea/gitea.git
-
 case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."

@@ -56,8 +56,6 @@ case $VERB in
           -e "s/##HUBDB##/${HUBDB}/g" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERPORT##/$OUTERHOSTPORT/" \
-          -e "s/##INNERHOST##/$INNERHOST/" \
-          -e "s/##INNERHOSTNAME##/$INNERHOSTNAME/" \
           -e "s/##DBHOST##/${PREFIX}-hub-mysql/" \
           -e "s/##PROTOCOL##/$REWRITEPROTO/" \
           -e "s/##LDAPBASEDN##/$LDAPORG/" \

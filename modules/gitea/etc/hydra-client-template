@@ -1,13 +1,13 @@
 {
-        "client_name": "kooplex-fiek-seafile",
+        "client_name": "##PREFIX##-gitea",
         "grant_types": [
                 "client_credentials",
                 "authorization_code"
         ],
-        "id": "kooplex-fiek-seafile",
-		  "description": "kooplex-fiek-seafile",
+        "id": "##PREFIX##-gitea",
+		  "description": "##PREFIX## GITEA",
         "redirect_uris": [
-                "https://kooplex-fiek.elte.hu/seafile/oauth/callback/"
+                "https://##OUTERHOST##/gitea/user/oauth2/##PREFIX##-gitea/callback"
         ],
         "response_types": [
                 "id_token",

@@ -1,5 +1,22 @@
 Visit the [Kooplex page](https://kooplex.github.io/) for further informations!
 
+## Prerequisites
+
+apt install docker.io
+vim /etc/docker/daemon.json
+```
+{
+          "exec-opts": ["native.cgroupdriver=systemd"], # for monitoring with grafana
+            "log-driver": "json-file",   # don't let logs grow too large
+              "log-opts": {
+                          "max-size": "100m"
+                            },
+              "storage-driver": "overlay2",   # that was recommended at some point
+      "insecure-registries":["##OTHER_KOOPLEX_INSTANCE##:5000"]  # In case of having multiple Kooplex instances, you may want reuse already built notebook images
+
+}
+```
+
 ## Kooplex configuration scripts
 
 To install a kooplex instance, follow steps below. Substitute $PROJECT with your project name and
@@ -11,7 +28,11 @@ $SRV with the kooplex root directory on your host machine.
 
     $ git clone https://github.com/kooplex/kooplex-config.git
 
+* Create certificate and copy in into $ORIGINAL_KEYS directory with name ${PREFIX}.crt and ${PREFIX}.key
+
 * copy config.sh_template to config.sh and modify it as necessary. Here are the variables explained:
+
+
 ```bash
 #The url that will be accessible from a browser
 OUTERHOSTNAME="example.org"

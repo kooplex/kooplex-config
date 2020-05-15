@@ -3,7 +3,7 @@
         "grant_types": [
                 "client_credentials"
         ],
-        "id": "consent-app",
+        "id": "##PREFIX##-consent",
         "response_types": [
                 "token"
         ],

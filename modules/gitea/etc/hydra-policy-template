@@ -8,6 +8,6 @@
 	],
 	"effect": "allow",
 	"subjects": [
-		"kooplex-fiek-seafile"
+		"##PREFIX##-gitea"
 	]
 }

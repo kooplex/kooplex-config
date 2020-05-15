@@ -66,7 +66,7 @@ def remove_new_service(service):
 
     reload_nginx_server()
     response = "Service %s ha been removed " % service
-    return jsonify({ 'response': str(response), 'service removalr': response })
+    return jsonify({ 'response': str(response), 'service removal': response })
 
 if __name__ == '__main__':
     logger = logging.getLogger()

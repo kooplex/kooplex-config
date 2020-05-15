@@ -17,9 +17,7 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_manual -o o=bind ${PREFIX}-manual
 
 
-      cp Dockerfile etc/entrypoint.sh $RF
-      # git clone https://github.com/kooplex/Manual.git $SRV/_manual
-      #      cp -r etc/* $SRV/_manual
+      cp Dockerfile etc/entrypoint.sh  $RF
       
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
@@ -27,7 +25,9 @@ case $VERB in
       echo "2. Building ${PREFIX}-manual..."
       docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
-
+  "install")
+      git clone https://github.com/kooplex/Manual.git $SRV/_manual
+  ;;
   "install-hydra")
   #  register_hydra $MODULE_NAME
   ;;

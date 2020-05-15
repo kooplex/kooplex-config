@@ -11,10 +11,10 @@ auth = HTTPBasicAuth()
 CONF_DIR="/etc/hydraconfig/"
 SECRET_DIR="/etc/secrets/"
 HYDRA_USER=os.getenv("HYDRA_API_USER")
-HYDRA_USER="hydrauser"
+#HYDRA_USER="hydrauser"
 
 HYDRA_PW=os.getenv("HYDRA_API_PW")
-HYDRA_PW="hydrapw"
+#HYDRA_PW="hydrapw"
 
 @auth.verify_password
 def verify_password(username, password):

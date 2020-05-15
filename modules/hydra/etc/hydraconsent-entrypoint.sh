@@ -6,6 +6,6 @@ chown www-data:www-data /srv/consent/application/config/application.php /srv/con
 chmod u+w  /srv/consent/application/config/application.php /srv/consent/application/config/database.php
 ln -sf /srv/consent/public /srv/consent/public/consent
 service nginx start
-service php7.0-fpm start
+service php7.3-fpm start
 
 sleep infinity
