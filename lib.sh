@@ -9,7 +9,7 @@ register_nginx() {
  sed -e "s/##PREFIX##/$PREFIX/" \
      -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
      -e "s/##MODULE_NAME##/${MODULE_NAME}/" \
-     -e "s/##OUTERHOST##/${OUTERHOST}/" etc/nginx-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
+     -e "s/##OUTERHOST##/${OUTERHOST}/" nginx-conf/nginx-conf-template | curl -u ${NGINX_API_USER}:${NGINX_API_PW}\
         ${NGINX_IP}:5000/api/new/${MODULE_NAME} -H "Content-Type: text/plain" -X POST --data-binary @-
 }
 
@@ -26,11 +26,11 @@ register_hydra() {
 
  sed -e "s/##PREFIX##/$PREFIX/" \
      -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-     -e "s/##OUTERHOST##/${OUTERHOST}/g" etc/hydra-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+     -e "s/##OUTERHOST##/${OUTERHOST}/g" hydra-conf/hydra-client-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
            ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
 
  sed -e "s/##PREFIX##/$PREFIX/" \
-     -e "s/##OUTERHOST##/${OUTERHOST}/g" etc/hydra-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
+     -e "s/##OUTERHOST##/${OUTERHOST}/g" hydra-conf/hydra-policy-template | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
         ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${MODULE_NAME} -H "Content-Type: application/json" -X POST --data-binary @-
 }
 

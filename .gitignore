@@ -1,3 +1,4 @@
 config.sh
 modules/nextstrain/
 modules/cbioportal
+modules/plugins/
