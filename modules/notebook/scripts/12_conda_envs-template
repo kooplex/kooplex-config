@@ -12,7 +12,9 @@ fi
 #FIXME: gid hardcoded, left here to lazy set formerly screwed permissions
 #chown -R $NB_USER:9998 /home/$NB_USER/.conda
 #
-#
+
+# To be able to create custom conda kernels per user
+mkdir -p /home/benedek/.conda/pkgs && chmod a+swr /home/benedek/.conda/pkgs/
  
 if [ -e ##FUNCTIONAL_VOLUME_MOUNT_POINT##/*/condaenvs/*/ ]; then
  

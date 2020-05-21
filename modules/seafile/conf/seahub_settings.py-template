@@ -5,7 +5,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'seahub_db',
-        'USER': 'seafile',
+        'USER': 'root',
         'PASSWORD': '##SEAFILEDB_PW##',
         'HOST': '##PREFIX##-seafile-mysql',
         'PORT': '3306'

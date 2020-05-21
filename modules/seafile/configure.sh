@@ -7,17 +7,17 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-
+SEAFILE_CACHE=/kooplex-big/_cache-${PREFIX}-${MODULE_NAME}/
 
 case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
     mkdir -p $SRV/_${MODULE_NAME}-mysql
-    mkdir -p /kooplex-big/_cache-${MODULE_NAME}/
+    mkdir -p $SEAFILE_CACHE
     mkdir -p $SRV/_${MODULE_NAME}-data
 
-    docker $DOCKERARGS volume create -o type=none -o device=/kooplex-big/_cache-${MODULE_NAME} -o o=bind ${PREFIX}-cache-${MODULE_NAME}
+    docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_CACHE -o o=bind ${PREFIX}-cache-${MODULE_NAME}
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-mysql -o o=bind ${PREFIX}-${MODULE_NAME}-mysql
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-data -o o=bind ${PREFIX}-${MODULE_NAME}-data
 
@@ -77,13 +77,13 @@ case $VERB in
 
   "admin")
      echo "Creating Seafile admin user..."
+     # https://download.seafile.com/published/seafile-manual/docker/deploy%20seafile%20with%20docker.md
 	docker $DOCKERARGS exec -it ${PREFIX}-${MODULE_NAME} /opt/seafile/seafile-server-latest/reset-admin.sh
   ;;
 
   "stop")
       echo "Stopping container ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm $NGINX_DIR/conf/conf/${MODULE_NAME}
   ;;
   "remove")
       echo "Removing $DOCKER_COMPOSE_FILE"
