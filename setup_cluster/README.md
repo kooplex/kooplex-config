@@ -6,12 +6,15 @@ The node kooplex-test has public network enabled, kooplex-cn1 and kooplex-cn2 ar
 
 The version number of the docker engine installed is 19.03.6.
 
-## Steps mainly follow
+## Installation howtos
 
+Steps mainly follow:
 * https://kubernetes.io/docs/tasks/tools/install-kubectl/
 * https://www.nakivo.com/blog/install-kubernetes-ubuntu/
 
-First steps run in root context at kooplex-test to be the master node.
+## Prerequisities
+
+These commands are run in root context at kooplex-test to be the master node.
 
 ```bash
 apt update && apt install -y apt-transport-https
@@ -27,6 +30,8 @@ sysctl -p
 
 **FIXME:** cgroup settings are not yet done. _Add the string after the existing Environment string_ in `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf`
 ```Environment=”cgroup-driver=systemd/cgroup-driver=cgroupfs”```
+
+## Master node setup
 
 Refresh to the latest required images and initialize the cluster.
 
@@ -154,7 +159,7 @@ kooplex-cn1    NotReady   <none>   61s     v1.18.4   beta.kubernetes.io/arch=amd
 kooplex-test   Ready      master   7m49s   v1.18.4   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=kooplex-test,kubernetes.io/os=linux,node-role.kubernetes.io/master=
 ```
 
-## Add label to worker node
+We have to add label to worker node
 
 ```bash
 kubectl  label node kooplex-cn1 node-role.kubernetes.io/worker= 
@@ -214,6 +219,18 @@ kubectl apply -f busybox.yaml
 Right after this `cni0` interfaces are created at worker nodes.
 
 If you `docker exec` any of the pod containers they answer ping by IP address.
+
+```
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master -- /bin/sh
+/ # ping 10.44.2.1
+PING 10.44.2.1 (10.44.2.1): 56 data bytes
+64 bytes from 10.44.2.1: seq=0 ttl=63 time=0.655 ms
+64 bytes from 10.44.2.1: seq=1 ttl=63 time=0.658 ms
+^C
+--- 10.44.2.1 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.655/0.656/0.658 ms
+```
 
 **FIXME:** nameserver 10.96.0.10 is not routed, and there is no DNS resolution yet.
 
