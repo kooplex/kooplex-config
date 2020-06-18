@@ -232,6 +232,11 @@ PING 10.44.2.1 (10.44.2.1): 56 data bytes
 round-trip min/avg/max = 0.655/0.656/0.658 ms
 ```
 
-**FIXME:** nameserver 10.96.0.10 is not routed, and there is no DNS resolution yet.
+## DNS troubleshooting
 
+In case verbose logging is required for the DNS service, issue the following configurator command and insert a line `log` above the errors line.
+
+```bash
+kubectl -n kube-system edit configmap coredns
+```
 
