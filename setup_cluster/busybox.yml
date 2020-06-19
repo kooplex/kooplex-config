@@ -8,7 +8,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 9376
+      targetPort: 8080
 ---
 apiVersion: v1
 kind: Pod
@@ -27,7 +27,7 @@ spec:
       - "3600"
     name: busybox
     ports:
-      - containerPort: 80
+      - containerPort: 8080
   nodeSelector:
     kubernetes.io/hostname: kooplex-cn1
 ---
@@ -41,7 +41,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 9376
+      targetPort: 8080
 ---
 apiVersion: v1
 kind: Pod
@@ -60,7 +60,7 @@ spec:
       - "3600"
     name: busybox
     ports:
-      - containerPort: 80
+      - containerPort: 8080
   nodeSelector:
     kubernetes.io/hostname: kooplex-cn2
 ---
@@ -74,7 +74,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 9376
+      targetPort: 8080
 ---
 apiVersion: v1
 kind: Pod
@@ -93,7 +93,7 @@ spec:
       - "3600"
     name: busybox
     ports:
-      - containerPort: 80
+      - containerPort: 8080
   nodeSelector:
     kubernetes.io/hostname: kooplex-test
 

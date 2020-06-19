@@ -232,6 +232,53 @@ PING 10.44.2.1 (10.44.2.1): 56 data bytes
 round-trip min/avg/max = 0.655/0.656/0.658 ms
 ```
 
+### Test
+
+Check pods, services and enpoints are created:
+
+```
+root@kooplex-test:~/ $ kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+bbs-cn1      ClusterIP   10.100.114.108   <none>        80/TCP    11m
+bbs-cn2      ClusterIP   10.96.17.144     <none>        80/TCP    105s
+bbs-master   ClusterIP   10.96.53.96      <none>        80/TCP    105s
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP   20h
+root@kooplex-test:~/ $ kubectl get ep
+NAME         ENDPOINTS             AGE
+bbs-cn1      10.44.1.5:8080        11m
+bbs-cn2      10.44.2.4:8080        110s
+bbs-master   10.44.0.7:8080        110s
+kubernetes   192.168.13.203:6443   20h
+root@kooplex-test:~/ $ kubectl get pods
+NAME             READY   STATUS    RESTARTS   AGE
+busybox-cn1      1/1     Running   0          21s
+busybox-cn2      1/1     Running   0          116s
+busybox-master   1/1     Running   0          116s
+```
+
+Use `nc` to test dataplane connectivity. Two terminals used:
+
+* Listen
+
+```
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-cn1 -- sh
+/ # nc -l -p 8080
+hali
+^Cpunt!
+```
+
+* Send
+
+```
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master -- sh
+/ # echo hali | nc bbs-cn1 80
+^Cpunt!
+```
+
+*Note:* the message in listen terminal appears after you send it in the other terminal. Busybox `nc` does not terminate after EOF we hit ctrl-C.
+
+*Note:* `nslookup` in busybox is somewhat buggy, every now and then forward DNS resolution do not yield an IP address and always fails. Other applications, however, resolve as expected (`ping`, `nc`).
+
 ## DNS troubleshooting
 
 In case verbose logging is required for the DNS service, issue the following configurator command and insert a line `log` above the errors line.
