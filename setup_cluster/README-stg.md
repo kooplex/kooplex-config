@@ -84,3 +84,26 @@ alma     krumpli
 root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pvsp-2 -- ls /test-pd
 korte
 ```
+
+
+# Move on
+
+Seems accross our nodes there is no need at this pont to go for NFS. [conf](pvcn.yml)
+
+```bash
+mkdit /big-data/sandbox.k8s
+kubectl apply -f pvcn.yml
+```
+
+### Test
+
+```
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv -- touch /test-pd/t
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-cn1-pv -- ls /test-pd/
+t
+```
+
+
+# The `nfs` storage volume
+
+To be tested later when really needed.
