@@ -287,3 +287,6 @@ In case verbose logging is required for the DNS service, issue the following con
 kubectl -n kube-system edit configmap coredns
 ```
 
+## Persistent storage
+
+See [README-stg.md](README-stg.md) for details.

@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-master-pv0
+  namespace: default
+spec:
+  hostname: busybox-master-pv0
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-pv
+  nodeSelector:
+    kubernetes.io/hostname: kooplex-test
+  volumes:
+  - name: test-pv
+    hostPath:
+      # directory location on host
+      path: /root/pv
+      type: Directory
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-master-pv1
+  namespace: default
+spec:
+  hostname: busybox-master-pv1
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-pv
+  nodeSelector:
+    kubernetes.io/hostname: kooplex-test
+  volumes:
+  - name: test-pv
+    hostPath:
+      # directory location on host
+      path: /root/pv/1
+      type: Directory
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-master-pv2
+  namespace: default
+spec:
+  hostname: busybox-master-pv2
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-pv
+  nodeSelector:
+    kubernetes.io/hostname: kooplex-test
+  volumes:
+  - name: test-pv
+    hostPath:
+      # directory location on host
+      path: /root/pv/2
+      type: Directory
