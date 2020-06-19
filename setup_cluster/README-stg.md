@@ -71,3 +71,16 @@ root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv-a -- touch /
 root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv-b -- ls /test-pd
 1  2  T
 ```
+
+# The `subPath` combined with `local` persistent volume
+
+It is possible to dedicate a subfolder for a pod. The example [configuration](pv-subpath.yml) buils on previous folders, volume and volume claim.
+
+### Test
+
+```
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pvsp-1 -- ls /test-pd
+alma     krumpli
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pvsp-2 -- ls /test-pd
+korte
+```
