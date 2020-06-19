@@ -20,7 +20,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ##MODULE_NAME##
+  name: ##PREFIX##-##MODULE_NAME##
   namespace: default
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##
