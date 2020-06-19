@@ -1,13 +1,11 @@
-All commands should be run from repositories root folder ```$KOOPLEX_CONFIG_DIR```
-
 ## BUILD
 ```
 bash kooplex.sh build nginx
 ```
 
-* Creates directories and docker volumes
+* Creates directories module directories inside service persistent volumes
+* Populate configuration information, key files and html files
 * Completes template files
-* Builds docker image
 
 
 ## START
@@ -15,5 +13,5 @@ bash kooplex.sh build nginx
 bash kooplex.sh start nginx
 ```
 
-* Launches nginx 
+* Launches nginx in kubernetes master node
 
