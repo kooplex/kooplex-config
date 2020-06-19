@@ -35,7 +35,7 @@ case $VERB in
 
   "start")
        echo "Starting containers of ${PREFIX}-${MODULE_NAME}"
-       kubectl create -f $BUILDMOD_DIR/nginx.yaml
+       kubectl apply -f $BUILDMOD_DIR/nginx.yaml
   ;;
 
 
