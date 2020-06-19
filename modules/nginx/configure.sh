@@ -18,7 +18,8 @@ case $VERB in
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
-          -e s,##MODULE_NAME##,$MODULE_NAME, build/nginx.yaml-template \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##EXTERNALIP##,$EXTERNALIP, build/nginx.yaml-template \
           > $BUILDMOD_DIR/nginx.yaml
 
       sed -e s,##CERT##,${PREFIX}.crt, \

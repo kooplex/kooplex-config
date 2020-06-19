@@ -14,7 +14,8 @@ spec:
       protocol: TCP
       port: 443
       targetPort: 443
-
+  externalIPs:
+    - ##EXTERNALIP##
 ---
 apiVersion: v1
 kind: Pod
