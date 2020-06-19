@@ -1,66 +1,59 @@
 #!/bin/bash
 
-CONFIGDIR=$PWD
+MYPWD=$PWD
+CONFIGDIR=$(dirname $0)
 
-. ./lib.sh
+for SRC in $CONFIGDIR/config.sh $CONFIGDIR/lib.sh ; do
+    if [ ! -f $SRC ] ; then
+        echo "$SRC is missing" >&2
+        exit 1
+    fi
+    . $SRC
+done
 
-getmodules() {
-  if [ $# -lt 2 ] || [ "$2" = "all" ]; then
-    echo "$SYSMODULES $MODULES"
-  elif [ "$2" = "sys" ]; then
-    echo "$SYSMODULES"
-  else
-    local args=($@)
-    echo "${args[@]:1}"
-  fi
-}
+
+echo "Prefix $PREFIX" >&2
+echo "Checking persistent volumes for services" >&2
+create_pv
+create_pvc
 
 VERB=$1
-SVCS=$2
-if [ "$SVCS" = "notebook" ]; then
-  EXTRA=$3
+shift
+
+if [ "$1" = "notebook" ]; then
+  SVCS=$1
+  EXTRA=$2
+elif [ "$1" = "all" ] ; then
+  SVCS="$SYSMODULES $MODULES"
+elif [ "$1" = "sys" ] ; then
+  SVCS="$SYSMODULES"
 else
-  SVCS=$(getmodules "$@")
-fi
-echo $VERB
-mkdir -p $BUILDDIR
-
-
-CA_DIR=$BUILDDIR/CA
-if [ -d $CA_DIR ] ; then
-    echo "$CA_DIR already present; will not generate ca" >&2
-else 
-    echo "generate CA"
-    set -e
-    mkdir $CA_DIR
-    openssl genrsa -out $CA_DIR/rootCA.key 4096
-    openssl req -x509 -new -nodes -key $CA_DIR/rootCA.key -sha256 -days 1024 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=$OUTERHOST" -out $CA_DIR/rootCA.crt
+  SVCS="$@"
 fi
 
+echo "Command $VERB" >&2
+echo "Modules $SVCS" >&2
+echo "Extra $EXTRA" >&2
+ 
 case $VERB in
 
-  "build")
+  "build"|"install"|"start"|"init"|"stop"|"remove"|"purge")
     set -e
   ;;
-  "install")
-    set -e
-  ;;
-  "start")
-
-    set -e
-  ;;
-  "init")
-    set -e
+  *)
+    echo "Unknown command $VERB" >&2
+    exit 1
   ;;
 esac
 
-echo "Starting $VERB..."
+echo "Starting $VERB..." >&2
 
-for svc in $SVCS
+for MODULE_NAME in $SVCS
 do
-  cd modules/$svc
+  mkdir_build
+  cd $CONFIGDIR/modules/$MODULE_NAME
   . ./configure.sh
-  cd $CONFIGDIR
 done
 
-echo "Finished $VERB."
+cd $MYPWD
+echo "Finished $VERB." >&2

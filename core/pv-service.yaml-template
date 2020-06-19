@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-##PREFIX##-svc-log
+  labels:
+    pvl: svc-log
+spec:
+  capacity:
+    storage: 100Mi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: ##SERVICELOG_DIR##
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ##KUBE_MASTERNODE##
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-##PREFIX##-svc-conf
+  labels:
+    pvl: svc-conf
+spec:
+  capacity:
+    storage: 100Mi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: ##SERVICECONF_DIR##
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ##KUBE_MASTERNODE##
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-##PREFIX##-svc-data
+  labels:
+    pvl: svc-data
+spec:
+  capacity:
+    storage: 100Mi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: ##SERVICEDATA_DIR##
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ##KUBE_MASTERNODE##
+---

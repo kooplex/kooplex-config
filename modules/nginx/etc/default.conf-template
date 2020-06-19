@@ -27,13 +27,13 @@ server {
 ####### Custom pages 
    error_page 404 /custom_404.html;
    location = /custom_404.html {
-        root /usr/share/nginx/html;
+        root /var/www/html/;
         internal;
    }
  
    error_page 502 /custom_502.html;
    location = /custom_502.html {
-        root /usr/share/nginx/html;
+        root /var/www/html/;
         internal;
    }
 ####### Custom pages end 

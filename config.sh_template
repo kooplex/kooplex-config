@@ -1,121 +1,144 @@
+FQDN=
+KUBE_MASTERNODE=
+PREFIX=k8plex
+KEYFILE=
+CERTFILE=
+
+BUILDDIR=/data/$PREFIX/build
+
+ROOT_DIR=/$PREFIX
+SERVICE_DIR=$ROOT_DIR/services
+
+SERVICELOG_DIR=$SERVICE_DIR/log
+SERVICECONF_DIR=$SERVICE_DIR/conf
+SERVICEDATA_DIR=$SERVICE_DIR/data
+
+DATA_DIR=$ROOT_DIR/data
+
+
+
+
+
+#######################
+
 SYSMODULES="net base" # admin"
-MODULES="base net ldap proxy nginx impersonator hub notebook"  #overleaf gitea seafile report-nginx manual hydra
+MODULES="base net ldap proxy hydra hub nginx" # notebook
 
-OUTERHOSTNAME="example.sthg.comu"
-OUTERHOST=$OUTERHOSTNAME
-
-INNERHOST="192.168.0.25"
-
-INTERNAL_SSL=false
-
-PREFIX=""
-
-MAIL_SERVER_HOSTNAME="mail.example.com"
-
-ORIGINAL_KEYS=
-
-DOCKERIP="/var/run/docker.sock"
-DOCKERPORT=""
-DOCKERPROTOCOL="unix"
-if [[ -z "${DOCKERPORT}" ]]; then
- DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP"
-else
- DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP:$DOCKERPORT"
-fi
-
-ROOT="/srv/"$PREFIX
-SRV=$ROOT/$PREFIX
-BUILDDIR=$ROOT"/build"
-
-LOG_DIR=$SRV/log
-CONF_DIR=$SRV/conf
-KEYS=$SRV/_keys
-
-SUBNET="172.20.0.0/16"
-SERVICESUBNET="172.16.0.0/16"
-MONITORINGSUBNET="172.18.0.0/16"
-
-LDAPDOMAIN=$OUTERHOST
-SMTP="smtp"
-SMTPPORT=25
-EMAIL_HOST=
-EMAIL_FROM=
-EMAIL_USER="No-reply"
-EMAIL_SUBJECT_PREFIX=
-
-DUMMYPASS=""
-HUBLDAP_PW=${DUMMYPASS}
-#HUBLDAP_ADMIN=		
-HUBROXY_PW=${DUMMYPASS}
-PROXYTOKEN=${DUMMYPASS}
-REWRITEPROTO=https
-
-HUB_DEBUG=True
-
-ERROR_LOG="error.log"
-CHECK_LOG="check.log"
-
-#EXECUTABLES
-DOCKER_COMPOSE="docker-compose"
-
-IMAGES_FROM_REGISTRY=True
-
-### INHERITED NAMES (or not )
-HUBDB=kooplexhub
-HUBDB_USER=kooplexhub
-HUBDB_PW=${DUMMYPASS}
-HUBDBROOT_PW=${DUMMYPASS}
-DJANGO_SECRET_KEY=''
-
-# GITEA
-GITEAADMINPW=${DUMMYPASS}
-GITEADB=${PREFIX}_gitea
-GITEAUSER=gitea
-GITEADBPW=${DUMMYPASS}
-
-# GITLAB
-GITLABDB=${PREFIX}_gitlabdb
-GITLABDBPW=${DUMMYPASS}
-GITLABADMIN=gitlabadmin
-GITLABADMINPW=${DUMMYPASS}
-
-# HYDRA
-HYDRACONSENTDB_USER=hydraconsent
-HYDRACONSENTDB_PW=
-HYDRACONSENTDB=hydraconsentdb
-HYDRADB_USER=hydra
-HYDRADB_PW=
-HYDRADB=hydradb
-HYDRA_ADMINPW=
-HYDRASYSTEM_SECRET= #(pwgen 32)
-URL_HYDRA=https://$OUTERHOST/hydra
-
-HYDRA_CONFIG=$CONF_DIR/hydra
-
-#OIDC SECRETS
-HYDRA_OIDC_SECRET_HUB=""
-# SEAFILE
-SEAFILE_SECRET=
-SEAFILEDB_PW=${DUMMYPASS}
-
-# SINGULARITY
-SINGULARITYDB_PW=
-SINGULARITY_SECRET=
-
-# name of the directory in each module of the Docker extra lines when building the notebook images
-NOTEBOOK_DOCKER_EXTRA=notebook-ext
-
-# Where should the docker volumes be created?
-DOCKER_VOLUME_DIR=
-
-MINUID=10000
-
-SECRETS=$SRV/.secrets
-
-NGINX_DIR=$SRV/_outernginx/
-
-# MOUNTPOINTS
-# where to find mounted storage and functional volumes
-
-FUNCTIONAL_VOLUME_MOUNT_POINT=/vol
-STORAGE_VOLUME_MOUNT_POINT=/mnt
+## CLEAN ## OUTERHOSTNAME="kooplex-test.elte.hu"
+## CLEAN ## OUTERHOST=$OUTERHOSTNAME
+## CLEAN ## 
+## CLEAN ## 
+## CLEAN ## 
+## CLEAN ## MAIL_SERVER_HOSTNAME=mail.elte.hu
+## CLEAN ## 
+## CLEAN ## #ORIGINAL_KEYS=/root/kooplex-test-keys/
+## CLEAN ## 
+## CLEAN ## DOCKERIP="/var/run/docker.sock"
+## CLEAN ## DOCKERPORT=""
+## CLEAN ## DOCKERPROTOCOL="unix"
+## CLEAN ## if [[ -z "${DOCKERPORT}" ]]; then
+## CLEAN ##  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP"
+## CLEAN ## else
+## CLEAN ##  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP:$DOCKERPORT"
+## CLEAN ## fi
+## CLEAN ## 
+## CLEAN ## 
+## CLEAN ## # The directory where certificates are stored for external SSL
+## CLEAN ## FQDN_CERT=$CONF_DIR/fqdn_certs
+## CLEAN ## REWRITEPROTO=https
+## CLEAN ## 
+## CLEAN ## # The directory where certificates are stored for internal SSL
+## CLEAN ## INTERNAL_CERT=$CONF_DIR/internal_certs
+## CLEAN ## 
+## CLEAN ## # Hydra client files, API will make this deprecate
+## CLEAN ## HYDRA_CONFIG=$CONF_DIR/hydra
+## CLEAN ## 
+## CLEAN ## # NGINX, API will make this deprecate 
+## CLEAN ## NGINX_DIR=$CONF_DIR/nginx
+## CLEAN ## 
+## CLEAN ## 
+## CLEAN ## #SUBNET="172.30.0.0/16"
+## CLEAN ## #SERVICESUBNET="172.33.0.0/16"
+## CLEAN ## #MONITORINGSUBNET="172.37.0.0/16"
+## CLEAN ## 
+## CLEAN ## LDAPDOMAIN=$OUTERHOST
+## CLEAN ## SMTP="smtp"
+## CLEAN ## SMTPPORT=25
+## CLEAN ## EMAIL_HOST=
+## CLEAN ## EMAIL_FROM=
+## CLEAN ## EMAIL_USER="No-reply"
+## CLEAN ## EMAIL_SUBJECT_PREFIX=
+## CLEAN ## 
+## CLEAN ## DUMMYPASS="ALMAFA321"
+## CLEAN ## HUBLDAP_PW=${DUMMYPASS}
+## CLEAN ## #HUBLDAP_ADMIN=
+## CLEAN ## HUBROXY_PW=${DUMMYPASS}
+## CLEAN ## PROXYTOKEN=${DUMMYPASS}
+## CLEAN ## 
+## CLEAN ## HUB_DEBUG=True
+## CLEAN ## 
+## CLEAN ## ERROR_LOG="error.log"
+## CLEAN ## CHECK_LOG="check.log"
+## CLEAN ## 
+## CLEAN ## #EXECUTABLES
+## CLEAN ## #DOCKER_COMPOSE="docker-compose"
+## CLEAN ## 
+## CLEAN ## # Notebook images can be pulled from a central registry, instead of always rebuilding them
+## CLEAN ## IMAGES_FROM_REGISTRY=True
+## CLEAN ## 
+## CLEAN ## ### INHERITED NAMES (or not )
+## CLEAN ## HUBDB=kooplexhub
+## CLEAN ## HUBDB_USER=hubuser
+## CLEAN ## HUBDB_PW=${DUMMYPASS}
+## CLEAN ## HUBDBROOT_PW=${DUMMYPASS}
+## CLEAN ## DJANGO_SECRET_KEY='n(bd1f1c%e8=_xad02x5qtfn%wgwpi492e$8_erx+d)!tpeoim'
+## CLEAN ## 
+## CLEAN ## # GITEA
+## CLEAN ## GITEAADMINPW=${DUMMYPASS}
+## CLEAN ## GITEADB=${PREFIX}_gitea
+## CLEAN ## GITEAUSER=gitea
+## CLEAN ## GITEADBPW=${DUMMYPASS}
+## CLEAN ## 
+## CLEAN ## # GITLAB
+## CLEAN ## GITLABDB=${PREFIX}_gitlabdb
+## CLEAN ## GITLABDBPW=${DUMMYPASS}
+## CLEAN ## GITLABADMIN=gitlabadmin
+## CLEAN ## GITLABADMINPW=${DUMMYPASS}
+## CLEAN ## 
+## CLEAN ## # HYDRA
+## CLEAN ## HYDRACONSENTDB_USER=hydraconsent
+## CLEAN ## HYDRACONSENTDB_PW=almafa123
+## CLEAN ## HYDRACONSENTDB=hydraconsentdb
+## CLEAN ## HYDRADB_USER=hydra
+## CLEAN ## HYDRADB_PW=almafa123
+## CLEAN ## HYDRADB=hydradb
+## CLEAN ## HYDRA_ADMINPW=almafa123
+## CLEAN ## HYDRASYSTEM_SECRET=iush4ievohyuaz0aipuaTaivouloihoo
+## CLEAN ## URL_HYDRA=https://kooplex-test.elte.hu/hydra
+## CLEAN ## 
+## CLEAN ## 
+## CLEAN ## #OIDC SECRETS
+## CLEAN ## HYDRA_OIDC_SECRET_HUB="~.Nseet.Mi_o"
+## CLEAN ## # SEAFILE
+## CLEAN ## SEAFILE_SECRET=sOX9MsO9Yg4Cbyx5JuZQcjifPqKDQTq0jyiMCfAnrn
+## CLEAN ## SEAFILEDB_PW=${DUMMYPASS}
+## CLEAN ## 
+## CLEAN ## # SINGULARITY
+## CLEAN ## SINGULARITYDB_PW=almafa123
+## CLEAN ## SINGULARITY_SECRET=gfDF$%gh4htr31
+## CLEAN ## 
+## CLEAN ## # name of the directory in each module of the Docker extra lines when building the notebook images
+## CLEAN ## NOTEBOOK_DOCKER_EXTRA=notebook-ext
+## CLEAN ## 
+## CLEAN ## # Where should the docker volumes be created?
+## CLEAN ## #DOCKER_VOLUME_DIR=/data//_volume/
+## CLEAN ## 
+## CLEAN ## MINUID=10000
+## CLEAN ## 
+## CLEAN ## SECRETS=$CONF_DIR/.secrets_clean
+## CLEAN ## 
+## CLEAN ## # MOUNTPOINTS
+## CLEAN ## # where to find mounted storage and functional volumes
+## CLEAN ## 
+## CLEAN ## FUNCTIONAL_VOLUME_MOUNT_POINT=/vol
+## CLEAN ## STORAGE_VOLUME_MOUNT_POINT=/mnt

@@ -1,68 +1,55 @@
 #!/bin/bash
 
-RF=$BUILDDIR/nginx
 
-mkdir -p $RF
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
+NGINX_KEYS=$FQDN_CERT
 
 case $VERB in
-
   "build")
-    echo "1. Configuring ${PREFIX}-nginx..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
+      mkdir_svcconf
+      mkdir_svclog
+      mkdir_svcdata
+      _mkdir $MODCONF_DIR/conf.d/sites-enabled
+      _mkdir $MODCONF_DIR/keys
 
-    if [ $REWRITEPROTO = "http" ]; then
-      EXTRACONFIG="ports:\n      - 80:80"
-    fi
+      cp $KEYFILE $MODCONF_DIR/keys/${PREFIX}.key
+      cp $CERTFILE $MODCONF_DIR/keys/${PREFIX}.crt
+      cp etc/custom* $MODDATA_DIR/
 
-      cp Dockerfile $RF
-      cp etc/nginx.conf $RF
-      cp etc/custom* $RF
-      sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-          -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
-          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $RF/sites.conf
-      
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, build/nginx.yaml-template \
+          > $BUILDMOD_DIR/nginx.yaml
 
-      echo "2. Building ${PREFIX}-nginx..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+      sed -e s,##CERT##,${PREFIX}.crt, \
+          -e s,##KEY##,${PREFIX}.key, \
+          -e s,##PREFIX##,${PREFIX}, \
+          -e s,##OUTERHOST##,$FQDN, \
+          -e s,##OUTERPORT##,$OUTERHOSTPORT, etc/default.conf-template \
+          > $MODCONF_DIR/conf.d/default.conf
   ;;
 
   "install")
   ;;
 
   "start")
-    echo "Starting nginx ${PREFIX}-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+       echo "Starting containers of ${PREFIX}-${MODULE_NAME}"
+       kubectl create -f $BUILDMOD_DIR/nginx.yaml
   ;;
 
-  "restart")
-    echo "Restarting nginx ${PREFIX}-nginx"
-    docker $DOCKERARGS restart $PREFIX-nginx
-  ;;
 
-  "init")
-  ;;
-    
   "stop")
-    echo "Stopping nginx ${PREFIX}-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Stopping containers of ${PREFIX}-${MODULE_NAME}"
+      kubectl delete -f $BUILDMOD_DIR/nginx.yaml
   ;;
-    
+
   "remove")
-    echo "Removing nginx ${PREFIX}-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
-    
+
   "purge")
-    echo "Purging nginx ${PREFIX}-nginx"
-    rm -R $RF
+      echo "Removing $BUILDMOD_DIR" 
+      rm -R -f $BUILDMOD_DIR
   ;;
-    
+
 esac
+
