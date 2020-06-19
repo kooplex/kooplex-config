@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-sandbox
+  labels:
+    pvl: toy
+spec:
+  capacity:
+    storage: 1Mi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /root/pv
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - kooplex-test
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1k
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "toy"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-master-pv-a
+  namespace: default
+spec:
+  hostname: busybox-master-pv-a
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+    volumeMounts:
+    - mountPath: /test-pd
+      name: pv-sandbox
+  nodeSelector:
+    kubernetes.io/hostname: kooplex-test
+  volumes:
+    - name: pv-sandbox
+      persistentVolumeClaim:
+        claimName: pvclaim
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-master-pv-b
+  namespace: default
+spec:
+  hostname: busybox-master-pv-b
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+    volumeMounts:
+    - mountPath: /test-pd
+      name: pv-sandbox
+  nodeSelector:
+    kubernetes.io/hostname: kooplex-test
+  volumes:
+    - name: pv-sandbox
+      persistentVolumeClaim:
+        claimName: pvclaim

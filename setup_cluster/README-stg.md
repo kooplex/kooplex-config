@@ -2,7 +2,8 @@
 
 The `hostPath` volume type is a candidate for services configuration and log folders planned to run only in the master node.
 
-Prepare some sandbox folders and create [pods](pv-hostpath.yml)
+Prepare some sandbox folders and create [pods](pv-hostpath.yml).
+
 ```bash
 mkdir -p /root/pv/1 /root/pv/2
 kubectl apply -f pv-hostpath.yml
@@ -28,4 +29,45 @@ alma
 root@kooplex-test:~/ $ touch pv/1/krumpli
 root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv1 -- ls /test-pd
 alma     krumpli
+```
+
+# The `local` persistent volume storage
+
+The `local` volume type is another candidate for services configuration and log folders planned to run only in the master node.
+
+Reuse former folders and create [pods](pv-local.yml).
+
+```bash
+kubectl apply -f pv-local.yml
+```
+
+### Test
+
+Note the same claim is shared by the two pods.
+
+```
+root@kooplex-test:~/ $ kubectl get pv
+NAME         CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM             STORAGECLASS    REASON   AGE
+pv-sandbox   1Mi        RWO            Retain           Bound    default/pvclaim   local-storage            13m
+root@kooplex-test:~/ $ kubectl get pvc
+NAME      STATUS   VOLUME       CAPACITY   ACCESS MODES   STORAGECLASS    AGE
+pvclaim   Bound    pv-sandbox   1Mi        RWO            local-storage   6m5s
+root@kooplex-test:~/ $ kubectl get pods
+NAME                  READY   STATUS    RESTARTS   AGE
+busybox-cn1           1/1     Running   2          157m
+busybox-cn2           1/1     Running   2          158m
+busybox-master        1/1     Running   2          158m
+busybox-master-pv-a   1/1     Running   0          6m10s
+busybox-master-pv-b   1/1     Running   0          6m10s
+busybox-master-pv0    1/1     Running   1          81m
+busybox-master-pv1    1/1     Running   1          81m
+busybox-master-pv2    1/1     Running   1          81m
+
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv-a -- ls /test-pd
+1  2
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv-b -- ls /test-pd
+1  2
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv-a -- touch /test-pd/T
+root@kooplex-test:~/ $ kubectl exec --stdin --tty busybox-master-pv-b -- ls /test-pd
+1  2  T
 ```
