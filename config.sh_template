@@ -25,6 +25,16 @@ DATA_DIR=$ROOT_DIR/data
 SYSMODULES="net base" # admin"
 MODULES="base net ldap proxy hydra hub nginx" # notebook
 
+DUMMYPASS=
+
+# SEAFILE
+SEAFILE_SECRET=
+SEAFILEDB_PW=${DUMMYPASS}
+SEAFILEADMIN=
+SEAFILEADMIN_PW=${DUMMYPASS}
+
+unset DUMMYPASS
+
 ## CLEAN ## OUTERHOSTNAME="kooplex-test.elte.hu"
 ## CLEAN ## OUTERHOST=$OUTERHOSTNAME
 ## CLEAN ## 
@@ -120,9 +130,6 @@ MODULES="base net ldap proxy hydra hub nginx" # notebook
 ## CLEAN ## 
 ## CLEAN ## #OIDC SECRETS
 ## CLEAN ## HYDRA_OIDC_SECRET_HUB="~.Nseet.Mi_o"
-## CLEAN ## # SEAFILE
-## CLEAN ## SEAFILE_SECRET=sOX9MsO9Yg4Cbyx5JuZQcjifPqKDQTq0jyiMCfAnrn
-## CLEAN ## SEAFILEDB_PW=${DUMMYPASS}
 ## CLEAN ## 
 ## CLEAN ## # SINGULARITY
 ## CLEAN ## SINGULARITYDB_PW=almafa123

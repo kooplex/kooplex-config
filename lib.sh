@@ -42,6 +42,7 @@ mkdir_build () {
     fi
     BUILDMOD_DIR=$BUILDDIR/$MODULE_NAME
     _mkdir $BUILDMOD_DIR
+    echo "Build dir: $BUILDMOD_DIR" >&2
 }
 
 # make module config dir
