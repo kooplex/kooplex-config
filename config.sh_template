@@ -1,5 +1,6 @@
 FQDN=
 EXTERNALIP=
+REWRITEPROTO=https
 KUBE_MASTERNODE=
 PREFIX=k8plex
 KEYFILE=
@@ -33,6 +34,17 @@ SEAFILEDB_PW=${DUMMYPASS}
 SEAFILEADMIN=
 SEAFILEADMIN_PW=${DUMMYPASS}
 
+# HYDRA
+HYDRACONSENTDB_USER=hydraconsent
+HYDRACONSENTDB_PW=
+HYDRACONSENTDB=hydraconsentdb
+HYDRADB_USER=hydra
+HYDRADB_PW=
+HYDRADB=hydradb
+HYDRA_ADMINPW=
+HYDRASYSTEM_SECRET=
+URL_HYDRA=
+
 unset DUMMYPASS
 
 ## CLEAN ## OUTERHOSTNAME="kooplex-test.elte.hu"
@@ -56,7 +68,6 @@ unset DUMMYPASS
 ## CLEAN ## 
 ## CLEAN ## # The directory where certificates are stored for external SSL
 ## CLEAN ## FQDN_CERT=$CONF_DIR/fqdn_certs
-## CLEAN ## REWRITEPROTO=https
 ## CLEAN ## 
 ## CLEAN ## # The directory where certificates are stored for internal SSL
 ## CLEAN ## INTERNAL_CERT=$CONF_DIR/internal_certs
@@ -116,16 +127,6 @@ unset DUMMYPASS
 ## CLEAN ## GITLABADMIN=gitlabadmin
 ## CLEAN ## GITLABADMINPW=${DUMMYPASS}
 ## CLEAN ## 
-## CLEAN ## # HYDRA
-## CLEAN ## HYDRACONSENTDB_USER=hydraconsent
-## CLEAN ## HYDRACONSENTDB_PW=almafa123
-## CLEAN ## HYDRACONSENTDB=hydraconsentdb
-## CLEAN ## HYDRADB_USER=hydra
-## CLEAN ## HYDRADB_PW=almafa123
-## CLEAN ## HYDRADB=hydradb
-## CLEAN ## HYDRA_ADMINPW=almafa123
-## CLEAN ## HYDRASYSTEM_SECRET=iush4ievohyuaz0aipuaTaivouloihoo
-## CLEAN ## URL_HYDRA=https://kooplex-test.elte.hu/hydra
 ## CLEAN ## 
 ## CLEAN ## 
 ## CLEAN ## #OIDC SECRETS

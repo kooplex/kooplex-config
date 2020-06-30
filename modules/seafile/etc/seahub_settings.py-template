@@ -5,9 +5,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'seahub_db',
-        'USER': 'seafile',
+        'USER': 'root',
         'PASSWORD': '##SEAFILEDB_PW##',
-        'HOST': '##PREFIX##-seafile-mysql',
+        'HOST': 'svc-##PREFIX##-seafile-mysql',
         'PORT': '3306'
     }
 }
@@ -43,7 +43,7 @@ ENABLE_OAUTH = True
 OAUTH_CLIENT_ID = '##HYDRA_CLIENTID##'
 OAUTH_CLIENT_SECRET = '##HYDRA_CLIENTSECRET##'
 
-OAUTH_REDIRECT_URL = '##REWRITEPROTO##://##OUTERHOST##/seafile/oauth/callback/'
+OAUTH_REDIRECT_URL = '##REWRITEPROTO##://##FQDN##/seafile/oauth/callback/'
 OAUTH_PROVIDER_DOMAIN = '##URL_HYDRA##'
 OAUTH_AUTHORIZATION_URL = '##URL_HYDRA##/oauth2/auth'
 OAUTH_TOKEN_URL = "##URL_HYDRA##/oauth2/token"
@@ -59,7 +59,7 @@ OAUTH_ATTRIBUTE_MAP = {
 ENABLE_SIGNUP=True
 
 ##############################
-FILE_SERVER_ROOT = "##REWRITEPROTO##://##OUTERHOST##/seafhttp"
+FILE_SERVER_ROOT = "##REWRITEPROTO##://##FQDN##/seafhttp"
 
 ####################### CUT HERE WHEN IN PRODUCTION #################
 DEBUG = True
