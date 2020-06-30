@@ -30,7 +30,7 @@ spec:
         name: svcdata-##PREFIX##-##MODULE_NAME##
         subPath: ##MODULE_NAME##/seafile
     env:
-      - name: DB_ROOT_PASSWORD
+      - name: DB_ROOT_PASSWD
         value: "##SEAFILE_MYSQL_ROOTPW##"
       - name: DB_HOST
         value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
