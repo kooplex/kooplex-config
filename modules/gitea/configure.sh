@@ -10,12 +10,7 @@ case $VERB in
 
       ROOTURL=${REWRITEPROTO}://${FQDN}/gitea
       sed -e s,##PREFIX##,$PREFIX, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
-          -e s,##ROOTURL##,$ROOTURL, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
-	  -e s,##GITEA_MYSQL_ROOTPW##,$GITEADB_PW, \
-	  -e s,##GITEADB_USER##,$GITEAUSER, \
-	  -e s,##GITEADB_PW##,$GITEAUSER_PW, 
           build/gitea-svcs.yaml-template > $BUILDMOD_DIR/gitea-svcs.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
@@ -24,7 +19,7 @@ case $VERB in
           -e s,##MODULE_NAME##,$MODULE_NAME, \
 	  -e s,##GITEA_MYSQL_ROOTPW##,$GITEADB_PW, \
 	  -e s,##GITEADB_USER##,$GITEAUSER, \
-	  -e s,##GITEADB_PW##,$GITEAUSER_PW, 
+	  -e s,##GITEADB_PW##,$GITEAUSER_PW, \
           build/gitea-pods.yaml-template > $BUILDMOD_DIR/gitea-pods.yaml
 
       CONFDIR=$MODDATA_DIR/gitea/gitea/conf
