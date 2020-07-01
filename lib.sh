@@ -76,9 +76,10 @@ purgedir_svc () {
 
 # restart nginx
 restart_nginx () {
-    echo "TBI restart_nginx $0" >&2
-    env
-    echo "---" >&2
+    echo "restart_nginx" >&2
+    bash $0 stop nginx
+    bash $0 start nginx
+    echo "restarted nginx" >&2
 }
 
 ## CA_DIR=$BUILDDIR/CA
