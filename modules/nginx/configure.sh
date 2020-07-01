@@ -30,8 +30,8 @@ case $VERB in
           -e s,##KEY##,${PREFIX}.key, \
           -e s,##PREFIX##,${PREFIX}, \
           -e s,##OUTERHOST##,$FQDN, \
-          -e s,##OUTERPORT##,$OUTERHOSTPORT, etc/default.conf-template \
-          > $MODCONF_DIR/conf.d/default.conf
+          -e s,##OUTERPORT##,$OUTERHOSTPORT, \
+	  conf/default.conf-template > $MODCONF_DIR/conf.d/default.conf
   ;;
 
   "install")
