@@ -3,7 +3,7 @@
 
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 #      mkdir_svcconf
 #      mkdir_svclog
       mkdir_svcdata
@@ -15,8 +15,17 @@ case $VERB in
           -e s,##MODULE_NAME##,$MODULE_NAME, \
 	  -e s,##GITEA_MYSQL_ROOTPW##,$GITEADB_PW, \
 	  -e s,##GITEADB_USER##,$GITEAUSER, \
-	  -e s,##GITEADB_PW##,$GITEAUSER_PW, build/gitea.yaml-template \
-          > $BUILDMOD_DIR/gitea.yaml
+	  -e s,##GITEADB_PW##,$GITEAUSER_PW, 
+          build/gitea-svcs.yaml-template > $BUILDMOD_DIR/gitea-svcs.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##ROOTURL##,$ROOTURL, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  -e s,##GITEA_MYSQL_ROOTPW##,$GITEADB_PW, \
+	  -e s,##GITEADB_USER##,$GITEAUSER, \
+	  -e s,##GITEADB_PW##,$GITEAUSER_PW, 
+          build/gitea-pods.yaml-template > $BUILDMOD_DIR/gitea-pods.yaml
 
       CONFDIR=$MODDATA_DIR/gitea/gitea/conf
       _mkdir $CONFDIR
@@ -26,33 +35,38 @@ case $VERB in
           -e s,##GITEADB_ROOTPW##,$GITEAADMINPW, \
           -e s,##GITEADB##,$GITEADB, \
           -e s,##GITEADB_USER##,$GITEAUSER, \
-          -e s,##GITEADB_PW##,$GITEAUSER_PW, etc/app.ini-template \
-          > $CONFDIR/app.ini
-    
+          -e s,##GITEADB_PW##,$GITEAUSER_PW, \
+	  conf/app.ini-template > $CONFDIR/app.ini
   ;;
 
   "install")
-      sed -e s,##PREFIX##,$PREFIX, etc/nginx-${MODULE_NAME}-template \
-          > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      sed -e s,##PREFIX##,$PREFIX, \
+          conf/nginx-${MODULE_NAME}-template > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      restart_nginx
   ;;
 
   "start")
-       echo "Starting containers of ${PREFIX}-${MODULE_NAME}"
-       kubectl apply -f $BUILDMOD_DIR/gitea.yaml
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/gitea-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/gitea-pods.yaml
   ;;
 
 
   "stop")
-      echo "Stopping containers of ${PREFIX}-${MODULE_NAME}"
-      kubectl delete -f $BUILDMOD_DIR/gitea.yaml
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/gitea-pods.yaml
   ;;
 
   "remove")
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/gitea-svcs.yaml
   ;;
 
   "purge")
-      echo "Removing $BUILDMOD_DIR" 
+      echo "Removing $BUILDMOD_DIR" >&2
       rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
 
 esac
