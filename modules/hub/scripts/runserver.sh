@@ -10,6 +10,15 @@ echo -e "*/1 * * * * /usr/bin/python3 /kooplexhub/kooplexhub/manage.py scheduler
 
 cd /kooplexhub/kooplexhub/
 #git pull
+
+
+while (true) ; do
+  echo "Waiting for mysql server"
+  mysql -u $HUBDB_USER --password=$HUBDB_PW -h $HUBDB_HOSTNAME $HUBDB -e "SELECT 1"
+  [ $? = 0 ] && break
+  sleep 2
+done
+
 /usr/bin/python3 manage.py makemigrations hub
 /usr/bin/python3 manage.py migrate
 /usr/bin/python3 manage.py runserver 0.0.0.0:80
