@@ -13,23 +13,23 @@ TEMP_PATH = /data/gitea/uploads
 
 [server]
 APP_DATA_PATH    = /data/gitea
-SSH_DOMAIN       = ##OUTERHOST##
+SSH_DOMAIN       = ##FQDN##
 HTTP_PORT        = 3000
-ROOT_URL         = ##REWRITEPROTO##://##OUTERHOST##/gitea/
+ROOT_URL         = ##ROOTURL##
 DISABLE_SSH      = false
 SSH_PORT         = 222
 SSH_LISTEN_PORT  = 222
 LFS_START_SERVER = true
 LFS_CONTENT_PATH = /data/git/lfs
-DOMAIN           = ##OUTERHOST##
+DOMAIN           = ##FQDN##
 LFS_JWT_SECRET   = bGuaqB45E6r631Shw8BUuXJl65GGONkvdhbHIaDqVFQ
 OFFLINE_MODE     = false
 
 [database]
 PATH     = /data/gitea/gitea.db
 DB_TYPE  = mysql
-HOST     = ##PREFIX##-gitea-mysql:3306
-NAME     = ##GITEADB##
+HOST     = svc-##PREFIX##-gitea-mysql
+NAME     = gitea
 USER     = ##GITEADB_USER##
 PASSWD   = ##GITEADB_PW##
 SSL_MODE = disable
