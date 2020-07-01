@@ -18,7 +18,7 @@ case $VERB in
 	  -e s,##SEAFILE_MYSQL_ROOTPW##,$SEAFILEDB_PW, \
 	  -e s,##SEAFILE_ADMIN##,$SEAFILEADMIN, \
 	  -e s,##SEAFILE_ADMINPW##,$SEAFILEADMIN_PW, \
-	  build/seafile-svcs.yaml-template > $BUILDMOD_DIR/seafile-svcs.yaml
+	  build/seafile-pods.yaml-template > $BUILDMOD_DIR/seafile-pods.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
