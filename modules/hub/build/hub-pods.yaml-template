@@ -7,7 +7,7 @@ metadata:
     name: lbl-##PREFIX##-##MODULE_NAME##
 spec:
   containers:
-  - image: kooplex-test.elte.hu:5000/k8plex-base:latest
+  - image: ##MY_REGISTRY##/k8plex-hub
     name: ##PREFIX##-##MODULE_NAME##
     ports:
       - containerPort: 80

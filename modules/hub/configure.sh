@@ -20,8 +20,8 @@ case $VERB in
 
       cp scripts/runserver.sh $BUILDMOD_DIR
       docker $DOCKERARGS build -t ${PREFIX}-hub -f $BUILDMOD_DIR/Dockerfile.hub $BUILDMOD_DIR
-      docker $DOCKERARGS tag ${PREFIX}-hub localhost:5000/${PREFIX}-hub
-      docker push localhost:5000/${PREFIX}-hub
+      docker $DOCKERARGS tag ${PREFIX}-hub ${MY_REGISTRY}/${PREFIX}-hub
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hub
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
@@ -31,6 +31,7 @@ case $VERB in
           -e s,##MODULE_NAME##,$MODULE_NAME, \
           -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
           -e s,##FQDN##,$FQDN, \
+          -e s,##MY_REGISTRY##,$MY_REGISTRY, \
           -e s,##DJANGO_SECRET_KEY##,$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g'), \
           -e s,##HUB_MYSQL_ROOTPW##,$HUBDB_PW, \
 	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
