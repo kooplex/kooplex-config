@@ -2,5 +2,7 @@
 ####### Gitea end
   location /gitea/ {
         proxy_pass       http://svc-##PREFIX##-gitea:3000/;
+        access_log      /var/log/nginx/gitea.access.log;
+        error_log       /var/log/nginx/gitea.error.log;
   }
 ####### Gitea end

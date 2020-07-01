@@ -1,7 +1,9 @@
 
   location /hub {
-    proxy_set_header Host $http_host;
-    proxy_pass http://svc-##PREFIX##-hub;
+        proxy_set_header Host $http_host;
+        proxy_pass http://svc-##PREFIX##-hub;
+        access_log      /var/log/nginx/hub.access.log;
+        error_log       /var/log/nginx/hub.error.log;
   }
 
   location /accounts {
