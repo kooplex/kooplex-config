@@ -3,7 +3,7 @@
 
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 #FIXME: all seafile persistent directories are handled together, split conf/data/log
 #      mkdir_svcconf
 #      mkdir_svclog
@@ -17,8 +17,12 @@ case $VERB in
           -e s,##FQDN##,$FQDN, \
 	  -e s,##SEAFILE_MYSQL_ROOTPW##,$SEAFILEDB_PW, \
 	  -e s,##SEAFILE_ADMIN##,$SEAFILEADMIN, \
-	  -e s,##SEAFILE_ADMINPW##,$SEAFILEADMIN_PW, build/seafile.yaml-template \
-          > $BUILDMOD_DIR/seafile.yaml
+	  -e s,##SEAFILE_ADMINPW##,$SEAFILEADMIN_PW, \
+	  build/seafile-svcs.yaml-template > $BUILDMOD_DIR/seafile-svcs.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/seafile-svcs.yaml-template > $BUILDMOD_DIR/seafile-svcs.yaml
 
       sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
           -e s,##PREFIX##,$PREFIX, \
@@ -27,33 +31,38 @@ case $VERB in
           -e s,##URL_HYDRA##,$URL_HYDRA, \
           -e s,##HYDRA_CLIENTID##,$HYDRA_SEAHUBCLIENTID, \
           -e s,##DJANGO_SECRET_KEY##,$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g'), \
-          -e s,##HYDRA_CLIENTSECRET##,$HYDRA_SEAHUBCLIENTSECRET, etc/seahub_settings.py-template \
-          > $CONFD/seahub_settings.py
-
+          -e s,##HYDRA_CLIENTSECRET##,$HYDRA_SEAHUBCLIENTSECRET, \
+	  conf/seahub_settings.py-template > $CONFD/seahub_settings.py
   ;;
 
   "install")
-      sed -e s,##PREFIX##,$PREFIX, etc/nginx-${MODULE_NAME}-template \
-          > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      sed -e s,##PREFIX##,$PREFIX, \
+          conf/nginx-${MODULE_NAME}-template > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      restart_nginx
   ;;
 
   "start")
-       echo "Starting containers of ${PREFIX}-${MODULE_NAME}"
-       kubectl apply -f $BUILDMOD_DIR/seafile.yaml
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/seafile-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/seafile-pods.yaml
   ;;
 
 
   "stop")
-      echo "Stopping containers of ${PREFIX}-${MODULE_NAME}"
-      kubectl delete -f $BUILDMOD_DIR/seafile.yaml
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/seafile-pods.yaml
   ;;
 
   "remove")
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/seafile-svcs.yaml
   ;;
 
   "purge")
-      echo "Removing $BUILDMOD_DIR" 
+      echo "Removing $BUILDMOD_DIR" >&2
       rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
 
 esac
