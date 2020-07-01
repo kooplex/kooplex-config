@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-##MODULE_NAME##
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: ssh
+      protocol: TCP
+      port: 222
+      targetPort: 22
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##
+spec:
+  containers:
+  - image: gitea/gitea:1.12.1
+    name: ##PREFIX##-##MODULE_NAME##
+    ports:
+      - containerPort: 80
+        name: http
+      - containerPort: 22
+        name: ssh
+    volumeMounts:
+      - mountPath: /data
+        name: svcdata-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/gitea
+    env:
+      - name: USER_UID
+        value: "1000"
+      - name: USER_GID
+        value: "1000"
+      - name: DB_TYPE
+        value: "mysql"
+      - name: DB_HOST
+        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+      - name: DB_NAME
+        value: "gitea"
+      - name: DB_USER
+        value: "##GITEADB_USER##"
+      - name: DB_PASSWD
+        value: "##GITEADB_PW##"
+      - name: ROOT_URL
+        value: "##ROOTURL##"
+      - name: DISABLE_REGISTRATION
+        value: "TRUE"
+  nodeSelector:
+    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+  volumes:
+    - name: svcdata-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svcdata-##PREFIX##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-##MODULE_NAME##-mysql
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-mysql
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##-mysql
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##-mysql
+spec:
+  containers:
+  - image: mariadb:10.5.4
+    name: ##PREFIX##-##MODULE_NAME##-mysql
+    ports:
+      - containerPort: 3306
+        name: mysql
+    volumeMounts:
+      - mountPath: /var/lib/mysql
+        name: svcdata-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/mysql/
+    env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: "##GITEA_MYSQL_ROOTPW##"
+      - name: MYSQL_USER
+        value: "##GITEADB_USER##"
+      - name: MYSQL_PASSWORD
+        value: "##GITEADB_PW##"
+      - name: MYSQL_DATABASE
+        value: "gitea"
+      - name: MYSQL_LOG_CONSOLE
+        value: "true"
+  nodeSelector:
+    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+  volumes:
+    - name: svcdata-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svcdata-##PREFIX##
