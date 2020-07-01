@@ -56,8 +56,9 @@ case $VERB in
   ;;
 
   "purge")
-      echo "Removing $BUILDMOD_DIR $MODDATA_DIR $MODCONF_DIR $MODLOG_DIR" >&2
-      rm -R -f $BUILDMOD_DIR $MODDATA_DIR $MODCONF_DIR $MODLOG_DIR
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
 
 esac

@@ -64,6 +64,15 @@ mkdir_svcdata () {
     _mkdir $MODDATA_DIR
 }
 
+# remove module service directories
+purgedir_svc() {
+    for d in $SERVICECONF_DIR/$MODULE_NAME $SERVICELOG_DIR/$MODULE_NAME $SERVICEDATA_DIR/$MODULE_NAME ; do
+        if [ -d $d ] ; then
+            rm -rf $d
+	    echo "Removed folder: $d" >&2
+        fi
+    done
+}
 
 ## CA_DIR=$BUILDDIR/CA
 ## if [ -d $CA_DIR ] ; then
