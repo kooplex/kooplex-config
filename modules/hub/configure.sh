@@ -39,7 +39,9 @@ case $VERB in
           -e s,##FQDN##,$FQDN, \
           -e s,##MY_REGISTRY##,$MY_REGISTRY, \
           -e s,##DJANGO_SECRET_KEY##,$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g'), \
-          -e s,##HUB_MYSQL_ROOTPW##,$HUBDB_PW, \
+          -e s,##HUB_MYSQL_ROOTPW##,$HUB_MYSQL_ROOTPW, \
+          -e s,##HUBDB_USER##,$HUBUSER, \
+          -e s,##HUBDB_PW##,$HUBUSER_PW, \
 	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
 
 

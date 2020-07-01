@@ -37,10 +37,12 @@ spec:
         value: "##FQDN##"
       - name: HUBDB
         value: hub
+      - name: HUBDB_USER
+        value: "##HUBDB_USER##"
+      - name: HUBDB_PW
+        value: "##HUBDB_PW##"
 ##      - HUBPROXY_PW=##PROXYTOKEN##
 ##      - HUBLDAP_PW=##HUBLDAP_PW##
-##      - HUBDB_USER=##HUBDB_USER##
-##      - HUBDB_PW=##HUBDB_PW##
 ##      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
 ##      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 ##      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
@@ -91,6 +93,12 @@ spec:
     env:
       - name: MYSQL_ROOT_PASSWORD
         value: "##HUB_MYSQL_ROOTPW##"
+      - name: MYSQL_USER
+        value: "##HUBDB_USER##"
+      - name: MYSQL_PASSWORD
+        value: "##HUBDB_PW##"
+      - name: MYSQL_DATABASE
+        value: "hub"
       - name: MYSQL_LOG_CONSOLE
         value: "true"
   nodeSelector:
