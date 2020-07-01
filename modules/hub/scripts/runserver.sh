@@ -1,5 +1,8 @@
 #! /bin/bash
 
+exec 2> /var/log/hub/runserver.log
+exec 1>&2
+
 #FIXME: this is not nice
 env > /var/spool/cron/crontabs/root
 echo -e "*/1 * * * * /usr/bin/python3 /kooplexhub/kooplexhub/manage.py scheduler\n" >> /var/spool/cron/crontabs/root

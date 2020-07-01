@@ -6,6 +6,12 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
       mkdir_svclog
       mkdir_svcdata
+      mkdir_svcconf
+
+      SECRET_DIR=$MODCONF_DIR/secrets
+      _mkdir $SECRET_DIR
+      touch $SECRET_DIR/${PREFIX}-hub-hydra.secret
+#FIXME
       
       CODE_DIR=$MODDATA_DIR/_hubcode_
       _mkdir $CODE_DIR
@@ -37,52 +43,14 @@ case $VERB in
 	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
 
 
-      echo "NOT REACHED THE END"
-      exit 3
-
 #      cp $BUILDDIR/CA/rootCA.crt $RF/
 
-# Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
-          -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
-          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##OUTERPORT##/$OUTERHOSTPORT/" \
-          -e "s/##INNERHOST##/$INNERHOST/" \
-          -e "s/##INNERHOSTNAME##/$INNERHOSTNAME/" \
-          -e "s/##DBHOST##/${PREFIX}-hub-mysql/" \
-          -e "s/##PROTOCOL##/$REWRITEPROTO/" \
-          -e "s/##LDAPBASEDN##/$LDAPORG/" \
-          -e "s/##LDAPUSER##/admin/" \
-          -e "s/##LDAPBIND_PW##/$HUBLDAP_PW/" \
-          -e "s/##HUBLDAP_PW##/$HUBLDAP_PW/" \
-          -e "s/##MINUID##/$MINUID/" \
-          -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
-          -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
-          -e "s/##DOCKERPORT##/$DOCKERPORT/" \
-          -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
-          -e "s/##DOCKER_VOLUME_DIR##/$(echo $DOCKER_VOLUME_DIR | sed s"/\//\\\\\//"g)/" \
-          -e "s/##IPPOOLLO##/$IPPOOLB/" \
-          -e "s/##IPPOOLHI##/$IPPOOLE/" \
-          -e "s/##HYDRA_OIDC_SECRET_HUB##/${HYDRA_OIDC_SECRET_HUB}/" \
-          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
-          -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
-          -e "s/##HUB_USER##/${HUB_USER}/g" \
-          -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
-          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-  	 
 #For hydra
-      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-hub.json-template > $HYDRA_CONFIG/client-policy-hub.json
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $HYDRA_CONFIG/client-hub.json
+#      sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-hub.json-template > $HYDRA_CONFIG/client-policy-hub.json
+#      sed -e "s/##PREFIX##/${PREFIX}/" \
+#	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+#	  -e "s/##OUTERHOST##/${OUTERHOST}/" hydraconfig/client-hub.json-template > $HYDRA_CONFIG/client-hub.json
 
-      echo "2. Building ${PREFIX}-hub..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
   "install")
@@ -95,10 +63,6 @@ case $VERB in
 
       echo NOT REACHED END
       exit 3
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-hub-template > $CONF_DIR/outer_nginx/sites-enabled/hub
 
 #For hydra
       sed -e "s/##PREFIX##/${PREFIX}/" hydraconfig/client-policy-${MODULE_NAME}.json-template > $HYDRA_CONFIG/client-policy-${MODULE_NAME}.json
