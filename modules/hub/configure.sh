@@ -1,50 +1,47 @@
 #!/bin/bash
 
-MODULE_NAME=hub
-RF=$BUILDDIR/${MODULE_NAME}
-
-mkdir -p $RF
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
-HUB_LOG=$LOG_DIR/hub
-
-#FIXME: get rid of PROJECT (db-name)
-#TODO: Volume mountpoints may be part of settings.py
 
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-hub..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
+      mkdir_svclog
+      mkdir_svcdata
       
-      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report \
-         $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
-         $SRV/_workdir $SRV/_git $HUB_LOG
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_assignment -o o=bind ${PREFIX}-assignment
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.garbage -o o=bind ${PREFIX}-garbage
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hubcode_ -o o=bind ${PREFIX}-hubcode
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_workdir -o o=bind ${PREFIX}-workdir
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report -o o=bind ${PREFIX}-report
-      docker $DOCKERARGS volume create -o type=none -o device=$HUB_LOG -o o=bind ${PREFIX}-hub-log
-
-      DIR=$SRV/_hubcode_
-      if [ -d $DIR/.git ] ; then
-          echo $DIR
-          #cd $DIR && git pull && cd -
+      CODE_DIR=$MODDATA_DIR/_hubcode_
+      _mkdir $CODE_DIR
+      if [ -d $CODE_DIR/.git ] ; then
+          echo "Code already cloned in folder $CODE_DIR. Pull if necessary"
       else
-          git clone https://github.com/kooplex/kooplex-hub.git $DIR
+          git clone https://github.com/kooplex/kooplex-hub.git $CODE_DIR
       fi
+
+      sed -e s,##PREFIX##,${PREFIX}, \
+          build/Dockerfile.hub-template > $BUILDMOD_DIR/Dockerfile.hub
+
+      cp scripts/runserver.sh $BUILDMOD_DIR
+      docker $DOCKERARGS build -t ${PREFIX}-hub -f $BUILDMOD_DIR/Dockerfile.hub $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-hub localhost:5000/${PREFIX}-hub
+      docker push localhost:5000/${PREFIX}-hub
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/hub-svcs.yaml-template > $BUILDMOD_DIR/hub-svcs.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##FQDN##,$FQDN, \
+          -e s,##DJANGO_SECRET_KEY##,$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g'), \
+          -e s,##HUB_MYSQL_ROOTPW##,$HUBDB_PW, \
+	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
+
+
+      echo "NOT REACHED THE END"
+      exit 3
 
 #      cp $BUILDDIR/CA/rootCA.crt $RF/
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HUBDB##/${HUBDB}/g" \
           -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
@@ -62,7 +59,6 @@ case $VERB in
           -e "s/##LDAPUSER##/admin/" \
           -e "s/##LDAPBIND_PW##/$HUBLDAP_PW/" \
           -e "s/##HUBLDAP_PW##/$HUBLDAP_PW/" \
-          -e "s/##DJANGO_SECRET_KEY##/$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g')/" \
           -e "s/##MINUID##/$MINUID/" \
           -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
           -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
@@ -90,6 +86,15 @@ case $VERB in
 
   "install")
 
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+          -e s,##FQDN##,$FQDN, \
+          conf/nginx-${MODULE_NAME}-template > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      restart_nginx
+
+      echo NOT REACHED END
+      exit 3
+
       sed -e "s/##PREFIX##/$PREFIX/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
 	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-hub-template > $CONF_DIR/outer_nginx/sites-enabled/hub
@@ -111,64 +116,82 @@ case $VERB in
   ;;
 
   "start")
-       echo "Starting containers of ${PREFIX}-hub"
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub-mysql
-#       docker exec ${PREFIX}-hub-mysql /initdb.sh
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hub
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/hub-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/hub-pods.yaml
   ;;
 
-  "init")
-       #docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
-#       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
-#       if [ ! $? -eq 0 ];then
-          docker exec ${PREFIX}-hub-mysql bash -c " echo \"CREATE DATABASE $HUBDB; CREATE USER '$HUBDB_USER'@'%' IDENTIFIED BY '$HUBDB_PW'; GRANT ALL ON $HUBDB.* TO '$HUBDB_USER'@'%';\" |  \
-            mysql -u root --password=$HUBDBROOT_PW  -h $PREFIX-hub-mysql"
-#       fi
-       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
-       docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
-       docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
-       docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py createsuperuser
-  ;;
-
-  "refresh")
-     #FIXME: docker $DOCKERARGS exec $PREFIX-hub bash -c "cd /kooplexhub; git pull;"
-  ;;
 
   "stop")
-      echo "Stopping containers of ${PREFIX}-hub"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm  $NGINX_DIR/conf/conf/hub
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/hub-pods.yaml
   ;;
 
   "remove")
-      echo "Removing containers of ${PREFIX}-hub"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
-
-      docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
-      PWFILE=$RF/consent-${MODULE_NAME}.pw
-      rm $PWFILE
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/hub-svcs.yaml
   ;;
 
   "purge")
-      echo "Removing $RF" 
-      rm -R -f $RF
-      
-      docker $DOCKERARGS volume rm ${PREFIX}-home
-      docker $DOCKERARGS volume rm ${PREFIX}-course
-      docker $DOCKERARGS volume rm ${PREFIX}-usercourse
-      docker $DOCKERARGS volume rm ${PREFIX}-share
-      docker $DOCKERARGS volume rm ${PREFIX}-hubdb
-      docker $DOCKERARGS volume rm ${PREFIX}-garbage
-  ;;
-  "cleandata")
-    echo "Cleaning data ${PREFIX}-hubdb"
-    rm -R -f $SRV/mysql
-    
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
 
-  "clean")
-  ;;
+ #### "init")
+#####       docker exec ${PREFIX}-hub-mysql /initdb.sh
+ ####      #docker exec ${PREFIX}-hub-mysql bash -c "echo 'show databases' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql  | grep  -q $HUBDB"
+#####       docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
+#####       if [ ! $? -eq 0 ];then
+ ####         docker exec ${PREFIX}-hub-mysql bash -c " echo \"CREATE DATABASE $HUBDB; CREATE USER '$HUBDB_USER'@'%' IDENTIFIED BY '$HUBDB_PW'; GRANT ALL ON $HUBDB.* TO '$HUBDB_USER'@'%';\" |  \
+ ####           mysql -u root --password=$HUBDBROOT_PW  -h $PREFIX-hub-mysql"
+#####       fi
+ ####      docker exec ${PREFIX}-hub-mysql bash -c "echo 'use $HUBDB' | mysql -u root --password=$HUBDBROOT_PW -h $PREFIX-hub-mysql"
+ ####      docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py makemigrations
+ ####      docker exec ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py migrate
+ ####      docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py createsuperuser
+ #### ;;
+
+ #### "refresh")
+ ####    #FIXME: docker $DOCKERARGS exec $PREFIX-hub bash -c "cd /kooplexhub; git pull;"
+ #### ;;
+
+ #### "stop")
+ ####     echo "Stopping containers of ${PREFIX}-hub"
+ ####     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+ ####     rm  $NGINX_DIR/conf/conf/hub
+ #### ;;
+
+ #### "remove")
+ ####     echo "Removing containers of ${PREFIX}-hub"
+ ####     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
+ ####     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+
+ ####     docker exec  ${PREFIX}-hydra  sh -c "hydra clients  delete ${PREFIX}-${MODULE_NAME}"
+ ####     PWFILE=$RF/consent-${MODULE_NAME}.pw
+ ####     rm $PWFILE
+ #### ;;
+
+ #### "purge")
+ ####     echo "Removing $RF" 
+ ####     rm -R -f $RF
+ ####     
+ ####     docker $DOCKERARGS volume rm ${PREFIX}-home
+ ####     docker $DOCKERARGS volume rm ${PREFIX}-course
+ ####     docker $DOCKERARGS volume rm ${PREFIX}-usercourse
+ ####     docker $DOCKERARGS volume rm ${PREFIX}-share
+ ####     docker $DOCKERARGS volume rm ${PREFIX}-hubdb
+ ####     docker $DOCKERARGS volume rm ${PREFIX}-garbage
+ #### ;;
+ #### "cleandata")
+ ####   echo "Cleaning data ${PREFIX}-hubdb"
+ ####   rm -R -f $SRV/mysql
+ ####   
+ #### ;;
+
+ #### "clean")
+####  ;;
 
 esac
 

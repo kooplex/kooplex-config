@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##
+spec:
+  containers:
+  - image: kooplex-test.elte.hu:5000/k8plex-base:latest
+    name: ##PREFIX##-##MODULE_NAME##
+    ports:
+      - containerPort: 80
+        name: http
+    volumeMounts:
+      - mountPath: /kooplexhub
+        name: svcdata-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/hub/_hubcode_
+      - mountPath: /var/log/hub
+        name: svclog-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/hub/
+    env:
+      - name: HUBDBROOT_PW
+        value: "##HUB_MYSQL_ROOTPW##"
+      - name: HUBDB_HOSTNAME
+        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+      - name: LANG
+        value: "en_US.UTF-8"
+      - name: DJANGO_SECRET_KEY
+        value: "##DJANGO_SECRET_KEY##"
+      - name: PREFIX
+        value: "##PREFIX##"
+      - name: DOMAIN
+        value: "##FQDN##"
+      - name: HUBDB
+        value: hub
+##      - HUBPROXY_PW=##PROXYTOKEN##
+##      - HUBLDAP_PW=##HUBLDAP_PW##
+##      - HUBDB_USER=##HUBDB_USER##
+##      - HUBDB_PW=##HUBDB_PW##
+##      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
+##      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+##      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
+  nodeSelector:
+    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+##    volumes:
+##      - ##PREFIX##-home:/mnt/.volumes/home:rw
+##      - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
+##      - ##PREFIX##-share:/mnt/.volumes/share:rw
+##      - ##PREFIX##-report:/mnt/.volumes/report:rw
+##      - ##PREFIX##-git:/mnt/.volumes/git:rw
+##      - ##PREFIX##-course:/mnt/.volumes/course:rw
+##      - ##PREFIX##-usercourse:/mnt/.volumes/usercourse:rw
+##      - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
+##      - ##PREFIX##-garbage:/mnt/.volumes/garbage:rw
+##      - /var/run/docker.sock:/var/run/docker.sock
+##      - ##PREFIX##-hub-log:/var/log/hub:rw
+  volumes:
+    - name: svcdata-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svcdata-##PREFIX##
+    - name: svclog-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svclog-##PREFIX##
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##-mysql
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##-mysql
+spec:
+  containers:
+  - image: mariadb:10.5.4
+    name: ##PREFIX##-##MODULE_NAME##-mysql
+    ports:
+      - containerPort: 3306
+        name: mysql
+    volumeMounts:
+      - mountPath: /var/lib/mysql
+        name: svcdata-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/mysql/
+#      - /etc/localtime:/etc/localtime:ro
+    env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: "##HUB_MYSQL_ROOTPW##"
+      - name: MYSQL_LOG_CONSOLE
+        value: "true"
+  nodeSelector:
+    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+  volumes:
+    - name: svcdata-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svcdata-##PREFIX##

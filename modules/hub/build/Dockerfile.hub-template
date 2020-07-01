@@ -1,6 +1,7 @@
 FROM ##PREFIX##-base
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
 		gcc cron \
 		gettext \
 		mysql-client libmysqlclient-dev \
@@ -8,8 +9,8 @@ RUN apt-get update && apt-get install -y \
                 vim less libssl-dev \
                 ssh git tzdata\
 		python3-pip python3-dev\
-                openssh-server openssh-sftp-server vim \
-	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+                openssh-server openssh-sftp-server vim && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV DJANGO_VERSION 1.11
 
@@ -17,7 +18,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install setuptools
 RUN pip3 install  mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"\
    ldap3  pwgen  "python-social-auth[django]" "social-auth-core[openidconnect]"\
-  django-tables2 django-bootstrap3 unidecode  PyGithub\
+   django-tables2 django-bootstrap3 unidecode  PyGithub\
    python-gitlab  social-auth-app-django==2.1.0 pyjwkest==1.4.0\
    pandas django_pandas  python-seafile-api kubernetes
 
@@ -26,8 +27,9 @@ RUN pip3 install social-auth-core==1.7.0  #separated otherwise install the newer
 RUN pip3 install parse
 RUN pip3 install git+https://github.com/arount/pytea
 
-COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
-RUN update-ca-certificates
+#FIXME
+#COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
+#RUN update-ca-certificates
 
 COPY runserver.sh /runserver.sh
 RUN chmod a+x /runserver.sh
