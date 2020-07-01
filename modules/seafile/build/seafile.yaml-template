@@ -94,3 +94,36 @@ spec:
     - name: svcdata-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
         claimName: pvc-svcdata-##PREFIX##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-##MODULE_NAME##-memcached
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-memcached
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 11211
+      targetPort: 11211
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##-memcached
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##-memcached
+spec:
+  containers:
+  - image: memcached:1.6.6-alpine
+    name: ##PREFIX##-##MODULE_NAME##-memcached
+    ports:
+      - containerPort: 11211
+        name: memcached
+    command: ["memcached"]
+    args: ["-m", "256"]
+  nodeSelector:
+    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+

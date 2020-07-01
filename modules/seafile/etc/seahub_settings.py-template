@@ -16,7 +16,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-        'LOCATION': '##PREFIX##-seafile-memcached:11211',
+        'LOCATION': 'svc-##PREFIX##-seafile-memcached:11211',
     },
     'locmem': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
