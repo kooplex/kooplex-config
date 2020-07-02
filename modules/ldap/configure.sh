@@ -1,104 +1,84 @@
 #!/bin/bash
 
-RF=$BUILDDIR/ldap
-
-mkdir -p $RF
-
-#    chown -R root $SRV/ldap
-#    chmod -R 755 $SRV/ldap
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 case $VERB in
+
   "build")
-      echo "1. Configuring ${PREFIX}-ldap..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
+      mkdir_svcdata
+      mkdir_svcconf
 
-     mkdir -p $SRV/ldap/
-     mkdir -p $SRV/ldap/etc
-     mkdir -p $SRV/ldap/var
-     docker $DOCKERARGS volume create -o type=none -o device=$SRV/ldap/etc -o o=bind ${PREFIX}-ldap-etc
-     docker $DOCKERARGS volume create -o type=none -o device=$SRV/ldap/var -o o=bind ${PREFIX}-ldap-var
-     
-      cp Dockerfile $RF
-      cp scripts/entrypoint.sh $RF
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/ldap-svcs.yaml-template > $BUILDMOD_DIR/ldap-svcs.yaml
 
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##ORGANIZATION##,"$LDAP_ORGANIZATION", \
+          -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
+          -e s,##FQDN##,$FQDN, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+	  build/ldap-pods.yaml-template > $BUILDMOD_DIR/ldap-pods.yaml
 
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-          -e "s/##SLAPD_PASSWORD##/${HUBLDAP_PW}/" \
-          -e "s/##SLAPD_CONFIG_PASSWORD##/${HUBLDAP_PW}/" \
-          -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-
-      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
-      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $RF/new_user.ldiftemplate
-      sed -e "s/##LDAPORG##/$LDAPORG/" etc/ldap.conf_template > $RF/ldap.conf
-
-      sed -e "s/##LDAPORG##/$LDAPORG/" \
-          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $RF/addgroup.sh
-      sed -e "s/##LDAPORG##/$LDAPORG/" \
-          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/adduser.sh_template > $RF/adduser.sh
-          
-
-      sed -e "s/##LDAPORG##/$LDAPORG/" \
-          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
-          
-      sed -e "s/##LDAPORG##/$LDAPORG/" \
-          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init-core.sh-template > $RF/init-core.sh
-
-      echo "2. Building ${PREFIX}-ldap..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+##      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
+##      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $RF/new_user.ldiftemplate
+##      sed -e "s/##LDAPORG##/$LDAPORG/" etc/ldap.conf_template > $RF/ldap.conf
+##
+##      sed -e "s/##LDAPORG##/$LDAPORG/" \
+##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
+##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $RF/addgroup.sh
+##      sed -e "s/##LDAPORG##/$LDAPORG/" \
+##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
+##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/adduser.sh_template > $RF/adduser.sh
+##          
+##
+##      sed -e "s/##LDAPORG##/$LDAPORG/" \
+##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
+##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
+##          
+##      sed -e "s/##LDAPORG##/$LDAPORG/" \
+##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
+##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
+##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init-core.sh-template > $RF/init-core.sh
   ;;
+
   "install")
-    echo "Installing slapd $PROJECT-ldap [$LDAPIP]"
-    
-   #      -p 666:$LDAPPORT \
+  ;;
 
-  ;;
   "start")
-      echo "Starting container ${PREFIX}-ldap"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/ldap-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/ldap-pods.yaml
   ;;
+
+
   "init")
-    echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
-    docker exec ${PREFIX}-ldap bash -c /init.sh
-    docker exec ${PREFIX}-ldap bash -c /init-core.sh
-    docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh users 1000"
-    docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh report 9990"
+    ##echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
+    ##docker exec ${PREFIX}-ldap bash -c /init.sh
+    ##docker exec ${PREFIX}-ldap bash -c /init-core.sh
+    ##docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh users 1000"
+    ##docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh report 9990"
   ;;
+    
   "stop")
-      echo "Stopping container ${PREFIX}-ldap"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/ldap-pods.yaml
   ;;
     
   "remove")
-      echo "Removing $DOCKER_COMPOSE_FILE"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/ldap-svcs.yaml
   ;;
-
+    
   "purge")
-    echo "Removing $RF" 
-    rm -R -f $RF
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
+  ;;
     
-    docker $DOCKERARGS volume rm ${PREFIX}-ldap-etc
-    docker $DOCKERARGS volume rm ${PREFIX}-ldap-var
-
-  ;;
-  "cleandata")
-    echo "Cleaning data ${PREFIX}-ldap"
-    rm -R -f $SRV/ldap/
-    
-  ;;
-  "clean")
-    echo "Cleaning image ${PREFIX}-ldap"
-    docker $DOCKERARGS rmi ${PREFIX}-ldap
-  ;;
 esac
+
