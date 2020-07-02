@@ -1,0 +1,9 @@
+
+  location /notebook {
+        proxy_set_header      Host $http_host;
+        proxy_pass            http://svc-##PREFIX##-proxy:8000;
+        access_log      /var/log/nginx/proxy.access.log;
+        error_log       /var/log/nginx/proxy.error.log;
+  }
+
+

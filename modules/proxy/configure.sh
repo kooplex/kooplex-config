@@ -1,61 +1,49 @@
 #!/bin/bash
-MODULE_NAME=proxy
-RF=$BUILDDIR/${MODULE_NAME}
 
-mkdir -p $RF
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 case $VERB in
   "build")
-    echo "1. Configuring ${PREFIX}-proxy..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 
-      cp Dockerfile $RF
-#      sed -e "s/##PUBLICIP##/${PREFIX}-proxy/" \
-#          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
-      cp  scripts/entrypoint.sh  $RF/entrypoint.sh
-      
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/proxy-pods.yaml-template > $BUILDMOD_DIR/proxy-pods.yaml
 
-
-      echo "2. Building ${PREFIX}-proxy..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
-  
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/proxy-svcs.yaml-template > $BUILDMOD_DIR/proxy-svcs.yaml
   ;;
+
   "install")
-# OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
-#        docker $DOCKERARGS restart $PREFIX-outer-nginx
-  ;;
-  "start")
-     echo "Starting proxy ${PREFIX}-proxy "
-     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-  ;;
-  "restart")
-    echo "Restarting proxy ${PREFIX}-proxy"
-    docker $DOCKERARGS restart ${PREFIX}-proxy
+      sed -e s,##PREFIX##,$PREFIX, \
+          conf/nginx-${MODULE_NAME}-template > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      restart_nginx
   ;;
 
-  "init")
-    
+  "start")
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/proxy-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/proxy-pods.yaml
   ;;
+
+
   "stop")
-    echo "Stopping proxy ${PREFIX}-proxy "
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/proxy-pods.yaml
   ;;
+
   "remove")
-    echo "Removing proxy ${PREFIX}-proxy "
-  docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/proxy-svcs.yaml
   ;;
-  "clean")
-    echo "Cleaning image ${PREFIX}-proxy"
-  ;;
+
   "purge")
-    echo "Purging proxy ${PREFIX}-proxy"
-    rm -R $RF
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
 
 esac
+
