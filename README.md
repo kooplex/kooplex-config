@@ -1,3 +1,10 @@
+NEEDS REVISION
+
+some modules dont play a part any longer: eg net
+
+----
+
+
 Visit the [Kooplex page](https://kooplex.github.io/) for further informations!
 
 ## Kooplex configuration scripts
