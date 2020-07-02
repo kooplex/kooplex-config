@@ -1,3 +1,8 @@
+NEEDS REVISION
+
+----
+
+
 LDAP initialization scripts and LDIF files
 
 It doesn't contain the organisation and admin setting because they are automatically created by the docker image when the image is started for the first time. The command-line syntax to initialize settings is
