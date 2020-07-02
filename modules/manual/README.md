@@ -33,10 +33,10 @@ bash kooplex.sh stop manual
 
 * Deletes the pod of the manual
 
-## DELETE
+## REMOVE
 
 ```
-bash kooplex.sh delete manual
+bash kooplex.sh remove manual
 ```
 
 * Deletes the service related to the manual
