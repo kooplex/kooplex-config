@@ -11,16 +11,11 @@ RUN gitbook fetch latest
 
 ENV BOOKDIR /gitbook
 
-#VOLUME $BOOKDIR
-
 ADD entrypoint.sh /entrypoint.sh
 
 EXPOSE 4000
 
 WORKDIR $BOOKDIR
-
-#CMD ["gitbook", "--help"]
-#CMD ["sleep", "infinity"]
 
 CMD ["/bin/bash", "/entrypoint.sh"]
 

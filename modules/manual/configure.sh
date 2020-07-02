@@ -1,67 +1,66 @@
 #!/bin/bash
 
-MODULE_NAME=manual
-RF=$BUILDDIR/${MODULE_NAME}
-
-mkdir -p $RF
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
 
 case $VERB in
 
   "build")
-    echo "1. Configuring ${PREFIX}-manual..."
-      
-      mkdir -p $SRV/_manual
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_manual -o o=bind ${PREFIX}-manual
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
+      mkdir_svcdata
 
+      if [ -d $MODDATA_DIR/.git ] ; then
+          echo "Manuals already cloned in folder $MODDATA_DIR. Pull if necessary"
+      else
+          git clone https://github.com/kooplex/Manual.git $MODDATA_DIR
+      fi
 
-      cp Dockerfile etc/entrypoint.sh $RF
-      # git clone https://github.com/kooplex/Manual.git $SRV/_manual
-      #      cp -r etc/* $SRV/_manual
-      
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+      cp build/Dockerfile $BUILDMOD_DIR
+      cp scripts/entrypoint.sh $BUILDMOD_DIR
+      docker $DOCKERARGS build -t ${PREFIX}-manual -f $BUILDMOD_DIR/Dockerfile $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-manual ${MY_REGISTRY}/${PREFIX}-manual
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-manual
 
-      echo "2. Building ${PREFIX}-manual..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/manual-svcs.yaml-template > $BUILDMOD_DIR/manual-svcs.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##MY_REGISTRY##,$MY_REGISTRY, \
+	  build/manual-pods.yaml-template > $BUILDMOD_DIR/manual-pods.yaml
   ;;
 
   "install")
-
-      sed -e "s/##PREFIX##/$PREFIX/" \
-	  -e "s/##OUTERHOST##/${OUTERHOST}/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
+      sed -e s,##PREFIX##,$PREFIX, \
+          conf/nginx-${MODULE_NAME}-template > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
+      restart_nginx
   ;;
 
   "start")
-    echo "Starting manual ${PREFIX}-manual"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/manual-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/manual-pods.yaml
   ;;
 
-  "restart")
-    echo "Restarting manual ${PREFIX}-manual"
-    docker $DOCKERARGS restart $PREFIX-manual
-  ;;
 
   "init")
   ;;
     
   "stop")
-    echo "Stopping manual ${PREFIX}-manual"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/manual-pods.yaml
   ;;
     
   "remove")
-    echo "Removing manual ${PREFIX}-net"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/manual-svcs.yaml
   ;;
     
   "purge")
-    echo "Purging manual ${PREFIX}-manual"
-    rm -R $RF
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
     
 esac
