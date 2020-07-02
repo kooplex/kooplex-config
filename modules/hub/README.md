@@ -1,4 +1,6 @@
-All commands should be run from repositories root folder ```$KOOPLEX_CONFIG_DIR```
+NEEDS REVISION
+
+----
 
 ## BUILD
 ```
