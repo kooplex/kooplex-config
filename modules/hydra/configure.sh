@@ -47,10 +47,10 @@ case $VERB in
           -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
           -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/" \
-          etc/database.php-template > $BUILDMOD_DIR/database.php #FIXME
-      cp etc/nginx.conf $BUILDMOD_DIR/ #FIXME
+          conf/database.php-template > $BUILDMOD_DIR/database.php
+      cp conf/nginx.conf $BUILDMOD_DIR
       sed -e "s/##PREFIX##/$PREFIX/"  \
-          etc/sites.conf-template > $BUILDMOD_DIR/sites.conf #FIXME
+          conf/sites.conf-template > $BUILDMOD_DIR/sites.conf
       cp scripts/hydraconsent-entrypoint.sh $BUILDMOD_DIR
 
       sed -e s,##PREFIX##,${PREFIX}, \

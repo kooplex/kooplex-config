@@ -1,6 +1,6 @@
 server {
   listen 80;
-  server_name ##PREFIX##-hydraconsent;
+  server_name svc-##PREFIX##-consent;
 
   root /srv/consent/public;
 
@@ -21,14 +21,14 @@ server {
 
   location ~ \.php {
     include snippets/fastcgi-php.conf;
-    fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+    fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
   }
 
   location ^~ /simplesaml {
         alias /srv/consent/public/simplesaml;
         location ~ ^(/simplesaml)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ { 
             include fastcgi_params; 
-            fastcgi_pass unix:/var/run/php/php7.0-fpm.sock; 
+            fastcgi_pass unix:/var/run/php/php7.3-fpm.sock; 
             fastcgi_index index.php; 
             fastcgi_param SCRIPT_FILENAME $document_root$phpfile; 
  
