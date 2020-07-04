@@ -1,43 +1,105 @@
 #!/bin/bash
 
-RF=$BUILDDIR/hydra
-
-mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 # After consent install
 # /consent/install and click the button
 # sed 'files'; #### --> 'database'; ####
 #
 
-CONSENT_LOG=$LOG_DIR/hydraconsent
 
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-hydra..."
-      
-      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode $HYDRA_CONFIG $CONSENT_LOG
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydradb -o o=bind ${PREFIX}-hydradb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconsentdb -o o=bind ${PREFIX}-hydraconsentdb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydracode -o o=bind ${PREFIX}-hydracode
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hydraconfig -o o=bind ${PREFIX}-hydraconfig
-      docker $DOCKERARGS volume create -o type=none -o device=$CONSENT_LOG -o o=bind ${PREFIX}-hydraconsent-log
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
+      mkdir_svcconf
+      mkdir_svclog
+      mkdir_svcdata
 
+      CODE_DIR=$MODDATA_DIR/_hydracode_
+      _mkdir $CODE_DIR
+      if [ -d $CODE_DIR/.git ] ; then
+          echo "Code already cloned in folder $CODE_DIR. Pull if necessary" >&2
+      else
+          echo "Cloning code" >&2
+          #git clone https://daevidt@bitbucket.org/daevidt/hydra-consent.git $CODE_DIR
+          git clone https://bitbucket.org/daevidt/hydra-consent.git $CODE_DIR
 #      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
-#      Magically put the code into $SRV/_hydracode/consent
+      echo "WARN FIXME: Magically put the code into $CODE_DIR/consent" >&2
+      fi
+      
+      create_rootCA
+      cp -a $CA_DIR/rootCA.{key,crt} $BUILDMOD_DIR
 
-      cp Dockerfile.hydraconsentdb $RF/
+      cp scripts/hydra-entrypoint.sh $BUILDMOD_DIR
+      cp scripts/api.py $BUILDMOD_DIR
+      cp scripts/02-api-start.sh $BUILDMOD_DIR
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##HYDRA_ADMINPW##,$HYDRA_ADMINPW, \
+          conf/hydra.yml-template > $BUILDMOD_DIR/hydra.yml
+      sed -e s,##PREFIX##,${PREFIX}, \
+          build/Dockerfile.hydra-template > $BUILDMOD_DIR/Dockerfile.hydra
+      docker $DOCKERARGS build -t ${PREFIX}-hydra -f $BUILDMOD_DIR/Dockerfile.hydra $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-hydra ${MY_REGISTRY}/${PREFIX}-hydra
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hydra
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
+          -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
+          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/" \
+          etc/database.php-template > $BUILDMOD_DIR/database.php #FIXME
+      cp etc/nginx.conf $BUILDMOD_DIR/ #FIXME
+      sed -e "s/##PREFIX##/$PREFIX/"  \
+          etc/sites.conf-template > $BUILDMOD_DIR/sites.conf #FIXME
+      cp scripts/hydraconsent-entrypoint.sh $BUILDMOD_DIR
+
+      sed -e s,##PREFIX##,${PREFIX}, \
+          -e s,##FQDN##,$FQDN, \
+          -e s,##MAIL_SERVER_HOSTNAME##,$MAIL_SERVER_HOSTNAME, \
+	  build/Dockerfile.hydraconsent-template > $BUILDMOD_DIR/Dockerfile.hydraconsent
+
+      docker $DOCKERARGS build -t ${PREFIX}-hydraconsent -f $BUILDMOD_DIR/Dockerfile.hydraconsent $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-hydraconsent ${MY_REGISTRY}/${PREFIX}-hydraconsent
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hydraconsent
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/hydra-svcs.yaml-template > $BUILDMOD_DIR/hydra-svcs.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##FQDN##,$FQDN, \
+          -e s,##MY_REGISTRY##,$MY_REGISTRY, \
+          -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+          -e s,##HYDRADB##,${HYDRADB},g \
+          -e s,##HYDRA_POSTGRESQL_USER##,postgres,g \
+          -e s,##HYDRA_POSTGRESQL_PW##,"${HYDRA_POSTGRESQL_PW}",g \
+          -e s,##HYDRACONSENT_MYSQL_ROOTPW##,"${HYDRACONSENT_MYSQL_ROOTPW}",g \
+          -e s,##HYDRACONSENTDB##,"${HYDRACONSENTDB}",g \
+          -e s,##HYDRACONSENTDB_PW##,"${HYDRACONSENTDB_PW}",g \
+          -e s,##HYDRACONSENTDB_USER##,"${HYDRACONSENTDB_USER}",g \
+	  -e s,##HYDRASYSTEM_SECRET##,"$HYDRASYSTEM_SECRET", \
+          -e s,##HYDRA_ADMINPW##,$HYDRA_ADMINPW, \
+          -e s,##HYDRA_API_USER##,$HYDRA_API_USER, \
+          -e s,##HYDRA_API_PW##,$HYDRA_API_PW, \
+	  build/hydra-pods.yaml-template > $BUILDMOD_DIR/hydra-pods.yaml
+      echo "ITT TARTUNK MOUNT /etc/hydraconfig/"
+      exit 3
+
+##          -e "s/##HYDRACONSENTDB##/${HYDRACONSENTDB}/g" \
+##          -e "s/##HYDRACONSENTDB_USER##/${HYDRACONSENTDB_USER}/g" \
+##          -e "s/##HYDRACONSENTDB_PW##/${HYDRACONSENTDB_PW}/g" \
+##          -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
+##          -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/
+
+      cp build/Dockerfile.hydraconsentdb $RF/
       cp etc/mysql.cnf $RF/
-      cp etc/nginx.conf $RF/
-      cp etc/*entrypoint.sh $RF/
 
 #      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
       #cp -ar src $SRV/_hydracode 
       cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json}   $HYDRA_CONFIG/
 
-      cp -a $BUILDDIR/CA/rootCA.{key,crt} $RF/
 
       ENCFILE=$RF/hydraconsent.enckey
       if [ ! -f $ENCFILE ] ; then
@@ -47,25 +109,13 @@ case $VERB in
 
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
       sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
 
-      sed -e "s/##PREFIX##/${PREFIX}/"\
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##MAIL_SERVER_HOSTNAME##/$MAIL_SERVER_HOSTNAME/" \
-	      Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
-      sed -e "s/##PREFIX##/$PREFIX/"  etc/sites.conf-template > $RF/sites.conf
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
-          -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php # $SRV/_hydracode/consent/application/config/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
 	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $SRV/_hydracode/consent/application/config/config.php
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/"  etc/hydra.yml-template > $RF/hydra.yml
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/" \
@@ -86,10 +136,23 @@ case $VERB in
   ;;
 
   "install")
-      sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-hydra-template > $CONF_DIR/outer_nginx/sites-enabled/hydra
+      register_module_in_nginx
+      getip_hydra
+      cat conf/public-policy.json | \
+          curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
+      register_module_in_hydra consent
   ;;
 
   "start")
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/hydra-svcs.yaml
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/hydra-pods.yaml
+
+       echo STOP
+       exit 3
+
+
        echo "Starting containers of ${PREFIX}-hydra"
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra-postgresql
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent-mysql
@@ -100,19 +163,9 @@ case $VERB in
   ;;
 
   "init")
-
+      echo "UNDONE"
+      exit 3
   
-	docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "CREATE DATABASE $HYDRADB;"
-        docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "CREATE USER $HYDRADB_USER WITH PASSWORD '$HYDRADB_USER';"
-        docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "GRANT ALL ON DATABASE $HYDRADB TO $HYDRADB_USER;"
-        docker exec -u postgres ${PREFIX}-hydra-postgresql  psql -c "GRANT CONNECT ON DATABASE $HYDRADB to $HYDRADB_USER;"
-
-	docker restart ${PREFIX}-hydra
-	sleep 2
-        
-        docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "create user $HYDRACONSENTDB_USER identified by '$HYDRACONSENTDB_PW';"
-	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "create database $HYDRACONSENTDB;"
-	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW -e  "GRANT ALL  privileges on $HYDRACONSENTDB.* to $HYDRACONSENTDB_USER;"
 
 	echo "I need to sleep for 10 secs"
 	sleep 10
@@ -155,31 +208,26 @@ case $VERB in
   ;;
 
   "stop")
-      echo "Stopping containers of ${PREFIX}-hydra"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm $NGINX_DIR/conf/conf/hydra
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/hydra-pods.yaml
+  ;;
+
+  "uninstall")
+      deregister_module_in_nginx
+      getip_hydra
+      curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-public
+      deregister_module_in_hydra consent
   ;;
 
   "remove")
-      echo "Removing containers of ${PREFIX}-hydra"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/hydra-svcs.yaml
   ;;
 
   "purge")
-      echo "Removing $RF" 
-      rm -R -f $RF
-      
-      docker $DOCKERARGS volume rm ${PREFIX}-hydradb
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
-  "cleandata")
-    echo "Cleaning data ${PREFIX}-hydradb"
-    rm -R -f $SRV/mysql
-    
-  ;;
-
-  "clean")
-  ;;
-
 esac
 

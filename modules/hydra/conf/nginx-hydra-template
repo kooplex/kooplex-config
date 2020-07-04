@@ -1,0 +1,15 @@
+
+####### Hydra 
+  location /hydra/ {
+     ## hydra host --dangerous-force-http , otherwise https
+        proxy_pass       http://svc-##PREFIX##-hydra:4444/;
+        access_log      /var/log/nginx/hydra.access.log;
+        error_log       /var/log/nginx/hydra.error.log;
+  }
+
+  location /consent/ {
+        proxy_pass       http://svc-##PREFIX##-consent/;
+        access_log      /var/log/nginx/hydraconsent.access.log;
+        error_log       /var/log/nginx/hydraconsent.error.log;
+  }
+####### Hydra end

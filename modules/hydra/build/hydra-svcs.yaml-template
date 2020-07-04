@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-##MODULE_NAME##
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4444
+      targetPort: 4444
+    - name: api
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-##MODULE_NAME##-postgresql
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-postgresql
+  ports:
+    - name: postgresql
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-consent
+spec:
+  selector:
+    name: lbl-##PREFIX##-consent
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-consent-mysql
+spec:
+  selector:
+    name: lbl-##PREFIX##-consent-mysql
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+

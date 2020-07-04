@@ -34,6 +34,20 @@ create_pvc () {
 }
 
 
+# create root CA
+create_rootCA () {
+    CA_DIR=$BUILDDIR/CA
+    if [ -d $CA_DIR ] ; then
+        echo "$CA_DIR already present; will not generate ca" >&2
+    else 
+        echo "generate CA" >&2
+        set -e
+        mkdir $CA_DIR
+        openssl genrsa -out $CA_DIR/rootCA.key 4096
+        openssl req -x509 -new -nodes -key $CA_DIR/rootCA.key -sha256 -days 1024 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=$FQDN" -out $CA_DIR/rootCA.crt
+    fi
+}
+
 # make module build dir
 mkdir_build () {
     if [ -z "$MODULE_NAME" ] ; then
@@ -74,12 +88,109 @@ purgedir_svc () {
     done
 }
 
+# register module in nginx
+register_module_in_nginx () {
+    NGINXCONF_DIR=$SERVICECONF_DIR/nginx/conf.d/sites-enabled
+    NGINX_CONF=$NGINXCONF_DIR/${MODULE_NAME}
+    TEMPLATE=conf/nginx-${MODULE_NAME}-template
+    if [ ! -d $NGINXCONF_DIR ] ; then
+       echo "ERROR: $NGINXCONF_DIR is not present. Make sure nginx module is built" >&2
+       exit 2
+    fi
+    if [ ! -f $TEMPLATE ] ; then
+       echo "ERROR: $TEMPLATE is not present." >&2
+       exit 2
+    fi
+    if [ -f $NGINX_CONF ] ; then
+        echo "$NGINX_CONF exists skipping registration" >&2
+    else
+        echo "created $NGINX_CONF" >&2
+        sed -e s,##PREFIX##,$PREFIX, \
+            -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+            -e s,##FQDN##,$FQDN, \
+            $TEMPLATE > $NGINX_CONF
+        restart_nginx
+    fi
+}
+
+# deregister module in nginx
+deregister_module_in_nginx () {
+    NGINXCONF_DIR=$SERVICECONF_DIR/nginx/conf.d/sites-enabled
+    NGINX_CONF=$NGINXCONF_DIR/${MODULE_NAME}
+    if [ -f $NGINX_CONF ] ; then
+        echo "Removed $NGINX_CONF" >&2
+        rm $NGINX_CONF
+        restart_nginx
+    else
+        echo "$NGINX_CONF does not exist" >&2
+    fi
+}
+
 # restart nginx
 restart_nginx () {
-    echo "restart_nginx" >&2
+    echo "Restarting nginx" >&2
     bash $0 stop nginx
     bash $0 start nginx
-    echo "restarted nginx" >&2
+    echo "Restarted nginx" >&2
+}
+
+
+
+# get hydra IP
+getip_hydra () {
+    HYDRA_IP=$(kubectl get svc | awk "/^svc-${PREFIX}-hydra\s/{ print \$3 }")
+    if [ -z "$HYDRA_IP" ] ; then
+        echo "Make sure hydra service is created" >&2
+        exit 2
+    fi
+    echo "IP address of hydra service is $HYDRA_IP" >&2
+}
+
+# register module in hydra
+register_module_in_hydra () {
+    getip_hydra
+    if [ -z "$1" ] ; then
+       M=$MODULE_NAME 
+    else
+       M=$1
+    fi
+    CLIENT_TEMPLATE=conf/client-${M}.json-template
+    POLICY_TEMPLATE=conf/client-policy-${M}.json-template
+    for T in $CLIENT_TEMPLATE $POLICY_TEMPLATE ; do
+        if [ ! -f $T ] ; then
+           echo "ERROR: $T is not present." >&2
+           exit 2
+        fi
+    done
+    sed -e s,##PREFIX##,${PREFIX}, \
+        -e s,##REWRITEPROTO##,${REWRITEPROTO}, \
+        -e s,##FQDN##,${FQDN}, \
+        $CLIENT_TEMPLATE | \
+        curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${M} -H "Content-Type: application/json" -X POST --data-binary @-
+    sed -e s,##PREFIX##,${PREFIX}, \
+        $POLICY_TEMPLATE | \
+        curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${M} -H "Content-Type: application/json" -X POST --data-binary @-
+    echo "Registered $M in hydra" >&2
+
+    SECRETS_FILE=$SERVICECONF_DIR/hydra/hydrasecrets/${PREFIX}-${M}-hydra.secret
+    if [ -f $SECRETS_FILE ] ; then
+        echo "Created $SECRETS_FILE" >&2
+    else
+        echo "ERROR: $SECRETS_FILE is missing" >&2
+        exit 2
+    fi
+}
+
+# deregister module in hydra
+deregister_module_in_hydra () {
+    getip_hydra
+    if [ -z "$1" ] ; then
+        M=$MODULE_NAME
+    else
+        M=$1
+    fi
+    curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-${M}
+    echo "Deregistered $M in hydra" >&2
 }
 
 ## CA_DIR=$BUILDDIR/CA

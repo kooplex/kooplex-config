@@ -36,8 +36,8 @@ echo "Modules $SVCS" >&2
 echo "Extra $EXTRA" >&2
  
 case $VERB in
-
-  "build"|"install"|"start"|"init"|"stop"|"remove"|"purge")
+#FIXME: init???
+  "build"|"install"|"start"|"uninstall"|"init"|"stop"|"remove"|"purge")
     set -e
   ;;
   *)

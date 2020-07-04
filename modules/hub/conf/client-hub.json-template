@@ -7,7 +7,7 @@
         "id": "##PREFIX##-hub",
 		  "description": "##PREFIX## HUB",
         "redirect_uris": [
-                "##REWRITEPROTO##://##OUTERHOST##/hub/oauth/complete/hydraoidc/"
+                "##REWRITEPROTO##://##FQDN##/hub/oauth/complete/hydraoidc/"
         ],
         "response_types": [
                 "id_token",
