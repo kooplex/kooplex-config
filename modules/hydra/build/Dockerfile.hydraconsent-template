@@ -13,18 +13,7 @@ RUN echo "postfix postfix/mailname string ##FQDN##" | debconf-set-selections && 
     echo  "postfix postfix/relayhost string '##MAIL_SERVER_HOSTNAME##'" | debconf-set-selections &&\
     apt install -y postfix
 
-
-RUN mkdir -p /srv/
-#ADD src/consent  /srv/consent
-
-COPY database.php /srv/consent/application/config/database.php
- 
-COPY nginx.conf /etc/nginx/ 
-COPY sites.conf /etc/nginx/
-
 ADD hydraconsent-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-
 ENTRYPOINT ["/entrypoint.sh"]
-

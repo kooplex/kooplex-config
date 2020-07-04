@@ -24,10 +24,25 @@ case $VERB in
           echo "Cloning code" >&2
           #git clone https://daevidt@bitbucket.org/daevidt/hydra-consent.git $CODE_DIR
           git clone https://bitbucket.org/daevidt/hydra-consent.git $CODE_DIR
-#      [ -d $SRV/_hydracode/consent ] && mv  $SRV/_hydracode/consent $SRV/_hydracode/consent_$(date +"%Y%m%d_%H%M")
-      echo "WARN FIXME: Magically put the code into $CODE_DIR/consent" >&2
+          echo "Patching and configuring code" >&2
+          sed -e s,##PREFIX##,$PREFIX, \
+              -e s,##HYDRACONSENTDB##,$HYDRACONSENTDB, \
+              -e s,##HYDRACONSENTDB_USER##,$HYDRACONSENTDB_USER, \
+              -e s,##HYDRACONSENTDB_PW##,$HYDRACONSENTDB_PW, \
+              conf/database.php-template > $CODE_DIR/application/config/database.php
+
+          ENCFILE=$BUILDMOD_DIR/hydraconsent.enckey
+          if [ ! -f $ENCFILE ] ; then
+             hexdump -n 16 -e '"%08X"' /dev/random > $ENCFILE
+             echo "Created encryption $ENCFILE" >&2
+          fi
+          sed -e s,##PREFIX##,${PREFIX}, \
+              -e s,##REWRITEPROTO##,${REWRITEPROTO}, \
+              -e s,##FQDN##,$FQDN, \
+              -e s,##CONSENT_ENCRYPTIONKEY##,"$(cat $ENCFILE)", \
+              conf/config.php-template > $CODE_DIR/application/config/config.php
       fi
-      
+
       create_rootCA
       cp -a $CA_DIR/rootCA.{key,crt} $BUILDMOD_DIR
 
@@ -43,14 +58,10 @@ case $VERB in
       docker $DOCKERARGS tag ${PREFIX}-hydra ${MY_REGISTRY}/${PREFIX}-hydra
       docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hydra
 
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
-          -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/" \
-          conf/database.php-template > $BUILDMOD_DIR/database.php
-      cp conf/nginx.conf $BUILDMOD_DIR
+      CONF_DIR=$MODCONF_DIR/consent-nginx
+      _mkdir $CONF_DIR
       sed -e "s/##PREFIX##/$PREFIX/"  \
-          conf/sites.conf-template > $BUILDMOD_DIR/sites.conf
+          conf/sites.conf-template > $CONF_DIR/default
       cp scripts/hydraconsent-entrypoint.sh $BUILDMOD_DIR
 
       sed -e s,##PREFIX##,${PREFIX}, \
@@ -84,8 +95,7 @@ case $VERB in
           -e s,##HYDRA_API_USER##,$HYDRA_API_USER, \
           -e s,##HYDRA_API_PW##,$HYDRA_API_PW, \
 	  build/hydra-pods.yaml-template > $BUILDMOD_DIR/hydra-pods.yaml
-      echo "ITT TARTUNK MOUNT /etc/hydraconfig/"
-      exit 3
+
 
 ##          -e "s/##HYDRACONSENTDB##/${HYDRACONSENTDB}/g" \
 ##          -e "s/##HYDRACONSENTDB_USER##/${HYDRACONSENTDB_USER}/g" \
@@ -93,46 +103,6 @@ case $VERB in
 ##          -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
 ##          -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/
 
-      cp build/Dockerfile.hydraconsentdb $RF/
-      cp etc/mysql.cnf $RF/
-
-#      cp Dockerfile.hydraconsent-template $RF/Dockerfile.hydraconsent
-      #cp -ar src $SRV/_hydracode 
-      cp -a hydraconfig/{public-policy.json,consent-app-policy.json,consent-app.json}   $HYDRA_CONFIG/
-
-
-      ENCFILE=$RF/hydraconsent.enckey
-      if [ ! -f $ENCFILE ] ; then
-	 hexdump -n 16 -e '"%08X"' /dev/random > $ENCFILE
-      fi
-
-
-
-# Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
-
-#      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-	  -e "s/##CONSENT_ENCRYPTIONKEY##/$(cat $ENCFILE)/"  consentconfig/config.php-template > $SRV/_hydracode/consent/application/config/config.php
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##HYDRA_ADMINPW##/$HYDRA_ADMINPW/" \
-	  -e "s/##HYDRASYSTEM_SECRET##/$HYDRASYSTEM_SECRET/" \
-	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-          -e "s/##HYDRACONSENTDB##/${HYDRACONSENTDB}/g" \
-          -e "s/##HYDRACONSENTDB_USER##/${HYDRACONSENTDB_USER}/g" \
-          -e "s/##HYDRACONSENTDB_PW##/${HYDRACONSENTDB_PW}/g" \
-          -e "s/##HYDRADB##/${HYDRADB}/g" \
-          -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
-          -e "s/##HYDRADB_PW##/${HYDRADB_PW}/g" \
-          -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-
-
-  	 
-      echo "2. Building ${PREFIX}-hydra..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
   "install")
@@ -148,18 +118,6 @@ case $VERB in
   "start")
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/hydra-pods.yaml
-
-       echo STOP
-       exit 3
-
-
-       echo "Starting containers of ${PREFIX}-hydra"
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra-postgresql
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent-mysql
-#       docker exec ${PREFIX}-hydra-mysql /initdb.sh
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra
-       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-keto
   ;;
 
   "init")

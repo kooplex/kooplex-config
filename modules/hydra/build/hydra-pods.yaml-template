@@ -107,6 +107,9 @@ spec:
       - containerPort: 80
         name: http
     volumeMounts:
+      - mountPath: /etc/nginx/sites-enabled
+        name: svcconf-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/consent-nginx/
       - mountPath: /srv
         name: svcdata-##PREFIX##-##MODULE_NAME##
         subPath: ##MODULE_NAME##/_hydracode_/
@@ -121,6 +124,9 @@ spec:
       - name: DOMAIN
         value: "##FQDN##"
   volumes:
+    - name: svcconf-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svcconf-##PREFIX##
     - name: svcdata-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
         claimName: pvc-svcdata-##PREFIX##
