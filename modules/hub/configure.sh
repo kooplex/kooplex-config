@@ -47,6 +47,8 @@ case $VERB in
   ;;
 
   "install")
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/hub-svcs.yaml
       register_module_in_nginx
       register_module_in_hydra
       cp -a $SECRETS_FILE $SERVICECONF_DIR/$MODULE_NAME/secrets
@@ -54,8 +56,6 @@ case $VERB in
   ;;
 
   "start")
-      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/hub-svcs.yaml
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/hub-pods.yaml
   ;;
