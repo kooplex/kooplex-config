@@ -3,10 +3,10 @@ FROM ##PREFIX##-base
 RUN apt update 
 
 RUN apt install -y curl zip && \
-    curl -sL https://deb.nodesource.com/setup_10.x |  bash - && \
+    curl -sL https://deb.nodesource.com/setup_14.x |  bash - && \
     apt install --yes nodejs 
 
-RUN apt install -y tmux  curlftpfs\
+RUN apt install -y tmux  curlftpfs \
  liblapack-dev libblas-dev \
  gfortran libfreetype6* pkg-config \
  git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake \

@@ -6,9 +6,15 @@ case $VERB in
     "build")
       echo "Building base image ${PREFIX}-base" >&2
       cp build/Dockerfile $BUILDMOD_DIR
+      sed -e s,##PREFIX##,$PREFIX, \
+          build/Dockerfile-base-apt-packages-template > $BUILDMOD_DIR/Dockerfile-base-apt-packages
+      sed -e s,##PREFIX##,$PREFIX, \
+          build/Dockerfile-base-conda-template > $BUILDMOD_DIR/Dockerfile-base-conda
       cp scripts/entrypoint.sh $BUILDMOD_DIR
       cp scripts/bashrc_tail $BUILDMOD_DIR
       docker $DOCKERARGS build -t ${PREFIX}-base -f $BUILDMOD_DIR/Dockerfile $BUILDMOD_DIR
+      docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $BUILDMOD_DIR/Dockerfile-base-apt-packages $BUILDMOD_DIR
+      docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $BUILDMOD_DIR/Dockerfile-base-conda $BUILDMOD_DIR
 
 
    # mkdir -p $SECRETS
@@ -25,15 +31,10 @@ case $VERB in
 #  #  cp requirements.txt $RF
 #  #  cp etc/conda-requirements*.txt $RF
    # cp Dockerfile $RF
-   # sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
-   # sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda
    # sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-extras-template > $RF/Dockerfile-base-conda-extras
    # sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-slurm-template > $RF/Dockerfile-base-slurm
    # sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-singularity-template > $RF/Dockerfile-base-singularity
  
-   # docker $DOCKERARGS build -t ${PREFIX}-base  $RF
-   # docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
-   # docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $RF/Dockerfile-base-conda  $RF 
    # docker $DOCKERARGS build -t ${PREFIX}-base-conda-extras -f $RF/Dockerfile-base-conda-extras  $RF 
    # docker $DOCKERARGS build -t ${PREFIX}-base-slurm -f $RF/Dockerfile-base-slurm  $RF 
    # docker $DOCKERARGS build -t ${PREFIX}-base-singularity -f $RF/Dockerfile-base-singularity  $RF 
@@ -55,18 +56,15 @@ case $VERB in
   "remove")
 
   ;;
-  "purge")
-  echo "Cleaning base folder $SRV/; Remove aquota"
-#  quotaoff -vu $SRV
-#  quotaoff -vg $SRV
-#  rm -f $SRV/aquota.*
-  rm -r $SRV/.secrets
-  ;;
+
+    "purge")
+      echo "Removing docker images" >&2
+      for i in ${PREFIX}-base-conda ${PREFIX}-base-apt-packages ${PREFIX}-base; do
+          docker $DOCKERARGS rmi i
+          echo "Removed image $i" >&2
+      done
+    ;;
+
   "clean")
-    echo "Cleaning base image ${PREFIX}-base"
-    #umount $SRV 
-#    echo "Check if $SRV is still mounted! Then run: ' rm -f "$DISKIMG/$PROJECT"fs.img '" 
-    #rm -f $DISKIMG/$PROJECT"fs.img" 
-    docker $DOCKERARGS rmi ${PREFIX}-base
   ;;
 esac
