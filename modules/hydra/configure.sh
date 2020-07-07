@@ -116,8 +116,10 @@ case $VERB in
       PCF=$SERVICECONF_DIR/hydra/hydra/${PREFIX}-public-${CLIENT}
       if [ -f $PCF ] ; then
           echo "File $PCF exists. Skip registration." >&2
+      else
+          echo "Register public policy" >&2
           cat conf/public-policy.json | \
-              curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
+              curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
       fi
       register_module_in_hydra consent
       sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
