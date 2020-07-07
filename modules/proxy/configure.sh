@@ -16,14 +16,12 @@ case $VERB in
   ;;
 
   "install")
-      sed -e s,##PREFIX##,$PREFIX, \
-          conf/nginx-${MODULE_NAME}-template > $SERVICECONF_DIR/nginx/conf.d/sites-enabled/${MODULE_NAME}
-      restart_nginx
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/proxy-svcs.yaml
+      register_module_in_nginx
   ;;
 
   "start")
-      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/proxy-svcs.yaml
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/proxy-pods.yaml
   ;;
@@ -32,6 +30,10 @@ case $VERB in
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/proxy-pods.yaml
+  ;;
+
+  "uninstall")
+      deregister_module_in_nginx
   ;;
 
   "remove")
