@@ -41,6 +41,9 @@ case $VERB in
               -e s,##FQDN##,$FQDN, \
               -e s,##CONSENT_ENCRYPTIONKEY##,"$(cat $ENCFILE)", \
               conf/config.php-template > $CODE_DIR/application/config/config.php
+
+           #FIXME:
+           echo "WARNING!!!! install third party dependency, e.g. hydra-client-sdk (untar untin no better solution)" >&2
       fi
 
       create_rootCA
@@ -110,9 +113,17 @@ case $VERB in
       kubectl apply -f $BUILDMOD_DIR/hydra-svcs.yaml
       register_module_in_nginx
       getip_hydra
-      cat conf/public-policy.json | \
-          curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
+      PCF=$SERVICECONF_DIR/hydra/hydra/${PREFIX}-public-${CLIENT}
+      if [ -f $PCF ] ; then
+          echo "File $PCF exists. Skip registration." >&2
+          cat conf/public-policy.json | \
+              curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
+      fi
       register_module_in_hydra consent
+      sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+          -e s,##FQDN##,$FQDN, \
+          -e s,##CONSENTPASSWORD##,$(cat $SECRETS_FILE), \
+          conf/hydra.php-template > $SERVICEDATA_DIR/hydra/_hydracode_/application/config/hydra.php
   ;;
 
   "start")
@@ -136,9 +147,6 @@ case $VERB in
 			docker cp  ${PREFIX}-hydra:/consent-app.pw $PWFILE
 	fi
 	CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
-        sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-            -e "s/##OUTERHOST##/$OUTERHOST/" \
-            -e "s/##CONSENTPASSWORD##/$CONSENTAPPPASSWORD/" consentconfig/hydra.php-template > $SRV/_hydracode/consent/application/config/hydra.php
 
 #	hydra 0.x esetén:
 	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/consent-app-policy.json"

@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
 $config["hydra.consent_client"] = 'consent-app';
-$config["hydra.url"] = '##REWRITEPROTO##://##OUTERHOST##/hydra';
+$config["hydra.url"] = '##REWRITEPROTO##://##FQDN##/hydra';
 $config["hydra.consent_secret"] = '##CONSENTPASSWORD##';

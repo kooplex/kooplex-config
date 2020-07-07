@@ -148,12 +148,17 @@ getip_hydra () {
 
 # register module in hydra
 register_module_in_hydra () {
-    getip_hydra
     if [ -z "$1" ] ; then
        M=$MODULE_NAME 
     else
        M=$1
     fi
+    SECRETS_FILE=$SERVICECONF_DIR/hydra/hydrasecrets/${PREFIX}-${M}-hydra.secret
+    if [ -f $SECRETS_FILE ] ; then
+        echo "File exists $SECRETS_FILE" >&2
+        exit 2
+    fi
+    getip_hydra
     CLIENT_TEMPLATE=conf/client-${M}.json-template
     POLICY_TEMPLATE=conf/client-policy-${M}.json-template
     for T in $CLIENT_TEMPLATE $POLICY_TEMPLATE ; do
@@ -172,7 +177,6 @@ register_module_in_hydra () {
         curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${M} -H "Content-Type: application/json" -X POST --data-binary @-
     echo "Registered $M in hydra" >&2
 
-    SECRETS_FILE=$SERVICECONF_DIR/hydra/hydrasecrets/${PREFIX}-${M}-hydra.secret
     if [ -f $SECRETS_FILE ] ; then
         echo "Created $SECRETS_FILE" >&2
     else
