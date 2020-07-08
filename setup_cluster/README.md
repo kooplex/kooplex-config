@@ -290,3 +290,7 @@ kubectl -n kube-system edit configmap coredns
 ## Persistent storage
 
 See [README-stg.md](README-stg.md) for details.
+
+## Python API
+
+See [README-py.md](README-py.md) for detaild.
