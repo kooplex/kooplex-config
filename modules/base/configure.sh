@@ -20,7 +20,7 @@ case $VERB in
       for dt in build/Dockerfile-image-*-template ; do
           if [ -f $dt ] ; then
               d=$(basename $dt | sed s,-template,,)
-              tag=$(echo $d | sed s,Dockerfile-image-,,)
+              tag=$(echo $d | sed s,Dockerfile-,,)
               echo "Building $d for $tag" >&2
               sed -e s,##PREFIX##,${PREFIX}, \
                   $dt > $BUILDMOD_DIR/$d
@@ -74,8 +74,16 @@ case $VERB in
     "purge")
       echo "Removing docker images" >&2
       for i in ${PREFIX}-base-conda ${PREFIX}-base-apt-packages ${PREFIX}-base; do
-          docker $DOCKERARGS rmi i
+          docker $DOCKERARGS rmi $i
           echo "Removed image $i" >&2
+      done
+      for dt in build/Dockerfile-image-*-template ; do
+          if [ -f $dt ] ; then
+              d=$(basename $dt | sed s,-template,,)
+              tag=$(echo $d | sed s,Dockerfile-,,)
+              docker $DOCKERARGS rmi ${PREFIX}-${tag} ${MY_REGISTRY}/${PREFIX}-${tag}
+              echo "Removed ${PREFIX}-${tag} ${MY_REGISTRY}/${PREFIX}-${tag}" >&2
+          fi
       done
     ;;
 
