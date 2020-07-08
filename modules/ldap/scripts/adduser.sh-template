@@ -1,0 +1,36 @@
+#! /bin/bash
+
+if [ ! $# -eq 3 ] ; then
+  echo "$0 <username> <userid> <groupid>" >&2
+  exit 1
+fi
+
+LDIF=$(mktemp)
+
+echo "Tempfile $LDIF"
+
+cat > $LDIF <<EOF
+dn: uid=%%USERNAME%%,ou=users,##LDAPORG##
+objectClass: posixAccount
+objectClass: InetOrgPerson
+uid: %%USERNAME%%
+cn: %%USERNAME%%
+sn: %%USERNAME%%
+uidNumber: %%USERID%%
+gidNumber: %%GROUPID%%
+loginShell: /bin/bash
+homeDirectory: %%HOME%%
+
+EOF
+
+sed -i -e "s/%%USERNAME%%/$1/" \
+    -e "s/%%USERID%%/$2/" \
+    -e "s/%%GROUPID%%/$3/" \
+    -e "s/%%HOME%%/\/v\/$1/" \
+    $LDIF
+
+cat $LDIF | ldapadd -D cn=admin,##LDAPORG## -w "##LDAP_ADMIN_PASSWORD##"
+
+rm $LDIF
+echo "Removed"
+

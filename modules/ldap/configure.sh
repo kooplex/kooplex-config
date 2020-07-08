@@ -5,6 +5,7 @@ case $VERB in
 
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
+      mkdir_svclog
       mkdir_svcdata
       mkdir_svcconf
 
@@ -20,29 +21,15 @@ case $VERB in
           -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
 	  build/ldap-pods.yaml-template > $BUILDMOD_DIR/ldap-pods.yaml
 
-##      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
-##      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $RF/new_user.ldiftemplate
-##      sed -e "s/##LDAPORG##/$LDAPORG/" etc/ldap.conf_template > $RF/ldap.conf
-##
-##      sed -e "s/##LDAPORG##/$LDAPORG/" \
-##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $RF/addgroup.sh
-##      sed -e "s/##LDAPORG##/$LDAPORG/" \
-##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/adduser.sh_template > $RF/adduser.sh
-##          
-##
-##      sed -e "s/##LDAPORG##/$LDAPORG/" \
-##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
-##          
-##      sed -e "s/##LDAPORG##/$LDAPORG/" \
-##          -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
-##          -e "s/##LDAPHOST##/${PREFIX}-ldap/" \
-##          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init-core.sh-template > $RF/init-core.sh
+      _mkdir $MODDATA_DIR/db
+      _mkdir $MODDATA_DIR/helper
+      DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
+      sed -e s/##LDAPORG##/$DN/ \
+          -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
+          scripts/init.sh-template > $MODDATA_DIR/helper/init.sh
+      sed -e s/##LDAPORG##/$DN/ \
+          -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
+          scripts/adduser.sh-template > $MODDATA_DIR/helper/adduser.sh
   ;;
 
   "install")
