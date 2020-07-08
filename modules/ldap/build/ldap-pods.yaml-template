@@ -15,9 +15,15 @@ spec:
       - containerPort: 636
         name: ldaps
     volumeMounts:
+      - mountPath: /var/log/ldap
+        name: svclog-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##
       - mountPath: /var/lib/ldap
         name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/
+        subPath: ##MODULE_NAME##/db
+      - mountPath: /usr/local/ldap
+        name: svcdata-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/helper
       - mountPath: /etc/ldap/slapd.d
         name: svcconf-##PREFIX##-##MODULE_NAME##
         subPath: ##MODULE_NAME##/
@@ -31,6 +37,9 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##KUBE_MASTERNODE##
   volumes:
+    - name: svclog-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svclog-##PREFIX##
     - name: svcdata-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
         claimName: pvc-svcdata-##PREFIX##

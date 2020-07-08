@@ -1,0 +1,21 @@
+
+LOCK_FILE=/var/log/ldap/_initialized
+LOG_FILE=/var/log/ldap/ini.log
+
+if [ -f $LOCK_FILE ] ; then
+    echo "Already initialized" >> $LOG_FILE
+else
+    cat << EOF | ldapadd -D cn=admin,##LDAPORG## -w "##LDAP_ADMIN_PASSWORD##"
+dn: ou=users,##LDAPORG##
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+
+dn: ou=groups,##LDAPORG##
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+EOF
+   touch $LOCK_FILE
+   echo "Just initialized" >> $LOG_FILE
+fi 
