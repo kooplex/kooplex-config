@@ -7,6 +7,7 @@ KEYFILE=
 CERTFILE=
 
 MY_REGISTRY=kooplex-test:5000
+URL_HYDRA=
 
 BUILDDIR=/data/$PREFIX/build
 
@@ -19,32 +20,48 @@ SERVICEDATA_DIR=$SERVICE_DIR/data
 
 DATA_DIR=$ROOT_DIR/data
 
+HOME_DIR=$ROOT_DIR/user/home
 
 #######################
 DOCKERARGS="-H unix:///var/run/docker.sock"
 #######################
 
-SYSMODULES="net base" # admin"
-MODULES="base net ldap proxy hydra hub nginx" # notebook
+SYSMODULES=base
+MODULES="base nginx hydra ldap proxy hub notebook"
 
 DUMMYPASS=
 
+#############
+## BACK END SERVICES
+#############
+
 # HYDRA
+HYDRACONSENT_MYSQL_ROOTPW=${DUMMYPASS}
 HYDRACONSENTDB_USER=hydraconsent
-HYDRACONSENTDB_PW=
-HYDRACONSENTDB=hydraconsentdb
+HYDRACONSENTDB_PW=${DUMMYPASS}
+HYDRACONSENTDB=hydraconsent
 HYDRADB_USER=hydra
-HYDRADB_PW=
-HYDRADB=hydradb
-HYDRA_ADMINPW=
+HYDRA_POSTGRESQL_PW=${DUMMYPASS}
+HYDRADB=hydra
+HYDRA_ADMINPW=${DUMMYPASS}
 HYDRASYSTEM_SECRET=
-URL_HYDRA=
+HYDRA_API_USER=
+HYDRA_API_PW=${DUMMYPASS}
+
+# LDAP
+LDAP_ORGANIZATION="kooplex organization"
+LDAP_ADMIN_PASSWORD=${DUMMYPASS}
+
+#############
+## FRONT END SERVICES
+#############
 
 # SEAFILE
 SEAFILE_SECRET=
 SEAFILEDB_PW=${DUMMYPASS}
 SEAFILEADMIN=
 SEAFILEADMIN_PW=${DUMMYPASS}
+DJANGO_SECRET_KEY=
 
 # GITEA
 GITEADB_PW=${DUMMYPASS}
