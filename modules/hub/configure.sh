@@ -44,6 +44,16 @@ case $VERB in
 	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
 
 #      cp $BUILDDIR/CA/rootCA.crt $RF/
+
+      _mkdir $HOME_DIR
+      sed -e s,##PREFIX##,${PREFIX}, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##HOME_DIR##,${HOME_DIR}, \
+          build/pv-hub.yaml-template > $BUILDMOD_DIR/pv-hub.yaml
+      sed -e s,##PREFIX##,${PREFIX}, \
+          build/pvc-hub.yaml-template > $BUILDMOD_DIR/pvc-hub.yaml
+      kubectl apply -f $BUILDMOD_DIR/pv-hub.yaml
+      kubectl apply -f $BUILDMOD_DIR/pvc-hub.yaml
   ;;
 
   "install")

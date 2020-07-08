@@ -22,6 +22,8 @@ spec:
       - mountPath: /etc/secrets
         name: svcconf-##PREFIX##-##MODULE_NAME##
         subPath: ##MODULE_NAME##/secrets
+      - mountPath: /mnt/home
+        name: pv-home-##PREFIX##
     env:
       - name: HUBDBROOT_PW
         value: "##HUB_MYSQL_ROOTPW##"
@@ -49,7 +51,6 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##KUBE_MASTERNODE##
 ##    volumes:
-##      - ##PREFIX##-home:/mnt/.volumes/home:rw
 ##      - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
 ##      - ##PREFIX##-share:/mnt/.volumes/share:rw
 ##      - ##PREFIX##-report:/mnt/.volumes/report:rw
@@ -70,6 +71,9 @@ spec:
     - name: svclog-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
         claimName: pvc-svclog-##PREFIX##
+    - name: pv-home-##PREFIX##
+      persistentVolumeClaim:
+        claimName: pvc-home-##PREFIX##
 ---
 apiVersion: v1
 kind: Pod
