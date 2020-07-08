@@ -16,6 +16,20 @@ case $VERB in
       docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $BUILDMOD_DIR/Dockerfile-base-apt-packages $BUILDMOD_DIR
       docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $BUILDMOD_DIR/Dockerfile-base-conda $BUILDMOD_DIR
 
+      echo "Build notebook images" >&2
+      for dt in build/Dockerfile-image-*-template ; do
+          if [ -f $dt ] ; then
+              d=$(basename $dt | sed s,-template,,)
+              tag=$(echo $d | sed s,Dockerfile-image-,,)
+              echo "Building $d for $tag" >&2
+              sed -e s,##PREFIX##,${PREFIX}, \
+                  $dt > $BUILDMOD_DIR/$d
+              docker $DOCKERARGS build -t ${PREFIX}-${tag} -f $BUILDMOD_DIR/$d $BUILDMOD_DIR
+              docker $DOCKERARGS tag ${PREFIX}-${tag} ${MY_REGISTRY}/${PREFIX}-${tag}
+              docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-${tag}
+          fi
+      done
+
 
    # mkdir -p $SECRETS
    # mkdir -p $KEYS
