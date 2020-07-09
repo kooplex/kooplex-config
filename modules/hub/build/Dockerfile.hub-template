@@ -31,12 +31,11 @@ RUN pip3 install git+https://github.com/arount/pytea
 #COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
 #RUN update-ca-certificates
 
-COPY runserver.sh /runserver.sh
-RUN chmod a+x /runserver.sh
+COPY runserver.sh /init/99-runserver.sh
+RUN chmod a+x /init/99-runserver.sh
 
 RUN ln -sf  /usr/share/zoneinfo/Europe/Budapest  /etc/localtime
 RUN dpkg-reconfigure tzdata
 
 EXPOSE 80
 
-ENTRYPOINT [ "/runserver.sh" ]

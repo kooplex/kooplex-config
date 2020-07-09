@@ -28,8 +28,9 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.19.0/tini 
     chmod +x /usr/local/bin/tini
 
 # Install LDAP and setup authentication
-RUN touch /etc/nslcd.conf && \
-    chmod 0600 /etc/nslcd.conf
+COPY nslcd.conf /etc/nslcd.conf
+RUN chmod 0600 /etc/nslcd.conf
+RUN sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf
 
 RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev 
 
@@ -37,10 +38,7 @@ RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/  
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
 
-# Do not run nslcd as a daemon
 RUN apt install -y systemd 
-RUN systemctl disable nslcd
-#RUN service nslcd disable
 
 ADD entrypoint.sh /entrypoint.sh
 
@@ -51,14 +49,11 @@ COPY bashrc_tail /tmp
 RUN cat /tmp/bashrc_tail >> /etc/bash.bashrc
 RUN rm /tmp/bashrc_tail
 
-EXPOSE 111/udp
-
 RUN mkdir /init
+RUN echo "service nslcd start" > /init/01-nslcd
 
 # we don't run apt-get clean, coz the apt-cache is useful when preparing new module volumes
 RUN rm -rf /var/lib/apt/lists/*
-
-ENV SSH_AUTH_SOCK /tmp/my_sshagent_sock
 
 ENTRYPOINT ["tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]

@@ -1,0 +1,8 @@
+uid nslcd
+gid nslcd
+uri ldap://svc-##PREFIX##-ldap
+base ##LDAPORG##
+binddn cn=admin,##LDAPORG##
+bindpw ##LDAP_ADMIN_PASSWORD##
+tls_cacertfile /etc/ssl/certs/ca-certificates.crt
+
