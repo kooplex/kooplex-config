@@ -12,6 +12,7 @@ case $VERB in
           build/Dockerfile-base-conda-template > $BUILDMOD_DIR/Dockerfile-base-conda
       cp scripts/entrypoint.sh $BUILDMOD_DIR
       cp scripts/bashrc_tail $BUILDMOD_DIR
+      cp scripts/99-notebook $BUILDMOD_DIR
       DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
       sed -e s,##PREFIX##,$PREFIX, \
           -e s/##LDAPORG##/$DN/ \

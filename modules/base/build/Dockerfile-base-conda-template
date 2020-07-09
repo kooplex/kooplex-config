@@ -21,4 +21,4 @@ RUN cd /tmp && \
 
 RUN /opt/conda/bin/conda update -y conda
 
-
+COPY 99-notebook /init/99-notebook
