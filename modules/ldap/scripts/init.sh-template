@@ -1,3 +1,4 @@
+#! /bin/bash
 
 LOCK_FILE=/var/log/ldap/_initialized
 LOG_FILE=/var/log/ldap/ini.log
