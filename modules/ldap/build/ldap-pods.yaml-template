@@ -28,8 +28,8 @@ spec:
         name: svcconf-##PREFIX##-##MODULE_NAME##
         subPath: ##MODULE_NAME##/
     env:
-      - name: LDAP_ORGANIZATION
-        value: "##ORGANIZATION##"
+      - name: LDAP_ORGANISATION
+        value: "##ORGANISATION##"
       - name: LDAP_DOMAIN
         value: "##FQDN##"
       - name: LDAP_ADMIN_PASSWORD

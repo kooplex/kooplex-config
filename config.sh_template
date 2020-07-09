@@ -49,7 +49,7 @@ HYDRA_API_USER=
 HYDRA_API_PW=${DUMMYPASS}
 
 # LDAP
-LDAP_ORGANIZATION="kooplex organization"
+LDAP_ORGANISATION="kooplex organization"
 LDAP_ADMIN_PASSWORD=${DUMMYPASS}
 
 #############

@@ -15,7 +15,7 @@ case $VERB in
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
-          -e s,##ORGANIZATION##,"$LDAP_ORGANIZATION", \
+          -e s,##ORGANISATION##,"$LDAP_ORGANISATION", \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
           -e s,##FQDN##,$FQDN, \
           -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
@@ -30,6 +30,7 @@ case $VERB in
       sed -e s/##LDAPORG##/$DN/ \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
           scripts/adduser.sh-template > $MODDATA_DIR/helper/adduser.sh
+      chmod +x $MODDATA_DIR/helper/init.sh
   ;;
 
   "install")
@@ -44,11 +45,8 @@ case $VERB in
 
 
   "init")
-    ##echo "Initializing slapd $PROJECT-ldap [$LDAPIP]"
-    ##docker exec ${PREFIX}-ldap bash -c /init.sh
-    ##docker exec ${PREFIX}-ldap bash -c /init-core.sh
-    ##docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh users 1000"
-    ##docker exec ${PREFIX}-ldap bash -c "/usr/local/bin/addgroup.sh report 9990"
+      echo "Initialization ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- /usr/local/ldap/init.sh
   ;;
     
   "stop")
