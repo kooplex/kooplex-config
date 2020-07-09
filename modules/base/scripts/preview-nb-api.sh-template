@@ -1,4 +1,4 @@
-echo "You can check the result under ##REWRITEPROTO##://##OUTERHOST##/${NB_URL}/report"
+echo "You can check the result under ##REWRITEPROTO##://##FQDN##/${NB_URL}/report"
 
 if [ -z "$REPORT_PORT" ]; then
         REPORT_PORT=9000

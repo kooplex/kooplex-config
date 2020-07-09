@@ -24,6 +24,7 @@ case $VERB in
           build/Dockerfile.hub-template > $BUILDMOD_DIR/Dockerfile.hub
 
       cp scripts/runserver.sh $BUILDMOD_DIR
+      cp $KUBE_CONFIG $BUILDMOD_DIR/kubeconfig
       docker $DOCKERARGS build -t ${PREFIX}-hub -f $BUILDMOD_DIR/Dockerfile.hub $BUILDMOD_DIR
       docker $DOCKERARGS tag ${PREFIX}-hub ${MY_REGISTRY}/${PREFIX}-hub
       docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hub
