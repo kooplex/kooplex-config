@@ -7,8 +7,8 @@ RUN apt-get update && \
 		mysql-client libmysqlclient-dev \
 		postgresql-client libpq-dev \
                 vim less libssl-dev \
-                ssh git tzdata\
-		python3-pip python3-dev\
+                ssh git \
+		python3-pip python3-dev \
                 openssh-server openssh-sftp-server vim && \
     rm -rf /var/lib/apt/lists/*
 
@@ -31,13 +31,10 @@ RUN pip3 install git+https://github.com/arount/pytea
 #COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
 #RUN update-ca-certificates
 
+RUN mkdir /root/.kube
+COPY kubeconfig /root/.kube/config
+
 COPY runserver.sh /init/99-runserver.sh
 RUN chmod a+x /init/99-runserver.sh
 
-RUN ln -sf  /usr/share/zoneinfo/Europe/Budapest  /etc/localtime
-RUN dpkg-reconfigure tzdata
-
 EXPOSE 80
-
-RUN mkdir /root/.kube
-COPY kubeconfig /root/.kube/config

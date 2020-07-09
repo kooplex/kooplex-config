@@ -14,6 +14,8 @@ case $VERB in
       cp scripts/bashrc_tail $BUILDMOD_DIR
       cp scripts/99-notebook $BUILDMOD_DIR
       cp scripts/start-notebook.sh $BUILDMOD_DIR
+      cp scripts/jupyter-notebook-kooplex $BUILDMOD_DIR
+      cp conf/kooplex-logo.png $BUILDMOD_DIR
       sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
           -e s/##FQDN##/$FQDN/ \
           scripts/preview-bokeh.sh-template > $BUILDMOD_DIR/preview-bokeh.sh
