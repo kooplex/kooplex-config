@@ -15,8 +15,8 @@ RUN apt-get update && \
     wget \
     bzip2 \
     ca-certificates \
-    sudo vim\
-    locales nfs-common acl nfs4-acl-tools
+    sudo vim \
+    locales nfs-common acl nfs4-acl-tools tzdata
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
@@ -32,14 +32,15 @@ COPY nslcd.conf /etc/nslcd.conf
 RUN chmod 0600 /etc/nslcd.conf
 RUN sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf
 
-RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev 
+RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev
 
+RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/
+RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
 
-RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/  
-RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
+RUN apt install -y systemd
 
-RUN apt install -y systemd 
-
+RUN mkdir /init
+RUN echo "service nslcd start" > /init/01-nslcd
 ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package
@@ -49,8 +50,8 @@ COPY bashrc_tail /tmp
 RUN cat /tmp/bashrc_tail >> /etc/bash.bashrc
 RUN rm /tmp/bashrc_tail
 
-RUN mkdir /init
-RUN echo "service nslcd start" > /init/01-nslcd
+RUN ln -sf  /usr/share/zoneinfo/Europe/Budapest  /etc/localtime
+RUN dpkg-reconfigure tzdata
 
 # we don't run apt-get clean, coz the apt-cache is useful when preparing new module volumes
 RUN rm -rf /var/lib/apt/lists/*
