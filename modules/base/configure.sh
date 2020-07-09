@@ -5,14 +5,19 @@ DOCKER_HOST=$DOCKERARGS
 case $VERB in
     "build")
       echo "Building base image ${PREFIX}-base" >&2
-      cp build/Dockerfile $BUILDMOD_DIR
+      cp build/Dockerfile-base $BUILDMOD_DIR
       sed -e s,##PREFIX##,$PREFIX, \
           build/Dockerfile-base-apt-packages-template > $BUILDMOD_DIR/Dockerfile-base-apt-packages
       sed -e s,##PREFIX##,$PREFIX, \
           build/Dockerfile-base-conda-template > $BUILDMOD_DIR/Dockerfile-base-conda
       cp scripts/entrypoint.sh $BUILDMOD_DIR
       cp scripts/bashrc_tail $BUILDMOD_DIR
-      docker $DOCKERARGS build -t ${PREFIX}-base -f $BUILDMOD_DIR/Dockerfile $BUILDMOD_DIR
+      DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s/##LDAPORG##/$DN/ \
+          -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
+          conf/nslcd.conf-template > $BUILDMOD_DIR/nslcd.conf
+      docker $DOCKERARGS build -t ${PREFIX}-base -f $BUILDMOD_DIR/Dockerfile-base $BUILDMOD_DIR
       docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $BUILDMOD_DIR/Dockerfile-base-apt-packages $BUILDMOD_DIR
       docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $BUILDMOD_DIR/Dockerfile-base-conda $BUILDMOD_DIR
 

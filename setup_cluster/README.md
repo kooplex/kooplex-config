@@ -64,6 +64,15 @@ kube-system   kube-scheduler-kooplex-test            1/1     Running   0        
 ## Overlay network setup
 
 We install flannel.
+
+Make sure podCIDR is shown in the node otherwise flannel install will fail. If necessary run a command like:
+
+```bash
+kubectl patch node kooplex-deploy -p '{"spec":{"podCIDR":"10.100.0.0/16"}}'
+```
+
+Flannel installation:
+
 ```bash
 curl https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml > flannel.yml-orig
 ```
