@@ -39,3 +39,5 @@ RUN dpkg-reconfigure tzdata
 
 EXPOSE 80
 
+RUN mkdir /root/.kube
+COPY kubeconfig /root/.kube/config

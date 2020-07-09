@@ -13,6 +13,13 @@ case $VERB in
       cp scripts/entrypoint.sh $BUILDMOD_DIR
       cp scripts/bashrc_tail $BUILDMOD_DIR
       cp scripts/99-notebook $BUILDMOD_DIR
+      cp scripts/start-notebook.sh $BUILDMOD_DIR
+      sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+          -e s/##FQDN##/$FQDN/ \
+          scripts/preview-bokeh.sh-template > $BUILDMOD_DIR/preview-bokeh.sh
+      sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+          -e s/##FQDN##/$FQDN/ \
+          scripts/preview-nb-api.sh-template > $BUILDMOD_DIR/preview-nb-api.sh
       DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
       sed -e s,##PREFIX##,$PREFIX, \
           -e s/##LDAPORG##/$DN/ \

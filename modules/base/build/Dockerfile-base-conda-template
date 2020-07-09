@@ -22,3 +22,6 @@ RUN cd /tmp && \
 RUN /opt/conda/bin/conda update -y conda
 
 COPY 99-notebook /init/99-notebook
+COPY start-notebook.sh /usr/local/bin/
+COPY preview-bokeh.sh /usr/local/bin/
+COPY preview-nb-api.sh /usr/local/bin/
