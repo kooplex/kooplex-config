@@ -17,8 +17,8 @@ pod_definition = {
                     "image": "kooplex-test:5000/k8plex-basic",
                     "volumeMounts": [{
                         "name": "pv-k8plex-hub-home",
-                        "mountPath": "/v/home",
-#                        "subPath": "username"
+                        "mountPath": "/v",
+                        "subPath": "username"
                     }],
                     "ports": [{
                         "containerPort": 8000,
@@ -51,12 +51,12 @@ svc_definition = {
             },
             "spec": {
                 "selector": {
-                    "name": "lbl-tst-nb",
+                    "lbl": "lbl-tst-nb",
                     },
                 "ports": [{
                         "port": 8000,
                         "targetPort": 8000,
-                 #       "name": "http",
+                        "name": "http",
                         "protocol": "TCP",
                 }],
             }
