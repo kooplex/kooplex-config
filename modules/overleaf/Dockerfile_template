@@ -1,7 +1,0 @@
-FROM sharelatex/sharelatex:v1.2.1
-
-ENV SHARELATEX_MONGO_URL mongodb://##PREFIX##-overleaf-mongo:27017/sharelatex
-ENV SHARELATEX_REDIS_HOST ##PREFIX##-overleaf-redis
-ENV SHARELATEX_APP_NAME OurShareLaTeX
-
-
