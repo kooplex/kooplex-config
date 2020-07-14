@@ -19,20 +19,9 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/_hubcode_ $SRV/mysql $SRV/_git $SRV/_share $SRV/home $SRV/_report \
-         $SRV/_hub.garbage $SRV/_course $SRV/_usercourse $SRV/_assignment \
-         $SRV/_workdir $SRV/_git $HUB_LOG
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/home -o o=bind ${PREFIX}-home
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_course -o o=bind ${PREFIX}-course
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_usercourse -o o=bind ${PREFIX}-usercourse
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_assignment -o o=bind ${PREFIX}-assignment
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_share -o o=bind ${PREFIX}-share
+      mkdir -p $SRV/{_hubcode_,mysql,_git,_share,_hub.garbage,_git} $HUB_LOG
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hub.garbage -o o=bind ${PREFIX}-garbage
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hubcode_ -o o=bind ${PREFIX}-hubcode
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_workdir -o o=bind ${PREFIX}-workdir
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_git -o o=bind ${PREFIX}-git
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_report -o o=bind ${PREFIX}-report
       docker $DOCKERARGS volume create -o type=none -o device=$HUB_LOG -o o=bind ${PREFIX}-hub-log
 
       DIR=$SRV/_hubcode_
@@ -136,24 +125,14 @@ case $VERB in
       echo "Removing $RF" 
       rm -R -f $RF
       
-      docker $DOCKERARGS volume rm ${PREFIX}-home
       docker $DOCKERARGS volume rm ${PREFIX}-hubcode
       docker $DOCKERARGS volume rm ${PREFIX}-hub-log
-      docker $DOCKERARGS volume rm ${PREFIX}-course
-      docker $DOCKERARGS volume rm ${PREFIX}-assignment
-      docker $DOCKERARGS volume rm ${PREFIX}-usercourse
-      docker $DOCKERARGS volume rm ${PREFIX}-workdir
-      docker $DOCKERARGS volume rm ${PREFIX}-share
       docker $DOCKERARGS volume rm ${PREFIX}-hubdb
-      docker $DOCKERARGS volume rm ${PREFIX}-garbage
-  ;;
-  "cleandata")
-    echo "Cleaning data ${PREFIX}-hubdb"
-    rm -R -f $SRV/mysql
-    
   ;;
 
   "clean")
+    echo "Cleaning data ${PREFIX}-hubdb"
+    rm -R -f $SRV/mysql
   ;;
 
 esac
