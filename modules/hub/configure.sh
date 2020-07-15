@@ -47,9 +47,19 @@ case $VERB in
 #      cp $BUILDDIR/CA/rootCA.crt $RF/
 
       _mkdir $HOME_DIR
+      _mkdir $PROJECT_DIR
+      _mkdir $REPORT_DIR
+      _mkdir $GARBAGE_DIR
+      _mkdir $VERSIONCONTROL_DIR
+      _mkdir $FILESYNC_DIR
       sed -e s,##PREFIX##,${PREFIX}, \
           -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
           -e s,##HOME_DIR##,${HOME_DIR}, \
+          -e s,##GARBAGE_DIR##,${GARBAGE_DIR}, \
+          -e s,##PROJECT_DIR##,${PROJECT_DIR}, \
+          -e s,##REPORT_DIR##,${REPORT_DIR}, \
+          -e s,##VERSIONCONTROL_DIR##,${VERSIONCONTROL_DIR}, \
+          -e s,##FILESYNC_DIR##,${FILESYNC_DIR}, \
           build/pv-hub.yaml-template > $BUILDMOD_DIR/pv-hub.yaml
       sed -e s,##PREFIX##,${PREFIX}, \
           build/pvc-hub.yaml-template > $BUILDMOD_DIR/pvc-hub.yaml

@@ -2,16 +2,16 @@
 USER_NAME = seafile
 ID = 08492a2121765c031a0af7c64c070c5aeb17fdf7
 NAME = seafile
-SERVICE_URL = ##REWRITEPROTO##://##OUTERHOST##/seafile
+SERVICE_URL = ##REWRITEPROTO##://##FQDN##/seafile
 
 [Client]
 PORT = 13419
 
 [Database]
 ENGINE = mysql
-HOST = ##PREFIX##-seafile-mysql
+HOST = svc-##PREFIX##-seafile-mysql
 PORT = 3306
-USER = seafile
+USER = root
 PASSWD = ##SEAFILEDB_PW##
 DB = ccnet_db
 CONNECTION_CHARSET = utf8

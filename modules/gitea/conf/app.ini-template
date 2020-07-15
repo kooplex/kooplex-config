@@ -62,11 +62,11 @@ SECRET_KEY     = XjOVTGe8eNblygsdL71ReehaJUj8A3FDQOqDkGth4Z0NTArwcelUYD4iP0mSqwt
 INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NzE2Njg5NTB9.U7tpH0rHbxq4nbEvL_IpEv154ib4BVdxdvutS41nisg
 
 [service]
-DISABLE_REGISTRATION              = true
+DISABLE_REGISTRATION              = false
 REQUIRE_SIGNIN_VIEW               = false
 REGISTER_EMAIL_CONFIRM            = false
 ENABLE_NOTIFY_MAIL                = false
-ALLOW_ONLY_EXTERNAL_REGISTRATION  = false
+ALLOW_ONLY_EXTERNAL_REGISTRATION  = true
 ENABLE_CAPTCHA                    = false
 DEFAULT_KEEP_EMAIL_PRIVATE        = false
 DEFAULT_ALLOW_CREATE_ORGANIZATION = true
@@ -82,4 +82,42 @@ ENABLED = false
 [openid]
 ENABLE_OPENID_SIGNIN = true
 ENABLE_OPENID_SIGNUP = false
+
+[repository.upload]
+; Whether repository file uploads are enabled. Defaults to `true`
+ENABLED = true
+; Path for uploads. Defaults to `data/tmp/uploads` (tmp gets deleted on gitea restart)
+TEMP_PATH = data/tmp/uploads
+; One or more allowed types, e.g. image/jpeg|image/png. Nothing means any file type
+ALLOWED_TYPES =
+; Max size of each file in megabytes. Defaults to 50MB
+FILE_MAX_SIZE = 50
+; Max number of files per upload. Defaults to 5
+MAX_FILES = 5
+
+[markup.asciidoc]
+ENABLED = true
+FILE_EXTENSIONS = .adoc,.asciidoc
+RENDER_COMMAND = "asciidoctor -e -a leveloffset=-1 --out-file=- -"
+; Input is not a standard input but a file
+IS_INPUT_FILE = false
+
+[markup.jupyter]
+ENABLED = true
+FILE_EXTENSIONS = .ipynb
+RENDER_COMMAND = "jupyter nbconvert --stdout --to html --execute --allow-errors --template basic "
+IS_INPUT_FILE = true
+
+[markup.restructuredtext]
+ENABLED = true
+FILE_EXTENSIONS = .rst
+RENDER_COMMAND = rst2html.py
+IS_INPUT_FILE = false
+
+[markup.sanitizer]
+; Pandoc renders TeX segments as <span>s with the "math" class, optionally
+; with "inline" or "display" classes depending on context.
+ELEMENT = span
+ALLOW_ATTR = class
+REGEXP = ^\s*((math(\s+|$)|inline(\s+|$)|display(\s+|$)))+
 

@@ -1,13 +1,13 @@
 {
-        "client_name": "##PREFIX##-gitea",
+        "client_name": "##PREFIX##-seafile",
         "grant_types": [
                 "client_credentials",
                 "authorization_code"
         ],
-        "id": "##PREFIX##-gitea",
-		  "description": "##PREFIX## GITEA",
+        "id": "##PREFIX##-seafile",
+		  "description": "##PREFIX##-seafile",
         "redirect_uris": [
-                "##REWRITEPROTO##://##FQDN##/gitea/user/oauth2/##PREFIX##-gitea/callback"
+                "https://##FQDN##/seafile/oauth/callback/"
         ],
         "response_types": [
                 "id_token",
@@ -15,6 +15,5 @@
                 "code"
         ],
         "scope": "hydra.keys.get openid offline profile email",
-                 "public":true
+		 "public":true
 }
-
