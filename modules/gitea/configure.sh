@@ -38,7 +38,13 @@ case $VERB in
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/gitea-svcs.yaml
       register_module_in_nginx
+      ;;
+
+  "init")
+      echo "Initiaizing services of ${PREFIX}-${MODULE_NAME}" >&2
       register_module_in_hydra
+      SECRET=$(cat $SECRETS_FILE)
+      kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- su git -c "gitea admin auth add-oauth --name ${PREFIX}-${MODULE_NAME} --provider openidConnect --auto-discover-url ${REWRITEPROTO}://$FQDN/hydra/.well-known/openid-configuration --key ${PREFIX}-${MODULE_NAME} --secret $SECRET"
   ;;
 
   "start")

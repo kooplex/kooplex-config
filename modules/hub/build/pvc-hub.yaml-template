@@ -14,3 +14,83 @@ spec:
     matchLabels:
       pvl: "pv-##PREFIX##-hub-home"
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-garbage-##PREFIX##
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "pv-##PREFIX##-hub-garbage"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-project-##PREFIX##
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "pv-##PREFIX##-hub-project"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-report-##PREFIX##
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "pv-##PREFIX##-hub-report"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-cache.versioncontrol-##PREFIX##
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "pv-##PREFIX##-hub-cache.versioncontrol"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-cache.filesync-##PREFIX##
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "pv-##PREFIX##-hub-cache.filesynch"
+---

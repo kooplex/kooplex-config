@@ -24,6 +24,12 @@ spec:
         subPath: ##MODULE_NAME##/secrets
       - mountPath: /mnt/home
         name: pv-home-##PREFIX##
+      - mountPath: /mnt/garbage
+        name: pv-garbage-##PREFIX##
+      - mountPath: /mnt/projects
+        name: pv-project-##PREFIX##
+      - mountPath: /mnt/reports
+        name: pv-report-##PREFIX##
     env:
       - name: HUBDBROOT_PW
         value: "##HUB_MYSQL_ROOTPW##"
@@ -52,13 +58,10 @@ spec:
     kubernetes.io/hostname: ##KUBE_MASTERNODE##
 ##    volumes:
 ##      - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
-##      - ##PREFIX##-share:/mnt/.volumes/share:rw
-##      - ##PREFIX##-report:/mnt/.volumes/report:rw
 ##      - ##PREFIX##-git:/mnt/.volumes/git:rw
 ##      - ##PREFIX##-course:/mnt/.volumes/course:rw
 ##      - ##PREFIX##-usercourse:/mnt/.volumes/usercourse:rw
 ##      - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
-##      - ##PREFIX##-garbage:/mnt/.volumes/garbage:rw
 ##      - /var/run/docker.sock:/var/run/docker.sock
 ##      - ##PREFIX##-hub-log:/var/log/hub:rw
   volumes:
@@ -74,6 +77,15 @@ spec:
     - name: pv-home-##PREFIX##
       persistentVolumeClaim:
         claimName: pvc-home-##PREFIX##
+    - name: pv-garbage-##PREFIX##
+      persistentVolumeClaim:
+        claimName: pvc-garbage-##PREFIX##
+    - name: pv-project-##PREFIX##
+      persistentVolumeClaim:
+        claimName: pvc-project-##PREFIX##
+    - name: pv-report-##PREFIX##
+      persistentVolumeClaim:
+        claimName: pvc-report-##PREFIX##
 ---
 apiVersion: v1
 kind: Pod
