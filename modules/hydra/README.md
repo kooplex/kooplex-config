@@ -29,3 +29,11 @@ bash kooplex.sh init hydra
 * Creates database in the hydra-mysql
 * Creates admin for django. You need to enter a password there interactively
 * Migrates django tables and models
+
+## INSERT hydra secret and clientid into consent/application/config/hydra.php
+<?php defined('BASEPATH') || exit('No direct script access allowed');
+
+$config["hydra.consent_client"] = '##CLIENT_ID##';
+$config["hydra.url"] = '##HYDRA_URL##';
+$config["hydra.consent_secret"] = '##HYDRA_SECRET##';
+

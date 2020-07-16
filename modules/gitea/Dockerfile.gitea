@@ -1,4 +1,4 @@
-FROM gitea/gitea:latest
+FROM gitea/gitea:1.12.0
 
 ADD app.ini /data/gitea/conf/app.ini 
 EXPOSE 222

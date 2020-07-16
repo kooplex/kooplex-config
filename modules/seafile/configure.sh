@@ -8,18 +8,16 @@ DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 SEAFILE_CACHE=/kooplex-big/_cache-${PREFIX}-${MODULE_NAME}/
-
+SEAFILE_DATA=$SRV/_${MODULE_NAME}-data
 case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-    mkdir -p $SRV/_${MODULE_NAME}-mysql
-    mkdir -p $SEAFILE_CACHE
-    mkdir -p $SRV/_${MODULE_NAME}-data
+    mkdir -p $SRV/_${MODULE_NAME}-mysql $SEAFILE_CACHE  $SEAFILE_DATA
 
     docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_CACHE -o o=bind ${PREFIX}-cache-${MODULE_NAME}
     docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-mysql -o o=bind ${PREFIX}-${MODULE_NAME}-mysql
-    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-data -o o=bind ${PREFIX}-${MODULE_NAME}-data
+    docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_DATA -o o=bind ${PREFIX}-${MODULE_NAME}-data
 
     cp Dockerfile.${MODULE_NAME} $RF/
     cp Dockerfile.${MODULE_NAME}_pw $RF/
@@ -33,8 +31,10 @@ case $VERB in
 	-e "s/##SEAFILE_ADMINPW##/$DUMMYPASS/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
     
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $RF/views.py.patch
+        -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $SEAFILE_DATA/seafile/conf/views.py.patch
 
+    HYDRA_SEAHUBCLIENTID=$PREFIX-seafile
+    HYDRA_SEAHUBCLIENTSECRET=`cat $SRV/.secrets/$PREFIX-seafile-hydra.secret`
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
         -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" \
@@ -42,12 +42,12 @@ case $VERB in
         -e "s,##URL_HYDRA##,$URL_HYDRA," \
         -e "s/##HYDRA_CLIENTID##/$HYDRA_SEAHUBCLIENTID/" \
 	-e "s/##DJANGO_SECRET_KEY##/$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g')/" \
-        -e "s/##HYDRA_CLIENTSECRET##/$HYDRA_SEAHUBCLIENTSECRET/" conf/seahub_settings.py-template > $RF/seahub_settings.py
+        -e "s/##HYDRA_CLIENTSECRET##/$HYDRA_SEAHUBCLIENTSECRET/" conf/seahub_settings.py-template > $SEAFILE_DATA/seafile/conf/seahub_settings.py
     
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
         -e "s/##PREFIX##/$PREFIX/" \
         -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $RF/ccnet.conf
+        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $SEAFILE_DATA/seafile/conf/ccnet.conf
 
 
    echo "2. Building ${PREFIX}-${MODULE_NAME}..."
@@ -100,13 +100,10 @@ case $VERB in
   "cleandata")
     echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
     docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
-    rm -R -f $SRV/_${MODULE_NAME}-data  
+    rm -R -f $SEAFILE_CACHE $SEAFILE_DATA
+
+    rm -r $RF
   ;;
 
-  "purge")
-###    echo "Removing $RF" 
-###    rm -R -f $RF
-###    docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
-  ;;
 
 esac

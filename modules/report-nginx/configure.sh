@@ -91,5 +91,8 @@ case $VERB in
     docker $DOCKERARGS volume rm ${PREFIX}-report-nginx-log
     docker $DOCKERARGS volume rm ${PREFIX}-report-nginx-html
   ;;
-    
+  "clean")
+   rm -r $REPORTNGINX_HTML $REPORTNGINX_LOG $REPORTNGINX_CONF
+
+  ;;  
 esac

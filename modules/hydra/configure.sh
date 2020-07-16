@@ -92,8 +92,9 @@ case $VERB in
   ;;
 
   "install-hydra")
-    cat etc/public-policy.json  | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}\
-           ${HYDRA_IP}:5000/api/new-client/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
+
+    HYDRA_IP=`IP=$(docker $DOCKERARGS inspect ${PREFIX}-hydra | grep "\"IPAddress\": \"172"); echo ${IP%*,} | sed -e 's/"//g' | sed 's/,//g' | awk '{print $2}'`
+    cat hydra-conf/public-policy.json  | curl -u ${HYDRA_API_USER}:${HYDRA_API_PW}            ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
     register_hydra "consent"
   ;;
   "uninstall-hydra")
@@ -114,6 +115,8 @@ case $VERB in
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydraconsent
        docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-hydra
 #       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d ${PREFIX}-keto
+
+    echo "Now you need to install hydra consent at $OUTERHOST/consent/install"
   ;;
 
   "init")
@@ -164,23 +167,22 @@ case $VERB in
 
   "purge")
       echo "Removing $RF" 
-      rm -R -f $RF
       
       docker $DOCKERARGS volume rm ${PREFIX}-hydradb
+      docker $DOCKERARGS volume rm ${PREFIX}-hydra-log
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsent-log
       docker $DOCKERARGS volume rm ${PREFIX}-hydracode
 #      docker $DOCKERARGS volume rm ${PREFIX}-hydraconfig
 #      rm  -r $HYDRA_CONF
   ;;
-  "cleandata")
-    echo "Cleaning data ${PREFIX}-hydradb"
-    rm -R -f $SRV/mysql
+  "clean")
+    #echo "Cleaning data ${PREFIX}-hydradb"
+    #rm -R -f $SRV/mysql
+    rm -r $RF
     
   ;;
 
-  "clean")
-  ;;
 
 esac
 

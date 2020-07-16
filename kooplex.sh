@@ -22,13 +22,13 @@ if [ "$SVCS" = "notebook" ]; then
 else
   SVCS=$(getmodules "$@")
 fi
-echo $VERB
 mkdir -p $BUILDDIR
 
 
 CA_DIR=$BUILDDIR/CA
 if [ -d $CA_DIR ] ; then
-    echo "$CA_DIR already present; will not generate ca" >&2
+  #  echo "$CA_DIR already present; will not generate ca" >&2
+    echo ""
 else 
     echo "generate CA"
     set -e
@@ -60,13 +60,15 @@ case $VERB in
   ;;
 esac
 
-echo "Starting $VERB..."
 
 for svc in $SVCS
 do
+
+  echo "Starting $VERB $svc"
   cd modules/$svc
   . ./configure.sh
   cd $CONFIGDIR
+  echo "Finished $VERB $svc"
+
 done
 
-echo "Finished $VERB."

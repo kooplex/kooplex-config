@@ -120,6 +120,7 @@ case $VERB in
   ;;
 
   "clean")
+    rm -r $RF
   ;;
 
 esac

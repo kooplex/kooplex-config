@@ -15,6 +15,10 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-report
   ;;
 
+  "cleandata")
+    rm -r $SRV/_report
+  ;;
+
 
 esac
 

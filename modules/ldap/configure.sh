@@ -15,9 +15,7 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-     mkdir -p $SRV/ldap/
-     mkdir -p $SRV/ldap/etc
-     mkdir -p $SRV/ldap/var
+     mkdir -p $SRV/{ldap,ldap/etc,ldap/var}
      docker $DOCKERARGS volume create -o type=none -o device=$SRV/ldap/etc -o o=bind ${PREFIX}-ldap-etc
      docker $DOCKERARGS volume create -o type=none -o device=$SRV/ldap/var -o o=bind ${PREFIX}-ldap-var
      
@@ -101,5 +99,6 @@ case $VERB in
   "clean")
     echo "Cleaning image ${PREFIX}-${MODULE_NAME}"
     docker $DOCKERARGS rmi ${PREFIX}-${MODULE_NAME}
+    rm -r $RF
   ;;
 esac

@@ -16,6 +16,10 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-home
   ;;
 
+  "cleandata")
+    rm -r $SRV/home
+  ;;
+
 
 esac
 

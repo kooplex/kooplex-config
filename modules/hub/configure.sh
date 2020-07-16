@@ -105,9 +105,6 @@ case $VERB in
        docker exec -it ${PREFIX}-hub python3 /kooplexhub/kooplexhub/manage.py updatemodel 
   ;;
 
-  "refresh")
-     #FIXME: docker $DOCKERARGS exec $PREFIX-hub bash -c "cd /kooplexhub; git pull;"
-  ;;
 
   "stop")
       echo "Stopping containers of ${PREFIX}-hub"
@@ -133,6 +130,7 @@ case $VERB in
   "clean")
     echo "Cleaning data ${PREFIX}-hubdb"
     rm -R -f $SRV/mysql
+    rm -r $RF
   ;;
 
 esac

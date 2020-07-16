@@ -16,6 +16,9 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-share
   ;;
 
+  "cleandata")
+    rm -r $SRV/_share
+  ;;
 
 esac
 

@@ -106,6 +106,7 @@ case $VERB in
     echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
     docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
     rm -R -f $SRV/_${MODULE_NAME}-data  
+    rm -r $RF
   ;;
 
   "purge")

@@ -16,6 +16,10 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-git
   ;;
 
+  "cleandata")
+    rm -r $SRV/_git
+  ;;
+
 
 esac
 
