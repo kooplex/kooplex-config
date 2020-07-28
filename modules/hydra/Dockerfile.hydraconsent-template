@@ -18,7 +18,7 @@ RUN echo "postfix postfix/mailname string ##OUTERHOST##" | debconf-set-selection
 RUN mkdir -p /srv/
 #ADD src/consent  /srv/consent
 
-COPY database.php /srv/consent/application/config/database.php
+#COPY database.php /srv/consent/application/config/database.php
  
 COPY nginx.conf /etc/nginx/ 
 COPY sites.conf /etc/nginx/

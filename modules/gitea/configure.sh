@@ -55,12 +55,10 @@ case $VERB in
   "uninstall-nginx")
     unregister_nginx $MODULE_NAME
   ;;
-# We need to add the oauth provider to gitea mysql
-# use kooplex-test_gitea
-# update login_source set cfg = '{"Provider":"openidConnect","ClientID":"kooplex-test-gitea","ClientSecret":"LbIiHbIKpDsd","OpenIDConnectAutoDiscoveryURL":"https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration","CustomURLMapping":null}' where id = 2;
-
-# The "name" in this line should be the same as the string in the calback url before the "/callback"
-
+  "init")
+    HYDRA_GITEACLIENTSECRET=`cat $SRV/.secrets/$PREFIX-gitea-hydra.secret`
+echo    docker exec $PREFIX-${MODULE_NAME} bash -c "su git -c 'gitea admin auth add-oauth --name $PREFIX-${MODULE_NAME} --provider openidConnect --auto-discover-url $REWRITEPROTO://$OUTERHOST/hydra/.well-known/openid-configuration --key $PREFIX-${MODULE_NAME} --secret $HYDRA_GITEACLIENTSECRET' "
+  ;;
   "start")
     echo "Starting container ${PREFIX}-${MODULE_NAME}"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
@@ -78,12 +76,15 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
   ;;
-  "cleandata")
+  "clean")
     echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
     docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
-    rm -R -f $SRV/_${MODULE_NAME}data
+    rm -R -f $SRV/_${MODULE_NAME}-data
     docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-db
-    rm -R -f $SRV/_${MODULE_NAME}db
+    rm -R -f $SRV/_${MODULE_NAME}-db
+    docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-conf
+    rm -R -f $GITEA_CONF
+    rm -r $RF
     
   ;;
 

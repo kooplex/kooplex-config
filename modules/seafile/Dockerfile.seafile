@@ -1,9 +1,16 @@
-FROM seafileltd/seafile-mc:7.0.2
+FROM seafileltd/seafile-mc:7.0.4
 
 COPY $RF/views.py.patch /tmp
 #RUN patch /opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py < /tmp/views.py.patch
 
 COPY $RF/seahub_settings.py /shared/seafile/conf/seahub_settings.py
 COPY $RF/ccnet.conf /shared/seafile/conf/ccnet.conf
+
+# PATCH FOR THIS VERSION
+RUN DIR=/opt/seafile/seafile-server-7.0.4/seahub/seahub; sed -i '290c\    return True#' $DIR/utils/__init__.py &&\
+    sed -i "143c\        user_info['idp_user'] = user_info_json['idp_user']" $DIR/oauth/views.py &&\
+    sed -i "167c\    email = user_info['idp_user']" $DIR/oauth/views.py &&\
+    sed -i '192a\    if isinstance(name, list):\n        name = name.pop(0)' $DIR/oauth/views.py &&\
+    sed -i '198a\    if isinstance(contact_email, list):\n       contact_email = contact_email.pop(0)' $DIR/oauth/views.py
 
 

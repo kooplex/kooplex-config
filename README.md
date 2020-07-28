@@ -2,8 +2,8 @@ Visit the [Kooplex page](https://kooplex.github.io/) for further informations!
 
 ## Prerequisites
 
-apt install docker.io
-vim /etc/docker/daemon.json
+* apt install docker.io docker-compose acl
+* vim /etc/docker/daemon.json
 ```
 {
           "exec-opts": ["native.cgroupdriver=systemd"], # for monitoring with grafana

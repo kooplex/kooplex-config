@@ -89,8 +89,6 @@ HYDRADB=hydradb
 HYDRA_ADMINPW=
 HYDRASYSTEM_SECRET= #(pwgen 32)
 URL_HYDRA=https://$OUTERHOST/hydra
-HYDRA_SEAHUBCLIENTID=${PREFIX}-seafile
-HYDRA_SEAHUBCLIENTSECRET=
 HYDRA_CONFIG=$CONF_DIR/hydra
 
 #OIDC SECRETS
@@ -125,6 +123,3 @@ HYDRA_API_PW="hydrapw"
 FUNCTIONAL_VOLUME_MOUNT_POINT=/vol
 STORAGE_VOLUME_MOUNT_POINT=/mnt
 
-### THAT IS UGLY. Kubernetes will sort it out
-NGINX_IP=`IP=$(docker $DOKERARGS inspect ${PREFIX}-nginx | grep "\"IPAddress\": \"172"); echo ${IP%*,} | sed -e 's/"//g' | awk '{print $2}'`
-HYDRA_IP=`IP=$(docker $DOCKERARGS inspect ${PREFIX}-hydra | grep "\"IPAddress\": \"172"); echo ${IP%*,} | sed -e 's/"//g' | sed 's/,//g' | awk '{print $2}'`

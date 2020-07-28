@@ -122,6 +122,7 @@ case $VERB in
   ;;
   "clean")
     echo "Cleaning base image $PREFIX-${MODULE_NAME}"
+    rm -r $RF
 #    docker $DOCKERARGS rmi $PREFIX-notebook
 #FIXME: hard coded
 #    docker $DOCKERARGS images |grep kooplex-notebook| awk '{print $1}' | xargs -n  1 docker $DOCKERARGS rmi

@@ -60,16 +60,19 @@ case $VERB in
 #  quotaoff -vu $SRV
 #  quotaoff -vg $SRV
 #  rm -f $SRV/aquota.*
-    rm -r $SRV/.secrets
 
     docker $DOCKERARGS volume rm ${PREFIX}-secrets
     docker $DOCKERARGS volume rm ${PREFIX}-keys
+    docker $DOCKERARGS rmi ${PREFIX}-base-slurm 
+    docker $DOCKERARGS rmi ${PREFIX}-base-singularity 
+    docker $DOCKERARGS rmi ${PREFIX}-base-conda 
+    docker $DOCKERARGS rmi ${PREFIX}-base-conda-extras
+
   ;;
   "clean")
     echo "Cleaning base image ${PREFIX}-base"
-    #umount $SRV 
-#    echo "Check if $SRV is still mounted! Then run: ' rm -f "$DISKIMG/$PROJECT"fs.img '" 
-    #rm -f $DISKIMG/$PROJECT"fs.img" 
-    docker $DOCKERARGS rmi ${PREFIX}-base
+
+    rm -r $SRV/.secrets
+    rm -r $RF
   ;;
 esac

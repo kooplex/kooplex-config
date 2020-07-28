@@ -15,6 +15,7 @@ fi
 
 # To be able to create custom conda kernels per user
 mkdir -p /home/$NB_USER/.conda/pkgs && chmod a+swr /home/$NB_USER/.conda/pkgs/
+touch /home/$NB_USER/.conda/environments.txt  && chmod a+rw /home/$NB_USER/.conda/environments.txt
  
 if [ -e ##FUNCTIONAL_VOLUME_MOUNT_POINT##/*/condaenvs/*/ ]; then
  
