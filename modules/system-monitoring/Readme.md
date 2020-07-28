@@ -19,3 +19,5 @@ e.g. http://kooplex-test-prometheus:9090
 Them import dashboard
 https://grafana.com/grafana/dashboards/893
 
+## TODO
+# --storage.tsdb.retention=30d to executable

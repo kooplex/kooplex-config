@@ -96,6 +96,12 @@ services:
     restart: unless-stopped
 #    ports:
 #      - 9090:9090
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'                                                                                                                                             
+      - '--storage.tsdb.path=/prometheus'                                                                                                                                                          
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'                                                                                                                          
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=400d'
     logging:
       options:
         max-size: "10m"
