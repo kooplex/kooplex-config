@@ -49,6 +49,7 @@ case $VERB in
       _mkdir $HOME_DIR
       _mkdir $PROJECT_DIR
       _mkdir $REPORT_DIR
+      _mkdir $REPORT_PREPARE_DIR
       _mkdir $GARBAGE_DIR
       _mkdir $VERSIONCONTROL_DIR
       _mkdir $FILESYNC_DIR
@@ -58,6 +59,7 @@ case $VERB in
           -e s,##GARBAGE_DIR##,${GARBAGE_DIR}, \
           -e s,##PROJECT_DIR##,${PROJECT_DIR}, \
           -e s,##REPORT_DIR##,${REPORT_DIR}, \
+          -e s,##REPORT_PREPARE_DIR##,${REPORT_PREPARE_DIR}, \
           -e s,##VERSIONCONTROL_DIR##,${VERSIONCONTROL_DIR}, \
           -e s,##FILESYNC_DIR##,${FILESYNC_DIR}, \
           build/pv-hub.yaml-template > $BUILDMOD_DIR/pv-hub.yaml

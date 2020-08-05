@@ -94,3 +94,19 @@ spec:
     matchLabels:
       pvl: "pv-##PREFIX##-hub-cache.filesynch"
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-cache.report-##PREFIX##
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      pvl: "pv-##PREFIX##-hub-cache.report"
+---
