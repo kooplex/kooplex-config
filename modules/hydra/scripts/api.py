@@ -81,14 +81,14 @@ def create_policy(service):
 @auth.login_required
 def remove_service(service):
     try:
+        policy_file = os.path.join(CONF_DIR, f'{service}-policy')
+        os.remove(policy_file)
         rtn = remove_hydra_service('policies', service)
         rtn = remove_hydra_service('clients', service)
         secret_file = os.path.join(SECRET_DIR, f'{service}-hydra.secret')
         os.remove(secret_file)
         client_file = os.path.join(CONF_DIR, f'{service}-client')
         os.remove(client_file)
-        policy_file = os.path.join(CONF_DIR, f'{service}-policy')
-        os.remove(policy_file)
     except Exception as e:
         logger.error('Removing conf file for %s failed %s' %(service, e))
         return jsonify({ 'error': str(e) })
