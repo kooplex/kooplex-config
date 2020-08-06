@@ -111,19 +111,21 @@ case $VERB in
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/hydra-svcs.yaml
-      register_module_in_nginx
+#      register_module_in_nginx
       getip_hydra
-      PCF=$SERVICECONF_DIR/hydra/hydra/${PREFIX}-public-${CLIENT}
+      PCF=$SERVICECONF_DIR/hydra/hydra/${PREFIX}-public
       if [ -f $PCF ] ; then
           echo "File $PCF exists. Skip registration." >&2
       else
           echo "Register public policy" >&2
-          cat conf/public-policy.json | \
+          sed -e s,##PREFIX##,$PREFIX, conf/public-policy.json | \
               curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
       fi
       register_module_in_hydra consent
+      SECRETS_FILE=$SERVICECONF_DIR/hydra/hydrasecrets/${PREFIX}-consent-hydra.secret
       sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
           -e s,##FQDN##,$FQDN, \
+          -e s,##PREFIX##,$PREFIX, \
           -e s,##CONSENTPASSWORD##,$(cat $SECRETS_FILE), \
           conf/hydra.php-template > $SERVICEDATA_DIR/hydra/_hydracode_/application/config/hydra.php
   ;;
@@ -181,7 +183,7 @@ case $VERB in
   ;;
 
   "uninstall")
-      deregister_module_in_nginx
+   #   deregister_module_in_nginx
       getip_hydra
       curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-public
       deregister_module_in_hydra consent
