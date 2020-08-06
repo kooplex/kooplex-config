@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##
+spec:
+#  subdomain: ##MODULE_NAME##-service
+  containers:
+  - image: ##MY_REGISTRY##/##PREFIX##-##MODULE_NAME##
+    name: ##PREFIX##-##MODULE_NAME##
+    volumeMounts:
+      - mountPath: /srv/
+        name: pv-report-##PREFIX##
+  volumes:
+    - name: pv-report-##PREFIX##
+      persistentVolumeClaim:
+        claimName: pvc-report-##PREFIX##
+
+  nodeSelector:
+    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+

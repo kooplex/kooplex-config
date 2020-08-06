@@ -1,70 +1,61 @@
 #!/bin/bash
-MODULE_NAME=report-nginx
-RF=$BUILDDIR/${MODULE_NAME}
-
-mkdir -p $RF
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
 
 case $VERB in
-
   "build")
-    echo "1. Configuring ${PREFIX}-report-nginx..."
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 
-#    if [ $REWRITEPROTO = "http" ]; then
-#      EXTRACONFIG="ports:\n      - 80:80"
-#    fi
-
-      cp Dockerfile $RF
-      cp etc/nginx.conf $RF
-      sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-          -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##OUTERHOST##/$OUTERHOST/" \
-          -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" \
-          -e "s/##INNERHOST##/$INNERHOST/" etc/sites.conf > $RF/sites.conf
+      cp build/{Dockerfile,nginx.conf}  $BUILDMOD_DIR
+      sed -e "s/##FQDN##/$FQDN/"  build/sites.conf > $BUILDMOD_DIR/sites.conf
       
-      sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-      echo "2. Building ${PREFIX}-report-nginx..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+      echo "2. Building ${PREFIX}-${MODULE_NAME}..."
+      docker $DOCKERARGS build -t ${PREFIX}-${MODULE_NAME} -f $BUILDMOD_DIR/Dockerfile $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-${MODULE_NAME} ${MY_REGISTRY}/${PREFIX}-${MODULE_NAME}
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-${MODULE_NAME}
+
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##MY_REGISTRY##,$MY_REGISTRY, \
+          build/${MODULE_NAME}-pods.yaml-template > $BUILDMOD_DIR/${MODULE_NAME}-pods.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          build/${MODULE_NAME}-svcs.yaml-template > $BUILDMOD_DIR/${MODULE_NAME}-svcs.yaml
   ;;
 
   "install")
-# OUTER-NGINX
-    sed -e "s/##PREFIX##/$PREFIX/" outer-nginx-${MODULE_NAME}-template > $CONF_DIR/outer_nginx/sites-enabled/${MODULE_NAME}
-#        docker $DOCKERARGS restart $PREFIX-outer-nginx
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/${MODULE_NAME}-svcs.yaml
+      register_module_in_nginx
   ;;
 
   "start")
-    echo "Starting report-nginx ${PREFIX}-report-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/${MODULE_NAME}-pods.yaml
   ;;
 
-  "restart")
-    echo "Restarting report-nginx ${PREFIX}-report-nginx"
-    docker $DOCKERARGS restart $PREFIX-report-nginx
-  ;;
 
-  "init")
-  ;;
-    
   "stop")
-    echo "Stopping report-nginx ${PREFIX}-report-nginx"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/${MODULE_NAME}-pods.yaml
   ;;
-    
+
+  "uninstall")
+      deregister_module_in_nginx
+  ;;
+
   "remove")
-    echo "Removing report-nginx ${PREFIX}-net"
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-    docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/${MODULE_NAME}-svcs.yaml
   ;;
-    
+
   "purge")
-    echo "Purging report-nginx ${PREFIX}-report-nginx"
-    rm -R $RF
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
+      purgedir_svc
   ;;
-    
+
 esac
+
