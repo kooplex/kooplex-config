@@ -11,12 +11,18 @@ spec:
   - image: ##MY_REGISTRY##/##PREFIX##-##MODULE_NAME##
     name: ##PREFIX##-##MODULE_NAME##
     volumeMounts:
-      - mountPath: /srv/
+      - mountPath: /srv/report/
         name: pv-report-##PREFIX##
+      - mountPath: /var/log/nginx
+        name: svclog-##PREFIX##-##MODULE_NAME##
+        subPath: ##MODULE_NAME##/
   volumes:
     - name: pv-report-##PREFIX##
       persistentVolumeClaim:
         claimName: pvc-report-##PREFIX##
+    - name: svclog-##PREFIX##-##MODULE_NAME##
+      persistentVolumeClaim:
+        claimName: pvc-svclog-##PREFIX##
 
   nodeSelector:
     kubernetes.io/hostname: ##KUBE_MASTERNODE##

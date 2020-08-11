@@ -21,6 +21,12 @@ SERVICEDATA_DIR=$SERVICE_DIR/data
 DATA_DIR=$ROOT_DIR/data
 
 HOME_DIR=$ROOT_DIR/user/home
+GARBAGE_DIR=$ROOT_DIR/user/_garbage
+PROJECT_DIR=$ROOT_DIR/user/project
+REPORT_DIR=$ROOT_DIR/user/report
+REPORT_PREPARE_DIR=$ROOT_DIR/user/report_prepare
+VERSIONCONTROL_DIR=$ROOT_DIR/user/_git
+FILESYNC_DIR=$ROOT_DIR/user/_fs
 
 #######################
 DOCKERARGS="-H unix:///var/run/docker.sock"

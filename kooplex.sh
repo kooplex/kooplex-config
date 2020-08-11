@@ -39,6 +39,10 @@ case $VERB in
   "build"|"install"|"start"|"uninstall"|"init"|"stop"|"remove"|"purge")
     set -e
   ;;
+  "restart")
+    $0 stop $@
+    $0 start $@
+  ;;
   *)
     echo "Unknown command $VERB" >&2
     exit 1
