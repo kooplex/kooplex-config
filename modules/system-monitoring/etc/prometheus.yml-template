@@ -49,3 +49,7 @@ scrape_configs:
     static_configs:
        - targets: ['##PREFIX##-cadvisor:8080']
 
+  - job_name: node
+    static_configs:
+    - targets: ['##PREFIX##-node-exporter:9100']
+
