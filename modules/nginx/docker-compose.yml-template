@@ -3,10 +3,10 @@ version: "3"
 services:
   ##PREFIX##-##MODULE_NAME##:
     container_name: ##PREFIX##-##MODULE_NAME##
-    image: ##PREFIX##-##MODULE_NAME##
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ##IMAGE_REPOSITORY_URL##/##IMAGE_REPOSITORY_BASE_NAME##-nginx:##IMAGE_REPOSITORY_VERSION##
+#   build:
+#      context: .
+#      dockerfile: Dockerfile
     networks:
       - ##PREFIX##-net
     volumes:

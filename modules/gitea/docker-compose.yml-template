@@ -3,13 +3,12 @@ version: "3"
 services:
   ##PREFIX##-gitea:
     container_name: ##PREFIX##-gitea
-    image: ##PREFIX##-gitea
-    container_name: ##PREFIX##-gitea
+    image: ##IMAGE_NAME##
     depends_on:
       - ##PREFIX##-gitea-mysql
-    build:
-      context: .
-      dockerfile: Dockerfile.gitea
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.gitea
     environment:
       - USER_UID=1000
       - USER_GID=1000

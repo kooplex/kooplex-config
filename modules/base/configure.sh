@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RF=$BUILDDIR/base
+MODULE_NAME=base
+RF=$BUILDDIR/${MODULE_NAME}
 mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 
@@ -17,15 +18,23 @@ case $VERB in
     docker $DOCKERARGS volume create -o type=none -o device=$KEYS -o o=bind ${PREFIX}-keys
     docker $DOCKERARGS volume create -o type=none -o device=$SECRETS -o o=bind ${PREFIX}-secrets
 
-    cp  scripts/* $RF
 
-    ## CREATE BASE IMAGE
-#    cp requirements.txt $RF
-#    cp etc/conda-requirements*.txt $RF
-    cp Dockerfile $RF
-    sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
-    docker $DOCKERARGS build -t ${PREFIX}-base  $RF
-    docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
+    IMAGENAME=base
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             cp  scripts/* $RF
+             cp Dockerfile $RF
+             docker $DOCKERARGS build -t ${PREFIX}-$IMAGENAME  $RF
+             sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
+             docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
+    else
+#	     echo "Using images from $IMAGE_REPOSITORY_URL"
+#             IMAGE_TO_PULL=$IMAGE_REPOSITORY_URL"/"kooplex-base-${IMAGENAME}
+#             docker $DOCKERARGS pull $IMAGE_TO_PULL
+#	     echo "Image PULLED from repository"
+#             docker tag $IMAGE_TO_PULL ${PREFIX}-${IMAGENAME}
+#	     echo "Image TAGGED from repository"
+    fi
+
 
     if [ ! ${IMAGE_REPOSITORY_URL} ]; then
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-template > $RF/Dockerfile-base-conda

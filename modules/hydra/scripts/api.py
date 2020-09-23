@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
 auth = HTTPBasicAuth()
 
-CONF_DIR="/etc/hydraconfig/"
+CONF_DIR="/conf/"
 SECRET_DIR="/etc/secrets/"
 HYDRA_USER=os.getenv("HYDRA_API_USER")
 #HYDRA_USER="hydrauser"

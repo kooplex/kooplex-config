@@ -10,6 +10,19 @@ SLAPD_FORCE_RECONFIGURE="${SLAPD_FORCE_RECONFIGURE:-false}"
 
 first_run=true
 
+
+
+cp /conf/new_user.ldiftemplate /etc/new_user.ldiftemplate
+cp /conf/new_group.ldiftemplate /etc/new_group.ldiftemplate
+cp /conf/adduser.sh /usr/local/bin/adduser.sh
+cp /conf/addgroup.sh /usr/local/bin/addgroup.sh
+cp /conf/ldap.conf /etc/ldap/ldap.conf
+
+cp /conf/init.sh /init.sh
+cp /conf/init-core.sh /init-core.sh
+ #
+chmod 700 /init.sh /init-core.sh /usr/local/bin/adduser.sh /usr/local/bin/addgroup.sh
+
 if [[ -f "/var/lib/ldap/DB_CONFIG" ]]; then
     first_run=false
 fi

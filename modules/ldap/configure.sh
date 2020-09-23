@@ -11,49 +11,64 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+LDAP_CONF=$CONF_DIR/${MODULE_NAME}
+
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-     mkdir -p $SRV/{ldap,ldap/etc,ldap/var}
+     mkdir -p $SRV/{ldap,ldap/etc,ldap/var} $LDAP_CONF
      docker $DOCKERARGS volume create -o type=none -o device=$SRV/ldap/etc -o o=bind ${PREFIX}-ldap-etc
      docker $DOCKERARGS volume create -o type=none -o device=$SRV/ldap/var -o o=bind ${PREFIX}-ldap-var
+     docker $DOCKERARGS volume create -o type=none -o device=$LDAP_CONF -o o=bind ${PREFIX}-ldap-conf
      
       cp Dockerfile $RF
       cp scripts/entrypoint.sh $RF
 
 
-      sed -e "s/##PREFIX##/${PREFIX}/" \
-          -e "s/##SLAPD_PASSWORD##/${HUBLDAP_PW}/" \
-          -e "s/##SLAPD_CONFIG_PASSWORD##/${HUBLDAP_PW}/" \
-          -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-
-      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $RF/new_group.ldiftemplate
-      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $RF/new_user.ldiftemplate
-      sed -e "s/##LDAPORG##/$LDAPORG/" etc/ldap.conf_template > $RF/ldap.conf
+      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_group.ldiftemplate_template > $LDAP_CONF/new_group.ldiftemplate
+      sed -e "s/##LDAPORG##/$LDAPORG/" etc/new_user.ldiftemplate_template > $LDAP_CONF/new_user.ldiftemplate
+      sed -e "s/##LDAPORG##/$LDAPORG/" etc/ldap.conf_template > $LDAP_CONF/ldap.conf
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
           -e "s/##LDAPHOST##/${PREFIX}-${MODULE_NAME}/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $RF/addgroup.sh
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/addgroup.sh_template > $LDAP_CONF/addgroup.sh
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
           -e "s/##LDAPHOST##/${PREFIX}-${MODULE_NAME}/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/adduser.sh_template > $RF/adduser.sh    
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/adduser.sh_template > $LDAP_CONF/adduser.sh    
 
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
           -e "s/##LDAPHOST##/${PREFIX}-${MODULE_NAME}/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $RF/init.sh
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init.sh-template > $LDAP_CONF/init.sh
           
       sed -e "s/##LDAPORG##/$LDAPORG/" \
           -e "s/##SLAPD_PASSWORD##/$HUBLDAP_PW/" \
           -e "s/##LDAPHOST##/${PREFIX}-${MODULE_NAME}/" \
-          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init-core.sh-template > $RF/init-core.sh
+          -e "s/##LDAPPORT##/$LDAPPORT/" scripts/init-core.sh-template > $LDAP_CONF/init-core.sh
 
-      echo "2. Building ${PREFIX}-${MODULE_NAME}..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    else
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    fi
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+#             docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
+
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+          -e "s/##SLAPD_PASSWORD##/${HUBLDAP_PW}/" \
+          -e "s/##SLAPD_CONFIG_PASSWORD##/${HUBLDAP_PW}/" \
+          -e "s/##MODULE_NAME##/${MODULE_NAME}/g" \
+          -e "s,##IMAGE_NAME##,${IMAGE_NAME},g" \
+          -e "s/##SLAPD_DOMAIN##/${LDAPDOMAIN}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+
   ;;
   "install")
     echo "Installing slapd $PROJECT-${MODULE_NAME} [$LDAPIP]"
@@ -89,6 +104,7 @@ case $VERB in
     
     docker $DOCKERARGS volume rm ${PREFIX}-ldap-etc
     docker $DOCKERARGS volume rm ${PREFIX}-ldap-var
+    docker $DOCKERARGS volume rm ${PREFIX}-ldap-conf
 
   ;;
   "cleandata")

@@ -23,9 +23,6 @@ case $VERB in
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_HTML  -o o=bind ${PREFIX}-${MODULE_NAME}-html
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_LOG  -o o=bind ${PREFIX}-${MODULE_NAME}-log
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_CONF  -o o=bind ${PREFIX}-${MODULE_NAME}-conf
-#    if [ $REWRITEPROTO = "http" ]; then
-#      EXTRACONFIG="ports:\n      - 80:80"
-#    fi
 
       cp Dockerfile $RF
       cp scripts/* $RF/
@@ -35,15 +32,27 @@ case $VERB in
           -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" etc/sites.conf > $REPORTNGINX_CONF/sites.conf
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    else
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    fi
       
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
+
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s,##REPORTNGINX_HTML##,$REPORTNGINX_HTML," \
           -e "s/##NGINX_API_USER##/${NGINX_API_USER}/g" \
           -e "s/##NGINX_API_PW##/${NGINX_API_PW}/g" \
+          -e "s/##MODULE_NAME##/${MODULE_NAME}/g" \
+          -e "s,##IMAGE_NAME##,${IMAGE_NAME},g" \
           -e "s/##EXTRACONFIG##/$EXTRACONFIG/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-      echo "2. Building ${PREFIX}-report-nginx..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
 
   "install-hydra")

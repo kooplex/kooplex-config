@@ -3,16 +3,17 @@ version: "3"
 services:
   ##PREFIX##-impersonator:
     container_name: ##PREFIX##-impersonator
-    image: ##PREFIX##-impersonator
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ##IMAGE_NAME##
+#   build:
+#      context: .
+#      dockerfile: Dockerfile
     networks:
       - ##PREFIX##-net
     volumes:
       - ##PREFIX##-home:/mnt/.volumes/home:rw
       - ##PREFIX##-git:/mnt/.volumes/git:rw
       - ##PREFIX##-cache-seafile:/mnt/.volumes/seafile:rw
+      - ##PREFIX##-impersonator-conf:/conf:ro
     privileged: true
     restart: unless-stopped
     environment:
@@ -29,5 +30,7 @@ volumes:
   ##PREFIX##-git:
     external: true
   ##PREFIX##-cache-seafile:
+    external: true
+  ##PREFIX##-impersonator-conf:
     external: true
 

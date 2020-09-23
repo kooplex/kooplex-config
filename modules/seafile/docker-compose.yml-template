@@ -19,10 +19,10 @@ services:
       - ##PREFIX##-seafile-privatenet
           
   ##PREFIX##-seafile:
-    image: ##PREFIX##-seafile
-    build:
-      context: .
-      dockerfile: Dockerfile.seafile
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-##MODULE_NAME##:##IMAGE_REPOSITORY_VERSION##
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.seafile
     container_name: ##PREFIX##-seafile
     volumes:
       - ##PREFIX##-seafile-data:/shared
@@ -50,11 +50,11 @@ services:
       - ##PREFIX##-seafile-privatenet
           
   ##PREFIX##-seafile-pw:
-    image: ##PREFIX##-seafilepw
-    build:
-      context: .
-      dockerfile: Dockerfile.seafile_pw
-    container_name: ##PREFIX##-seafile-pw
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-##MODULE_NAME##-pw:##IMAGE_REPOSITORY_VERSION##
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.seafile_pw
+    container_name: ##PREFIX##-##MODULE_NAME##-pw
     environment:
       - MYSQL_ROOT_PASSWORD=##SEAFILE_MYSQL_ROOTPW##
       - MYSQL_HOST=##PREFIX##-seafile-mysql

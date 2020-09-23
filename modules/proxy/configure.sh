@@ -11,18 +11,27 @@ case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-proxy..."
 
-      cp Dockerfile $RF
+      
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    else
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    fi
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             cp Dockerfile $RF
 #      sed -e "s/##PUBLICIP##/${PREFIX}-proxy/" \
 #          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
-      cp  scripts/entrypoint.sh  $RF/entrypoint.sh
-      
+             cp  scripts/entrypoint.sh  $RF/entrypoint.sh
+             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
+
       sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s,##IMAGE_NAME##,${IMAGE_NAME}," \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-
-      echo "2. Building ${PREFIX}-proxy..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
-  
   ;;
   "install-hydra")
   #  register_hydra $MODULE_NAME

@@ -20,8 +20,8 @@ RUN mkdir -p /srv/
 
 #COPY database.php /srv/consent/application/config/database.php
  
-COPY nginx.conf /etc/nginx/ 
-COPY sites.conf /etc/nginx/
+#COPY nginx.conf /etc/nginx/ 
+#COPY sites.conf /etc/nginx/
 
 ADD hydraconsent-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

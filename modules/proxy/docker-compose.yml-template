@@ -3,10 +3,10 @@ version: "3"
 services:
   ##PREFIX##-proxy:
     container_name: ##PREFIX##-proxy
-    image: ##PREFIX##-proxy
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ##IMAGE_NAME##
+#   build:
+#      context: .
+#      dockerfile: Dockerfile
     networks:
       - ##PREFIX##-net
     volumes:

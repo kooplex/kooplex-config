@@ -14,8 +14,8 @@ RUN apt clean
 RUN pip install setuptools
 RUN pip install flask flask-httpauth psutil
 
-COPY nsswitch.conf /etc
-COPY nslcd.conf /etc
+#COPY nsswitch.conf /etc
+#COPY nslcd.conf /etc
 RUN chmod 600 /etc/nslcd.conf
 COPY 01-nslcd-start.sh /init
 COPY 02-api-start.sh /init
@@ -28,3 +28,4 @@ COPY git_functions.py /local
 RUN rmdir /home
 RUN ln -s /mnt/.volumes/home /home
 
+CMD ["cp","/conf/*","/etc"]

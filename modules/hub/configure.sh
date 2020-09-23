@@ -8,7 +8,8 @@ mkdir -p $RF
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
-HUB_LOG=$LOG_DIR/hub
+HUB_LOG=$LOG_DIR/${MODULE_NAME}
+HUB_CONF=$CONF_DIR/${MODULE_NAME}
 
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
@@ -19,10 +20,11 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/{_hubcode_,mysql,_git,_share,_hub.garbage,_git} $HUB_LOG
+      mkdir -p $SRV/{_hubcode_,mysql,_git,_share,_hub.garbage,_git} $HUB_LOG $HUB_CONF
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
       docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hubcode_ -o o=bind ${PREFIX}-hubcode
       docker $DOCKERARGS volume create -o type=none -o device=$HUB_LOG -o o=bind ${PREFIX}-hub-log
+      docker $DOCKERARGS volume create -o type=none -o device=$HUB_CONF -o o=bind ${PREFIX}-hub-conf
 
       DIR=$SRV/_hubcode_
       if [ -d $DIR/.git ] ; then
@@ -32,16 +34,29 @@ case $VERB in
           git clone https://github.com/kooplex/kooplex-hub.git $DIR
       fi
 
-      cp $BUILDDIR/CA/rootCA.crt $RF/
+    cp $BUILDDIR/CA/rootCA.crt $HUB_CONF/
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    else
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    fi
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile
+             sed -e "s/##PREFIX##/$PREFIX/" \
+                 -e "s/##HUBDB##/${HUBDB}/g" \
+                 -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
+                 -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
+                 -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
+             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
 
 # Ez a config.sh-ban van      LDAPPW=$(getsecret ldap)
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile.hub
       sed -e "s/##PREFIX##/$PREFIX/" \
-          -e "s/##HUBDB##/${HUBDB}/g" \
-          -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
-          -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
-          -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
-      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s,##IMAGE_NAME##,${IMAGE_NAME},g" \
           -e "s/##HUBDB##/${HUBDB}/g" \
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERPORT##/$OUTERHOSTPORT/" \
@@ -51,25 +66,22 @@ case $VERB in
           -e "s/##LDAPUSER##/admin/" \
           -e "s/##LDAPBIND_PW##/$HUBLDAP_PW/" \
           -e "s/##HUBLDAP_PW##/$HUBLDAP_PW/" \
-          -e "s/##DJANGO_SECRET_KEY##/$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g')/" \
+          -e "s,##DJANGO_SECRET_KEY##,${DJANGO_SECRET_KEY}," \
           -e "s/##MINUID##/$MINUID/" \
-          -e "s/##DOCKERHOST##/$(echo $DOCKERIP | sed s"/\//\\\\\//"g)/" \
-          -e "s/##DOCKERAPIURL##/$(echo $DOCKERAPIURL | sed s"/\//\\\\\//"g)/" \
+          -e "s,##DOCKERHOST##, ${DOCKERIP}," \
+          -e "s,##DOCKERAPIURL##,${DOCKERAPIURL}," \
           -e "s/##DOCKERPORT##/$DOCKERPORT/" \
           -e "s/##DOCKERPROTOCOL##/$DOCKERPROTOCOL/" \
-          -e "s/##DOCKER_VOLUME_DIR##/$(echo $DOCKER_VOLUME_DIR | sed s"/\//\\\\\//"g)/" \
+          -e "s,##DOCKER_VOLUME_DIR##,${DOCKER_VOLUME_DIR}," \
           -e "s/##IPPOOLLO##/$IPPOOLB/" \
           -e "s/##IPPOOLHI##/$IPPOOLE/" \
-          -e "s/##HYDRA_OIDC_SECRET_HUB##/${HYDRA_OIDC_SECRET_HUB}/" \
+          -e "s,##HYDRA_OIDC_SECRET_HUB##,${HYDRA_OIDC_SECRET_HUB}," \
           -e "s/##PROXYTOKEN##/$PROXYTOKEN/" \
           -e "s/##HUBDB_USER##/${HUBDB_USER}/g" \
           -e "s/##HUB_USER##/${HUB_USER}/g" \
           -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
           -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
   	 
-
-      echo "2. Building ${PREFIX}-hub..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
   ;;
 
   "install-hydra")

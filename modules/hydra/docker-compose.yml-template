@@ -3,12 +3,12 @@ version: "3"
 services:
   ##PREFIX##-hydra:
     container_name: ##PREFIX##-hydra
-    image: ##PREFIX##-hydra
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-hydra:##IMAGE_REPOSITORY_VERSION##
+#   build:
+#      context: .
+#      dockerfile: Dockerfile
     depends_on:
       - ##PREFIX##-hydra-postgresql
-    build:
-      context: .
-      dockerfile: Dockerfile.hydra
     networks:
       - ##PREFIX##-hydra-privatenet
       - ##PREFIX##-service-net
@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     volumes:
       - ##PREFIX##-hydra-log:/var/log/api:rw
-#      - ##PREFIX##-hydra-conf:/etc/hydraconfig:ro
+      - ##PREFIX##-hydra-conf:/conf:rw
       - ##PREFIX##-secrets:/etc/secrets:rw
     logging:
       options:
@@ -57,15 +57,16 @@ services:
 
   ##PREFIX##-hydraconsent:
     container_name: ##PREFIX##-hydraconsent
-    image: ##PREFIX##-hydraconsent
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-hydraconsent:##IMAGE_REPOSITORY_VERSION##
     depends_on:
       - ##PREFIX##-hydraconsent-mysql
-    build:
-      context: .
-      dockerfile: Dockerfile.hydraconsent
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.hydraconsent
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ##PREFIX##-hydracode:/srv/:rw
+      - ##PREFIX##-hydracode:/srv/consent/:rw
+      - ##PREFIX##-hydraconsent-conf:/conf:ro
     networks:
       - ##PREFIX##-net
       - ##PREFIX##-hydra-privatenet
@@ -81,10 +82,10 @@ services:
 
   ##PREFIX##-hydraconsent-mysql:
     container_name: ##PREFIX##-hydraconsent-mysql
-    image: ##PREFIX##-hydraconsent-mysql 
-    build:
-      context: .
-      dockerfile: Dockerfile.hydraconsentdb
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-hydraconsent-mysql:##IMAGE_REPOSITORY_VERSION##
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.hydraconsentdb
     networks:
       - ##PREFIX##-hydra-privatenet
     volumes:
@@ -113,8 +114,10 @@ volumes:
     external: true
   ##PREFIX##-hydracode:
     external: true
-#  ##PREFIX##-hydra-conf:
-#    external: true
+  ##PREFIX##-hydra-conf:
+    external: true
+  ##PREFIX##-hydraconsent-conf:
+    external: true
   ##PREFIX##-secrets:
     external: true
   ##PREFIX##-hydra-log:

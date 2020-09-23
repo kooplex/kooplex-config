@@ -4,14 +4,14 @@ FROM oryd/hydra:v0.11.6-alpine
 RUN apk add --no-cache openssl
 RUN apk add --no-cache ca-certificates
 
-COPY rootCA.key /etc/rootCA.key
-COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
-RUN update-ca-certificates
-RUN openssl genrsa -out /etc/hydra.key 2048
-RUN openssl req -new -sha256 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=##PREFIX##-hydra" -key /etc/hydra.key -out /etc/hydra.csr
-RUN openssl x509 -req -in /etc/hydra.csr -CA /usr/local/share/ca-certificates/rootCA.crt -CAkey /etc/rootCA.key -CAcreateserial -out /tmp/hydra.crt -days 1024 -sha256
-RUN cat /tmp/hydra.crt /usr/local/share/ca-certificates/rootCA.crt > /etc/hydra.crt
-RUN rm /etc/rootCA.key /tmp/hydra.crt
+#COPY rootCA.key /etc/rootCA.key
+#COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt
+#RUN update-ca-certificates
+##RUN openssl genrsa -out /etc/hydra.key 2048
+##RUN openssl req -new -sha256 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=##PREFIX##-hydra" -key /etc/hydra.key -out /etc/hydra.csr
+##RUN openssl x509 -req -in /etc/hydra.csr -CA /usr/local/share/ca-certificates/rootCA.crt -CAkey /etc/rootCA.key -CAcreateserial -out /tmp/hydra.crt -days 1024 -sha256
+##RUN cat /tmp/hydra.crt /usr/local/share/ca-certificates/rootCA.crt > /etc/hydra.crt
+##RUN rm /etc/rootCA.key /tmp/hydra.crt
 
 ENV PYTHONUNBUFFERED=1
 
@@ -42,7 +42,7 @@ RUN mkdir -p /etc/hydraconfig/
 #COPY consent-app.json /etc/hydraconfig/consent-app.json
 #COPY public-policy.json /etc/hydraconfig/public-policy.json
 
-COPY hydra.yml /root/.hydra.yml
+#COPY hydra.yml /root/.hydra.yml
 
 ADD hydra-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

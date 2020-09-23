@@ -3,10 +3,10 @@ version: "3"
 services:
   ##PREFIX##-report-nginx:
     container_name: ##PREFIX##-report-nginx
-    image: ##PREFIX##-report-nginx
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ##IMAGE_NAME##
+#   build:
+#      context: .
+#      dockerfile: Dockerfile
     networks:
       - ##PREFIX##-net
     volumes:

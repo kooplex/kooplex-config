@@ -24,6 +24,28 @@ case $VERB in
     cp -r templates/* $GITEA_CONF/ 
 
     sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" \
+        -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
+        -e "s/##GITEADB_ROOTPW##/$GITEAADMINPW/" \
+        -e "s/##GITEADB##/$GITEADB/" \
+        -e "s/##GITEADB_USER##/$GITEAUSER/" \
+        -e "s/##GITEADB_PW##/$GITEADBPW/" etc/app.ini-template > $GITEA_CONF/app.ini
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    else
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    fi
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile.gitea > $RF/Dockerfile
+             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
+
+    sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s,##IMAGE_NAME##,${IMAGE_NAME}," \
         -e "s/##ROOTURL##/${REWRITEPROTO}:\/\/$OUTERHOST\/gitea/" \
         -e "s/##GITEANET##/$GITEANET/" \
         -e "s/##GITEADB_ROOTPW##/$GITEAADMINPW/" \
@@ -31,16 +53,7 @@ case $VERB in
         -e "s/##GITEADB_USER##/$GITEAUSER/" \
         -e "s/##GITEADB_PW##/$GITEADBPW/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
-    sed -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" \
-        -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
-        -e "s/##GITEADB_ROOTPW##/$GITEAADMINPW/" \
-        -e "s/##GITEADB##/$GITEADB/" \
-        -e "s/##GITEADB_USER##/$GITEAUSER/" \
-        -e "s/##GITEADB_PW##/$GITEADBPW/" etc/app.ini-template > $RF/app.ini
     
-   echo "2. Building ${PREFIX}-${MODULE_NAME}..."
-   docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
 
  ;;
   "install-hydra")
@@ -56,14 +69,15 @@ case $VERB in
     unregister_nginx $MODULE_NAME
   ;;
   "init")
+    docker exec $PREFIX-${MODULE_NAME} bash -c "cp /data/gitea/templates/app.ini /data/gitea/conf/app.ini"
+    docker restart $PREFIX-${MODULE_NAME}
+
     HYDRA_GITEACLIENTSECRET=`cat $SRV/.secrets/$PREFIX-gitea-hydra.secret`
 echo    docker exec $PREFIX-${MODULE_NAME} bash -c "su git -c 'gitea admin auth add-oauth --name $PREFIX-${MODULE_NAME} --provider openidConnect --auto-discover-url $REWRITEPROTO://$OUTERHOST/hydra/.well-known/openid-configuration --key $PREFIX-${MODULE_NAME} --secret $HYDRA_GITEACLIENTSECRET' "
   ;;
   "start")
     echo "Starting container ${PREFIX}-${MODULE_NAME}"
     docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
-  ;;
-  "init")
   ;;
   "stop")
       echo "Stopping container ${PREFIX}-${MODULE_NAME}"

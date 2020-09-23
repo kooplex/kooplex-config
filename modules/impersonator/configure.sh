@@ -1,29 +1,47 @@
 #!/bin/bash
 
-RF=$BUILDDIR/impersonator
+MODULE_NAME=impersonator
+RF=$BUILDDIR/${MODULE_NAME}
 
 mkdir -p $RF
 
 DOCKER_HOST=$DOCKERARGS
 DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
+IMP_CONF=$CONF_DIR/${MODULE_NAME}
+
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-impersonator..."
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-template > $RF/Dockerfile
-
-      cp scripts/01-nslcd-start.sh $RF
-      cp scripts/02-api-start.sh $RF
-      cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
+     
+     mkdir -p $IMP_CONF
+     docker $DOCKERARGS volume create -o type=none -o device=$IMP_CONF -o o=bind ${PREFIX}-impersonator-conf
 
 ###  printf "$(ldap_ldapconfig)\n\n" > ${RF}/ldap.conf
 
-  printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/nsswitch.conf
-  printf "$(ldap_nslcdconfig)\n\n" > ${RF}/nslcd.conf
-  chown root ${RF}/nslcd.conf
-  chmod 0600 ${RF}/nslcd.conf
+  printf "$(ldap_nsswitchconfig)\n\n" > ${IMP_CONF}/nsswitch.conf
+  printf "$(ldap_nslcdconfig)\n\n" > ${IMP_CONF}/nslcd.conf
+  chown root ${IMP_CONF}/nslcd.conf
+  chmod 0600 ${IMP_CONF}/nslcd.conf
 
-      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    else
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    fi
+
+    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             cp scripts/01-nslcd-start.sh $RF
+             cp scripts/02-api-start.sh $RF
+             cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
+             sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
+             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
+
+      sed -e "s/##PREFIX##/$PREFIX/" \
+          -e "s,##IMAGE_NAME##,${IMAGE_NAME}," docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 ###      cp etc/nsswitch.conf $RF
 ###      cp scripts/create_user_userdb.sh $RF
 ##      cp scripts/03-startinotify.sh $RF
@@ -54,9 +72,6 @@ case $VERB in
 ###      chmod 0600 $RF/nslcd.conf
 ###      chmod 0755 $RF/share.sh
 ###      chmod 0755 $RF/patch-gitconfig.sh
-
-      echo "2. Building ${PREFIX}-impersonator..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
   ;;
 
   "install")

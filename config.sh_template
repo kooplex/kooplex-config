@@ -1,5 +1,5 @@
 SYSMODULES="net base" # admin"
-MODULES="base net nginx ldap proxy impersonator report-nginx manual hub notebook"  #overleaf gitea seafile hydra system-monitoring
+MODULES="base net nginx ldap proxy impersonator report-nginx hub notebook"  #overleaf gitea seafile hydra system-monitoring
 
 OUTERHOSTNAME="example.sthg.comu"
 OUTERHOST=$OUTERHOSTNAME
@@ -28,6 +28,7 @@ BUILDDIR=$ROOT"/build"
 
 LOG_DIR=$SRV/log
 CONF_DIR=$SRV/conf
+DATA_DIR=$SRV/data
 KEYS=$SRV/_keys
 
 SUBNET="172.20.0.0/16"
@@ -42,7 +43,7 @@ EMAIL_FROM=
 EMAIL_USER="No-reply"
 EMAIL_SUBJECT_PREFIX=
 
-DUMMYPASS=""
+DUMMYPASS="dummypass"
 HUBLDAP_PW=${DUMMYPASS}
 #HUBLDAP_ADMIN=		
 HUBROXY_PW=${DUMMYPASS}
@@ -59,13 +60,15 @@ DOCKER_COMPOSE="docker-compose"
 
 # Leave it blank if you build images locally
 IMAGE_REPOSITORY_URL=
+IMAGE_REPOSITORY_BASE_NAME=kooplex-base
+IMAGE_REPOSITORY_VERSION=latest
 
 ### INHERITED NAMES (or not )
 HUBDB=kooplexhub
 HUBDB_USER=kooplexhub
 HUBDB_PW=${DUMMYPASS}
 HUBDBROOT_PW=${DUMMYPASS}
-DJANGO_SECRET_KEY=''
+DJANGO_SECRET_KEY='yeryeqry@t2gdsfsr2@3fdssttntra'
 
 # GITEA
 GITEAADMINPW=${DUMMYPASS}
@@ -81,25 +84,25 @@ GITLABADMINPW=${DUMMYPASS}
 
 # HYDRA
 HYDRACONSENTDB_USER=hydraconsent
-HYDRACONSENTDB_PW=
+HYDRACONSENTDB_PW=${DUMMYPASS}
 HYDRACONSENTDB=hydraconsentdb
 HYDRADB_USER=hydra
-HYDRADB_PW=
+HYDRADB_PW=${DUMMYPASS}
 HYDRADB=hydradb
-HYDRA_ADMINPW=
+HYDRA_ADMINPW=${DUMMYPASS}
 HYDRASYSTEM_SECRET= #(pwgen 32)
-URL_HYDRA=https://$OUTERHOST/hydra
+URL_HYDRA=$REWRITEPROTO://$OUTERHOST/hydra
 HYDRA_CONFIG=$CONF_DIR/hydra
 
 #OIDC SECRETS
-HYDRA_OIDC_SECRET_HUB=""
+#HYDRA_OIDC_SECRET_HUB=""
 # SEAFILE
-SEAFILE_SECRET=
+#SEAFILE_SECRET=
 SEAFILEDB_PW=${DUMMYPASS}
 
 # SINGULARITY
-SINGULARITYDB_PW=
-SINGULARITY_SECRET=
+SINGULARITYDB_PW=${DUMMYPASS}
+SINGULARITY_SECRET=${DUMMYPASS}
 
 # name of the directory in each module of the Docker extra lines when building the notebook images
 NOTEBOOK_DOCKER_EXTRA=notebook-ext
