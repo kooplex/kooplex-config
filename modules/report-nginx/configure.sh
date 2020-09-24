@@ -33,16 +33,13 @@ case $VERB in
           -e "s/##OUTERHOST##/$OUTERHOST/" \
           -e "s/##OUTERHOSTNAME##/$OUTERHOSTNAME/" etc/sites.conf > $REPORTNGINX_CONF/sites.conf
 
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
-    else
-      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    fi
-      
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
-             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
-             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    else 
+        IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+        docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 
       sed -e "s/##PREFIX##/$PREFIX/" \

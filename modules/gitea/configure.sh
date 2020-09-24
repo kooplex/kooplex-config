@@ -31,17 +31,14 @@ case $VERB in
         -e "s/##GITEADB_USER##/$GITEAUSER/" \
         -e "s/##GITEADB_PW##/$GITEADBPW/" etc/app.ini-template > $GITEA_CONF/app.ini
 
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
+          IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    fi
-
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
-             sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile.gitea > $RF/Dockerfile
-             docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
-             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+          IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+          echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+          sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile.gitea > $RF/Dockerfile
+          docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+          #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 
     sed -e "s/##PREFIX##/$PREFIX/" \

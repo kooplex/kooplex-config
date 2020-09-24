@@ -1,4 +1,4 @@
-FROM ##PREFIX##-base-conda-extras
+FROM ##IMAGE_NAME##
 
 #RUN pip install jupyterlab-bokeh-server && jupyter labextension install jupyterlab-bokeh-server
 RUN  jupyter labextension install @pyviz/jupyterlab_pyviz jupyterlab-dash

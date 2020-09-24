@@ -73,27 +73,24 @@ case $VERB in
           -e "s,##OUTERHOST##,$OUTERHOST," \
 	  -e "s,##CONSENT_ENCRYPTIONKEY##,$(cat $ENCFILE),"  consentconfig/config.php-template > $HYDRA_CODE_DIR/application/config/config.php
 
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-      IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    fi
-
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+        IMAGE_NAME=${PREFIX}-${MODULE_NAME}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              cp scripts/* $RF
              sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
 #             sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydra -t ${IMAGE_REPOSITORY_BASE_NAME}-hydra $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydra -t ${IMAGE_REPOSITORY_PREFIX}-hydra $RF
 
              sed -e "s/##PREFIX##/${PREFIX}/"\
                  -e "s,##OUTERHOST##,$OUTERHOST," \
                  -e "s/##MAIL_SERVER_HOSTNAME##/$MAIL_SERVER_HOSTNAME/" \
 	     Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsent -t ${IMAGE_REPOSITORY_BASE_NAME}-hydraconsent $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsent -t ${IMAGE_REPOSITORY_PREFIX}-hydraconsent $RF
 
              cp Dockerfile.hydraconsentdb $RF/
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_BASE_NAME}-hydraconsent-mysql $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql $RF
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 
@@ -111,7 +108,7 @@ case $VERB in
           -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
           -e "s/##HYDRADB_PW##/${HYDRADB_PW}/g" \
           -e "s,##IMAGE_REPOSITORY_URL##,${IMAGE_REPOSITORY_URL},g" \
-          -e "s,##IMAGE_REPOSITORY_BASE_NAME##,${IMAGE_REPOSITORY_BASE_NAME},g" \
+          -e "s,##IMAGE_REPOSITORY_PREFIX##,${IMAGE_REPOSITORY_PREFIX},g" \
           -e "s,##IMAGE_REPOSITORY_VERSION##,${IMAGE_REPOSITORY_VERSION},g"  \
           -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
 
@@ -125,11 +122,11 @@ case $VERB in
 
     HYDRA_CONSENTSECRET=`cat $SRV/.secrets/$PREFIX-consent-hydra.secret`
     cat << EOF > ${HYDRA_CONSENTCODE}/application/config/hydra.php 
-<?php defined\('BASEPATH'\) || exit\('No direct script access allowed'\);
+<?php defined('BASEPATH') || exit('No direct script access allowed');
   
-$config["hydra.consent_client"] = '${PREFIX}-consent';
-$config["hydra.url"] = '${REWRITEPROTO}://${OUTERHOST}/hydra';
-$config["hydra.consent_secret"] = '${HYDRA_CONSENTSECRET}';
+\$config["hydra.consent_client"] = '${PREFIX}-consent';
+\$config["hydra.url"] = '${REWRITEPROTO}://${OUTERHOST}/hydra';
+\$config["hydra.consent_secret"] = '${HYDRA_CONSENTSECRET}';
 EOF
 
   ;;

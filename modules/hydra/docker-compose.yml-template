@@ -3,7 +3,7 @@ version: "3"
 services:
   ##PREFIX##-hydra:
     container_name: ##PREFIX##-hydra
-    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-hydra:##IMAGE_REPOSITORY_VERSION##
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##-hydra:##IMAGE_REPOSITORY_VERSION##
 #   build:
 #      context: .
 #      dockerfile: Dockerfile
@@ -57,7 +57,7 @@ services:
 
   ##PREFIX##-hydraconsent:
     container_name: ##PREFIX##-hydraconsent
-    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-hydraconsent:##IMAGE_REPOSITORY_VERSION##
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##-hydraconsent:##IMAGE_REPOSITORY_VERSION##
     depends_on:
       - ##PREFIX##-hydraconsent-mysql
 #    build:
@@ -82,7 +82,7 @@ services:
 
   ##PREFIX##-hydraconsent-mysql:
     container_name: ##PREFIX##-hydraconsent-mysql
-    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_BASE_NAME##-hydraconsent-mysql:##IMAGE_REPOSITORY_VERSION##
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##-hydraconsent-mysql:##IMAGE_REPOSITORY_VERSION##
 #    build:
 #      context: .
 #      dockerfile: Dockerfile.hydraconsentdb

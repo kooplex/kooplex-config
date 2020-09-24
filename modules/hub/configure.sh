@@ -36,13 +36,10 @@ case $VERB in
 
     cp $BUILDDIR/CA/rootCA.crt $HUB_CONF/
 
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-      IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    fi
-
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
+         IMAGE_NAME=${PREFIX}-${MODULE_NAME}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile
              sed -e "s/##PREFIX##/$PREFIX/" \

@@ -26,6 +26,37 @@ case $VERB in
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $SEAFILE_DATA/seafile/conf/views.py.patch
 
+    
+    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+        -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $SEAFILE_DATA/seafile/conf/ccnet.conf
+
+    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
+         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    else
+         IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
+             cp Dockerfile.${MODULE_NAME} Dockerfile.${MODULE_NAME}_pw entrypoint.sh_pw set_password.py $RF/
+             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION} $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile_pw -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}-pw:${IMAGE_REPOSITORY_VERSION} $RF
+             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+    fi
+
+    sed -e "s/##PREFIX##/$PREFIX/" \
+        -e "s/##OUTERHOST##/$OUTERHOST/" \
+        -e "s/##MODULE_NAME##/${MODULE_NAME}/" \
+	-e "s/##SEAFILE_MYSQL_ROOTPW##/$DUMMYPASS/" \
+	-e "s/##SEAFILE_ADMIN##/admin@kooplex/" \
+        -e "s,##IMAGE_REPOSITORY_URL##,${IMAGE_REPOSITORY_URL},g" \
+        -e "s,##IMAGE_REPOSITORY_PREFIX##,${IMAGE_REPOSITORY_PREFIX},g" \
+        -e "s,##IMAGE_REPOSITORY_VERSION##,${IMAGE_REPOSITORY_VERSION},g" \
+	-e "s/##SEAFILE_ADMINPW##/$DUMMYPASS/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
+    
+ ;;
+
+  "install-hydra")
+    register_hydra $MODULE_NAME
     HYDRA_SEAHUBCLIENTID=$PREFIX-seafile
     HYDRA_SEAHUBCLIENTSECRET=`cat $SRV/.secrets/$PREFIX-seafile-hydra.secret`
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
@@ -36,40 +67,6 @@ case $VERB in
         -e "s/##HYDRA_CLIENTID##/$HYDRA_SEAHUBCLIENTID/" \
 	-e "s,##DJANGO_SECRET_KEY##,$DJANGO_SECRET_KEY," \
         -e "s,##HYDRA_CLIENTSECRET##,$HYDRA_SEAHUBCLIENTSECRET," conf/seahub_settings.py-template > $SEAFILE_DATA/seafile/conf/seahub_settings.py
-    
-    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $SEAFILE_DATA/seafile/conf/ccnet.conf
-
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
-    else
-      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    fi
-
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-             echo "2. Building ${PREFIX}-${MODULE_NAME}.."
-             cp Dockerfile.${MODULE_NAME} Dockerfile.${MODULE_NAME}_pw entrypoint.sh_pw set_password.py $RF/
-             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION} $RF
-             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile_pw -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}-pw:${IMAGE_REPOSITORY_VERSION} $RF
-             #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
-    fi
-
-    sed -e "s/##PREFIX##/$PREFIX/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" \
-        -e "s/##MODULE_NAME##/${MODULE_NAME}/" \
-	-e "s/##SEAFILE_MYSQL_ROOTPW##/$DUMMYPASS/" \
-	-e "s/##SEAFILE_ADMIN##/admin@kooplex/" \
-        -e "s,##IMAGE_REPOSITORY_URL##,${IMAGE_REPOSITORY_URL},g" \
-        -e "s,##IMAGE_REPOSITORY_BASE_NAME##,${IMAGE_REPOSITORY_BASE_NAME},g" \
-        -e "s,##IMAGE_REPOSITORY_VERSION##,${IMAGE_REPOSITORY_VERSION},g" \
-	-e "s/##SEAFILE_ADMINPW##/$DUMMYPASS/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-    
- ;;
-
-  "install-hydra")
-    register_hydra $MODULE_NAME
   ;;
   "uninstall-hydra")
     unregister_hydra $MODULE_NAME
