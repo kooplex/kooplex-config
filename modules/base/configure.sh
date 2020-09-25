@@ -9,10 +9,7 @@ case $VERB in
   "build")
     echo "Building base image ${PREFIX}-base"
 
-    mkdir -p $SECRETS
-    mkdir -p $KEYS
-    mkdir -p $CONF_DIR
-    mkdir -p $LOG_DIR
+    mkdir -p $SECRETS $KEYS $CONF_DIR $LOG_DIR
     cp $ORIGINAL_KEYS/${PREFIX}.{crt,key} $KEYS/ 
     
     docker $DOCKERARGS volume create -o type=none -o device=$KEYS -o o=bind ${PREFIX}-keys
@@ -41,12 +38,17 @@ case $VERB in
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-slurm-template > $RF/Dockerfile-base-slurm
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-singularity-template > $RF/Dockerfile-base-singularity
         sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-conda-extras-template > $RF/Dockerfile-base-conda-extras
+        sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-notebook-base-template > $RF/Dockerfile-notebook-base
  
         docker $DOCKERARGS build -t ${PREFIX}-base-slurm -f $RF/Dockerfile-base-slurm  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-singularity -f $RF/Dockerfile-base-singularity  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $RF/Dockerfile-base-conda  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-conda-extras -f $RF/Dockerfile-base-conda-extras  $RF 
-        docker $DOCKERARGS tag ${PREFIX}-base-conda-extras ${PREFIX}-notebook-base
+        docker $DOCKERARGS build -t ${PREFIX}-notebook-base -f $RF/Dockerfile-notebook-base  $RF 
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS tag ${PREFIX}-notebook-base ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-base:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-base:${IMAGE_REPOSITORY_VERSION}
+        fi 
     fi
 
   ;;

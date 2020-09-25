@@ -32,10 +32,14 @@ case $VERB in
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
          IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-         IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+         #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_NAME}
+        fi 
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 

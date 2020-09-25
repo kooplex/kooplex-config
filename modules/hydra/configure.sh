@@ -74,7 +74,7 @@ case $VERB in
 	  -e "s,##CONSENT_ENCRYPTIONKEY##,$(cat $ENCFILE),"  consentconfig/config.php-template > $HYDRA_CONSENTCODE/application/config/config.php
 
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
-        IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
         IMAGE_NAME=${PREFIX}-${MODULE_NAME}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
@@ -92,6 +92,11 @@ case $VERB in
              cp Dockerfile.hydraconsentdb $RF/
              docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql $RF
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydr:a${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql:${IMAGE_REPOSITORY_VERSION}
+        fi 
     fi
 
       sed -e "s/##PREFIX##/$PREFIX/" \

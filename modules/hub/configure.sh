@@ -38,7 +38,8 @@ case $VERB in
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
         IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-         IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        # IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hub-template > $RF/Dockerfile
              sed -e "s/##PREFIX##/$PREFIX/" \
@@ -47,6 +48,9 @@ case $VERB in
                  -e "s/##HUBDB_PW##/${HUBDB_PW}/g" \
                  -e "s/##HUBDBROOT_PW##/${HUBDBROOT_PW}/" scripts/runserver.sh > $RF/runserver.sh
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_NAME}
+        fi 
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 

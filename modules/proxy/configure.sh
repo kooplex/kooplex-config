@@ -23,6 +23,9 @@ case $VERB in
 #          -e "s/##ADMINIP##/${PREFIX}-proxy/"  scripts/entrypoint.sh > $RF/entrypoint.sh
              cp  scripts/entrypoint.sh  $RF/entrypoint.sh
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_NAME}
+        fi 
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 

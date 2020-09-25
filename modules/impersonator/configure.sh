@@ -36,6 +36,9 @@ case $VERB in
              cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
              sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_NAME}
+        fi 
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 

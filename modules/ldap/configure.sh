@@ -57,6 +57,9 @@ case $VERB in
         IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_NAME}
+        fi 
 #             docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 

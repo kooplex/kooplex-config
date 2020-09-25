@@ -39,6 +39,9 @@ case $VERB in
           echo "2. Building ${PREFIX}-${MODULE_NAME}.."
           sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile.gitea > $RF/Dockerfile
           docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
+        if [ ${IMAGE_REPOSITORY_URL} ]; then
+              docker $DOCKERARGS push ${IMAGE_NAME}
+        fi 
           #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
     fi
 
