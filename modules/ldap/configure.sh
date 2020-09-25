@@ -82,7 +82,7 @@ case $VERB in
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
   ;;
   "init")
-    echo "Initializing slapd $PROJECT-${MODULE_NAME} [$LDAPIP]"
+    echo "Initializing slapd ${PREFIX}-${MODULE_NAME} [$LDAPIP]"
     docker exec ${PREFIX}-${MODULE_NAME} bash -c /init.sh
     docker exec ${PREFIX}-${MODULE_NAME} bash -c /init-core.sh
     docker exec ${PREFIX}-${MODULE_NAME} bash -c "/usr/local/bin/addgroup.sh users 1000"
