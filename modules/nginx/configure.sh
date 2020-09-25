@@ -30,10 +30,10 @@ case $VERB in
            -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $NGINX_CONF/default.conf
 
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
-         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
          #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
-         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_BASE_NAME}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
@@ -47,8 +47,8 @@ case $VERB in
            -e "s/##NGINX_API_USER##/${NGINX_API_USER}/g" \
            -e "s/##NGINX_API_PW##/${NGINX_API_PW}/g" \
            -e "s/##MODULE_NAME##/${MODULE_NAME}/g" \
-           -e "s/##IMAGE_REPOSITORY_URL##/${IMAGE_REPOSITORY_URL}/g" \
-           -e "s/##IMAGE_REPOSITORY_BASE_NAME##/${IMAGE_REPOSITORY_BASE_NAME}/g" \
+           -e "s,##IMAGE_REPOSITORY_URL##,${IMAGE_REPOSITORY_URL},g" \
+           -e "s,##IMAGE_REPOSITORY_PREFIX##,${IMAGE_REPOSITORY_PREFIX},g" \
            -e "s,##IMAGE_REPOSITORY_VERSION##,${IMAGE_REPOSITORY_VERSION},g"  docker-compose.yml-template > $DOCKER_COMPOSE_FILE
   
   ;;

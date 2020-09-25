@@ -81,19 +81,19 @@ case $VERB in
              cp scripts/* $RF
              sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
 #             sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydra -t ${IMAGE_REPOSITORY_PREFIX}-hydra $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydra -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydra $RF
 
              sed -e "s/##PREFIX##/${PREFIX}/"\
                  -e "s,##OUTERHOST##,$OUTERHOST," \
                  -e "s/##MAIL_SERVER_HOSTNAME##/$MAIL_SERVER_HOSTNAME/" \
 	     Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsent -t ${IMAGE_REPOSITORY_PREFIX}-hydraconsent $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsent -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent $RF
 
              cp Dockerfile.hydraconsentdb $RF/
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql $RF
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
         if [ ${IMAGE_REPOSITORY_URL} ]; then
-              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydr:a${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydra:${IMAGE_REPOSITORY_VERSION}
               docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent:${IMAGE_REPOSITORY_VERSION}
               docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql:${IMAGE_REPOSITORY_VERSION}
         fi 

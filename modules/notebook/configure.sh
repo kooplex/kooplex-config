@@ -17,7 +17,7 @@ case $VERB in
         IMAGE_DIR="./image-"$IMAGE_TYPE
         BUILD_IMAGE_DIR=${RF}/${IMAGE_DIR}
         mkdir -p ${BUILD_IMAGE_DIR} 
-        IMAGE_NAME=${PREFIX}-${MODULE_NAME}-${IMAGE_TYPE}
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}-${IMAGE_TYPE}:${IMAGE_REPOSITORY_VERSION}
 
 	[ -e ${IMAGE_DIR}/conda-requirements.txt ] &&  cp -p ${IMAGE_DIR}/conda-requirements.txt ${BUILD_IMAGE_DIR}/conda-requirements.txt
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > ${BUILD_IMAGE_DIR}/start-notebook.sh
@@ -77,6 +77,9 @@ case $VERB in
              sed -e "s/##PREFIX##/${PREFIX}/" \
                  -e "s,##IMAGE_NAME##,${BASE_IMAGE_NAME},"  ${IMAGE_DIR}/Dockerfile-template > ${DOCKER_FILE}
              docker $DOCKERARGS build -f ${DOCKER_FILE} -t ${IMAGE_NAME} ${BUILD_IMAGE_DIR}
+             if [ ${IMAGE_REPOSITORY_URL} ]; then
+                   docker $DOCKERARGS push ${IMAGE_NAME}
+             fi 
 #             docker tag  ${PREFIX}-${MODULE_NAME}-$imgname-base "localhost:5000/"${MODULE_NAME}-$imgname-base
 #             docker push "localhost:5000/"${MODULE_NAME}-$imgname-base
         fi
