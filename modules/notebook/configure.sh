@@ -60,8 +60,16 @@ case $VERB in
         if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
              BASE_IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-${IMAGE_TYPE}-base
 	     echo "Using base image ${BASE_IMAGE_NAME} (pulled from repository}"
-             docker $DOCKERARGS pull ${BASE_IMAGE_NAME}
-	     echo "Image PULLED from repository"
+             if docker $DOCKERARGS pull ${BASE_IMAGE_NAME} ; then
+	       echo "Image PULLED from repository"
+             else
+               BASE_IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-base
+               docker $DOCKERARGS pull ${BASE_IMAGE_NAME}
+               sed -e "s/##PREFIX##/${PREFIX}/" \
+                 -e "s,##IMAGE_NAME##,${BASE_IMAGE_NAME},"  ${IMAGE_DIR}/Dockerfile-template > ${DOCKER_FILE}
+               docker $DOCKERARGS build -f ${DOCKER_FILE} -t ${IMAGE_NAME} ${BUILD_IMAGE_DIR}
+             fi
+
 #             docker tag ${IMAGE_NAME}-base ${PREFIX}-${MODULE_NAME}-$imgname-base
 #	     echo "Image TAGGED from repository"
         else

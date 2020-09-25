@@ -59,6 +59,7 @@ CHECK_LOG="check.log"
 DOCKER_COMPOSE="docker-compose"
 
 # Leave it blank if you build images locally
+#PULL_IMAGE_FROM_REPOSITORY=True
 IMAGE_REPOSITORY_URL=
 IMAGE_REPOSITORY_BASE_NAME=kooplex-base
 IMAGE_REPOSITORY_VERSION=latest
