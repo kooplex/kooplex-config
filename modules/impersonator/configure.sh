@@ -24,13 +24,12 @@ case $VERB in
   chown root ${IMP_CONF}/nslcd.conf
   chmod 0600 ${IMP_CONF}/nslcd.conf
 
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
-      IMAGE_NAME=${PREFIX}-${MODULE_NAME}
-    else
-      IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    fi
+    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+     else
+      #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+      IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
 
-    if [ ! ${IMAGE_REPOSITORY_URL} ]; then
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              cp scripts/01-nslcd-start.sh $RF
              cp scripts/02-api-start.sh $RF
@@ -99,7 +98,8 @@ case $VERB in
   "purge")
     echo "Removing $RF" 
 
-    docker $DOCKERARGS volume rm ${PREFIX}-git
+#    docker $DOCKERARGS volume rm ${PREFIX}-git
+    docker $DOCKERARGS volume rm ${PREFIX}-impersonator-conf
   ;;
 
   "clean")

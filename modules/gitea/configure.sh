@@ -34,7 +34,8 @@ case $VERB in
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
           IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-          IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+	  IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+          #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
           echo "2. Building ${PREFIX}-${MODULE_NAME}.."
           sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile.gitea > $RF/Dockerfile
           docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
@@ -79,7 +80,7 @@ echo    docker exec $PREFIX-${MODULE_NAME} bash -c "su git -c 'gitea admin auth 
   "stop")
       echo "Stopping container ${PREFIX}-${MODULE_NAME}"
       docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
-      rm  $NGINX_DIR/conf/conf/${MODULE_NAME}
+      #rm  $NGINX_DIR/conf/conf/${MODULE_NAME}
   ;;
     
   "remove")

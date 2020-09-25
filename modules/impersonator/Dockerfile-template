@@ -28,4 +28,4 @@ COPY git_functions.py /local
 RUN rmdir /home
 RUN ln -s /mnt/.volumes/home /home
 
-CMD ["cp","/conf/*","/etc"]
+#CMD ["cp","/conf/*","/etc"]
