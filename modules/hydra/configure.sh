@@ -205,6 +205,7 @@ EOF
     rm -r $RF
       
       docker $DOCKERARGS volume rm ${PREFIX}-hydradb
+      docker $DOCKERARGS volume rm ${PREFIX}-hydra-conf
       docker $DOCKERARGS volume rm ${PREFIX}-hydra-log
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsent-conf

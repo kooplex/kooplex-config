@@ -120,13 +120,14 @@ case $VERB in
     rm -r $RF
      # docker $DOCKERARGS volume rm ${PREFIX}-seafile-data
       docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
+      docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-conf
       docker $DOCKERARGS volume rm ${PREFIX}-seafile-mysql
       docker $DOCKERARGS volume rm ${PREFIX}-cache-seafile
   ;;
 
   "clean")
     echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
-    rm -R -f $SEAFILE_CACHE $SEAFILE_DATA $SEAFILE_DB
+    rm -R -f $SEAFILE_CACHE $SEAFILE_DATA $SEAFILE_DB $SEAFILE_CONF
 
   ;;
 
