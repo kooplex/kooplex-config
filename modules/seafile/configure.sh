@@ -10,15 +10,16 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 SEAFILE_CACHE=/kooplex-big/_cache-${PREFIX}-${MODULE_NAME}/
 SEAFILE_DATA=$SRV/_${MODULE_NAME}-data
 SEAFILE_CONF=$SRV/_${MODULE_NAME}-conf
+SEAFILE_DB=$SRV/_${MODULE_NAME}-mysql
 
 case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
 
-    mkdir -p $SRV/_${MODULE_NAME}-mysql $SEAFILE_CACHE  $SEAFILE_DATA/seafile/conf/
+    mkdir -p $SEAFILE_DB $SEAFILE_CACHE  $SEAFILE_DATA/seafile/conf/
 
     docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_CACHE -o o=bind ${PREFIX}-cache-${MODULE_NAME}
-    docker $DOCKERARGS volume create -o type=none -o device=$SRV/_${MODULE_NAME}-mysql -o o=bind ${PREFIX}-${MODULE_NAME}-mysql
+    docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_DB -o o=bind ${PREFIX}-${MODULE_NAME}-mysql
     docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_DATA -o o=bind ${PREFIX}-${MODULE_NAME}-data
     docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_CONF -o o=bind ${PREFIX}-${MODULE_NAME}-conf
 
@@ -116,17 +117,17 @@ case $VERB in
 
   ;;
   "purge")
-      docker $DOCKERARGS volume rm ${PREFIX}-seafile-data
+    rm -r $RF
+     # docker $DOCKERARGS volume rm ${PREFIX}-seafile-data
+      docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
       docker $DOCKERARGS volume rm ${PREFIX}-seafile-mysql
       docker $DOCKERARGS volume rm ${PREFIX}-cache-seafile
   ;;
 
-  "cleandata")
+  "clean")
     echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
-    docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-data
-    rm -R -f $SEAFILE_CACHE $SEAFILE_DATA
+    rm -R -f $SEAFILE_CACHE $SEAFILE_DATA $SEAFILE_DB
 
-    rm -r $RF
   ;;
 
 

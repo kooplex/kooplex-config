@@ -21,7 +21,7 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-workdir
   ;;
 
-  "cleandata")
+  "clean")
     rm -r $SRV/{_course,_usercourse,_assignment,_workdir}
   ;;
 

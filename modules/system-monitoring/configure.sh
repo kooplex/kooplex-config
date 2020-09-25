@@ -91,5 +91,10 @@ case $VERB in
     echo "Purging grafana ${PREFIX}-grafana"
     rm -R $RF
   ;;
-    
+  "clean")
+
+      rm -r $SRV_GRAFANA/etc $SRV_GRAFANA/log $SRV_GRAFANA/varlib $SRV_GRAFANA/etc $SRV_GRAFANA/dashboards $SRV_GRAFANA/datasources $SRV_GRAFANA/notifiers
+      rm -r $SRV_PROMETHEUS/etc $SRV_PROMETHEUS/log $SRV_PROMETHEUS/data
+      rm -r $SRV_NODEEXPORTER/etc
+  ;;    
 esac

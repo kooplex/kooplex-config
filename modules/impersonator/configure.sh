@@ -97,13 +97,14 @@ case $VERB in
 
   "purge")
     echo "Removing $RF" 
+    rm -R -f $RF
 
 #    docker $DOCKERARGS volume rm ${PREFIX}-git
     docker $DOCKERARGS volume rm ${PREFIX}-impersonator-conf
   ;;
 
   "clean")
-    rm -R -f $RF
+    rm -r $IMP_CONF
   ;;
 esac
 

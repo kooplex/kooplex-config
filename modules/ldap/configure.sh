@@ -53,7 +53,8 @@ case $VERB in
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
         IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else
-        IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
 #             docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
@@ -104,14 +105,9 @@ case $VERB in
     docker $DOCKERARGS volume rm ${PREFIX}-ldap-conf
 
   ;;
-  "cleandata")
-    echo "Cleaning data ${PREFIX}-${MODULE_NAME}"
-    rm -R -f $SRV/ldap/
-    
-  ;;
   "clean")
     echo "Cleaning image ${PREFIX}-${MODULE_NAME}"
     docker $DOCKERARGS rmi ${PREFIX}-${MODULE_NAME}
-    rm -r $RF
+    rm -R -f $SRV/ldap/ $LDAP_CONF
   ;;
 esac

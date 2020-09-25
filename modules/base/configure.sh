@@ -70,6 +70,7 @@ case $VERB in
 #  quotaoff -vu $SRV
 #  quotaoff -vg $SRV
 #  rm -f $SRV/aquota.*
+    rm -r $RF
 
     docker $DOCKERARGS volume rm ${PREFIX}-secrets
     docker $DOCKERARGS volume rm ${PREFIX}-keys
@@ -82,7 +83,6 @@ case $VERB in
   "clean")
     echo "Cleaning base image ${PREFIX}-base"
 
-    rm -r $SRV/.secrets
-    rm -r $RF
+    rm -r $SECRETS
   ;;
 esac

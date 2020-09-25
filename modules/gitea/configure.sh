@@ -96,10 +96,10 @@ echo    docker exec $PREFIX-${MODULE_NAME} bash -c "su git -c 'gitea admin auth 
     rm -R -f $SRV/_${MODULE_NAME}-db
     docker $DOCKERARGS volume rm ${PREFIX}-${MODULE_NAME}-conf
     rm -R -f $GITEA_CONF
-    rm -r $RF
     
   ;;
 
   "purge")
+    rm -r $RF
   ;;
 esac

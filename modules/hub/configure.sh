@@ -10,28 +10,27 @@ DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
 
 HUB_LOG=$LOG_DIR/${MODULE_NAME}
 HUB_CONF=$CONF_DIR/${MODULE_NAME}
+HUB_CODE=$SRV/_hubcode_
+HUB_DB=$SRV/hubdb
 
 #FIXME: get rid of PROJECT (db-name)
 #TODO: Volume mountpoints may be part of settings.py
-HYDRA_API_USER=hydrauser
-HYDRA_API_PW=hydrapw
 
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hub..."
       
-      mkdir -p $SRV/{_hubcode_,mysql,_git,_share,_hub.garbage,_git} $HUB_LOG $HUB_CONF
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/mysql -o o=bind ${PREFIX}-hubdb
-      docker $DOCKERARGS volume create -o type=none -o device=$SRV/_hubcode_ -o o=bind ${PREFIX}-hubcode
+      mkdir -p $HUB_LOG $HUB_CONF $HUB_CODE $HUB_DB 
+      docker $DOCKERARGS volume create -o type=none -o device=$HUB_DB -o o=bind ${PREFIX}-hubdb
+      docker $DOCKERARGS volume create -o type=none -o device=$HUB_CODE -o o=bind ${PREFIX}-hubcode
       docker $DOCKERARGS volume create -o type=none -o device=$HUB_LOG -o o=bind ${PREFIX}-hub-log
       docker $DOCKERARGS volume create -o type=none -o device=$HUB_CONF -o o=bind ${PREFIX}-hub-conf
 
-      DIR=$SRV/_hubcode_
-      if [ -d $DIR/.git ] ; then
-          echo $DIR
+      if [ -d $HUB_CODE/.git ] ; then
+          echo $HUB_CODE
           #cd $DIR && git pull && cd -
       else
-          git clone https://github.com/kooplex/kooplex-hub.git $DIR
+          git clone https://github.com/kooplex/kooplex-hub.git $HUB_CODE
       fi
 
     cp $BUILDDIR/CA/rootCA.crt $HUB_CONF/
@@ -133,13 +132,13 @@ case $VERB in
       
       docker $DOCKERARGS volume rm ${PREFIX}-hubcode
       docker $DOCKERARGS volume rm ${PREFIX}-hub-log
+      docker $DOCKERARGS volume rm ${PREFIX}-hub-conf
       docker $DOCKERARGS volume rm ${PREFIX}-hubdb
   ;;
 
   "clean")
     echo "Cleaning data ${PREFIX}-hubdb"
-    rm -R -f $SRV/mysql
-    rm -r $RF
+    rm -R -f $HUB_CODE $HUB_DB $HUB_CONF $HUB_LOG
   ;;
 
 esac

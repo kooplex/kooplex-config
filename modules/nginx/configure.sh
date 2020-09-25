@@ -14,9 +14,7 @@ NGINX_CONF=$CONF_DIR/${MODULE_NAME}
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..."
-      mkdir -p $NGINX_HTML 
-      mkdir -p $NGINX_LOG
-      mkdir -p $NGINX_CONF/sites-enabled
+      mkdir -p $NGINX_HTML $NGINX_LOG $NGINX_CONF/sites-enabled
 
       docker $DOCKERARGS volume create -o type=none -o device=$NGINX_HTML  -o o=bind ${PREFIX}-nginx-html
       docker $DOCKERARGS volume create -o type=none -o device=$NGINX_LOG  -o o=bind ${PREFIX}-nginx-log
@@ -78,7 +76,9 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-nginx-conf
       docker $DOCKERARGS volume rm ${PREFIX}-nginx-log
       docker $DOCKERARGS volume rm ${PREFIX}-nginx-html
-      
+  ;;
+  "clean")
+    rm -r -f $NGINX_HTML $NGINX_LOG $NGINX_CONF
   ;;
 
 esac

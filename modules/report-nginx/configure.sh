@@ -16,9 +16,7 @@ case $VERB in
   "build")
     echo "1. Configuring ${PREFIX}-report-nginx..."
 
-      mkdir -p $REPORTNGINX_HTML 
-      mkdir -p $REPORTNGINX_LOG
-      mkdir -p $REPORTNGINX_CONF/sites-enabled
+      mkdir -p $REPORTNGINX_HTML $REPORTNGINX_LOG $REPORTNGINX_CONF/sites-enabled
 
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_HTML  -o o=bind ${PREFIX}-${MODULE_NAME}-html
       docker $DOCKERARGS volume create -o type=none -o device=$REPORTNGINX_LOG  -o o=bind ${PREFIX}-${MODULE_NAME}-log
@@ -36,7 +34,8 @@ case $VERB in
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
     else 
-        IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
         echo "2. Building ${PREFIX}-${MODULE_NAME}.."
         docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
         #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build

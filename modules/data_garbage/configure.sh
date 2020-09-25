@@ -15,7 +15,7 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-garbage
   ;;
 
-  "cleandata")
+  "clean")
     rm -r $SRV/_hub.garbage
   ;;
 

@@ -20,11 +20,12 @@ HYDRACONSENT_CONF=$CONF_DIR/hydraconsent
 HYDRA_DB=$SRV/_hydradb
 HYDRA_CONSENTDB=$SRV/_hydraconsentdb
 HYDRA_CONSENTCODE=$SRV/_hydracode
+
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-hydra..."
       
-      mkdir -p $SRV/_hydradb $SRV/_hydraconsentdb $SRV/_hydracode $HYDRACONSENT_CONF $HYDRA_CONF $CONSENT_LOG $HYDRA_LOG
+      mkdir -p $HYDRA_DB $HYDRA_CONSENTDB $HYDRA_CONSENTCODE $HYDRACONSENT_CONF $HYDRA_CONF $CONSENT_LOG $HYDRA_LOG
       docker $DOCKERARGS volume create -o type=none -o device=$HYDRA_DB -o o=bind ${PREFIX}-hydradb
       docker $DOCKERARGS volume create -o type=none -o device=$HYDRA_CONSENTDB -o o=bind ${PREFIX}-hydraconsentdb
       docker $DOCKERARGS volume create -o type=none -o device=$HYDRA_CONSENTCODE -o o=bind ${PREFIX}-hydracode
@@ -39,12 +40,11 @@ case $VERB in
       cp etc/nginx.conf $HYDRACONSENT_CONF/
 
       #cp -ar src $SRV/_hydracode 
-      HYDRA_CODE_DIR=$SRV/_hydracode
-      if [ -d $HYDRA_CODE_DIR/.git ] ; then
-          echo $HYDRA_CODE_DIR
+      if [ -d $HYDRA_CONSENTCODE/.git ] ; then
+          echo $HYDRA_CONSENTCODE
           #cd $DIR && git pull && cd -
       else
-          git clone https://github.com/kooplex/hydra-consent.git $HYDRA_CODE_DIR
+          git clone https://github.com/kooplex/hydra-consent.git $HYDRA_CONSENTCODE
       fi
 
 
@@ -65,13 +65,13 @@ case $VERB in
       sed -e "s/##PREFIX##/$PREFIX/" \
           -e "s/##HYDRACONSENTDB##/$HYDRACONSENTDB/" \
           -e "s/##HYDRACONSENTDB_USER##/$HYDRACONSENTDB_USER/" \
-          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template >  $HYDRA_CODE_DIR/application/config/database.php
+          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template >  $HYDRA_CONSENTCODE/application/config/database.php
 #          -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  etc/database.php-template > $RF/database.php # $SRV/_hydracode/consent/application/config/database.php
 #      sed -e "s/##HYDRACONSENTDB_PW##/$HYDRACONSENTDB_PW/"  Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
       sed -e "s/##PREFIX##/${PREFIX}/" \
 	  -e "s/##REWRITEPROTO##/${REWRITEPROTO}/" \
           -e "s,##OUTERHOST##,$OUTERHOST," \
-	  -e "s,##CONSENT_ENCRYPTIONKEY##,$(cat $ENCFILE),"  consentconfig/config.php-template > $HYDRA_CODE_DIR/application/config/config.php
+	  -e "s,##CONSENT_ENCRYPTIONKEY##,$(cat $ENCFILE),"  consentconfig/config.php-template > $HYDRA_CONSENTCODE/application/config/config.php
 
     if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
         IMAGE_NAME=${IMAGE_REPOSITORY_URL}/${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
@@ -202,25 +202,21 @@ EOF
 
   "purge")
       echo "Removing $RF" 
+    rm -r $RF
       
       docker $DOCKERARGS volume rm ${PREFIX}-hydradb
       docker $DOCKERARGS volume rm ${PREFIX}-hydra-log
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsentdb
+      docker $DOCKERARGS volume rm ${PREFIX}-hydraconsent-conf
       docker $DOCKERARGS volume rm ${PREFIX}-hydraconsent-log
       docker $DOCKERARGS volume rm ${PREFIX}-hydracode
-#      docker $DOCKERARGS volume rm ${PREFIX}-hydraconfig
+      docker $DOCKERARGS volume rm ${PREFIX}-hydraconfig
 #      rm  -r $HYDRA_CONF
   ;;
   "clean")
     #echo "Cleaning data ${PREFIX}-hydradb"
     #rm -R -f $SRV/mysql
-    rm -r $RF
-    
-  ;;
-  "cleandata")
-    #echo "Cleaning data ${PREFIX}-hydradb"
-    #rm -R -f $SRV/mysql
-    rm -r $HYDRA_CONSENTDB $HYDRA_DB
+    rm -r $HYDRA_CONSENTDB $HYDRA_DB $HYDRA_CONSENTCODE $HYDRACONSENT_CONF $HYDRA_CONF $CONSENT_LOG $HYDRA_LOG
     
   ;;
 

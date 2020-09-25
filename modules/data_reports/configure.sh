@@ -15,7 +15,7 @@ case $VERB in
       docker $DOCKERARGS volume rm ${PREFIX}-report
   ;;
 
-  "cleandata")
+  "clean")
     rm -r $SRV/_report
   ;;
 
