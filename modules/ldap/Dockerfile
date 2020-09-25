@@ -1,25 +1,25 @@
-#FROM debian:jessie
-#
-#MAINTAINER Laszlo Dobos <dobos@complex.elte.hu>
-## Based on by dinkel/openldap by Christian Luginbühl <dinkel@pimprecords.com>
-#
-#USER root
-#
-#ENV OPENLDAP_VERSION 2.4.40
-#
-#RUN apt-get update && \
-#    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-#        slapd=${OPENLDAP_VERSION}* vim ldap-utils && \
-#    apt-get clean && \
-#    rm -rf /var/lib/apt/lists/*
-#
-#RUN mv /etc/ldap /etc/ldap.dist
-#
-#RUN chown -R openldap:openldap /var/run/slapd/
-#
-#EXPOSE 389
+FROM debian:jessie
 
-FROM dinkel/openldap:2.4.40 
+MAINTAINER Laszlo Dobos <dobos@complex.elte.hu>
+# Based on by dinkel/openldap by Christian Luginbühl <dinkel@pimprecords.com>
+
+USER root
+
+ENV OPENLDAP_VERSION 2.4.40
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+        slapd=${OPENLDAP_VERSION}* vim ldap-utils && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mv /etc/ldap /etc/ldap.dist
+
+RUN chown -R openldap:openldap /var/run/slapd/
+
+EXPOSE 389
+
+#FROM dinkel/openldap:2.4.40 
 
 #COPY new_user.ldiftemplate /etc/new_user.ldiftemplate
 #COPY new_group.ldiftemplate /etc/new_group.ldiftemplate
