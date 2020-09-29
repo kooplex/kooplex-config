@@ -20,7 +20,8 @@ case $VERB in
     if [ ! ${PULL_IMAGE_FROM_REPOSITORY} ]; then
              cp  scripts/* $RF
              cp Dockerfile $RF
-             docker $DOCKERARGS build -t ${PREFIX}-$IMAGENAME  $RF
+             docker $DOCKERARGS build -t ${PREFIX}-base  $RF
+             docker $DOCKERARGS tag ${PREFIX}-base ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}base:${IMAGE_REPOSITORY_VERSION}
              sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-base-apt-packages-template > $RF/Dockerfile-base-apt-packages
              docker $DOCKERARGS build -t ${PREFIX}-base-apt-packages -f $RF/Dockerfile-base-apt-packages  $RF 
 #    else
@@ -45,9 +46,10 @@ case $VERB in
         docker $DOCKERARGS build -t ${PREFIX}-base-conda -f $RF/Dockerfile-base-conda  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-base-conda-extras -f $RF/Dockerfile-base-conda-extras  $RF 
         docker $DOCKERARGS build -t ${PREFIX}-notebook-base -f $RF/Dockerfile-notebook-base  $RF 
+        docker $DOCKERARGS tag ${PREFIX}-notebook-base ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}notebook-base:${IMAGE_REPOSITORY_VERSION}
         if [ ${IMAGE_REPOSITORY_URL} ]; then
-              docker $DOCKERARGS tag ${PREFIX}-notebook-base ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-base:${IMAGE_REPOSITORY_VERSION}
-              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-base:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS tag ${PREFIX}-notebook-base ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}notebook-base:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}notebook-base:${IMAGE_REPOSITORY_VERSION}
         fi 
     fi
 

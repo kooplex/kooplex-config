@@ -73,29 +73,26 @@ case $VERB in
           -e "s,##OUTERHOST##,$OUTERHOST," \
 	  -e "s,##CONSENT_ENCRYPTIONKEY##,$(cat $ENCFILE),"  consentconfig/config.php-template > $HYDRA_CONSENTCODE/application/config/config.php
 
-    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
-        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    else
-        IMAGE_NAME=${PREFIX}-${MODULE_NAME}
+    if [ ! ${PULL_IMAGE_FROM_REPOSITORY} ]; then
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              cp scripts/* $RF
              sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.hydra-template > $RF/Dockerfile.hydra
 #             sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile.keto-template > $RF/Dockerfile.keto
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydra -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydra $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydra -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}hydra $RF
 
              sed -e "s/##PREFIX##/${PREFIX}/"\
                  -e "s,##OUTERHOST##,$OUTERHOST," \
                  -e "s/##MAIL_SERVER_HOSTNAME##/$MAIL_SERVER_HOSTNAME/" \
 	     Dockerfile.hydraconsent-template > $RF/Dockerfile.hydraconsent
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsent -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsent -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}hydraconsent $RF
 
              cp Dockerfile.hydraconsentdb $RF/
-             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.hydraconsentdb -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}hydraconsent-mysql $RF
              #docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build
         if [ ${IMAGE_REPOSITORY_URL} ]; then
-              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydra:${IMAGE_REPOSITORY_VERSION}
-              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent:${IMAGE_REPOSITORY_VERSION}
-              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-hydraconsent-mysql:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}hydra:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}hydraconsent:${IMAGE_REPOSITORY_VERSION}
+              docker $DOCKERARGS push ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}hydraconsent-mysql:${IMAGE_REPOSITORY_VERSION}
         fi 
     fi
 

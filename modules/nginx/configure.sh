@@ -29,11 +29,8 @@ case $VERB in
            -e "s/##OUTERHOST##/$OUTERHOST/" \
            -e "s/##OUTERPORT##/$OUTERHOSTPORT/"  etc/outerhost.conf-template > $NGINX_CONF/default.conf
 
-    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
-         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    else
-         #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
-         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    if [ ! ${PULL_IMAGE_FROM_REPOSITORY} ]; then
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF

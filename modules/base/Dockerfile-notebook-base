@@ -1,3 +1,0 @@
-FROM ${PREFIX}-base-conda-extras
-
-RUN rm -rf /var/lib/apt/lists/*

@@ -33,15 +33,12 @@ case $VERB in
         -e "s/##SEAFILEDB_PW##/$SEAFILEDB_PW/" \
         -e "s/##OUTERHOST##/$OUTERHOST/" conf/ccnet.conf-template > $SEAFILE_DATA/seafile/conf/ccnet.conf
 
-    if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
-         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
-    else
-         #IMAGE_NAME=${PREFIX}-${MODULE_NAME}
-         IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION}
+    if [ ! ${PULL_IMAGE_FROM_REPOSITORY} ]; then
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              cp Dockerfile.${MODULE_NAME} Dockerfile.${MODULE_NAME}_pw entrypoint.sh_pw set_password.py $RF/
-             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION} $RF
-             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile_pw -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}-pw:${IMAGE_REPOSITORY_VERSION} $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}${MODULE_NAME}:${IMAGE_REPOSITORY_VERSION} $RF
+             docker $DOCKER_HOST build -f $RF/Dockerfile.seafile_pw -t ${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}${MODULE_NAME}-pw:${IMAGE_REPOSITORY_VERSION} $RF
         if [ ${IMAGE_REPOSITORY_URL} ]; then
               docker $DOCKERARGS push ${IMAGE_NAME}
         fi 

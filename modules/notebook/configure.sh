@@ -17,7 +17,7 @@ case $VERB in
         IMAGE_DIR="./image-"$IMAGE_TYPE
         BUILD_IMAGE_DIR=${RF}/${IMAGE_DIR}
         mkdir -p ${BUILD_IMAGE_DIR} 
-        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-${MODULE_NAME}-${IMAGE_TYPE}:${IMAGE_REPOSITORY_VERSION}
+        IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}${MODULE_NAME}-${IMAGE_TYPE}:${IMAGE_REPOSITORY_VERSION}
 
 	[ -e ${IMAGE_DIR}/conda-requirements.txt ] &&  cp -p ${IMAGE_DIR}/conda-requirements.txt ${BUILD_IMAGE_DIR}/conda-requirements.txt
         sed -e "s/##PREFIX##/${PREFIX}/" scripts/start-notebook.sh-template > ${BUILD_IMAGE_DIR}/start-notebook.sh
@@ -58,12 +58,12 @@ case $VERB in
         DOCKER_FILE=${BUILD_IMAGE_DIR}/Dockerfile
 
         if [ ${PULL_IMAGE_FROM_REPOSITORY} ]; then
-             BASE_IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-${IMAGE_TYPE}-base
+             BASE_IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}notebook-${IMAGE_TYPE}-base
 	     echo "Using base image ${BASE_IMAGE_NAME} (pulled from repository}"
              if docker $DOCKERARGS pull ${BASE_IMAGE_NAME} ; then
 	       echo "Image PULLED from repository"
              else
-               BASE_IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}-notebook-base
+               BASE_IMAGE_NAME=${IMAGE_REPOSITORY_URL}${IMAGE_REPOSITORY_PREFIX}notebook-base
                docker $DOCKERARGS pull ${BASE_IMAGE_NAME}
                sed -e "s/##PREFIX##/${PREFIX}/" \
                  -e "s,##IMAGE_NAME##,${BASE_IMAGE_NAME},"  ${IMAGE_DIR}/Dockerfile-template > ${DOCKER_FILE}
