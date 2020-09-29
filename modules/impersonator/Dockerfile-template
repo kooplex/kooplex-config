@@ -27,5 +27,6 @@ COPY seafile_functions.py /local
 COPY git_functions.py /local
 RUN rmdir /home
 RUN ln -s /mnt/.volumes/home /home
+COPY entrypoint.sh /
 
 #CMD ["cp","/conf/*","/etc"]
