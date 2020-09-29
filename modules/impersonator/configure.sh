@@ -33,7 +33,7 @@ case $VERB in
              echo "2. Building ${PREFIX}-${MODULE_NAME}.."
              cp scripts/01-nslcd-start.sh $RF
              cp scripts/02-api-start.sh $RF
-             cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
+             cp scripts/{entrypoint.sh,common.py,seafile_functions.py,git_functions.py,api.py} $RF
              sed -e "s/##PREFIX##/${PREFIX}/g"  Dockerfile-template > $RF/Dockerfile
              docker $DOCKER_HOST build -f $RF/Dockerfile -t ${IMAGE_NAME} $RF
         if [ ${IMAGE_REPOSITORY_URL} ]; then
