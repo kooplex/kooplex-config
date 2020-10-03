@@ -3,7 +3,7 @@ version: "3"
 services:
   ##PREFIX##-##MODULE_NAME##:
     container_name: ##PREFIX##-##MODULE_NAME##
-    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##-nginx:##IMAGE_REPOSITORY_VERSION##
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##nginx:##IMAGE_REPOSITORY_VERSION##
 #   build:
 #      context: .
 #      dockerfile: Dockerfile

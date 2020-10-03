@@ -74,7 +74,8 @@ case $VERB in
     docker restart $PREFIX-${MODULE_NAME}
 
     HYDRA_GITEACLIENTSECRET=`cat $SRV/.secrets/$PREFIX-gitea-hydra.secret`
-echo    docker exec $PREFIX-${MODULE_NAME} bash -c "su git -c 'gitea admin auth add-oauth --name $PREFIX-${MODULE_NAME} --provider openidConnect --auto-discover-url $REWRITEPROTO://$OUTERHOST/hydra/.well-known/openid-configuration --key $PREFIX-${MODULE_NAME} --secret $HYDRA_GITEACLIENTSECRET' "
+    docker exec $PREFIX-${MODULE_NAME} bash -c "su git -c 'gitea admin auth add-oauth --name $PREFIX-${MODULE_NAME} --provider openidConnect --auto-discover-url $REWRITEPROTO://$OUTERHOST/hydra/.well-known/openid-configuration --key $PREFIX-${MODULE_NAME} --secret $HYDRA_GITEACLIENTSECRET' "
+    docker restart $PREFIX-${MODULE_NAME}
   ;;
   "start")
     echo "Starting container ${PREFIX}-${MODULE_NAME}"

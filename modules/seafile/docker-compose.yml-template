@@ -13,7 +13,7 @@ services:
       - ##PREFIX##-seafile-privatenet
 
   ##PREFIX##-seafile:
-    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##-##MODULE_NAME##:##IMAGE_REPOSITORY_VERSION##
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX####MODULE_NAME##:##IMAGE_REPOSITORY_VERSION##
 #    build:
 #      context: .
 #      dockerfile: Dockerfile.seafile
@@ -46,7 +46,7 @@ services:
       - ##PREFIX##-seafile-privatenet
           
   ##PREFIX##-seafile-pw:
-    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX##-##MODULE_NAME##-pw:##IMAGE_REPOSITORY_VERSION##
+    image: ##IMAGE_REPOSITORY_URL####IMAGE_REPOSITORY_PREFIX####MODULE_NAME##-pw:##IMAGE_REPOSITORY_VERSION##
 #    build:
 #      context: .
 #      dockerfile: Dockerfile.seafile_pw

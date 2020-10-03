@@ -19,8 +19,6 @@ services:
     environment:
       - BASE_URL_SEAFILE=http://##PREFIX##-seafile
       - MNT_VOL_SYNC=/mnt/.volumes/seafile
-    command: ["bash","-c","'ls","/conf;","cp", "/conf/*","/etc/'"]
-#    command: ["ls","/conf;","cp","/conf/*","/etc/"]
  
 
 networks:

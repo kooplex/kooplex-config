@@ -11,6 +11,11 @@ bash kooplex.sh start proxy
 bash kooplex.sh start hydra
 bash kooplex.sh init hydra
 bash kooplex.sh install-nginx hydra
+# Now Bonfire consent code need to be installed
+# Visit $OUTERHOST/consent/install
+# Settings in Bonfire consent code
+# login as admin
+# in settings/security change login method to username only
 
 bash kooplex.sh start gitea 
 bash kooplex.sh build seafile
@@ -27,10 +32,12 @@ do
         bash kooplex.sh install-hydra $module
 done
 
+# Restart seafile container
 
 bash kooplex.sh start report-nginx
 
 bash kooplex.sh start hub
+sleep 10
 bash kooplex.sh init hub
 
 # REGISTER TO NGINX
@@ -42,9 +49,22 @@ done
 bash kooplex.sh build impersonator 
 bash kooplex.sh start impersonator 
 
+# We need at least one notebook image
+bash kooplex.sh build notebook basic
+
+# Things that need some improvement from the kooplx-hub code side
+docker restart ${PREFIX}-hub 
+docker exec -it ${PREFIX}-hub bash -c "cd kooplexhub/kooplexhub/; python3 manage.py updatemodel"
+
+docker restart ${PREFIX}-seafile
+docker restart ${PREFIX}-hydra 
+docker restart ${PREFIX}-nginx
 
 
-
+# To enable seafile 
+# login to $OUTERHOST/admin
+# set FS server
+# $OUTERHOST/seafile
 
 # Stopping and removing everything
 for module in gitea seafile hydra report-nginx impersonator nginx ldap proxy hub #notebook 

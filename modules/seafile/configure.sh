@@ -24,8 +24,9 @@ case $VERB in
     docker $DOCKERARGS volume create -o type=none -o device=$SEAFILE_CONF -o o=bind ${PREFIX}-${MODULE_NAME}-conf
 
 
-    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
-        -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $SEAFILE_DATA/seafile/conf/views.py.patch
+#    sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
+#        -e "s/##OUTERHOST##/$OUTERHOST/" views.py.patch-template > $SEAFILE_DATA/seafile/conf/views.py.patch
+    cp -r patch-for-7.0.4/ $RF/
 
     
     sed -e "s/##REWRITEPROTO##/$REWRITEPROTO/" \
@@ -93,12 +94,14 @@ case $VERB in
 #     docker $DOCKERARGS exec ${PREFIX}-${MODULE_NAME} bash -c "/shared/seafile/conf/ccnet.conf"
      
      # PATCH FOR THIS VERSION
-     docker $DOCKERARGS exec ${PREFIX}-${MODULE_NAME} bash -c "DIR=/opt/seafile/seafile-server-7.0.4/seahub/seahub; sed -i '290c\    return True#' \$DIR/utils/__init__.py &&\
-         sed -i \"143c\        user_info['idp_user'] = user_info_json['idp_user']\" \$DIR/oauth/views.py &&\
-         sed -i \"167c\    email = user_info['idp_user']\" \$DIR/oauth/views.py &&\
-         sed -i '192a\    if isinstance(name, list):\n        name = name.pop(0)' \$DIR/oauth/views.py &&\
-         sed -i '198a\    if isinstance(contact_email, list):\n       contact_email = contact_email.pop(0)' \$DIR/oauth/views.py"
+    # docker $DOCKERARGS exec ${PREFIX}-${MODULE_NAME} bash -c "DIR=/opt/seafile/seafile-server-7.0.4/seahub/seahub; sed -i '290c\    return True#' \$DIR/utils/__init__.py &&\
+    #     sed -i \"143c\        user_info['idp_user'] = user_info_json['idp_user']\" \$DIR/oauth/views.py &&\
+    #     sed -i \"167c\    email = user_info['idp_user']\" \$DIR/oauth/views.py &&\
+    #     sed -i '192a\    if isinstance(name, list):\n        name = name.pop(0)' \$DIR/oauth/views.py &&\
+    #     sed -i '198a\    if isinstance(contact_email, list):\n       contact_email = contact_email.pop(0)' \$DIR/oauth/views.py"
 
+    docker $DOCKERARGS cp $RF/patch-for-7.0.4/__init__.py ${PREFIX}-${MODULE_NAME}:/opt/seafile/seafile-server-latest/seahub/seahub/utils/__init__.py
+    docker $DOCKERARGS cp $RF/patch-for-7.0.4/views.py ${PREFIX}-${MODULE_NAME}:/opt/seafile/seafile-server-latest/seahub/seahub/oauth/views.py
   ;;
 
   "admin")
