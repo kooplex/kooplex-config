@@ -45,7 +45,7 @@ case $VERB in
       STATE=$(kubectl get pods | awk "/^$PREFIX-gitea\s/ {print \$3}")
       if [ "$STATE" = "Running" ] ; then
           register_module_in_hydra
-          kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- su git -c "gitea admin auth add-oauth --name ${PREFIX}-${MODULE_NAME} --provider openidConnect --auto-discover-url ${REWRITEPROTO}://$FQDN/hydra/.well-known/openid-configuration --key ${PREFIX}-${MODULE_NAME} --secret $SECRET"
+          kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- su git -c "gitea admin auth add-oauth --name ${CLIENT} --provider openidConnect --auto-discover-url ${REWRITEPROTO}://$FQDN/hydra/.well-known/openid-configuration --key ${PREFIX}-${MODULE_NAME} --secret $SECRET"
       else
           echo "Pod for $MODULE_NAME is not running" >&2
       fi
