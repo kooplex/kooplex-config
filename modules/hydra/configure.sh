@@ -38,7 +38,7 @@ case $VERB in
           -e s,##FQDN##,$FQDN, \
           -e s,##CONSENT_ENCRYPTIONKEY##,"$(cat $ENCFILE)", \
           conf/config.php-template > $BUILDMOD_DIR/config.php
-      kubectl cp $BUILDMOD_DIR/config.php-template helper:$HELPER_CODE_DIR/application/config/config.php
+      kubectl cp $BUILDMOD_DIR/config.php helper:$HELPER_CODE_DIR/application/config/config.php
 
       create_rootCA
       cp -a $CA_DIR/rootCA.{key,crt} $BUILDMOD_DIR
