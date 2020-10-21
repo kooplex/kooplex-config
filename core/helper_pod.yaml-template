@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: helper
+  namespace: default
+spec:
+  containers:
+  - image: ubuntu
+    name: helper
+    volumeMounts:
+      - mountPath: /data
+        name: svcdata
+      - mountPath: /conf
+        name: svcconf
+      - mountPath: /log
+        name: svclog
+    command: ["sleep"]
+    args: ["infinity"]
+  volumes:
+    - name: svcdata
+      persistentVolumeClaim:
+        claimName: pvc-svcdata-##PREFIX##
+    - name: svcconf
+      persistentVolumeClaim:
+        claimName: pvc-svcconf-##PREFIX##
+    - name: svclog
+      persistentVolumeClaim:
+        claimName: pvc-svclog-##PREFIX##
+  nodeSelector:
+    kubernetes.io/hostname: ##SERVICENODE##
