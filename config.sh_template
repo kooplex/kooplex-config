@@ -1,7 +1,7 @@
 FQDN=
 EXTERNALIP=
 REWRITEPROTO=https
-KUBE_MASTERNODE=
+SERVICE_NODE=
 PREFIX=k8plex
 KEYFILE=
 CERTFILE=
@@ -15,8 +15,11 @@ ROOT_DIR=/$PREFIX
 SERVICE_DIR=$ROOT_DIR/services
 
 SERVICELOG_DIR=$SERVICE_DIR/log
+SERVICELOG_QUOTA=
 SERVICECONF_DIR=$SERVICE_DIR/conf
+SERVICECONF_QUOTA=
 SERVICEDATA_DIR=$SERVICE_DIR/data
+SERVICEDATA_QUOTA=
 
 DATA_DIR=$ROOT_DIR/data
 
@@ -33,7 +36,7 @@ DOCKERARGS="-H unix:///var/run/docker.sock"
 #######################
 
 SYSMODULES=base
-MODULES="base nginx hydra ldap proxy hub notebook"
+MODULES="nginx hydra ldap proxy hub notebook"
 
 DUMMYPASS=
 

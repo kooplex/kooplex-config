@@ -13,9 +13,6 @@ done
 
 
 echo "Prefix $PREFIX" >&2
-echo "Checking persistent volumes for services" >&2
-create_pv
-create_pvc
 
 VERB=$1
 shift
@@ -36,6 +33,24 @@ echo "Modules $SVCS" >&2
 echo "Extra $EXTRA" >&2
  
 case $VERB in
+  "starthelper")
+    echo "Starting helper pod" >&2
+    start_helper
+  ;;
+  "stophelper")
+    echo "Stopping helper pod" >&2
+    stop_helper
+  ;;
+  "createvolumes")
+    echo "Checking persistent volumes for services" >&2
+    volume_configuration
+    kubectl apply -f $CONF_YAML
+  ;;
+  "removevolumes")
+    echo "Remove persistent volumes for services" >&2
+    volume_configuration
+    kubectl delete -f $CONF_YAML
+  ;;
   "build"|"install"|"start"|"uninstall"|"init"|"stop"|"remove"|"purge")
     set -e
   ;;
@@ -49,7 +64,7 @@ case $VERB in
   ;;
 esac
 
-echo "Starting $VERB..." >&2
+echo "Issue $VERB for each module..." >&2
 
 for MODULE_NAME in $SVCS
 do

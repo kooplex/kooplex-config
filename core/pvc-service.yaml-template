@@ -8,7 +8,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 100Mi
+      storage: ##SERVICECONF_QUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
@@ -24,7 +24,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 100Mi
+      storage: ##SERVICELOG_QUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
@@ -40,7 +40,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 100Mi
+      storage: ##SERVICEDATA_QUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:

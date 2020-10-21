@@ -8,29 +8,24 @@ _mkdir () {
     fi
 }
 
-# Make sure persistent volumes for services exist
-create_pv () {
-    for d in $SERVICELOG_DIR $SERVICECONF_DIR $SERVICEDATA_DIR $BUILDDIR; do
-        _mkdir $d
-    done
-    CONF_YAML=$BUILDDIR/pv-service.yaml
-    sed -e s,##PREFIX##,$PREFIX, \
-        -e s,##KUBE_MASTERNODE##,$KUBE_MASTERNODE, \
+# Volume manipulation
+volume_configuration () {
+    CONF_YAML=$BUILDDIR/volume-service.yaml
+    ( sed -e s,##PREFIX##,$PREFIX, \
+        -e s,##SERVICENODE##,$SERVICE_NODE, \
         -e s,##SERVICELOG_DIR##,$SERVICELOG_DIR, \
+        -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
         -e s,##SERVICECONF_DIR##,$SERVICECONF_DIR, \
+        -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
         -e s,##SERVICEDATA_DIR##,$SERVICEDATA_DIR, \
-        $CONFIGDIR/core/pv-service.yaml-template \
-        > $CONF_YAML
-    kubectl apply -f $CONF_YAML
-}
-
-# make sure persistent volume claims exists
-create_pvc () {
-    CONF_YAML=$BUILDDIR/pvc-service.yaml
-    sed -e s,##PREFIX##,$PREFIX, \
+        -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
+        $CONFIGDIR/core/pv-service.yaml-template
+      sed -e s,##PREFIX##,$PREFIX, \
+        -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
+        -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
+        -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
         $CONFIGDIR/core/pvc-service.yaml-template \
-        > $CONF_YAML
-    kubectl apply -f $CONF_YAML
+    )    > $CONF_YAML
 }
 
 
@@ -60,22 +55,36 @@ mkdir_build () {
 }
 
 # make module config dir
-mkdir_svcconf () {
-    MODCONF_DIR=$SERVICECONF_DIR/$MODULE_NAME
-    _mkdir $MODCONF_DIR
+start_helper () {
+    HELPER_YAML=$BUILDDIR/helper.yaml
+    echo "HELPER POD DESCRIPTOR $TMP_YAML" >&2
+    sed -e s,##PREFIX##,$PREFIX, \
+        -e s,##SERVICENODE##,$SERVICE_NODE, \
+	core/helper_pod.yaml-template \
+	> $HELPER_YAML
+    kubectl apply -f $HELPER_YAML
 }
+
+stop_helper () {
+    HELPER_YAML=$BUILDDIR/helper.yaml
+    kubectl delete -f $HELPER_YAML
+}
+
+# make module conf dir
+mkdir_svcconf () {
+    kubectl exec -it helper -- mkdir -p /conf/$MODULE_NAME/$1
+}
+
 
 # make module log dir
 mkdir_svclog () {
-    MODLOG_DIR=$SERVICELOG_DIR/$MODULE_NAME
-    _mkdir $MODLOG_DIR
+    kubectl exec -it helper -- mkdir -p /log/$MODULE_NAME/$1
 }
 
 
 # make module service data dir
 mkdir_svcdata () {
-    MODDATA_DIR=$SERVICEDATA_DIR/$MODULE_NAME
-    _mkdir $MODDATA_DIR
+    kubectl exec -it helper -- mkdir -p /data/$MODULE_NAME/$1
 }
 
 # remove module service directories
@@ -90,40 +99,27 @@ purgedir_svc () {
 
 # register module in nginx
 register_module_in_nginx () {
-    NGINXCONF_DIR=$SERVICECONF_DIR/nginx/conf.d/sites-enabled
-    NGINX_CONF=$NGINXCONF_DIR/${MODULE_NAME}
+    #NGINXCONF_DIR=$SERVICECONF_DIR/nginx/conf.d/sites-enabled
+    #NGINX_CONF=$NGINXCONF_DIR/${MODULE_NAME}
     TEMPLATE=conf/nginx-${MODULE_NAME}-template
-    if [ ! -d $NGINXCONF_DIR ] ; then
-       echo "ERROR: $NGINXCONF_DIR is not present. Make sure nginx module is built" >&2
-       exit 2
-    fi
     if [ ! -f $TEMPLATE ] ; then
        echo "ERROR: $TEMPLATE is not present." >&2
        exit 2
     fi
-    if [ -f $NGINX_CONF ] ; then
-        echo "$NGINX_CONF exists skipping registration" >&2
-    else
-        echo "created $NGINX_CONF" >&2
-        sed -e s,##PREFIX##,$PREFIX, \
-            -e s,##REWRITEPROTO##,$REWRITEPROTO, \
-            -e s,##FQDN##,$FQDN, \
-            $TEMPLATE > $NGINX_CONF
-        restart_nginx
-    fi
+    echo "creating nginx conf for $MODULE_NAME" >&2
+    sed -e s,##PREFIX##,$PREFIX, \
+        -e s,##REWRITEPROTO##,$REWRITEPROTO, \
+        -e s,##FQDN##,$FQDN, \
+        $TEMPLATE > $BUILDMOD_DIR/$MODULE_NAME
+    kubectl cp $BUILDMOD_DIR/$MODULE_NAME helper:/conf/nginx/$MODULE_NAME
+    restart_nginx
 }
 
 # deregister module in nginx
 deregister_module_in_nginx () {
-    NGINXCONF_DIR=$SERVICECONF_DIR/nginx/conf.d/sites-enabled
-    NGINX_CONF=$NGINXCONF_DIR/${MODULE_NAME}
-    if [ -f $NGINX_CONF ] ; then
-        echo "Removed $NGINX_CONF" >&2
-        rm $NGINX_CONF
-        restart_nginx
-    else
-        echo "$NGINX_CONF does not exist" >&2
-    fi
+    echo "deleting nginx conf of $MODULE_NAME" >&2
+    kubectl exec -it helper -- rm -f /conf/nginx/$MODULE_NAME
+    restart_nginx
 }
 
 # restart nginx

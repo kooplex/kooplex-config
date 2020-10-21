@@ -6,7 +6,7 @@ metadata:
     pvl: svc-log
 spec:
   capacity:
-    storage: 100Mi
+    storage: ##SERVICELOG_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -21,7 +21,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -31,7 +31,7 @@ metadata:
     pvl: svc-conf
 spec:
   capacity:
-    storage: 100Mi
+    storage: ##SERVICECONF_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -46,7 +46,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -56,7 +56,7 @@ metadata:
     pvl: svc-data
 spec:
   capacity:
-    storage: 100Mi
+    storage: ##SERVICEDATA_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -71,5 +71,5 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---

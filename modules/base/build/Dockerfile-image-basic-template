@@ -36,7 +36,7 @@ RUN cd singularity && \
     cp -r singularity /usr/local/go/src/github.com/sylabs/
 
 WORKDIR /usr/local/go/src/github.com/sylabs/singularity
-RUN  ./mconfig && cd builddir && make && make install
+#RUN  ./mconfig && cd builddir && make && make install
 
 RUN pip install jupyterthemes
 

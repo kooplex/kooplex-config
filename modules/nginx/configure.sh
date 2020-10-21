@@ -8,16 +8,49 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
       mkdir_svcconf
       mkdir_svclog
-      mkdir_svcdata
-      _mkdir $MODCONF_DIR/conf.d/sites-enabled
-      _mkdir $MODCONF_DIR/keys
 
-      cp $KEYFILE $MODCONF_DIR/keys/${PREFIX}.key
-      cp $CERTFILE $MODCONF_DIR/keys/${PREFIX}.crt
-      cp conf/custom* $MODDATA_DIR/
+      echo "Store certificates" >&2
+      KEY=$(cat $KEYFILE | base64 -w 0)
+      CERT=$(cat $CERTFILE | base64 -w 0)
+      cat build/tls-secret.yaml-template | \
+	      sed -e s,##PREFIX##,$PREFIX, \
+	          -e s,##KEY##,$KEY, \
+	          -e s,##CERT##,$CERT, \
+              > $BUILDMOD_DIR/tls-secret.yaml
+      kubectl apply -f $BUILDMOD_DIR/tls-secret.yaml
 
+      echo "Store default.conf in configmap" >&2
+      ( cat <<EOF1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: $PREFIX-nginx
+  namespace: default
+data:
+  default: |
+EOF1
+        sed -e s,##OUTERHOST##,$FQDN, \
+          -e s,##OUTERPORT##,$OUTERHOSTPORT, \
+	  -e s,^,"    ", \
+	  conf/default.conf-template
+  cat <<EOF2
+  pg_404: |
+EOF2
+        sed s,^,"    ", conf/custom_404.html
+
+  cat <<EOF3
+  pg_502: |
+EOF3
+        sed s,^,"    ", conf/custom_502.html
+
+      ) \
+              > $BUILDMOD_DIR/confmap.yaml
+      kubectl apply -f $BUILDMOD_DIR/confmap.yaml
+      
+      echo "Create pod/service descriptions" >&2
       sed -e s,##PREFIX##,$PREFIX, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
 	  build/nginx-pods.yaml-template > $BUILDMOD_DIR/nginx-pods.yaml
 
@@ -25,16 +58,6 @@ case $VERB in
           -e s,##MODULE_NAME##,$MODULE_NAME, \
           -e s,##EXTERNALIP##,$EXTERNALIP, \
 	  build/nginx-svcs.yaml-template > $BUILDMOD_DIR/nginx-svcs.yaml
-
-      sed -e s,##CERT##,${PREFIX}.crt, \
-          -e s,##KEY##,${PREFIX}.key, \
-          -e s,##PREFIX##,${PREFIX}, \
-          -e s,##OUTERHOST##,$FQDN, \
-          -e s,##OUTERPORT##,$OUTERHOSTPORT, \
-	  conf/default.conf-template > $MODCONF_DIR/conf.d/default.conf
-  ;;
-
-  "install")
   ;;
 
   "start")

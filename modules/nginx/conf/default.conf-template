@@ -2,7 +2,7 @@ server {
 
   listen *:80;
   listen [::]:80;
-  server_name ##PREFIX##.elte.hu;
+  server_name ##OUTERHOST##;
   return 301 https://$host$request_uri;
   client_max_body_size 0;
 }
@@ -16,8 +16,8 @@ server {
   client_max_body_size 0;
 
 ### Digicert
-  ssl_certificate         /etc/nginx/keys/##CERT##;
-  ssl_certificate_key     /etc/nginx/keys/##KEY##;
+  ssl_certificate         /etc/nginx/keys/tls.crt;
+  ssl_certificate_key     /etc/nginx/keys/tls.key;
 
 ### Logs
   access_log /var/log/nginx/outerhost-access.log;

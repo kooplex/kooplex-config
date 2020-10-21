@@ -16,20 +16,23 @@ spec:
       - containerPort: 443
         name: https
     volumeMounts:
-      - mountPath: /etc/nginx/conf.d
+      - name: defaultconf
+        mountPath: /etc/nginx/conf.d
+        readOnly: true
+      - name: data
+        mountPath: /var/www/html
+        readOnly: true
+      - mountPath: /etc/nginx/conf.d/sites-enabled
         name: svcconf-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/conf.d/
+        subPath: ##MODULE_NAME##
       - mountPath: /var/log/nginx
         name: svclog-##PREFIX##-##MODULE_NAME##
         subPath: ##MODULE_NAME##/
-      - mountPath: /var/www/html
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/
       - mountPath: /etc/nginx/keys
-        name: svcconf-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/keys/
+        name: certs
+        readOnly: true
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
   volumes:
     - name: svcconf-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
@@ -37,7 +40,21 @@ spec:
     - name: svclog-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
         claimName: pvc-svclog-##PREFIX##
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
-      persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
+    - name: certs
+      secret:
+        secretName: ##PREFIX##-tls
+    - name: defaultconf
+      configMap:
+        name: ##PREFIX##-nginx
+        items:
+        - key: "default"
+          path: "default.conf"
+    - name: data
+      configMap:
+        name: ##PREFIX##-nginx
+        items:
+        - key: "pg_404"
+          path: "custom_404.html"
+        - key: "pg_502"
+          path: "custom_502.html"
 

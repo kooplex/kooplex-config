@@ -16,35 +16,29 @@ case $VERB in
       mkdir_svclog
       mkdir_svcdata
 
-      CODE_DIR=$MODDATA_DIR/_hydracode_
-      _mkdir $CODE_DIR
-      if [ -d $CODE_DIR/.git ] ; then
-          echo "Code already cloned in folder $CODE_DIR. Pull if necessary" >&2
-      else
-          echo "Cloning code" >&2
-          #git clone https://daevidt@bitbucket.org/daevidt/hydra-consent.git $CODE_DIR
-          git clone https://bitbucket.org/daevidt/hydra-consent.git $CODE_DIR
-          echo "Patching and configuring code" >&2
-          sed -e s,##PREFIX##,$PREFIX, \
-              -e s,##HYDRACONSENTDB##,$HYDRACONSENTDB, \
-              -e s,##HYDRACONSENTDB_USER##,$HYDRACONSENTDB_USER, \
-              -e s,##HYDRACONSENTDB_PW##,$HYDRACONSENTDB_PW, \
-              conf/database.php-template > $CODE_DIR/application/config/database.php
+      mkdir_svcdata _hydracode_
+      HELPER_CODE_DIR=/data/hydra/_hydracode_
+      kubectl exec -it helper -- bash -c "[ -d $HELPER_CODE_DIR/.git ] || git clone https://github.com/kooplex/hydra-consent.git $HELPER_CODE_DIR"
 
-          ENCFILE=$BUILDMOD_DIR/hydraconsent.enckey
-          if [ ! -f $ENCFILE ] ; then
-             hexdump -n 16 -e '"%08X"' /dev/random > $ENCFILE
-             echo "Created encryption $ENCFILE" >&2
-          fi
-          sed -e s,##PREFIX##,${PREFIX}, \
-              -e s,##REWRITEPROTO##,${REWRITEPROTO}, \
-              -e s,##FQDN##,$FQDN, \
-              -e s,##CONSENT_ENCRYPTIONKEY##,"$(cat $ENCFILE)", \
-              conf/config.php-template > $CODE_DIR/application/config/config.php
+      echo "Patching and configuring code" >&2
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##HYDRACONSENTDB##,$HYDRACONSENTDB, \
+          -e s,##HYDRACONSENTDB_USER##,$HYDRACONSENTDB_USER, \
+          -e s,##HYDRACONSENTDB_PW##,$HYDRACONSENTDB_PW, \
+          conf/database.php-template > $BUILDMOD_DIR/database.php
+      kubectl cp $BUILDMOD_DIR/database.php helper:$HELPER_CODE_DIR/application/config/database.php
 
-           #FIXME:
-           echo "WARNING!!!! install third party dependency, e.g. hydra-client-sdk (untar untin no better solution)" >&2
+      ENCFILE=$BUILDMOD_DIR/hydraconsent.enckey
+      if [ ! -f $ENCFILE ] ; then
+         hexdump -n 16 -e '"%08X"' /dev/random > $ENCFILE
+         echo "Created encryption $ENCFILE" >&2
       fi
+      sed -e s,##PREFIX##,${PREFIX}, \
+          -e s,##REWRITEPROTO##,${REWRITEPROTO}, \
+          -e s,##FQDN##,$FQDN, \
+          -e s,##CONSENT_ENCRYPTIONKEY##,"$(cat $ENCFILE)", \
+          conf/config.php-template > $BUILDMOD_DIR/config.php
+      kubectl cp $BUILDMOD_DIR/config.php-template helper:$HELPER_CODE_DIR/application/config/config.php
 
       create_rootCA
       cp -a $CA_DIR/rootCA.{key,crt} $BUILDMOD_DIR
@@ -61,12 +55,12 @@ case $VERB in
       docker $DOCKERARGS tag ${PREFIX}-hydra ${MY_REGISTRY}/${PREFIX}-hydra
       docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hydra
 
-      CONF_DIR=$MODCONF_DIR/consent-nginx
-      _mkdir $CONF_DIR
+      mkdir_svcconf consent-nginx
       sed -e "s/##PREFIX##/$PREFIX/"  \
-          conf/sites.conf-template > $CONF_DIR/default
-      cp scripts/hydraconsent-entrypoint.sh $BUILDMOD_DIR
+          conf/sites.conf-template > $BUILDMOD_DIR/consent-nginx-default
+      kubectl cp $BUILDMOD_DIR/consent-nginx-default helper:/conf/hydra/consent-nginx/default
 
+      cp scripts/hydraconsent-entrypoint.sh $BUILDMOD_DIR
       sed -e s,##PREFIX##,${PREFIX}, \
           -e s,##FQDN##,$FQDN, \
           -e s,##MAIL_SERVER_HOSTNAME##,$MAIL_SERVER_HOSTNAME, \
@@ -82,7 +76,7 @@ case $VERB in
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##FQDN##,$FQDN, \
           -e s,##MY_REGISTRY##,$MY_REGISTRY, \
           -e s,##REWRITEPROTO##,$REWRITEPROTO, \
@@ -98,36 +92,25 @@ case $VERB in
           -e s,##HYDRA_API_USER##,$HYDRA_API_USER, \
           -e s,##HYDRA_API_PW##,$HYDRA_API_PW, \
 	  build/hydra-pods.yaml-template > $BUILDMOD_DIR/hydra-pods.yaml
-
-
-##          -e "s/##HYDRACONSENTDB##/${HYDRACONSENTDB}/g" \
-##          -e "s/##HYDRACONSENTDB_USER##/${HYDRACONSENTDB_USER}/g" \
-##          -e "s/##HYDRACONSENTDB_PW##/${HYDRACONSENTDB_PW}/g" \
-##          -e "s/##HYDRADB_USER##/${HYDRADB_USER}/g" \
-##          -e "s/##HYDRADBROOT_PW##/${HYDRADBROOT_PW}/
-
   ;;
 
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/hydra-svcs.yaml
-#      register_module_in_nginx
+      register_module_in_nginx
       getip_hydra
-      PCF=$SERVICECONF_DIR/hydra/hydra/${PREFIX}-public
-      if [ -f $PCF ] ; then
-          echo "File $PCF exists. Skip registration." >&2
-      else
-          echo "Register public policy" >&2
-          sed -e s,##PREFIX##,$PREFIX, conf/public-policy.json | \
-              curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
-      fi
+      echo "Register public policy" >&2
+      sed -e s,##PREFIX##,$PREFIX, conf/public-policy.json | \
+          curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
       register_module_in_hydra consent
-      SECRETS_FILE=$SERVICECONF_DIR/hydra/hydrasecrets/${PREFIX}-consent-hydra.secret
+
+      SECRET=$(kubectl exec -it helper -- cat /conf/hydra/hydra/hydrasecrets/${PREFIX}-consent-hydra.secret)
       sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
           -e s,##FQDN##,$FQDN, \
           -e s,##PREFIX##,$PREFIX, \
-          -e s,##CONSENTPASSWORD##,$(cat $SECRETS_FILE), \
-          conf/hydra.php-template > $SERVICEDATA_DIR/hydra/_hydracode_/application/config/hydra.php
+          -e s,##CONSENTPASSWORD##,$SECRET, \
+          conf/hydra.php-template > $BUILDMOD_DIR/hydra_patched.php
+      kubectl cp $BUILDMOD_DIR/hydra_patched.php helper:/data/hydra/_hydracode_/application/config/hydra.php
   ;;
 
   "start")
