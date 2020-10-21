@@ -104,10 +104,9 @@ case $VERB in
           curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
 
       register_module_in_hydra consent
-      sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
-          -e s,##FQDN##,$FQDN, \
-          -e s,##PREFIX##,$PREFIX, \
+      sed -e s,##HYDRACLIENT##,$CLIENT, \
           -e s,##CONSENTPASSWORD##,$SECRET, \
+          -e s,##URL_HYDRA##,$REWRITEPROTO://$FQDN/hydra, \
           conf/hydra.php-template > $BUILDMOD_DIR/hydra_patched.php
       kubectl cp $BUILDMOD_DIR/hydra_patched.php helper:/data/hydra/_hydracode_/application/config/hydra.php
   ;;

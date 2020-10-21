@@ -7,7 +7,6 @@ KEYFILE=
 CERTFILE=
 
 MY_REGISTRY=kooplex-test:5000
-URL_HYDRA=
 
 BUILDDIR=/data/$PREFIX/build
 

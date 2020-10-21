@@ -33,8 +33,8 @@ case $VERB in
               -e s,##PREFIX##,$PREFIX, \
               -e s,##FQDN##,$FQDN, \
               -e s,##SEAFILEDB_PW##,$SEAFILEDB_PW, \
-              -e s,##URL_HYDRA##,$URL_HYDRA, \
-              -e s,##HYDRA_CLIENTID##,$HYDRA_SEAHUBCLIENTID, \
+              -e s,##URL_HYDRA##,$REWRITEPROTO://$FQDN/hydra, \
+              -e s,##HYDRA_CLIENTID##,${CLIENT}, \
               -e s,##DJANGO_SECRET_KEY##,$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g'), \
               -e s,##HYDRA_CLIENTSECRET##,$SECRET, \
 	  conf/seahub_settings.py-template > $BUILDMOD_DIR/seahub_settings.py

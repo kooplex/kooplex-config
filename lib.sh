@@ -148,6 +148,7 @@ register_module_in_hydra () {
        M=$1
     fi
     getip_hydra
+    CLIENT=${PREFIX}-${M}
     CLIENT_TEMPLATE=conf/client-${M}.json-template
     POLICY_TEMPLATE=conf/client-policy-${M}.json-template
     for T in $CLIENT_TEMPLATE $POLICY_TEMPLATE ; do
@@ -160,11 +161,11 @@ register_module_in_hydra () {
         -e s,##REWRITEPROTO##,${REWRITEPROTO}, \
         -e s,##FQDN##,${FQDN}, \
         $CLIENT_TEMPLATE | \
-        curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${PREFIX}-${M} -H "Content-Type: application/json" -X POST --data-binary @-
+        curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-client/${CLIENT} -H "Content-Type: application/json" -X POST --data-binary @-
     sed -e s,##PREFIX##,${PREFIX}, \
         $POLICY_TEMPLATE | \
-        curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${M} -H "Content-Type: application/json" -X POST --data-binary @-
-    echo "Registered $M in hydra" >&2
+        curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${CLIENT} -H "Content-Type: application/json" -X POST --data-binary @-
+    echo "Registered $CLIENT in hydra" >&2
 
     SECRET=$(kubectl exec -it helper -- cat /conf/hydra/hydrasecrets/${PREFIX}-${M}-hydra.secret)
 }
