@@ -102,9 +102,8 @@ case $VERB in
       echo "Register public policy" >&2
       sed -e s,##PREFIX##,$PREFIX, conf/public-policy.json | \
           curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-public -H "Content-Type: application/json" -X POST --data-binary @-
-      register_module_in_hydra consent
 
-      SECRET=$(kubectl exec -it helper -- cat /conf/hydra/hydra/hydrasecrets/${PREFIX}-consent-hydra.secret)
+      register_module_in_hydra consent
       sed -e s,##REWRITEPROTO##,$REWRITEPROTO, \
           -e s,##FQDN##,$FQDN, \
           -e s,##PREFIX##,$PREFIX, \

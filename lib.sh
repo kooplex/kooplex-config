@@ -99,8 +99,6 @@ purgedir_svc () {
 
 # register module in nginx
 register_module_in_nginx () {
-    #NGINXCONF_DIR=$SERVICECONF_DIR/nginx/conf.d/sites-enabled
-    #NGINX_CONF=$NGINXCONF_DIR/${MODULE_NAME}
     TEMPLATE=conf/nginx-${MODULE_NAME}-template
     if [ ! -f $TEMPLATE ] ; then
        echo "ERROR: $TEMPLATE is not present." >&2
@@ -149,11 +147,6 @@ register_module_in_hydra () {
     else
        M=$1
     fi
-    SECRETS_FILE=$SERVICECONF_DIR/hydra/hydrasecrets/${PREFIX}-${M}-hydra.secret
-    if [ -f $SECRETS_FILE ] ; then
-        echo "File exists $SECRETS_FILE" >&2
-        exit 2
-    fi
     getip_hydra
     CLIENT_TEMPLATE=conf/client-${M}.json-template
     POLICY_TEMPLATE=conf/client-policy-${M}.json-template
@@ -173,12 +166,7 @@ register_module_in_hydra () {
         curl -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/new-policy/${PREFIX}-${M} -H "Content-Type: application/json" -X POST --data-binary @-
     echo "Registered $M in hydra" >&2
 
-    if [ -f $SECRETS_FILE ] ; then
-        echo "Created $SECRETS_FILE" >&2
-    else
-        echo "ERROR: $SECRETS_FILE is missing" >&2
-        exit 2
-    fi
+    SECRET=$(kubectl exec -it helper -- cat /conf/hydra/hydrasecrets/${PREFIX}-${M}-hydra.secret)
 }
 
 # deregister module in hydra

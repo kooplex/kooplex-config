@@ -38,7 +38,7 @@ spec:
       - name: DISABLE_REGISTRATION
         value: "TRUE"
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
   volumes:
     - name: svcdata-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
@@ -74,7 +74,7 @@ spec:
       - name: MYSQL_LOG_CONSOLE
         value: "true"
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
   volumes:
     - name: svcdata-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
