@@ -4,9 +4,6 @@
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
-#FIXME: all seafile persistent directories are handled together, split conf/data/log
-#      mkdir_svcconf
-#      mkdir_svclog
       mkdir_svcdata
 
       sed -e s,##PREFIX##,$PREFIX, \
@@ -61,14 +58,19 @@ case $VERB in
       kubectl delete -f $BUILDMOD_DIR/seafile-pods.yaml
   ;;
 
-  "remove")
+  "uninstall")
+      deregister_module_in_nginx
+      deregister_module_in_hydra
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/seafile-svcs.yaml
   ;;
 
-  "purge")
+  "remove")
       echo "Removing $BUILDMOD_DIR" >&2
       rm -R -f $BUILDMOD_DIR
+  ;;
+
+  "purge")
       purgedir_svc
   ;;
 

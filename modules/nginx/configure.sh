@@ -59,27 +59,32 @@ EOF3
 	  build/nginx-svcs.yaml-template > $BUILDMOD_DIR/nginx-svcs.yaml
   ;;
 
-  "start")
+  "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/nginx-svcs.yaml
+  ;;
+
+  "start")
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/nginx-pods.yaml
   ;;
-
 
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/nginx-pods.yaml
   ;;
 
-  "remove")
+  "uninstall")
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/nginx-svcs.yaml
   ;;
 
-  "purge")
+  "remove")
       echo "Removing $BUILDMOD_DIR" >&2
       rm -R -f $BUILDMOD_DIR
+  ;;
+
+  "purge")
       purgedir_svc
   ;;
 

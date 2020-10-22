@@ -44,6 +44,11 @@ case $VERB in
       register_module_in_nginx
       ;;
 
+  "start")
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/gitea-pods.yaml
+  ;;
+
   "init")
       echo "Initiaizing services of ${PREFIX}-${MODULE_NAME}" >&2
       STATE=$(kubectl get pods | awk "/^$PREFIX-gitea\s/ {print \$3}")
@@ -55,11 +60,6 @@ case $VERB in
       fi
   ;;
 
-  "start")
-      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/gitea-pods.yaml
-  ;;
-
 
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
@@ -69,16 +69,16 @@ case $VERB in
   "uninstall")
       deregister_module_in_nginx
       deregister_module_in_hydra
-  ;;
-
-  "remove")
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/gitea-svcs.yaml
   ;;
 
-  "purge")
+  "remove")
       echo "Removing $BUILDMOD_DIR" >&2
       rm -R -f $BUILDMOD_DIR
+  ;;
+
+  "purge")
       purgedir_svc
   ;;
 

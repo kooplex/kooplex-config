@@ -33,6 +33,11 @@ echo "Modules $SVCS" >&2
 echo "Extra $EXTRA" >&2
  
 case $VERB in
+  "createvolumes")
+    echo "Checking persistent volumes for services" >&2
+    volume_configuration
+    kubectl apply -f $CONF_YAML
+  ;;
   "starthelper")
     echo "Starting helper pod" >&2
     start_helper
@@ -40,11 +45,6 @@ case $VERB in
   "stophelper")
     echo "Stopping helper pod" >&2
     stop_helper
-  ;;
-  "createvolumes")
-    echo "Checking persistent volumes for services" >&2
-    volume_configuration
-    kubectl apply -f $CONF_YAML
   ;;
   "removevolumes")
     echo "Remove persistent volumes for services" >&2

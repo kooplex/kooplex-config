@@ -95,16 +95,18 @@ EOF1
   "uninstall")
       deregister_module_in_nginx
       deregister_module_in_hydra
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/hub-svcs.yaml || true
+      kubectl delete -f $BUILDMOD_DIR/pvc-hub.yaml || true
+      kubectl delete -f $BUILDMOD_DIR/pv-hub.yaml
   ;;
 
   "remove")
-      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/hub-svcs.yaml
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
   ;;
 
   "purge")
-      echo "Removing $BUILDMOD_DIR" >&2
-      rm -R -f $BUILDMOD_DIR
       purgedir_svc
   ;;
 

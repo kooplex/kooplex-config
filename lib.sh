@@ -89,11 +89,9 @@ mkdir_svcdata () {
 
 # remove module service directories
 purgedir_svc () {
-    for d in $SERVICECONF_DIR/$MODULE_NAME $SERVICELOG_DIR/$MODULE_NAME $SERVICEDATA_DIR/$MODULE_NAME ; do
-        if [ -d $d ] ; then
-            rm -rf $d
-	    echo "Removed folder: $d" >&2
-        fi
+    for d in conf log data ; do
+        kubectl exec -it helper -- rm -rf /$d/$MODULE_NAME
+        echo "Removed folder: $d" >&2
     done
 }
 

@@ -98,6 +98,14 @@ case $VERB in
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/hydra-svcs.yaml
       register_module_in_nginx
+  ;;
+
+  "start")
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/hydra-pods.yaml
+  ;;
+
+  "init")
       getip_hydra
       echo "Register public policy" >&2
       sed -e s,##PREFIX##,$PREFIX, conf/public-policy.json | \
@@ -111,73 +119,30 @@ case $VERB in
       kubectl cp $BUILDMOD_DIR/hydra_patched.php helper:/data/hydra/_hydracode_/application/config/hydra.php
   ;;
 
-  "start")
-      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/hydra-pods.yaml
-  ;;
-
-  "init")
-      echo "UNDONE"
-      exit 3
-  
-
-	echo "I need to sleep for 10 secs"
-	sleep 10
-
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/public-policy.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/client-hub.json"
-	PWFILE=$RF/consent-app.pw
-	if [ ! -f $PWFILE ] ; then
-		docker exec  ${PREFIX}-hydra  sh -c "hydra clients  import /etc/hydraconfig/consent-app.json > /consent-app.pw" && \
-			docker cp  ${PREFIX}-hydra:/consent-app.pw $PWFILE
-	fi
-	CONSENTAPPPASSWORD=$(cut -f4 -d\  $PWFILE | cut -d: -f2)
-
-#	hydra 0.x esetén:
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/consent-app-policy.json"
-	docker exec  ${PREFIX}-hydra  sh -c "hydra policies import /etc/hydraconfig/client-policy-hub.json"
-
-#	hydra 1.x esetén:
-#	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/consent-app-policy.json"
-#	docker exec  ${PREFIX}-hydra  sh -c "hydra policies create -f /etc/hydraconfig/client-policy-hub.json"
-
-## This might give an error first. It might be that first we need to load the site first in browser
-	docker exec ${PREFIX}-hydraconsent-mysql mysql --password=$HYDRACONSENTDB_PW $HYDRACONSENTDB -e  "update bf_settings set value = 'noreply@elte.hu' where name = 'sender_email';"
-
-#\c monitor
-#GRANT readaccess TO usage_viewer;
-#ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON DATABASE $HYDRADB TO $HYDRADB_USER;
-#GRANT USAGE ON SCHEMA public to usage_viewer;
-#GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO usage_viewer;
-#GRANT SELECT ON ALL TABLES IN SCHEMA public TO usage_viewer;
-
-
-
-  ;;
-
-  "refresh")
-  ;;
-
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/hydra-pods.yaml
   ;;
 
   "uninstall")
-   #   deregister_module_in_nginx
+      deregister_module_in_nginx
+      echo "Need to start pod for API accsess, sleeping 30 secs to make sure it is started" >&2
+      $0 start hydra
+      sleep 30
       getip_hydra
       curl -X DELETE -u ${HYDRA_API_USER}:${HYDRA_API_PW} ${HYDRA_IP}:5000/api/remove/${PREFIX}-public
       deregister_module_in_hydra consent
-  ;;
-
-  "remove")
+      $0 stop hydra
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/hydra-svcs.yaml
   ;;
 
-  "purge")
+  "remove")
       echo "Removing $BUILDMOD_DIR" >&2
       rm -R -f $BUILDMOD_DIR
+  ;;
+
+  "purge")
       purgedir_svc
   ;;
 esac
