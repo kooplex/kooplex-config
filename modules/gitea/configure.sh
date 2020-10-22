@@ -33,7 +33,7 @@ case $VERB in
 	  conf/app.ini-template > $BUILDMOD_DIR/app.ini
        kubectl cp $BUILDMOD_DIR/app.ini helper:/data/gitea/gitea/gitea/conf/app.ini
 
-       kubectl exec -it helper mkdir /data/gitea/gitea/gitea/templates/
+       kubectl exec -it helper -- mkdir -p /data/gitea/gitea/gitea/templates/
        kubectl cp template/home.tmpl helper:/data/gitea/gitea/gitea/templates/
        kubectl cp template/user helper:/data/gitea/gitea/gitea/templates/
   ;;
@@ -54,7 +54,8 @@ case $VERB in
       STATE=$(kubectl get pods | awk "/^$PREFIX-gitea\s/ {print \$3}")
       if [ "$STATE" = "Running" ] ; then
           register_module_in_hydra
-          kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- su git -c "gitea admin auth add-oauth --name ${CLIENT} --provider openidConnect --auto-discover-url ${REWRITEPROTO}://$FQDN/hydra/.well-known/openid-configuration --key ${PREFIX}-${MODULE_NAME} --secret $SECRET"
+          kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- su git -c "gitea admin auth add-oauth --name ${CLIENT} --provider openidConnect --auto-discover-url ${REWRITEPROTO}://$FQDN/hydra/.well-known/openid-configuration --key ${PREFIX}-${MODULE_NAME} --secret ${SECRET}"
+	  $0 restart gitea
       else
           echo "Pod for $MODULE_NAME is not running" >&2
       fi

@@ -87,6 +87,11 @@ EOF1
       kubectl apply -f $BUILDMOD_DIR/hub-pods.yaml
   ;;
 
+  "init")
+	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -- python3 /kooplexhub/kooplexhub/manage.py makemigrations
+	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -- python3 /kooplexhub/kooplexhub/manage.py migrate
+  ;;
+
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/hub-pods.yaml

@@ -1,6 +1,0 @@
-FROM postgres:10.3
-
-RUN apt update
-RUN apt install -y postgis postgresql-10-pgrouting osm2pgsql libpq-dev ruby gcc make
-
-RUN gem install pg-ldap-sync

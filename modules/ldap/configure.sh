@@ -45,7 +45,6 @@ case $VERB in
       kubectl apply -f $BUILDMOD_DIR/ldap-pods.yaml
   ;;
 
-
   "init")
       echo "Initialization ${PREFIX}-${MODULE_NAME}" >&2
       kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- /usr/local/ldap/init.sh
