@@ -32,6 +32,10 @@ case $VERB in
           -e s,##GITEADB_PW##,$GITEAUSER_PW, \
 	  conf/app.ini-template > $BUILDMOD_DIR/app.ini
        kubectl cp $BUILDMOD_DIR/app.ini helper:/data/gitea/gitea/gitea/conf/app.ini
+
+       kubectl exec -it helper mkdir /data/gitea/gitea/gitea/templates/
+       kubectl cp template/home.tmpl helper:/data/gitea/gitea/gitea/templates/
+       kubectl cp template/user helper:/data/gitea/gitea/gitea/templates/
   ;;
 
   "install")
