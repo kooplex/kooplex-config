@@ -6,7 +6,7 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 
       sed -e s,##PREFIX##,$PREFIX, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
 	  build/proxy-pods.yaml-template > $BUILDMOD_DIR/proxy-pods.yaml
 

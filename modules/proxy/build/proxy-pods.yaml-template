@@ -16,5 +16,5 @@ spec:
       - containerPort: 8001
         name: api
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
 
