@@ -35,7 +35,7 @@ spec:
       - name: LDAP_ADMIN_PASSWORD
         value: "##LDAP_ADMIN_PASSWORD##"
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
   volumes:
     - name: svclog-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:

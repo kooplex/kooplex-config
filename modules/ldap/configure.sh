@@ -18,27 +18,29 @@ case $VERB in
           -e s,##ORGANISATION##,"$LDAP_ORGANISATION", \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
           -e s,##FQDN##,$FQDN, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
 	  build/ldap-pods.yaml-template > $BUILDMOD_DIR/ldap-pods.yaml
 
-      _mkdir $MODDATA_DIR/db
-      _mkdir $MODDATA_DIR/helper
+      mkdir_svcdata db
+      mkdir_svcdata helper
       DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
       sed -e s/##LDAPORG##/$DN/ \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
-          scripts/init.sh-template > $MODDATA_DIR/helper/init.sh
+          scripts/init.sh-template > $BUILDMOD_DIR/helper_init.sh
       sed -e s/##LDAPORG##/$DN/ \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
-          scripts/adduser.sh-template > $MODDATA_DIR/helper/adduser.sh
-      chmod +x $MODDATA_DIR/helper/init.sh
+          scripts/adduser.sh-template > $BUILDMOD_DIR/helper_adduser.sh
+      chmod +x $BUILDMOD_DIR/helper_init.sh
+      kubectl cp $BUILDMOD_DIR/helper_init.sh helper:/data/$MODULE_NAME/helper/init.sh
+      kubectl cp $BUILDMOD_DIR/helper_adduser.sh helper:/data/$MODULE_NAME/helper/adduser.sh
   ;;
 
   "install")
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/ldap-svcs.yaml
   ;;
 
   "start")
-      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/ldap-svcs.yaml
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/ldap-pods.yaml
   ;;
