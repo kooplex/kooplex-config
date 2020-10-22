@@ -30,8 +30,7 @@ metadata:
 data:
   default: |
 EOF1
-        sed -e s,##OUTERHOST##,$FQDN, \
-          -e s,##OUTERPORT##,$OUTERHOSTPORT, \
+        sed -e s,##FQDN##,$FQDN, \
 	  -e s,^,"    ", \
 	  conf/default.conf-template
   cat <<EOF2

@@ -2,7 +2,7 @@ server {
 
   listen *:80;
   listen [::]:80;
-  server_name ##OUTERHOST##;
+  server_name ##FQDN##;
   return 301 https://$host$request_uri;
   client_max_body_size 0;
 }
@@ -10,7 +10,7 @@ server {
 server {
 
   listen *:443 ssl;
-  server_name ##OUTERHOST##;
+  server_name ##FQDN##;
   proxy_set_header X-Real-IP $remote_addr;
   proxy_set_header      Host $http_host;
   client_max_body_size 0;

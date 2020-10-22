@@ -6,7 +6,7 @@ metadata:
     pvl: pv-##PREFIX##-hub-home
 spec:
   capacity:
-    storage: 100Gi
+    storage: ##HOME_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -21,7 +21,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -31,7 +31,7 @@ metadata:
     pvl: pv-##PREFIX##-hub-garbage
 spec:
   capacity:
-    storage: 100Gi
+    storage: ##GARBAGE_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -46,7 +46,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -56,7 +56,7 @@ metadata:
     pvl: pv-##PREFIX##-hub-project
 spec:
   capacity:
-    storage: 100Gi
+    storage: ##PROJECT_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -71,7 +71,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -81,7 +81,7 @@ metadata:
     pvl: pv-##PREFIX##-hub-report
 spec:
   capacity:
-    storage: 100Gi
+    storage: ##REPORT_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
@@ -96,24 +96,24 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-##PREFIX##-hub-cache.versioncontrol
+  name: pv-##PREFIX##-hub-cache
   labels:
-    pvl: pv-##PREFIX##-hub-cache.versioncontrol
+    pvl: pv-##PREFIX##-hub-cache
 spec:
   capacity:
-    storage: 100Gi
+    storage: ##CACHE_QUOTA##
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: ##VERSIONCONTROL_DIR##
+    path: ##CACHE_DIR##
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -121,55 +121,5 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ##KUBE_MASTERNODE##
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-##PREFIX##-hub-cache.filesynch
-  labels:
-    pvl: pv-##PREFIX##-hub-cache.filesynch
-spec:
-  capacity:
-    storage: 100Gi
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
-    path: ##FILESYNC_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##KUBE_MASTERNODE##
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-##PREFIX##-hub-cache.report
-  labels:
-    pvl: pv-##PREFIX##-hub-cache.report
-spec:
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
-    path: ##REPORT_PREPARE_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##KUBE_MASTERNODE##
+          - ##SERVICENODE##
 ---

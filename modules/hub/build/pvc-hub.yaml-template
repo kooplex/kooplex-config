@@ -8,7 +8,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 256Mi
+      storage: ##HOME_USERQUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
@@ -24,7 +24,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 100Gi
+      storage: ##GARBAGE_QUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
@@ -40,7 +40,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 256Mi
+      storage: ##PROJECT_PROJECTQUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
@@ -56,7 +56,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 256Mi
+      storage: ##REPORT_REPORTQUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
@@ -65,48 +65,16 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-cache.versioncontrol-##PREFIX##
+  name: pvc-cache-##PREFIX##
 spec:
   accessModes:
     - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 256Mi
+      storage: ##CACHE_USERQUOTA##
   storageClassName: local-storage
   selector:
     matchLabels:
-      pvl: "pv-##PREFIX##-hub-cache.versioncontrol"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-cache.filesync-##PREFIX##
-spec:
-  accessModes:
-    - ReadWriteMany
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 256Mi
-  storageClassName: local-storage
-  selector:
-    matchLabels:
-      pvl: "pv-##PREFIX##-hub-cache.filesynch"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-cache.report-##PREFIX##
-spec:
-  accessModes:
-    - ReadWriteMany
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 256Mi
-  storageClassName: local-storage
-  selector:
-    matchLabels:
-      pvl: "pv-##PREFIX##-hub-cache.report"
+      pvl: "pv-##PREFIX##-hub-cache"
 ---

@@ -8,17 +8,9 @@ case $VERB in
       mkdir_svcdata
       mkdir_svcconf
 
-      SECRET_DIR=$MODCONF_DIR/secrets
-      _mkdir $SECRET_DIR
-      touch $SECRET_DIR/${PREFIX}-${MODULE_NAME}-hydra.secret
-      
-      CODE_DIR=$MODDATA_DIR/_hubcode_
-      _mkdir $CODE_DIR
-      if [ -d $CODE_DIR/.git ] ; then
-          echo "Code already cloned in folder $CODE_DIR. Pull if necessary"
-      else
-          git clone https://github.com/kooplex/kooplex-hub.git $CODE_DIR
-      fi
+      mkdir_svcdata _hubcode_
+      HELPER_CODE_DIR=/data/hub/_hubcode_
+      kubectl exec -it helper -- bash -c "[ -d $HELPER_CODE_DIR/.git ] || git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git $HELPER_CODE_DIR"
 
       sed -e s,##PREFIX##,${PREFIX}, \
           build/Dockerfile.hub-template > $BUILDMOD_DIR/Dockerfile.hub
@@ -35,7 +27,7 @@ case $VERB in
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##FQDN##,$FQDN, \
           -e s,##MY_REGISTRY##,$MY_REGISTRY, \
           -e s,##DJANGO_SECRET_KEY##,$(echo $DJANGO_SECRET_KEY | sed -e 's/\$/$$/g'), \
@@ -44,26 +36,25 @@ case $VERB in
           -e s,##HUBDB_PW##,$HUBUSER_PW, \
 	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
 
-#      cp $BUILDDIR/CA/rootCA.crt $RF/
-
-      _mkdir $HOME_DIR
-      _mkdir $PROJECT_DIR
-      _mkdir $REPORT_DIR
-      _mkdir $REPORT_PREPARE_DIR
-      _mkdir $GARBAGE_DIR
-      _mkdir $VERSIONCONTROL_DIR
-      _mkdir $FILESYNC_DIR
       sed -e s,##PREFIX##,${PREFIX}, \
-          -e s,##KUBE_MASTERNODE##,${KUBE_MASTERNODE}, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##HOME_DIR##,${HOME_DIR}, \
+          -e s,##HOME_QUOTA##,${HOME_QUOTA}, \
           -e s,##GARBAGE_DIR##,${GARBAGE_DIR}, \
+          -e s,##GARBAGE_QUOTA##,${GARBAGE_QUOTA}, \
           -e s,##PROJECT_DIR##,${PROJECT_DIR}, \
+          -e s,##PROJECT_QUOTA##,${PROJECT_QUOTA}, \
           -e s,##REPORT_DIR##,${REPORT_DIR}, \
-          -e s,##REPORT_PREPARE_DIR##,${REPORT_PREPARE_DIR}, \
-          -e s,##VERSIONCONTROL_DIR##,${VERSIONCONTROL_DIR}, \
-          -e s,##FILESYNC_DIR##,${FILESYNC_DIR}, \
+          -e s,##REPORT_QUOTA##,${REPORT_QUOTA}, \
+          -e s,##CACHE_DIR##,${CACHE_DIRS}, \
+          -e s,##CACHE_QUOTA##,${CACHE_QUOTA}, \
           build/pv-hub.yaml-template > $BUILDMOD_DIR/pv-hub.yaml
       sed -e s,##PREFIX##,${PREFIX}, \
+          -e s,##HOME_USERQUOTA##,${HOME_USERQUOTA}, \
+          -e s,##GARBAGE_QUOTA##,${GARBAGE_QUOTA}, \
+          -e s,##PROJECT_PROJECTQUOTA##,${PROJECT_PROJECTQUOTA}, \
+          -e s,##REPORT_REPORTQUOTA##,${REPORT_REPORTQUOTA}, \
+          -e s,##CACHE_USERQUOTA##,${CACHE_USERQUOTA}, \
           build/pvc-hub.yaml-template > $BUILDMOD_DIR/pvc-hub.yaml
       kubectl apply -f $BUILDMOD_DIR/pv-hub.yaml
       kubectl apply -f $BUILDMOD_DIR/pvc-hub.yaml
@@ -74,8 +65,21 @@ case $VERB in
       kubectl apply -f $BUILDMOD_DIR/hub-svcs.yaml
       register_module_in_nginx
       register_module_in_hydra
-      cp -a $SECRETS_FILE $SERVICECONF_DIR/$MODULE_NAME/secrets
-      echo "Secrets copied" >&2
+      echo "Store default.conf in configmap" >&2
+      ( cat <<EOF1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: $PREFIX-hub
+  namespace: default
+data:
+  client: $CLIENT
+  secret: $SECRET
+EOF1
+      ) \
+              > $BUILDMOD_DIR/confmap.yaml
+      kubectl apply -f $BUILDMOD_DIR/confmap.yaml
   ;;
 
   "start")

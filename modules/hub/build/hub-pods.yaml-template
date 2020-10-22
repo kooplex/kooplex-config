@@ -55,7 +55,7 @@ spec:
 ##      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 ##      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
 ##    volumes:
 ##      - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
 ##      - ##PREFIX##-git:/mnt/.volumes/git:rw
@@ -118,7 +118,7 @@ spec:
       - name: MYSQL_LOG_CONSOLE
         value: "true"
   nodeSelector:
-    kubernetes.io/hostname: ##KUBE_MASTERNODE##
+    kubernetes.io/hostname: ##SERVICENODE##
   volumes:
     - name: svcdata-##PREFIX##-##MODULE_NAME##
       persistentVolumeClaim:
