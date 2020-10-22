@@ -45,12 +45,12 @@ case $VERB in
   ;;
 
   "install")
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/seafile-svcs.yaml
       register_module_in_nginx
   ;;
 
   "start")
-      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/seafile-svcs.yaml
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/seafile-pods.yaml
   ;;
