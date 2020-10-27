@@ -13,4 +13,6 @@ FROM seafileltd/seafile-mc:7.0.4
 #    sed -i '192a\    if isinstance(name, list):\n        name = name.pop(0)' $DIR/oauth/views.py &&\
 #    sed -i '198a\    if isinstance(contact_email, list):\n       contact_email = contact_email.pop(0)' $DIR/oauth/views.py
 
+ADD patch-for-7.0.4/__init__.py /opt/seafile/seafile-server-7.0.4/seahub/seahub/utils/__init__.py
+ADD patch-for-7.0.4/views.py /opt/seafile/seafile-server-7.0.4/seahub/seahub/oauth/views.py
 
