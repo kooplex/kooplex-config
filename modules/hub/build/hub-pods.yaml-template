@@ -49,8 +49,9 @@ spec:
         value: "##HUBDB_USER##"
       - name: HUBDB_PW
         value: "##HUBDB_PW##"
+      - name: HUBLDAP_PW
+        value: "##LDAP_ADMIN_PASSWORD##"
 ##      - HUBPROXY_PW=##PROXYTOKEN##
-##      - HUBLDAP_PW=##HUBLDAP_PW##
 ##      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
 ##      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 ##      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##

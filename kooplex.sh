@@ -17,10 +17,7 @@ echo "Prefix $PREFIX" >&2
 VERB=$1
 shift
 
-if [ "$1" = "notebook" ]; then
-  SVCS=$1
-  EXTRA=$2
-elif [ "$1" = "all" ] ; then
+if [ "$1" = "all" ] ; then
   SVCS="$SYSMODULES $MODULES"
 elif [ "$1" = "sys" ] ; then
   SVCS="$SYSMODULES"
@@ -30,7 +27,6 @@ fi
 
 echo "Command $VERB" >&2
 echo "Modules $SVCS" >&2
-echo "Extra $EXTRA" >&2
  
 case $VERB in
   "createvolumes")

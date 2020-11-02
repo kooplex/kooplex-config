@@ -45,11 +45,6 @@ ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package
 
-# Patch bashrc
-COPY bashrc_tail /tmp
-RUN cat /tmp/bashrc_tail >> /etc/bash.bashrc
-RUN rm /tmp/bashrc_tail
-
 RUN ln -sf  /usr/share/zoneinfo/Europe/Budapest  /etc/localtime
 RUN dpkg-reconfigure tzdata
 

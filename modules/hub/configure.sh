@@ -34,6 +34,7 @@ case $VERB in
           -e s,##HUB_MYSQL_ROOTPW##,$HUB_MYSQL_ROOTPW, \
           -e s,##HUBDB_USER##,$HUBUSER, \
           -e s,##HUBDB_PW##,$HUBUSER_PW, \
+          -e s,##LDAP_ADMIN_PASSWORD##,$LDAP_ADMIN_PASSWORD, \
 	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
 
       sed -e s,##PREFIX##,${PREFIX}, \

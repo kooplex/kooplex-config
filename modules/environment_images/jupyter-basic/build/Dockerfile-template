@@ -1,0 +1,69 @@
+FROM ##BASE##
+
+# apt
+RUN apt update 
+
+RUN apt install -y curl zip && \
+    curl -sL https://deb.nodesource.com/setup_14.x |  bash - && \
+    apt install --yes nodejs 
+
+RUN apt install -y tmux  curlftpfs \
+ liblapack-dev libblas-dev \
+ gfortran libfreetype6* pkg-config \
+ git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake \
+ inotify-tools \
+ autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends \
+ libfontconfig1 libxrender1 libxrender-dev \
+ g++-5 libicu-dev libxml2-dev \
+ libblacs-mpi-dev libscalapack-mpi-dev \
+ texlive-xetex texlive-lang-european texlive-science
+
+# conda
+ENV CONDA_DIR /opt/conda
+ENV PATH $CONDA_DIR/bin:$PATH
+ENV SHELL /bin/bash
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+# Create conda dir
+RUN mkdir -p $CONDA_DIR
+
+# Install conda
+RUN cd /tmp && \
+    mkdir -p $CONDA_DIR && \
+    ANACONDA="Anaconda3-2020.02-Linux-x86_64.sh" && \
+    wget --quiet https://repo.anaconda.com/archive/${ANACONDA} && \
+    #FIXME: check sum
+    /bin/bash ${ANACONDA} -f -b -p $CONDA_DIR && \
+    rm ${ANACONDA}
+
+RUN /opt/conda/bin/conda update -y conda
+
+# basic
+ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
+RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
+
+# Add local files as late as possible to avoid cache busting
+ADD start-notebook.sh /usr/local/bin/start-notebook.sh
+RUN chmod a+x /usr/local/bin/start-notebook.sh
+#ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
+#ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
+
+RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
+
+########## add the rest
+ADD init /init/
+ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
+ADD jupyter_report_config.py /etc/jupyter_report_config.py
+RUN chmod a+x /init/91-startsshagent.sh
+
+WORKDIR /
+
+#RUN pip install jupyterlab-bokeh-server && jupyter labextension install jupyterlab-bokeh-server
+RUN  jupyter labextension install @pyviz/jupyterlab_pyviz jupyterlab-dash
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
+   apt update && apt install yarn
+
+

@@ -97,7 +97,8 @@ purgedir_svc () {
 
 # register module in nginx
 register_module_in_nginx () {
-    TEMPLATE=conf/nginx-${MODULE_NAME}-template
+    MODULE_NAME_CLEAN=$(basename ${MODULE_NAME})
+    TEMPLATE=conf/nginx-${MODULE_NAME_CLEAN}-template
     if [ ! -f $TEMPLATE ] ; then
        echo "ERROR: $TEMPLATE is not present." >&2
        exit 2
@@ -106,8 +107,8 @@ register_module_in_nginx () {
     sed -e s,##PREFIX##,$PREFIX, \
         -e s,##REWRITEPROTO##,$REWRITEPROTO, \
         -e s,##FQDN##,$FQDN, \
-        $TEMPLATE > $BUILDMOD_DIR/$MODULE_NAME
-    kubectl cp $BUILDMOD_DIR/$MODULE_NAME helper:/conf/nginx/$MODULE_NAME
+	$TEMPLATE > $BUILDMOD_DIR/$MODULE_NAME_CLEAN
+    kubectl cp $BUILDMOD_DIR/$MODULE_NAME_CLEAN helper:/conf/nginx/$MODULE_NAME_CLEAN
     restart_nginx
 }
 
@@ -191,8 +192,6 @@ deregister_module_in_hydra () {
 ##     openssl req -x509 -new -nodes -key $CA_DIR/rootCA.key -sha256 -days 1024 -subj "/C=HU/ST=BP/L=Budapest/O=KRFT/CN=$OUTERHOST" -out $CA_DIR/rootCA.crt
 ## fi
 
-
-#DEPRECATED# # IP address functions
 #DEPRECATED# 
 #DEPRECATED# ldapquery () {
 #DEPRECATED# echo ldapsearch -x -H ldap://${PREFIX}-ldap -D cn=admin,$LDAPORG -b ou=users,$LDAPORG -s one "objectclass=top" -w $LDAPPW
