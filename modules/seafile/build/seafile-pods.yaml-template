@@ -7,7 +7,8 @@ metadata:
     name: lbl-##PREFIX##-##MODULE_NAME##
 spec:
   containers:
-  - image: seafileltd/seafile-mc:7.1.4
+#  - image: seafileltd/seafile-mc:7.1.5
+  - image: kooplex/seafile
     name: ##PREFIX##-##MODULE_NAME##
     ports:
       - containerPort: 80
@@ -87,4 +88,26 @@ spec:
     args: ["-m", "256"]
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
-
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ##PREFIX##-##MODULE_NAME##-pwapi
+  namespace: default
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##-pwapi
+spec:
+  containers:
+  - image: kooplex/k8plex-seafile_pw
+    name: ##PREFIX##-##MODULE_NAME##-pwapi
+    ports:
+      - containerPort: 8000
+        name: http
+    env:
+      - name: MYSQL_ROOT_PASSWD
+        value: "##SEAFILE_MYSQL_ROOTPW##"
+      - name: MYSQL_HOST
+        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+  nodeSelector:
+    kubernetes.io/hostname: ##SERVICENODE##
+---

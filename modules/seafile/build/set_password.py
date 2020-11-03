@@ -2,9 +2,10 @@
 
 import os
 import hashlib
-import MySQLdb
 from flask import Flask, jsonify
 from flask_httpauth import HTTPBasicAuth
+import pymysql
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
@@ -20,7 +21,7 @@ def verify_password(username, password):
 def get_alive():
     return jsonify({'message': 'API server is running'})
 
-F = lambda string: ''.join('{:02x}'.format(ord(c)) for c in string)
+F = lambda bytestring: ''.join('{:02x}'.format(c) for c in bytestring)
 
 def code_password_for_seafile(password):
     salt = os.urandom(32)
@@ -31,8 +32,8 @@ def store_user_pw(username, password):
     code = code_password_for_seafile(password)
     sqlq = "update EmailUser set passwd = '%s' where email = '%s';" % (code, username)
     dbhost = os.getenv('MYSQL_HOST', 'seafile-mysql')
-    pw = os.getenv('MYSQL_ROOT_PASSWORD')
-    db = MySQLdb.connect(dbhost, "root", pw, "ccnet_db")
+    pw = os.getenv('MYSQL_ROOT_PASSWD')
+    db = pymysql.connect(dbhost, "root", pw, "ccnet_db")
     c = db.cursor()
     c.execute(sqlq)
     c.close()

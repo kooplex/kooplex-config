@@ -26,7 +26,7 @@ c.FileContentsManager.delete_to_trash = False
 #c.MappingKernelManager.cull_idle_timeout = 10000
 
 # This will enable the option to switch between conda envs in the notebook-server
-c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
+##c.NotebookApp.kernel_spec_manager_class = 'environment_kernels.EnvironmentKernelSpecManager'
 
 c.LatexConfig.latex_command = 'pdflatex'
 

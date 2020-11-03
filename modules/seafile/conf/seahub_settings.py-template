@@ -76,7 +76,7 @@ LOGGING = {
         'dfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/debug.log',
+            'filename': '/var/log/debug.log',
             'formatter': 'verbose',
         },
     },

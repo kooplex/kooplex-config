@@ -6,6 +6,8 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
       mkdir_svcdata
 
+      cp -r patch-for-7.0.4/ $BUILDMOD_DIR/
+
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
@@ -19,6 +21,12 @@ case $VERB in
           -e s,##MODULE_NAME##,$MODULE_NAME, \
 	  build/seafile-svcs.yaml-template > $BUILDMOD_DIR/seafile-svcs.yaml
 
+      cp build/Dockerfile.seafile_pw $BUILDMOD_DIR
+      cp build/set_password.py $BUILDMOD_DIR
+      cp build/requirements.txt $BUILDMOD_DIR
+      docker $DOCKERARGS build -t ${PREFIX}-seafile_pw -f $BUILDMOD_DIR/Dockerfile.seafile_pw $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-seafile_pw ${MY_REGISTRY}/${PREFIX}-seafile_pw
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-seafile_pw
   ;;
 
   "init")
@@ -36,6 +44,8 @@ case $VERB in
               -e s,##HYDRA_CLIENTSECRET##,$SECRET, \
 	  conf/seahub_settings.py-template > $BUILDMOD_DIR/seahub_settings.py
 	  kubectl cp $BUILDMOD_DIR/seahub_settings.py helper:/data/seafile/seafile/seafile/conf/seahub_settings.py
+
+
       else
           echo "Pod for $MODULE_NAME is not running" >&2
       fi
@@ -59,8 +69,8 @@ case $VERB in
   ;;
 
   "uninstall")
-      deregister_module_in_nginx
       deregister_module_in_hydra
+      deregister_module_in_nginx
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl delete -f $BUILDMOD_DIR/seafile-svcs.yaml
   ;;

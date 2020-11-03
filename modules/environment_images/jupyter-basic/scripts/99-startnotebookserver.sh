@@ -25,5 +25,5 @@ if [ "${REPORT_TYPE}" == "dynamic" ]; then
     nice -n 19 /usr/local/bin/start-notebook.sh --config=/etc/jupyter_report_config.py --NotebookApp.base_url="/${NB_URL}" --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN --notebook-dir=$REPORT_DIR 
 else
     echo "Starting notebook for $NB_USER..."
-    nice -n 19 /usr/local/bin/start-notebook.sh --config=/etc/jupyter_notebook_config.py --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN --EnvironmentKernelSpecManager.display_name_template=\" {}\" 
+    nice -n 19 /usr/local/bin/start-notebook.sh --config=/etc/jupyter_notebook_config.py --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN ##--EnvironmentKernelSpecManager.display_name_template=\" {}\" 
 fi
