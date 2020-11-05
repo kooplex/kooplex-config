@@ -9,6 +9,10 @@ import pwd
 import pysearpc
 
 from common import randstring, sudo, urlopen
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 # initialization
 logger = logging.getLogger(__name__)
@@ -18,11 +22,10 @@ logger = logging.getLogger(__name__)
 ###########################################
 class mySeafile:
     D_PARENT = os.getenv('MNT_VOL_SYNC', '/tmp')
-    BASE_URL = os.getenv('BASE_URL_SEAFILE', 'http://localhost')
-    URL = BASE_URL + '/seafile'
 
-    def __init__(self, username): 
+    def __init__(self, service_url, username): 
         self._u = username
+        self._url = service_url
         self._mkdir(self.seaf_conf_dir)
         self._mkdir(self.seaf_log_dir)
         self._mkdir(self.seaf_path)
@@ -124,7 +127,7 @@ class mySeafile:
             headers = { 'X-SEAFILE-OTP': tfa, }
         else:
             headers = None
-        token_json = urlopen("{}/api2/auth-token/".format(self.URL), data = data, headers = headers)
+        token_json = urlopen("{}/api2/auth-token/".format(self._url), data = data, headers = headers)
         logger.debug('token for {} retrieved'.format(self._u))
         return json.loads(token_json)['token']
 
@@ -135,7 +138,7 @@ class mySeafile:
 
     def sync(self, password, libraryid, librarypassword):
         token = self.get_token(password)
-        tmp = self.get_repo_download_info("{}/api2/repos/{}/download-info/".format(self.URL, libraryid), token)
+        tmp = self.get_repo_download_info("{}/api2/repos/{}/download-info/".format(self._url, libraryid), token)
         folder = os.path.join(self.seaf_path, tmp['repo_name'])
         self._mkdir(folder)
         logger.debug('folder {}'.format(folder))
@@ -155,7 +158,8 @@ class mySeafile:
         if 'permission' in tmp.keys():
             is_readonly = tmp['permission']
         more_info = None
-        more_info_dict = {'server_url': self.BASE_URL }
+        o = urlparse(self._url)
+        more_info_dict = {'server_url': '{o.scheme}://{o.netloc}'.format(o) }
         if repo_salt:
             more_info_dict.update({'repo_salt': repo_salt})
         if is_readonly:
@@ -222,8 +226,8 @@ def mkdir_parent(username):
 
 
 @sudo
-def start_sync(username, password, libraryid, librarypassword):
-    sfo = mySeafile(username)
+def start_sync(service_url, username, password, libraryid, librarypassword):
+    sfo = mySeafile(service_url, username)
     sfo.start()
     #FIXME: check if already syncing
     #for t in sfo.clone_tasks():
@@ -232,8 +236,8 @@ def start_sync(username, password, libraryid, librarypassword):
     return sfo.sync(password, libraryid, librarypassword)
 
 @sudo
-def stop_sync(username, libraryid):
-    sfo = mySeafile(username)
+def stop_sync(service_url, username, libraryid):
+    sfo = mySeafile(service_url, username)
     sfo.start()
     sfo.desync(libraryid)
     #FIXME: stop sfo if doing nothing

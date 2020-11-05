@@ -1,92 +1,61 @@
 #!/bin/bash
 
-RF=$BUILDDIR/impersonator
-
-mkdir -p $RF
-
-DOCKER_HOST=$DOCKERARGS
-DOCKER_COMPOSE_FILE=$RF/docker-compose.yml
-
 case $VERB in
   "build")
-      echo "1. Configuring ${PREFIX}-impersonator..."
-      sed -e "s/##PREFIX##/${PREFIX}/" Dockerfile-template > $RF/Dockerfile
+      echo "1. Building ${PREFIX}-impersonator..." >&2
+      mkdir_svclog
 
-      cp scripts/01-nslcd-start.sh $RF
-      cp scripts/02-api-start.sh $RF
-      cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $RF
+      cp scripts/02-api-start.sh $BUILDMOD_DIR
+      cp scripts/{common.py,seafile_functions.py,git_functions.py,api.py} $BUILDMOD_DIR
+      sed -e "s/##PREFIX##/${PREFIX}/" \
+	      build/Dockerfile-template \
+	      > $BUILDMOD_DIR/Dockerfile
 
-###  printf "$(ldap_ldapconfig)\n\n" > ${RF}/ldap.conf
+      docker $DOCKERARGS build -t ${PREFIX}-impersonator -f $BUILDMOD_DIR/Dockerfile $BUILDMOD_DIR
+      docker $DOCKERARGS tag ${PREFIX}-impersonator ${MY_REGISTRY}/${PREFIX}-impersonator
+      docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-impersonator
 
-  printf "$(ldap_nsswitchconfig)\n\n" > ${RF}/nsswitch.conf
-  printf "$(ldap_nslcdconfig)\n\n" > ${RF}/nslcd.conf
-  chown root ${RF}/nslcd.conf
-  chmod 0600 ${RF}/nslcd.conf
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          build/impersonator-svcs.yaml-template > $BUILDMOD_DIR/impersonator-svcs.yaml
 
-      sed -e "s/##PREFIX##/$PREFIX/" docker-compose.yml-template > $DOCKER_COMPOSE_FILE
-###      cp etc/nsswitch.conf $RF
-###      cp scripts/create_user_userdb.sh $RF
-##      cp scripts/03-startinotify.sh $RF
-##      cp scripts/04-start-seafileclient.sh $RF
-###      sed -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
-###          -e "s/##PREFIX##/$PREFIX/" \
-###          -e "s/##MINUID##/$MINUID/" scripts/patch-davfs.sh-template > $RF/patch-davfs.sh
-###      sed -e "s/##LDAPPORT##/$LDAPPORT/" \
-###          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
-###          -e "s/##LDAPBASE##/$LDAPORG/" \
-###          -e "s/##LDAPBINDROOTPW##/$DUMMYPASS/"  scripts/patch-gitconfig.sh_template > $RF/patch-gitconfig.sh
-###      sed -e "s/##LDAPPORT##/$LDAPPORT/" \
-###          -e "s/##LDAPORG##/$LDAPORG/" \
-###          -e "s/##LDAPPW##/$LDAPPW/" \
-###          -e "s/##PREFIX##/$PREFIX/" \
-###          -e "s/##INNERHOST##/$INNERHOST/" \
-###          -e "s/##GITLABADMIN##/${GITLABADMIN}/" \
-###          -e "s/##GITLABADMINPW##/${GITLABADMINPW}/" \
-###          -e "s/##LDAPBINDPW##/$DUMMYPASS/" scripts/create_admin.sh-template > $RF/create_admin.sh
-###      sed -e "s/##LDAPURI##/ldap:\/\/$LDAPSERV/" \
-###          -e "s/##LDAPBASE##/ou=users,$LDAPORG/" \
-###          -e "s/##LDAPBINDDN##/cn=admin,$LDAPORG/" \
-###          -e "s/##LDAPBINDPW##/$LDAPPW/" \
-###          -e "s/##LDAPBINDROOT##/cn=admin,$LDAPORG/" \
-###          -e "s/##LDAPBINDROOTPW##/$LDAPPW/" etc/nslcd.conf_template > $RF/nslcd.conf
-###      sed -e "s/##OWNCLOUDURL##/http:\/\/${PREFIX}-nginx\/ownCloud\/ocs\/v1.php\/apps\/files_sharing\/api\/v1\/shares/" \
-###          -e "s/##WEBDAVPATTERN##/http:..${PREFIX}-nginx.ownCloud.remote.php.webdav./" scripts/share.sh_template > $RF/share.sh
-###      chmod 0600 $RF/nslcd.conf
-###      chmod 0755 $RF/share.sh
-###      chmod 0755 $RF/patch-gitconfig.sh
-
-      echo "2. Building ${PREFIX}-impersonator..."
-      docker-compose $DOCKER_HOST -f $DOCKER_COMPOSE_FILE build 
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##SERVICENODE##,${SERVICE_NODE}, \
+          -e s,##IMAGE##,$MY_REGISTRY/${PREFIX}-impersonator, \
+          build/impersonator-pods.yaml-template > $BUILDMOD_DIR/impersonator-pods.yaml
   ;;
 
   "install")
+      echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/impersonator-svcs.yaml
+
   ;;
 
   "start")  
-      echo "Starting container ${PREFIX}-impersonator"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE up -d
+      echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl apply -f $BUILDMOD_DIR/impersonator-pods.yaml
   ;;
 
-  "init")  
-  ;;
 
   "stop")
-      echo "Stopping container ${PREFIX}-impersonator"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE down
+      echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/impersonator-pods.yaml
+  ;;
+
+  "uninstall")
+      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/impersonator-svcs.yaml || true
   ;;
     
   "remove")
-      echo "Removing $DOCKER_COMPOSE_FILE"
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE kill
-      docker-compose $DOCKERARGS -f $DOCKER_COMPOSE_FILE rm
+      echo "Removing $BUILDMOD_DIR" >&2
+      rm -R -f $BUILDMOD_DIR
   ;;
 
   "purge")
-    echo "Removing $RF" 
-    rm -R -f $RF
+      purgedir_svc
   ;;
 
-  "clean")
-  ;;
 esac
 

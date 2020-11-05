@@ -2,6 +2,8 @@
 
 import sys
 import logging
+import pickle
+import base64
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 
@@ -21,23 +23,28 @@ def verify_password(username, password):
 def get_alive():
     return jsonify({'message': 'API server is running'})
 
-@app.route('/api/sync/sync/<username>/<password>/<libraryid>/<librarypassword>')
+@app.route('/api/sync/sync/<data>')
 @auth.login_required
-def get_sync_sync(username, password, libraryid, librarypassword):
+def get_sync_sync(data):
+    data_dict = None
     try:
-        mkdir_parent(username)
-        response = start_sync(username, password, libraryid, librarypassword)
+        data_dict = pickle.loads(base64.b64decode(data))
+        mkdir_parent(data_dict['username'])
+        response = start_sync(**data_dict)
     except Exception as e:
-        logger.error('oops start sync: {} for {} -- {}'.format(libraryid, username, e))
+        logger.error('oops start sync: {data} --> {data_dict} -- {e}'.format(data, data_dict, e))
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response), 'sync_folder': response })
 
-@app.route('/api/sync/desync/<username>/<libraryid>')
+@app.route('/api/sync/desync/<data>')
 @auth.login_required
 def get_sync_desync(username, libraryid):
+    data_dict = None
     try:
-        response = stop_sync(username, libraryid)
+        data_dict = pickle.loads(base64.b64decode(data))
+        response = stop_sync(**data_dict)
     except Exception as e:
+        logger.error('oops stop sync: {data} --> {data_dict} -- {e}'.format(data, data_dict, e))
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response) })
 

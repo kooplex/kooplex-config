@@ -1,4 +1,4 @@
 #! /bin/bash
 
-cd /local && \
-   ./api.py > /tmp/api.py &
+cd /usr/local/bin && \
+   ./api.py > /var/log/api/api.py
