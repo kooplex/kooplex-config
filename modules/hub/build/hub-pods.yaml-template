@@ -30,6 +30,9 @@ spec:
         name: pv-project-##PREFIX##
       - mountPath: /mnt/reports
         name: pv-report-##PREFIX##
+      - mountPath: /mnt/report_prepare
+        name: pv-cache-##PREFIX##
+        subPath: report_prepare
     env:
       - name: HUBDBROOT_PW
         value: "##HUB_MYSQL_ROOTPW##"
@@ -87,6 +90,9 @@ spec:
     - name: pv-report-##PREFIX##
       persistentVolumeClaim:
         claimName: pvc-report-##PREFIX##
+    - name: pv-cache-##PREFIX##
+      persistentVolumeClaim:
+        claimName: pvc-cache-##PREFIX##
 ---
 apiVersion: v1
 kind: Pod
