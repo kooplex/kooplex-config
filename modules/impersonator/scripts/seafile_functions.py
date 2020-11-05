@@ -178,14 +178,12 @@ class mySeafile:
         try:
             self.client.clone(libraryid,
                           version,
-                          relay_id,
                           repo_name.encode('utf-8'),
                           folder,
                           clone_token,
                           repo_passwd, magic,
-                          relay_addr,
-                          relay_port,
-                          email, random_key, enc_version, more_info)
+                          email,
+                          random_key, enc_version, more_info)
         except pysearpc.common.SearpcError as e:
             if str(e) == 'Repo already exists':
                 logger.warning('{} for {} already exists'.format(libraryid, self._u))

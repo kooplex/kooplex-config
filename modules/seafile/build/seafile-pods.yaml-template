@@ -13,6 +13,8 @@ spec:
     ports:
       - containerPort: 80
         name: http
+      - containerPort: 8082
+        name: file
     volumeMounts:
       - mountPath: /shared
         name: svcdata-##PREFIX##-##MODULE_NAME##
