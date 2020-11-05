@@ -28,11 +28,11 @@ def get_alive():
 def get_sync_sync(data):
     data_dict = None
     try:
-        data_dict = pickle.loads(base64.b64decode(data))
-        mkdir_parent(data_dict['username'])
-        response = start_sync(**data_dict)
+        data_dict = pickle.loads(base64.b64decode(eval(data)))
+        mkdir_parent(data_dict['username'], data_dict['service_url'])
+        response = start_sync(data_dict['username'], data_dict['service_url'], data_dict['password'], data_dict['libraryid'], data_dict['librarypassword'])
     except Exception as e:
-        logger.error('oops start sync: {data} --> {data_dict} -- {e}'.format(data, data_dict, e))
+        logger.error('oops start sync: {data} --> {data_dict} -- {e}'.format(data = data, data_dict = data_dict, e = e))
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response), 'sync_folder': response })
 
@@ -41,10 +41,10 @@ def get_sync_sync(data):
 def get_sync_desync(username, libraryid):
     data_dict = None
     try:
-        data_dict = pickle.loads(base64.b64decode(data))
-        response = stop_sync(**data_dict)
+        data_dict = pickle.loads(base64.b64decode(eval(data)))
+        response = stop_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
     except Exception as e:
-        logger.error('oops stop sync: {data} --> {data_dict} -- {e}'.format(data, data_dict, e))
+        logger.error('oops stop sync: {data} --> {data_dict} -- {e}'.format(data = data, data_dict = data_dict, e = e))
         return jsonify({ 'error': str(e) })
     return jsonify({ 'response': str(response) })
 
@@ -87,7 +87,7 @@ def get_versioncontrol_removecache(username):
 if __name__ == '__main__':
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler(sys.stdout)
+    handler = logging.FileHandler('/var/log/api/api.log')
     handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)

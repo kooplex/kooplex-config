@@ -17,6 +17,10 @@ except ImportError:
 # initialization
 logger = logging.getLogger(__name__)
 
+def root_folder(username, service_url):
+    o = urlparse(service_url)
+    return os.path.join(mySeafile.D_PARENT, username, o.netloc.replace('.', '_'))
+
 ###########################################
 # seafile daemon manipulation
 ###########################################
@@ -25,6 +29,7 @@ class mySeafile:
 
     def __init__(self, service_url, username): 
         self._u = username
+        self._root = root_folder(username, service_url)
         self._url = service_url
         self._mkdir(self.seaf_conf_dir)
         self._mkdir(self.seaf_log_dir)
@@ -44,22 +49,22 @@ class mySeafile:
         logger.debug('mkdir {}'.format(f))
 
     @property
-    def seaf_conf_dir(self): return os.path.join(self.D_PARENT, self._u, 'seafconf')
+    def seaf_conf_dir(self): return os.path.join(self._root, 'seafconf')
     @property
-    def seaf_log_dir(self): return os.path.join(self.D_PARENT, self._u, 'seafconf/logs')
+    def seaf_log_dir(self): return os.path.join(self._root, 'seafconf/logs')
     @property
-    def seaf_path(self): return os.path.join(self.D_PARENT, self._u, 'synchron')
+    def seaf_path(self): return os.path.join(self._root, 'synchron')
     @property
-    def seaf_data_dir(self): return os.path.join(self.D_PARENT, self._u, 'seafile-data')
+    def seaf_data_dir(self): return os.path.join(self._root, 'seafile-data')
 
     @property
-    def seaf_ini(self): return os.path.join(self.D_PARENT, self._u, 'seafconf/seafile.ini')
+    def seaf_ini(self): return os.path.join(self._root, 'seafconf/seafile.ini')
     @property
-    def seaf_sock(self): return os.path.join(self.D_PARENT, self._u, 'seafile-data/seafile.sock')
+    def seaf_sock(self): return os.path.join(self._root, 'seafile-data/seafile.sock')
     @property
-    def seaf_idfile(self): return os.path.join(self.D_PARENT, self._u, 'seafile-data/id')
+    def seaf_idfile(self): return os.path.join(self._root, 'seafile-data/id')
     @property
-    def seaf_ccnet_conf(self): return os.path.join(self.D_PARENT, self._u, 'seafile-data/ccnet.conf')
+    def seaf_ccnet_conf(self): return os.path.join(self._root, 'seafile-data/ccnet.conf')
 
     @property
     def client(self):
@@ -159,7 +164,7 @@ class mySeafile:
             is_readonly = tmp['permission']
         more_info = None
         o = urlparse(self._url)
-        more_info_dict = {'server_url': '{o.scheme}://{o.netloc}'.format(o) }
+        more_info_dict = {'server_url': '{o.scheme}://{o.netloc}'.format(o = o) }
         if repo_salt:
             more_info_dict.update({'repo_salt': repo_salt})
         if is_readonly:
@@ -187,8 +192,8 @@ class mySeafile:
             else:
                 raise
         logger.info('Synchronizing {} for {}'.format(folder, self._u))
-        if folder.startswith(self.D_PARENT):
-            folder = folder[(len(self.D_PARENT) + 1):]
+        if folder.startswith(self._root):
+            folder = folder[(len(self._root) + 1):]
         return folder
 
     def desync(self, libraryid):
@@ -216,17 +221,17 @@ class mySeafile:
 
 
 
-def mkdir_parent(username):
-    f = os.path.join(mySeafile.D_PARENT, username)
+def mkdir_parent(username, service_url):
+    f = root_folder(username, service_url)
     U = pwd.getpwnam(username)
     if not os.path.exists(f):
-        os.mkdir(f)
+        os.makedirs(f)
         os.chown(f, U.pw_uid, U.pw_gid)
         logger.info('Created {}'.format(f))
 
 
 @sudo
-def start_sync(service_url, username, password, libraryid, librarypassword):
+def start_sync(username, service_url, password, libraryid, librarypassword):
     sfo = mySeafile(service_url, username)
     sfo.start()
     #FIXME: check if already syncing
@@ -236,7 +241,7 @@ def start_sync(service_url, username, password, libraryid, librarypassword):
     return sfo.sync(password, libraryid, librarypassword)
 
 @sudo
-def stop_sync(service_url, username, libraryid):
+def stop_sync(username, service_url, libraryid):
     sfo = mySeafile(service_url, username)
     sfo.start()
     sfo.desync(libraryid)
