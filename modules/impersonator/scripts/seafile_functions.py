@@ -117,8 +117,8 @@ class mySeafile:
         platform = 'linux'
         device_id = self.device_id
         device_name = 'terminal-' + os.uname()[1]
-        client_version = ''
-        platform_version = ''
+        client_version = 'v0.1'
+        platform_version = 'v0.1'
         data = {
             'username': self._u,
             'password': password,
