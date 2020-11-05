@@ -23,30 +23,24 @@ def verify_password(username, password):
 def get_alive():
     return jsonify({'message': 'API server is running'})
 
-@app.route('/api/sync/sync/<data>')
+@app.route('/api/sync/<data>')
 @auth.login_required
-def get_sync_sync(data):
+def get_sync(data):
     data_dict = None
     try:
         data_dict = pickle.loads(base64.b64decode(eval(data)))
-        mkdir_parent(data_dict['username'], data_dict['service_url'])
-        response = start_sync(data_dict['username'], data_dict['service_url'], data_dict['password'], data_dict['libraryid'], data_dict['librarypassword'])
+        if data_dict['do'] == 'start':
+            mkdir_parent(data_dict['username'], data_dict['service_url'])
+            response = start_sync(data_dict['username'], data_dict['service_url'], data_dict['password'], data_dict['libraryid'], data_dict['librarypassword'])
+            return jsonify({ 'response': str(response), 'sync_folder': response })
+        elif data_dict['do'] == 'stop':
+            response = stop_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
+            return jsonify({ 'response': str(response) })
+        else:
+            raise Exception('wrong parameter passed')
     except Exception as e:
         logger.error('oops start sync: {data} --> {data_dict} -- {e}'.format(data = data, data_dict = data_dict, e = e))
         return jsonify({ 'error': str(e) })
-    return jsonify({ 'response': str(response), 'sync_folder': response })
-
-@app.route('/api/sync/desync/<data>')
-@auth.login_required
-def get_sync_desync(username, libraryid):
-    data_dict = None
-    try:
-        data_dict = pickle.loads(base64.b64decode(eval(data)))
-        response = stop_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
-    except Exception as e:
-        logger.error('oops stop sync: {data} --> {data_dict} -- {e}'.format(data = data, data_dict = data_dict, e = e))
-        return jsonify({ 'error': str(e) })
-    return jsonify({ 'response': str(response) })
 
 
 @app.route('/api/versioncontrol/clone/<username>')
