@@ -235,7 +235,7 @@ def rmdir_cache(username, service_url, password, library_id):
     tmp = sfo.get_repo_download_info("{}/api2/repos/{}/download-info/".format(sfo._url, libraryid), token)
     folder = os.path.join(self.seaf_path, tmp['repo_name'])
     try:
-        shutil.rmtree(path, ignore_errors = True)
+        shutil.rmtree(path, ignore_errors = False)
         msg = 'folder {} removed'.format(folder)
         logger.debug(msg)
     except Exception as e:
