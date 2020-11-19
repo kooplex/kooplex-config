@@ -7,7 +7,7 @@ import base64
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 
-from seafile_functions import start_sync, stop_sync, mkdir_parent
+from seafile_functions import start_sync, stop_sync, mkdir_parent, rmcache_sync
 from git_functions import clone_repo, rmdir_repo, mkdir_repo
 
 app = Flask(__name__)
@@ -36,6 +36,10 @@ def get_sync(data):
         elif data_dict['do'] == 'stop':
             response = stop_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
             return jsonify({ 'response': str(response) })
+        elif data_dict['do'] == 'drop':
+            response1 = stop_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
+            response2 = rmcache_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
+            return jsonify({ 'response': { 'stop_sync': str(response1), 'rmcache_sync': str(response2) } })
         else:
             raise Exception('wrong parameter passed')
     except Exception as e:

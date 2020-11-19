@@ -7,6 +7,7 @@ import json
 import seafile
 import pwd
 import pysearpc
+import shutil
 
 from common import randstring, sudo, urlopen
 try:
@@ -227,6 +228,20 @@ def mkdir_parent(username, service_url):
         os.chown(f, U.pw_uid, U.pw_gid)
         logger.info('Created {}'.format(f))
 
+@sudo
+def rmdir_cache(username, service_url, password, library_id):
+    sfo = mySeafile(service_url, username)
+    token = sfo.get_token(password)
+    tmp = sfo.get_repo_download_info("{}/api2/repos/{}/download-info/".format(sfo._url, libraryid), token)
+    folder = os.path.join(self.seaf_path, tmp['repo_name'])
+    try:
+        shutil.rmtree(path, ignore_errors = True)
+        msg = 'folder {} removed'.format(folder)
+        logger.debug(msg)
+    except Exception as e:
+        logger.error('cannot rm folder {} -- {}'.format(folder, e))
+        msg = e
+    return msg
 
 @sudo
 def start_sync(username, service_url, password, libraryid, librarypassword):
