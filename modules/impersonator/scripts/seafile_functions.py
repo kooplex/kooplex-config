@@ -229,7 +229,7 @@ def mkdir_parent(username, service_url):
         logger.info('Created {}'.format(f))
 
 @sudo
-def rmdir_cache(username, service_url, password, library_id):
+def rmcache_sync(username, service_url, password, library_id):
     sfo = mySeafile(service_url, username)
     token = sfo.get_token(password)
     tmp = sfo.get_repo_download_info("{}/api2/repos/{}/download-info/".format(sfo._url, libraryid), token)
