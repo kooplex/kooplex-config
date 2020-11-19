@@ -38,7 +38,7 @@ def get_sync(data):
             return jsonify({ 'response': str(response) })
         elif data_dict['do'] == 'drop':
             response1 = stop_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
-            response2 = rmcache_sync(data_dict['username'], data_dict['service_url'], data_dict['libraryid'])
+            response2 = rmcache_sync(data_dict['username'], data_dict['service_url'], data_dict['password'], data_dict['libraryid'])
             return jsonify({ 'response': { 'stop_sync': str(response1), 'rmcache_sync': str(response2) } })
         else:
             raise Exception('wrong parameter passed')

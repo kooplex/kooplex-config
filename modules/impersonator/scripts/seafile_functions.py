@@ -229,13 +229,13 @@ def mkdir_parent(username, service_url):
         logger.info('Created {}'.format(f))
 
 @sudo
-def rmcache_sync(username, service_url, password, library_id):
+def rmcache_sync(username, service_url, password, libraryid):
     sfo = mySeafile(service_url, username)
     token = sfo.get_token(password)
     tmp = sfo.get_repo_download_info("{}/api2/repos/{}/download-info/".format(sfo._url, libraryid), token)
-    folder = os.path.join(self.seaf_path, tmp['repo_name'])
+    folder = os.path.join(sfo.seaf_path, tmp['repo_name'])
     try:
-        shutil.rmtree(path, ignore_errors = False)
+        shutil.rmtree(folder, ignore_errors = False)
         msg = 'folder {} removed'.format(folder)
         logger.debug(msg)
     except Exception as e:
