@@ -11,6 +11,7 @@ case $VERB in
       ROOTURL=${REWRITEPROTO}://${FQDN}/gitea
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##EXTERNALIP##,$EXTERNALIP, \
           build/gitea-svcs.yaml-template > $BUILDMOD_DIR/gitea-svcs.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
