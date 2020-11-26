@@ -15,6 +15,8 @@ spec:
     env:
       - name: MNT_VOL_SYNC
         value: /cache.fs
+      - name: MNT_VOL_REPO
+        value: /cache.git
     volumeMounts:
       - mountPath: /var/log/api
         name: svclog-##PREFIX##-##MODULE_NAME##

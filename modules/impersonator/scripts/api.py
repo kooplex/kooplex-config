@@ -4,11 +4,12 @@ import sys
 import logging
 import pickle
 import base64
+import subprocess
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 
 from seafile_functions import start_sync, stop_sync, mkdir_parent, rmcache_sync
-from git_functions import clone_repo, rmdir_repo, mkdir_repo
+from git_functions import clone_repo, rmdir_repo, mkdir_repo, clone_folder
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
@@ -47,40 +48,74 @@ def get_sync(data):
         return jsonify({ 'error': str(e) })
 
 
-@app.route('/api/versioncontrol/clone/<username>')
-@auth.login_required
-def get_versioncontrol_clone(username):
+#FIXME: @auth.login_required
+@app.route('/api/register_git/<service>')
+def get_register_git(service):
     try:
-        assert username == request.args.get('username'), 'hacker go away'
-        url_clone_repo = request.args.get('clone')
-        port = request.args.get('port')
-        prefix = request.args.get('prefix')
-        folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
-        rsa = request.args.get('rsa_file')
-        if folder.endswith('.git'):
-            folder = folder[:-4]
-        mkdir_repo(username, folder)
-        response = clone_repo(username, rsa, url_clone_repo, port, folder)
+        if ':' in service:
+            service, port = service.split(':')
+            cmd = [ 'ssh-keyscan', '-p', port, '-H', service ]
+        else:
+            cmd = [ 'ssh-keyscan', '-H', service ]
+        proc = subprocess.Popen(cmd, stdout = subprocess.PIPE)
+        kh = proc.stdout.read()
+        open('/etc/ssh/ssh_known_hosts', 'a').write(kh)
+        proc_ret = proc.returncode
+        logger.info('wrote known_host info for {}, exit code: {}'.format(service, proc_ret))
+        return jsonify({ 'status': 'ok' })
     except Exception as e:
-        logger.error(e)
+        logger.error('oops registering: {} cmd {} -- {}'.format(service, cmd, e))
         return jsonify({ 'error': str(e) })
-    return jsonify({ 'response': str(response), 'clone_folder': folder })
 
-@app.route('/api/versioncontrol/removecache/<username>')
+@app.route('/api/versioncontrol/<data>')
 @auth.login_required
-def get_versioncontrol_removecache(username):
+def get_versioncontrol(data):
+    data_dict = None
     try:
-        assert username == request.args.get('username'), 'hacker go away'
-        url_clone_repo = request.args.get('clone')
-        prefix = request.args.get('prefix')
-        folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
-        if folder.endswith('.git'):
-            folder = folder[:-4]
-        rmdir_repo(folder)
+        data_dict = pickle.loads(base64.b64decode(eval(data)))
+        if data_dict['do'] == 'clone':
+            mkdir_repo(data_dict['username'], data_dict['service_url'])
+            response = clone_repo(data_dict['username'], data_dict['rsa'], data_dict['service_url'], data_dict['url_clone_repo'])
+            folder = clone_folder(data_dict['url_clone_repo'])
+            logger.debug('response: {}, folder: {}'.format(response, folder))
+            return jsonify({ 'response': str(response), 'clone_folder': folder })
+        else:
+            raise Exception('wrong parameter passed')
     except Exception as e:
-        logger.error(e)
+        logger.error('oops: {data} --> {data_dict} -- {e}'.format(data = data, data_dict = data_dict, e = e))
         return jsonify({ 'error': str(e) })
-    return jsonify({ 'response': 'removed folder {}'.format(folder) })
+
+#    try:
+#        assert username == request.args.get('username'), 'hacker go away'
+#        url_clone_repo = request.args.get('clone')
+#        port = request.args.get('port')
+#        prefix = request.args.get('prefix')
+#        folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
+#        rsa = request.args.get('rsa_file')
+#        if folder.endswith('.git'):
+#            folder = folder[:-4]
+#        mkdir_repo(username, folder)
+#        response = clone_repo(username, rsa, url_clone_repo, port, folder)
+#    except Exception as e:
+#        logger.error(e)
+#        return jsonify({ 'error': str(e) })
+#    return jsonify({ 'response': str(response), 'clone_folder': folder })
+#
+#@app.route('/api/versioncontrol/removecache/<username>')
+#@auth.login_required
+#def get_versioncontrol_removecache(username):
+#    try:
+#        assert username == request.args.get('username'), 'hacker go away'
+#        url_clone_repo = request.args.get('clone')
+#        prefix = request.args.get('prefix')
+#        folder = '\\'.join([ prefix, username, url_clone_repo.split(':')[-1].replace('/', '\\') ])
+#        if folder.endswith('.git'):
+#            folder = folder[:-4]
+#        rmdir_repo(folder)
+#    except Exception as e:
+#        logger.error(e)
+#        return jsonify({ 'error': str(e) })
+#    return jsonify({ 'response': 'removed folder {}'.format(folder) })
 
 if __name__ == '__main__':
     logger = logging.getLogger()
