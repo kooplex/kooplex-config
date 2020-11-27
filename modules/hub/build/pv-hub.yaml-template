@@ -11,17 +11,12 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##HOME_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -36,17 +31,12 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##GARBAGE_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -61,17 +51,12 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##PROJECT_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -86,17 +71,12 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##REPORT_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##SERVICENODE##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -111,15 +91,10 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##CACHE_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##SERVICENODE##
 ---

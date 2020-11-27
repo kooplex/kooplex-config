@@ -2,6 +2,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-home-##PREFIX##
+  labels:
+    name: k8plex-home
 spec:
   accessModes:
     - ReadWriteMany
@@ -9,10 +11,9 @@ spec:
   resources:
     requests:
       storage: ##HOME_USERQUOTA##
-  storageClassName: local-storage
-  selector:
-    matchLabels:
-      pvl: "pv-##PREFIX##-hub-home"
+  storageClassName: ""
+  volumeName:
+    pv-##PREFIX##-hub-home
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -25,7 +26,7 @@ spec:
   resources:
     requests:
       storage: ##GARBAGE_QUOTA##
-  storageClassName: local-storage
+  storageClassName: ""
   selector:
     matchLabels:
       pvl: "pv-##PREFIX##-hub-garbage"
@@ -41,10 +42,8 @@ spec:
   resources:
     requests:
       storage: ##PROJECT_PROJECTQUOTA##
-  storageClassName: local-storage
-  selector:
-    matchLabels:
-      pvl: "pv-##PREFIX##-hub-project"
+  volumeName: pv-##PREFIX##-hub-project
+  storageClassName: ""
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -57,7 +56,7 @@ spec:
   resources:
     requests:
       storage: ##REPORT_REPORTQUOTA##
-  storageClassName: local-storage
+  storageClassName: ""
   selector:
     matchLabels:
       pvl: "pv-##PREFIX##-hub-report"
@@ -73,7 +72,7 @@ spec:
   resources:
     requests:
       storage: ##CACHE_USERQUOTA##
-  storageClassName: local-storage
+  storageClassName: ""
   selector:
     matchLabels:
       pvl: "pv-##PREFIX##-hub-cache"
