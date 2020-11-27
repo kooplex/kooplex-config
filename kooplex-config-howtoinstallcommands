@@ -1,0 +1,96 @@
+# complete config file
+cp config.sh_template config.sh
+
+# Get certificate for the site and copy it into $ORIGINAL_KEYS
+# You can create certificate with Let's encrypt: https://certbot.eff.org/
+
+# VOLUMES
+bash ./kooplex.sh build data_garbage data_git data_share data_homes data_courses data_reports
+
+#BASE SERVICES
+bash ./kooplex.sh build base net nginx report-nginx
+bash ./kooplex.sh start nginx report-nginx
+
+#LDAP
+bash ./kooplex.sh build ldap
+bash ./kooplex.sh start ldap
+sleep 5
+bash ./kooplex.sh init ldap
+
+#HYDRA
+bash ./kooplex.sh build hydra
+bash ./kooplex.sh start hydra
+bash ./kooplex.sh install-nginx hydra
+sleep 10
+bash ./kooplex.sh init hydra
+bash ./kooplex.sh init hydra
+bash ./kooplex.sh install-hydra hydra
+# !! Install hydraconsent
+# Follow modules/hydra/Readme.md
+
+#HUB
+bash ./kooplex.sh build hub
+bash ./kooplex.sh start hub
+bash ./kooplex.sh install-nginx hub
+bash ./kooplex.sh install-hydra hub 
+sleep 10
+bash ./kooplex.sh init hub
+# !!
+docker restart $PREFIX-hub
+
+
+# GITEA
+bash ./kooplex.sh build gitea
+bash ./kooplex.sh start gitea
+bash ./kooplex.sh install-hydra gitea 
+bash ./kooplex.sh install-nginx gitea
+#bash ./kooplex.sh init gitea
+#admin auth add-oauth --name kooplex-test --provider openidConnect --auto-discover-url https://kooplex-test.elte.hu/hydra/.well-known/openid-configuration --key kooplex-test-${MODULE_NAME} --secret SS
+
+#SEAFILE
+bash ./kooplex.sh build seafile
+bash ./kooplex.sh start seafile
+bash ./kooplex.sh admin seafile
+#Instructions in modules/seafile/Readme.md
+bash ./kooplex.sh build seafile
+bash ./kooplex.sh start seafile
+# !!
+docker restart $PREFIX-seafile
+bash ./kooplex.sh install-hydra seafile
+
+#IMPEROSNATOR
+bash ./kooplex.sh build impersonator
+bash ./kooplex.sh start impersonator
+
+# BUILD  notebook images
+bash ./kooplex.sh install-nginx notebook 
+bash ./kooplex.sh build notebook basic
+# exec into hub everytime a new image is built
+cd bash ./kooplexhub/kooplexhub/ && python3 manage.py updatemodel
+
+#PROXY
+bash ./kooplex.sh build proxy
+bash ./kooplex.sh start proxy
+bash ./kooplex.sh install-nginx proxy
+
+
+# !! TO USE seafile and gitea within notebooks you have to register it in django admin
+
+
+
+### DELETE Everything
+
+# STOP
+bash ./kooplex.sh stop
+bash ./kooplex.sh stop seafile gitea hydra
+
+# REMOVE Images
+bash ./kooplex.sh remove
+bash ./kooplex.sh purge
+bash ./kooplex.sh remove seafile gitea hydra
+bash ./kooplex.sh purge seafile gitea hydra
+
+# CLEAN Data
+bash ./kooplex.sh clean
+bash ./kooplex.sh cleandata
+bash ./kooplex.sh purge data_garbage data_git  data_courses data_homes data_share data_reports

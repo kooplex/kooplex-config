@@ -9,6 +9,7 @@ sleep 10
 bash kooplex.sh init ldap 
 bash kooplex.sh start proxy 
 bash kooplex.sh start hydra
+sleep 10
 bash kooplex.sh init hydra
 bash kooplex.sh install-nginx hydra
 # Now Bonfire consent code need to be installed
@@ -82,7 +83,7 @@ do
         bash  kooplex.sh purge $module
 done
 
-for module in gitea seafile hydra report-nginx impersonator nginx ldap proxy hub notebook
+for module in gitea seafile hydra report-nginx impersonator nginx ldap proxy hub notebook data_courses data_garbage data_git data_homes  data_reports  data_share
 do
         bash kooplex.sh clean $module
 done
