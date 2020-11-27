@@ -71,12 +71,12 @@ def clone_repo(username, rsa, service_url, url_clone_repo):
     return proc_ret
 
 
-def rmdir_repo(folder):
-    folder_abs = os.path.join(root_folder(username, service_url), folder)
-    if not os.path.exists(folder_abs):
-        return
-    shutil.rmtree(folder_abs)
-    logger.info('removed folder {}'.format(folder))
+def rmdir_repo(username, service_url, url_clone_repo):
+    folder = os.path.join(root_folder(username, service_url), clone_folder(url_clone_repo))
+    if os.path.exists(folder):
+        shutil.rmtree(folder)
+        logger.info('removed folder {}'.format(folder))
+    return folder
 
 
 def mkdir_repo(username, service_url):

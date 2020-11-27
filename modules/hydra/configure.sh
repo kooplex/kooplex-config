@@ -8,6 +8,30 @@ DOCKER_HOST=$DOCKERARGS
 # sed 'files'; #### --> 'database'; ####
 #
 
+# EDU ID 
+# vim application/vendor/simplesaml/simplesamlphp/config/config.php
+# /*
+#     * The DSN the sql datastore should connect to.
+#     *
+#     * See http://www.php.net/manual/en/pdo.drivers.php for the various
+#     * syntaxes.
+#     */
+#
+# 'store.sql.dsn'                 => "mysql:host=svc-k8plex-consent-mysql;dbname=hydraconsent"
+#  'store.sql.username' => '?',
+#  'store.sql.password' => '?',
+# 'database.dsn' => 'mysql:host=svc-k8plex-consent-mysql;dbname=hydraconsent',
+#
+#    /*
+#     * SQL database credentials
+#     */
+#    'database.username' => 'hydraconsent',
+#    'database.password' => 'cesaeG2taij5ohg7',
+#    'database.options' => [],
+#
+# EDIT application/controllers/Auth.php
+#
+# chown www-data:www-data application/vendor/simplesamllog/ -R
 
 case $VERB in
   "build")
