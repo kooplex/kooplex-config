@@ -26,6 +26,9 @@ case $VERB in
       DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
       sed -e s/##LDAPORG##/$DN/ \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
+          -e s,##GID_USERS##,"$GID_USERS", \
+          -e s,##GID_HUB##,"$GID_HUB", \
+          -e s,##UID_HUB##,"$UID_HUB", \
           scripts/init.sh-template > $BUILDMOD_DIR/helper_init.sh
       sed -e s/##LDAPORG##/$DN/ \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \

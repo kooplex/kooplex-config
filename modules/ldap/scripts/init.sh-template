@@ -16,6 +16,31 @@ dn: ou=groups,##LDAPORG##
 objectClass: organizationalUnit
 objectClass: top
 ou: groups
+
+dn: cn=users,ou=groups,##LDAPORG##
+objectClass: posixGroup
+objectClass: top
+cn: users
+gidNumber: ##GID_USERS##
+description: "All kooplex users"
+
+dn: cn=hubadmin,ou=groups,##LDAPORG##
+objectClass: posixGroup
+objectClass: top
+cn: hubadmin
+gidNumber: ##GID_HUB##
+description: "Hub manipulates filesystem via this group"
+
+dn: uid=hub,ou=users,##LDAPORG##
+objectClass: posixAccount
+objectClass: InetOrgPerson
+uid: hub
+cn: hub
+sn: hub
+uidNumber: ##UID_HUB##
+gidNumber: ##GID_HUB##
+loginShell: /bin/bash
+homeDirectory: /
 EOF
    touch $LOCK_FILE
    echo "Just initialized" >> $LOG_FILE
