@@ -4,14 +4,13 @@ case $VERB in
   "build")
       echo "Building image $PREFIX-${MODULE_NAME}" >&2
       IMAGE_NAME="$PREFIX-ei-$(basename ${MODULE_NAME})"
-      cp build/start-notebook.sh ${BUILDMOD_DIR}/
-      cp build/jupyter-notebook-kooplex ${BUILDMOD_DIR}/
-      cp etc/{jupyter_notebook_config.py,jupyter_report_config.py,kooplex-logo.png} ${BUILDMOD_DIR}/
+      cp etc/rstudio-* ${BUILDMOD_DIR}/
       sed -e s,##BASE##,${PREFIX}-base, \
+          -e s,##PREFIX##,${PREFIX}, \
               build/Dockerfile-template \
               > ${BUILDMOD_DIR}/Dockerfile
       _mkdir $BUILDMOD_DIR/init
-      cp scripts/{0?-*.sh,9?-*.sh} ${BUILDMOD_DIR}/init
+      cp scripts/*.sh ${BUILDMOD_DIR}
       
       docker $DOCKERARGS build -t ${IMAGE_NAME} -f $BUILDMOD_DIR/Dockerfile $BUILDMOD_DIR
       docker $DOCKERARGS tag ${IMAGE_NAME} ${MY_REGISTRY}/${IMAGE_NAME}
@@ -20,7 +19,7 @@ case $VERB in
 
   "install")
       echo "Register in nginx ${PREFIX}-${MODULE_NAME}" >&2
-      register_module_in_nginx
+#      register_module_in_nginx
       IMAGE_NAME="$PREFIX-ei-$(basename ${MODULE_NAME})"
       echo "Register in hub ${IMAGE_NAME}" >&2
       kubectl exec -it ${PREFIX}-hub -- python3 /kooplexhub/kooplexhub/manage.py manage_image --add ${IMAGE_NAME}

@@ -1,0 +1,180 @@
+FROM ##BASE##
+
+FROM ##PREFIX##-ei-jupyter-basic
+
+
+FROM rocker/verse:3.6.3
+
+USER root
+
+# configure apt frontent
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    wget \
+    bzip2 \
+    ca-certificates \
+    sudo vim\
+    locales
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+
+COPY --from=1 /opt/conda /opt/conda
+
+# Install Tini
+RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.9.0/tini && \
+    echo "faafbfb5b079303691a939a747d7f60591f2143164093727e870b289a44d9872 *tini" | sha256sum -c - && \
+    mv tini /usr/local/bin/tini && \
+    chmod +x /usr/local/bin/tini
+
+# Install LDAP and setup authentication
+COPY --from=0 /etc/nslcd.conf /etc/nslcd.conf
+RUN chmod 0600 /etc/nslcd.conf
+
+RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev 
+RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/  
+RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/  
+
+RUN apt update &&  apt install --yes systemd
+
+# Do not run nslcd as a daemon
+RUN systemctl disable nslcd
+
+RUN pam-auth-update --package
+
+EXPOSE 111/udp
+
+## # Configure environment
+## ENV CONDA_VER "latest"
+## ENV CONDA_DIR /opt/conda
+## ENV PATH $CONDA_DIR/bin:$PATH
+## ENV SHELL /bin/bash
+## ENV LC_ALL en_US.UTF-8
+## ENV LANG en_US.UTF-8
+## ENV LANGUAGE en_US.UTF-8
+## 
+## # Create conda dir
+## RUN mkdir -p $CONDA_DIR
+## 
+## # Maybe this one is not needed, since you can create conda envs into volumes
+## RUN chmod a+wrx $CONDA_DIR    
+## 
+## # Install conda
+## RUN cd /tmp && \
+##     mkdir -p $CONDA_DIR && \
+##     ANACONDA="Anaconda3-2019.07-Linux-x86_64.sh" && \
+##     wget --quiet https://repo.anaconda.com/archive/${ANACONDA} && \
+##     # echo "09f53738b0cd3bb96f5b1bac488e5528df9906be2480fe61df40e0e0d19e3d48 *Anaconda3-5.2.0-Linux-x86_64.sh" | sha256sum -c - && \
+##     /bin/bash ${ANACONDA} -f -b -p $CONDA_DIR && \
+##     rm ${ANACONDA}
+## 
+## RUN /opt/conda/bin/conda update -y conda
+
+
+#RUN sed -i -e "s/bionic/xenial/g" /etc/apt/sources.list && apt update && apt install -y slurm-client
+#RUN sed -i -e "s/xenial/bionic/g" /etc/apt/sources.list && apt update
+
+RUN R -e "install.packages('pdftools',repos='http://cran.us.r-project.org')"
+#RUN apt update && apt install -y libpoppler-dev libpoppler-cpp*
+RUN apt update && apt install -q -y nginx 
+
+RUN apt install -y net-tools
+# we don't run apt-get clean, coz the apt-cache is useful when preparing new module volumes
+RUN rm -rf /var/lib/apt/lists/*
+
+ENV SSH_AUTH_SOCK /tmp/my_sshagent_sock
+
+RUN mv /init /init.sh
+
+#ENV PASSWORD rstudio 
+ADD entrypoint-rstudio.sh /entrypoint.sh
+ADD rstudio-login.html /etc/rstudio/login.html
+ADD rstudio-user-settings /etc/rstudio/user-settings
+RUN chmod a-w /etc/rstudio/login.html
+
+#Meg valamit ezzel is kezdeni kell /var/run/s6/services/rstudio/run
+
+COPY --from=0 /init/ /init
+
+COPY --from=0 /etc/nsswitch.conf /etc/nsswitch.conf
+ADD rstudio-rserver.conf /etc/rstudio/rserver.conf
+ADD rstudio-rsession.conf /etc/rstudio/rsession.conf
+
+ADD rstudio-nginx.conf /etc/nginx/sites-enabled/
+
+ENTRYPOINT ["tini", "--"]
+CMD ["/bin/bash", "/entrypoint.sh"]
+
+
+
+
+
+##############333
+#
+#
+## RUN apt update 
+## 
+## RUN apt install -y curl zip && \
+##     curl -sL https://deb.nodesource.com/setup_14.x |  bash - && \
+##     apt install --yes nodejs 
+## 
+## RUN apt install -y tmux  curlftpfs \
+##  liblapack-dev libblas-dev \
+##  gfortran libfreetype6* pkg-config \
+##  git gcc mpi-default-dev mpi-default-bin libfftw3-dev fftw3 cmake \
+##  inotify-tools \
+##  autoconf libncurses5-dev libncursesw5-dev zlib1g-dev libbz2-dev liblzma-dev apt-rdepends \
+##  libfontconfig1 libxrender1 libxrender-dev \
+##  g++-5 libicu-dev libxml2-dev \
+##  libblacs-mpi-dev libscalapack-mpi-dev \
+##  texlive-xetex texlive-lang-european texlive-science
+## 
+## # conda
+## ENV CONDA_DIR /opt/conda
+## ENV PATH $CONDA_DIR/bin:$PATH
+## ENV SHELL /bin/bash
+## ENV LC_ALL en_US.UTF-8
+## ENV LANG en_US.UTF-8
+## ENV LANGUAGE en_US.UTF-8
+## 
+## # Create conda dir
+## RUN mkdir -p $CONDA_DIR
+## 
+## # Install conda
+## RUN cd /tmp && \
+##     mkdir -p $CONDA_DIR && \
+##     ANACONDA="Anaconda3-2020.02-Linux-x86_64.sh" && \
+##     wget --quiet https://repo.anaconda.com/archive/${ANACONDA} && \
+##     #FIXME: check sum
+##     /bin/bash ${ANACONDA} -f -b -p $CONDA_DIR && \
+##     rm ${ANACONDA}
+## 
+## RUN /opt/conda/bin/conda update -y conda
+## 
+## # basic
+## ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
+## RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
+## 
+## # Add local files as late as possible to avoid cache busting
+## ADD start-notebook.sh /usr/local/bin/start-notebook.sh
+## RUN chmod a+x /usr/local/bin/start-notebook.sh
+## #ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
+## #ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
+## 
+## RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
+## 
+## ########## add the rest
+## ADD init /init/
+## ADD jupyter_notebook_config.py /etc/jupyter_notebook_config.py
+## ADD jupyter_report_config.py /etc/jupyter_report_config.py
+## RUN chmod a+x /init/91-startsshagent.sh
+## 
+## WORKDIR /
+## 
+## #RUN pip install jupyterlab-bokeh-server && jupyter labextension install jupyterlab-bokeh-server
+## RUN  jupyter labextension install @pyviz/jupyterlab_pyviz jupyterlab-dash
+## 
+## RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
+##    apt update && apt install yarn
+## 

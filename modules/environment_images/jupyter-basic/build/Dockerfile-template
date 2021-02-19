@@ -40,6 +40,14 @@ RUN cd /tmp && \
 
 RUN /opt/conda/bin/conda update -y conda
 
+#RUN pip install jupyterlab-bokeh-server && jupyter labextension install jupyterlab-bokeh-server
+RUN  jupyter labextension install @pyviz/jupyterlab_pyviz jupyterlab-dash
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
+   apt update && apt install yarn
+
+RUN apt install -y python3-dev libpq-dev
+
 # basic
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
 RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
@@ -47,8 +55,8 @@ RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 RUN chmod a+x /usr/local/bin/start-notebook.sh
-#ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
-#ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
+ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
+ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
 
 RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
 
@@ -60,11 +68,4 @@ RUN chmod a+x /init/91-startsshagent.sh
 
 WORKDIR /
 
-#RUN pip install jupyterlab-bokeh-server && jupyter labextension install jupyterlab-bokeh-server
-RUN  jupyter labextension install @pyviz/jupyterlab_pyviz jupyterlab-dash
-
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
-   apt update && apt install yarn
-
-RUN apt install -y python3-dev libpq-dev
 
