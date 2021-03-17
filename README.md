@@ -1,3 +1,42 @@
+# Prerequisities
+
+An NFS server for persistent storage.
+
+At server side create the necessary folders and grant write access for kooplex services
+
+Example NFS service with a ZFS backend
+```bash
+zfs create pool/k8plex
+zfs set mountpoint=/srv/vols/k8plex pool/k8plex
+zfs set quota=10G pool/k8plex
+zfs set sharenfs="rw=@FQDN_NODE1,insecure,no_root_squash,rw=@FQDN_NODE2,insecure,no_root_squash,..." pool/k8plex
+zfs set acltype=posixacl pool/k8plex
+
+mkdir -p /srv/vols/k8plex/services/log
+mkdir -p /srv/vols/k8plex/services/conf
+mkdir -p /srv/vols/k8plex/services/data
+```
+
+# Installation steps
+
+## Helper
+
+```bash
+kooplex.sh create_service_pv
+kooplex.sh start_helper
+```
+
+
+# Uninstallation steps
+
+```bash
+kooplex.sh stop_helper
+kooplex.sh delete_service_pv
+```
+
+Remove or back up NFS folders.
+
+
 NEEDS REVISION
 
 some modules dont play a part any longer: eg net
