@@ -8,26 +8,34 @@ _mkdir () {
     fi
 }
 
-# Volume manipulation
-volume_configuration () {
-    CONF_YAML=$BUILDDIR/volume-service.yaml
+# PVs across services
+pv_yaml () {
+    CONF_YAML=$BUILDDIR/pv-service.yaml
     ( sed -e s,##PREFIX##,$PREFIX, \
-        -e s,##SERVICENODE##,$SERVICE_NODE, \
         -e s,##SERVICELOG_DIR##,$SERVICELOG_DIR, \
         -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
+        -e s,##NFS_SERVER_SVCLOG##,$NFS_SERVER_SVCLOG, \
         -e s,##SERVICECONF_DIR##,$SERVICECONF_DIR, \
         -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
+        -e s,##NFS_SERVER_SVCCONF##,$NFS_SERVER_SVCCONF, \
         -e s,##SERVICEDATA_DIR##,$SERVICEDATA_DIR, \
         -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
+        -e s,##NFS_SERVER_SVCDATA##,$NFS_SERVER_SVCDATA, \
         $CONFIGDIR/core/pv-service.yaml-template
-      sed -e s,##PREFIX##,$PREFIX, \
-        -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
-        -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
-        -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
-        $CONFIGDIR/core/pvc-service.yaml-template \
     )    > $CONF_YAML
 }
 
+# PVCs across services
+pvc_yaml () {
+    CONF_YAML=$BUILDDIR/pvc-${1}-service.yaml
+    ( sed -e s,##PREFIX##,$PREFIX, \
+        -e s,##NS##,$1, \
+        -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
+        -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
+        -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
+        $CONFIGDIR/core/pvc-service.yaml-template
+    )    > $CONF_YAML
+}
 
 # create root CA
 create_rootCA () {
@@ -57,10 +65,10 @@ mkdir_build () {
 # make module config dir
 start_helper () {
     HELPER_YAML=$BUILDDIR/helper.yaml
-    echo "HELPER POD DESCRIPTOR $TMP_YAML" >&2
+    echo "HELPER POD DESCRIPTOR $HELPER_YAML" >&2
     sed -e s,##PREFIX##,$PREFIX, \
-        -e s,##SERVICENODE##,$SERVICE_NODE, \
-	core/helper_pod.yaml-template \
+	-e s,##NS##,$NS_HELPER, \
+	core/pod-helper.yaml-template \
 	> $HELPER_YAML
     kubectl apply -f $HELPER_YAML
 }

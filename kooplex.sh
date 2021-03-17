@@ -29,23 +29,31 @@ echo "Command $VERB" >&2
 echo "Modules $SVCS" >&2
  
 case $VERB in
-  "createvolumes")
-    echo "Checking persistent volumes for services" >&2
-    volume_configuration
+  "create_service_pv")
+    echo "Create persistent volumes for services" >&2
+    _mkdir $BUILDDIR
+    pv_yaml
     kubectl apply -f $CONF_YAML
+    DONE=1
   ;;
-  "starthelper")
+  "start_helper")
     echo "Starting helper pod" >&2
+    kubectl create namespace $NS_HELPER
+    pvc_yaml $NS_HELPER
+    kubectl apply -f $CONF_YAML
     start_helper
+    DONE=1
   ;;
-  "stophelper")
-    echo "Stopping helper pod" >&2
-    stop_helper
+  "stop_helper")
+    echo "Deleting helper namespace $NS_HELPER" >&2
+    kubectl delete namespace $NS_HELPER
+    DONE=1
   ;;
-  "removevolumes")
+  "delete_service_pv")
     echo "Remove persistent volumes for services" >&2
-    volume_configuration
+    pv_yaml
     kubectl delete -f $CONF_YAML
+    DONE=1
   ;;
   "build"|"install"|"start"|"uninstall"|"init"|"stop"|"remove"|"purge")
     set -e
@@ -53,21 +61,27 @@ case $VERB in
   "restart")
     $0 stop $@
     $0 start $@
+    DONE=1
   ;;
   *)
     echo "Unknown command $VERB" >&2
-    exit 1
+    DONE=1
   ;;
 esac
 
-echo "Issue $VERB for each module..." >&2
+if [ -z "$DONE" ] ; then
 
-for MODULE_NAME in $SVCS
-do
-  mkdir_build
-  cd $CONFIGDIR/modules/$MODULE_NAME
-  . ./configure.sh
-done
+  echo "Issue $VERB for each module..." >&2
+
+  for MODULE_NAME in $SVCS
+  do
+    mkdir_build
+    cd $CONFIGDIR/modules/$MODULE_NAME
+    . ./configure.sh
+  done
+
+fi
 
 cd $MYPWD
-echo "Finished $VERB." >&2
+
+echo "Finished with $VERB." >&2

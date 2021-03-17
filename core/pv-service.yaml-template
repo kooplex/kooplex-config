@@ -1,9 +1,10 @@
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-##PREFIX##-svc-log
   labels:
-    pvl: svc-log
+    pvl: ##PREFIX##-svc-log
 spec:
   capacity:
     storage: ##SERVICELOG_QUOTA##
@@ -11,24 +12,19 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##SERVICELOG_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##NFS_SERVER_SVCLOG##
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-##PREFIX##-svc-conf
   labels:
-    pvl: svc-conf
+    pvl: ##PREFIX##-svc-conf
 spec:
   capacity:
     storage: ##SERVICECONF_QUOTA##
@@ -36,24 +32,19 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##SERVICECONF_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##NFS_SERVER_SVCCONF##
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-##PREFIX##-svc-data
   labels:
-    pvl: svc-data
+    pvl: ##PREFIX##-svc-data
 spec:
   capacity:
     storage: ##SERVICEDATA_QUOTA##
@@ -61,15 +52,10 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
     path: ##SERVICEDATA_DIR##
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - ##SERVICENODE##
+    server: ##NFS_SERVER_SVCDATA##
 ---
