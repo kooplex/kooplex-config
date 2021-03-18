@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MYPWD=$PWD
-CONFIGDIR=$(dirname $0)
+CONFIGDIR=$(realpath $(dirname $0))
 
 for SRC in $CONFIGDIR/config.sh $CONFIGDIR/lib.sh ; do
     if [ ! -f $SRC ] ; then
@@ -29,6 +29,21 @@ echo "Command $VERB" >&2
 echo "Modules $SVCS" >&2
  
 case $VERB in
+  "create_clusterrole")
+    echo "Create cluster role" >&2
+    kubectl apply -f $BUILDDIR/clusterrole.yaml
+    sed -e s,##NFS_CLIENT_PROVISIONER##,nfs-client-provisioner-runner-$PREFIX, \
+        core/clusterrole.yaml-template > $BUILDDIR/clusterrole.yaml
+    kubectl apply -f $BUILDDIR/clusterrole.yaml
+    DONE=1
+    ;;
+
+  "delete_clusterrole")
+    echo "Delete cluster role" >&2
+    kubectl delete clusterrole nfs-client-provisioner-runner-$PREFIX
+    ;;
+
+
   "create_service_pv")
     echo "Create persistent volumes for services" >&2
     _mkdir $BUILDDIR

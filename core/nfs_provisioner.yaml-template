@@ -1,0 +1,93 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+        name: nfs-client-provisioner
+        namespace: ##NS##
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+        name: ##ROLEBINDINGNAME##
+        namespace: ##NS##
+subjects:
+        - kind: ServiceAccount
+          name: nfs-client-provisioner
+          namespace: ##NS##
+roleRef:
+        kind: ClusterRole
+        name: ##NFS_CLIENT_PROVISIONER##
+        apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+        name: leader-locking-nfs-client-provisioner
+        namespace: ##NS##
+rules:
+        - apiGroups: [""]
+          resources: ["endpoints"]
+          verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+        name: leader-locking-nfs-client-provisioner
+        namespace: ##NS##
+subjects:
+        - kind: ServiceAccount
+          name: nfs-client-provisioner
+          namespace: ##NS##
+roleRef:
+        kind: Role
+        name: leader-locking-nfs-client-provisioner
+        apiGroup: rbac.authorization.k8s.io
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+        name: ##NS##
+provisioner: ##PROVISIONER##
+parameters:
+        archiveOnDelete: "false"
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+        name: nfs-client-provisioner
+        namespace: ##NS##
+spec:
+        selector:
+                matchLabels:
+                        app: nfs-client-provisioner
+        replicas: 1
+        strategy:
+                type: Recreate
+        template:
+                metadata:
+                        labels:
+                                app: nfs-client-provisioner
+                spec:
+                        serviceAccountName: nfs-client-provisioner
+                        containers:
+                                - name: nfs-client-provisioner
+                                  image: quay.io/external_storage/nfs-client-provisioner:latest
+                                  resources:
+                                          limits:
+                                                  cpu: 1
+                                                  memory: 1Gi
+                                  volumeMounts:
+                                          - name: nfs-client-mnt
+                                            mountPath: /persistentvolumes
+                                  env:
+                                          - name: PROVISIONER_NAME
+                                            value: ##PROVISIONER##
+                                          - name: NFS_SERVER
+                                            value: ##NFS_SERVER##
+                                          - name: NFS_PATH
+                                            value: ##NFS_PATH##
+                        volumes:
+                                - name: nfs-client-mnt
+                                  nfs:
+                                          server: ##NFS_SERVER##
+                                          path: ##NFS_PATH##
+

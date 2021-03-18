@@ -5,24 +5,28 @@ case $VERB in
 
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
-      mkdir_svclog
-      mkdir_svcdata
-      mkdir_svcconf
+      kubectl create namespace $NS_LDAP
+      nfs_provisioner $NS_LDAP veo1.int.vo.elte.hu /srv/vols/k8plex_test
 
       sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_LDAP, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
-	  build/ldap-svcs.yaml-template > $BUILDMOD_DIR/ldap-svcs.yaml
+          build/svc-ldap.yaml-template > $BUILDMOD_DIR/svc-ldap.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_LDAP, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+	  build/pvc-ldap.yaml-template > $BUILDMOD_DIR/pvc-ldap.yaml
+
+      sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_LDAP, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
           -e s,##ORGANISATION##,"$LDAP_ORGANISATION", \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
           -e s,##FQDN##,$FQDN, \
           -e s,##SERVICENODE##,${SERVICE_NODE}, \
-	  build/ldap-pods.yaml-template > $BUILDMOD_DIR/ldap-pods.yaml
+	  build/pod-ldap.yaml-template > $BUILDMOD_DIR/pod-ldap.yaml
 
-      mkdir_svcdata db
-      mkdir_svcdata helper
       DN="dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
       sed -e s/##LDAPORG##/$DN/ \
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
@@ -34,33 +38,34 @@ case $VERB in
           -e s,##LDAP_ADMIN_PASSWORD##,"$LDAP_ADMIN_PASSWORD", \
           scripts/adduser.sh-template > $BUILDMOD_DIR/helper_adduser.sh
       chmod +x $BUILDMOD_DIR/helper_init.sh
-      kubectl cp $BUILDMOD_DIR/helper_init.sh helper:/data/$MODULE_NAME/helper/init.sh
-      kubectl cp $BUILDMOD_DIR/helper_adduser.sh helper:/data/$MODULE_NAME/helper/adduser.sh
   ;;
 
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/ldap-svcs.yaml
+      kubectl apply -f $BUILDMOD_DIR/pvc-ldap.yaml
+      kubectl apply -f $BUILDMOD_DIR/svc-ldap.yaml
   ;;
 
   "start")
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/ldap-pods.yaml
+      kubectl apply -f $BUILDMOD_DIR/pod-ldap.yaml
   ;;
 
   "init")
       echo "Initialization ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- /usr/local/ldap/init.sh
+      kubectl cp -n $NS_LDAP $BUILDMOD_DIR/helper_init.sh ${PREFIX}-${MODULE_NAME}:/usr/local/ldap/init.sh
+      kubectl cp -n $NS_LDAP $BUILDMOD_DIR/helper_adduser.sh ${PREFIX}-${MODULE_NAME}:/usr/local/ldap/adduser.sh
+      kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -n $NS_LDAP -- /usr/local/ldap/init.sh
   ;;
     
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/ldap-pods.yaml
+      kubectl delete -f $BUILDMOD_DIR/pod-ldap.yaml
   ;;
     
   "uninstall")
-      echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/ldap-svcs.yaml
+      echo "Deleting namespace ${NS_LDAP}" >&2
+      kubectl delete namespace $NS_LDAP
   ;;
     
   "remove")

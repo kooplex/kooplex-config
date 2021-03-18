@@ -10,7 +10,8 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: ##SERVICECONF_QUOTA##
+      #storage: ##SERVICECONF_QUOTA##
+      storage: 1Gi
   storageClassName: ""
   selector:
     matchLabels:
@@ -27,7 +28,8 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: ##SERVICELOG_QUOTA##
+      #storage: ##SERVICELOG_QUOTA##
+      storage: 1Gi
   storageClassName: ""
   selector:
     matchLabels:
@@ -44,7 +46,8 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: ##SERVICEDATA_QUOTA##
+      #storage: ##SERVICEDATA_QUOTA##
+      storage: 1Gi
   storageClassName: ""
   selector:
     matchLabels:

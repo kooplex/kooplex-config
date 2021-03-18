@@ -33,12 +33,12 @@ $ cp kooplex-config/config.sh_template kooplex-config/config.sh
 
 TBD
 
-## Helper
+## Create a cluster role for nfs provisioning
 
 ```bash
-kooplex.sh create_service_pv
-kooplex.sh start_helper
+kooplex.sh create_clusterrole
 ```
+
 
 ## Proxy
 
@@ -48,9 +48,20 @@ kooplex.sh install proxy
 kooplex.sh start proxy 
 ```
 
+## Ldap
+
+
+```bash
+kooplex.sh build ldap
+kooplex.sh install ldap
+kooplex.sh start ldap
+kooplex.sh init ldap
+```
+
 # Uninstallation steps
 
 ```bash
+kooplex.sh uninstall ldap 
 kooplex.sh uninstall proxy 
 kooplex.sh stop_helper
 kooplex.sh delete_service_pv

@@ -26,3 +26,5 @@ spec:
     - name: svclog
       persistentVolumeClaim:
         claimName: pvc-##PREFIX##-svc-log
+  nodeSelector:
+    kubernetes.io/hostname: veo1

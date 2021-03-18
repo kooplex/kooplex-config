@@ -1,0 +1,42 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-svclog
+  namespace: ##NS##
+spec:
+  storageClassName: ##PREFIX##-##MODULE_NAME##
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage:
+        1Mi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-svcdata
+  namespace: ##NS##
+spec:
+  storageClassName: ##PREFIX##-##MODULE_NAME##
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage:
+        1Mi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-svcconf
+  namespace: ##NS##
+spec:
+  storageClassName: ##PREFIX##-##MODULE_NAME##
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage:
+        1Mi
+---

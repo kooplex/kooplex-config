@@ -8,6 +8,22 @@ _mkdir () {
     fi
 }
 
+
+nfs_provisioner () {
+    CONF_YAML=$BUILDDIR/nfs_provisioner-${1}.yaml
+    echo "Creating nfs provisioner..." >&2
+    #FIXME: 
+    ( sed -e s,##NS##,$1, \
+          -e s,##ROLEBINDINGNAME##,crlb-nfs-client-provisioner-runner-$1, \
+          -e s,##NFS_CLIENT_PROVISIONER##,nfs-client-provisioner-runner-$PREFIX, \
+          -e s,##PROVISIONER##,veo1/nfs, \
+          -e s,##NFS_SERVER##,$2, \
+          -e s,##NFS_PATH##,$3, \
+          $CONFIGDIR/core/nfs_provisioner.yaml-template
+    )    > $CONF_YAML
+    kubectl apply -f $CONF_YAML
+}
+
 # PVs across services
 pv_yaml () {
     CONF_YAML=$BUILDDIR/pv-service.yaml
@@ -73,32 +89,28 @@ start_helper () {
     kubectl apply -f $HELPER_YAML
 }
 
-stop_helper () {
-    HELPER_YAML=$BUILDDIR/helper.yaml
-    kubectl delete -f $HELPER_YAML
-}
 
 # make module conf dir
 mkdir_svcconf () {
-    kubectl exec -it helper -- mkdir -p /conf/$MODULE_NAME/$1
+    kubectl exec -it helper -n $NS_HELPER -- mkdir -p /conf/$MODULE_NAME/$1
 }
 
 
 # make module log dir
 mkdir_svclog () {
-    kubectl exec -it helper -- mkdir -p /log/$MODULE_NAME/$1
+    kubectl exec -it helper -n $NS_HELPER -- mkdir -p /log/$MODULE_NAME/$1
 }
 
 
 # make module service data dir
 mkdir_svcdata () {
-    kubectl exec -it helper -- mkdir -p /data/$MODULE_NAME/$1
+    kubectl exec -it helper -n $NS_HELPER -- mkdir -p /data/$MODULE_NAME/$1
 }
 
 # remove module service directories
 purgedir_svc () {
     for d in conf log data ; do
-        kubectl exec -it helper -- rm -rf /$d/$MODULE_NAME
+        kubectl exec -it helper -n $NS_HELPER -- rm -rf /$d/$MODULE_NAME
         echo "Removed folder: $d" >&2
     done
 }
