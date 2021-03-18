@@ -16,7 +16,7 @@ nfs_provisioner () {
     ( sed -e s,##NS##,$1, \
           -e s,##ROLEBINDINGNAME##,crlb-nfs-client-provisioner-runner-$1, \
           -e s,##NFS_CLIENT_PROVISIONER##,nfs-client-provisioner-runner-$PREFIX, \
-          -e s,##PROVISIONER##,veo1/nfs, \
+          -e s,##PROVISIONER##,$NFS_SERVER/nfs, \
           -e s,##NFS_SERVER##,$2, \
           -e s,##NFS_PATH##,$3, \
           $CONFIGDIR/core/nfs_provisioner.yaml-template

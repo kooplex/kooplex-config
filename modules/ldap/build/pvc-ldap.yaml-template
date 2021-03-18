@@ -10,7 +10,7 @@ spec:
   resources:
     requests:
       storage:
-        1Mi
+        ##REQUEST_LOG##
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -24,7 +24,7 @@ spec:
   resources:
     requests:
       storage:
-        1Mi
+        ##REQUEST_DATA##
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -38,5 +38,5 @@ spec:
   resources:
     requests:
       storage:
-        1Mi
+        ##REQUEST_CONF##
 ---

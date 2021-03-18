@@ -6,7 +6,7 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
       kubectl create namespace $NS_LDAP
-      nfs_provisioner $NS_LDAP veo1.int.vo.elte.hu /srv/vols/k8plex_test
+      nfs_provisioner $NS_LDAP $NFS_SERVER $NFS_PATH
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##NS##,$NS_LDAP, \
@@ -16,6 +16,9 @@ case $VERB in
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##NS##,$NS_LDAP, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##REQUEST_LOG##,$SERVICELOG_REQUEST, \
+          -e s,##REQUEST_CONF##,$SERVICECONF_REQUEST, \
+          -e s,##REQUEST_DATA##,$SERVICEDATA_REQUEST, \
 	  build/pvc-ldap.yaml-template > $BUILDMOD_DIR/pvc-ldap.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
@@ -65,7 +68,9 @@ case $VERB in
     
   "uninstall")
       echo "Deleting namespace ${NS_LDAP}" >&2
-      kubectl delete namespace $NS_LDAP
+      kubectl delete namespace $NS_LDAP || true
+      kubectl delete storageclass $NS_LDAP || true
+      kubectl delete clusterrolebinding crlb-nfs-client-provisioner-runner-$NS_LDAP
   ;;
     
   "remove")
