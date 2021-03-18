@@ -40,12 +40,21 @@ kooplex.sh create_service_pv
 kooplex.sh start_helper
 ```
 
+## Proxy
+
+```bash
+kooplex.sh build proxy
+kooplex.sh install proxy 
+kooplex.sh start proxy 
+```
 
 # Uninstallation steps
 
 ```bash
+kooplex.sh uninstall proxy 
 kooplex.sh stop_helper
 kooplex.sh delete_service_pv
+kooplex.sh remove
 ```
 
 Remove or back up NFS folders.

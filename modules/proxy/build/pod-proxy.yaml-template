@@ -2,11 +2,10 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##
 spec:
-#  subdomain: ##MODULE_NAME##-service
   containers:
   - image: jupyterhub/configurable-http-proxy:4.2.1
     name: ##PREFIX##-##MODULE_NAME##
