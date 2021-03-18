@@ -19,6 +19,20 @@ mkdir -p /srv/vols/k8plex/services/data
 
 # Installation steps
 
+## Retrieve sources and configure k8plex
+
+* clone this repository
+* create configuration file
+
+```bash
+$ git clone -b kubernetes-ns https://github.com/kooplex/kooplex-config.git
+$ cp kooplex-config/config.sh_template kooplex-config/config.sh
+```
+
+* edit configuration file
+
+TBD
+
 ## Helper
 
 ```bash
@@ -37,14 +51,17 @@ kooplex.sh delete_service_pv
 Remove or back up NFS folders.
 
 
-NEEDS REVISION
+# Further reading
 
-some modules dont play a part any longer: eg net
+Visit the [Kooplex page](https://kooplex.github.io/) for more information.
+
+
+BELOW LINE NEEDS REVISION
+
 
 ----
 
 
-Visit the [Kooplex page](https://kooplex.github.io/) for further informations!
 
 ## Kooplex configuration scripts
 
@@ -53,11 +70,6 @@ $SRV with the kooplex root directory on your host machine.
 
 ## Installation
 
-* clone this repository
-
-    $ git clone https://github.com/kooplex/kooplex-config.git
-
-* copy config.sh_template to config.sh and modify it as necessary. Here are the variables explained:
 ```bash
 #The url that will be accessible from a browser
 OUTERHOSTNAME="example.org"
