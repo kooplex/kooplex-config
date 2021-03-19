@@ -11,10 +11,21 @@ zfs set mountpoint=/srv/vols/k8plex pool/k8plex
 zfs set quota=10G pool/k8plex
 zfs set sharenfs="rw=@FQDN_NODE1,insecure,no_root_squash,rw=@FQDN_NODE2,insecure,no_root_squash,..." pool/k8plex
 zfs set acltype=posixacl pool/k8plex
+```
+One can configure k8plex services with separat volumes for different storage purposes, like one volume for service data, configuration and logs, and another volume for user data. For testing purposes a single volume setup recommended.
 
-mkdir -p /srv/vols/k8plex/services/log
-mkdir -p /srv/vols/k8plex/services/conf
-mkdir -p /srv/vols/k8plex/services/data
+Service data, configuration and log folders are provisioned dynamically by NFS client provisioners, folders for user data are mapped to several stand alone PVs. For those the necessary subfolders need to be created in advance, otherwise a POD may fail to start during mount phase, a nfs server raising a no such file or directory folder.
+
+In our example with the single exported volume do the following:
+
+```bash
+mkdir -p /srv/vols/k8plex/users
+mkdir -p /srv/vols/k8plex/garbage
+mkdir -p /srv/vols/k8plex/data/report
+mkdir -p /srv/vols/k8plex/data/project
+mkdir -p /srv/vols/k8plex/cache/_fs
+mkdir -p /srv/vols/k8plex/cache/_git
+mkdir -p /srv/vols/k8plex/cache/report_prepare
 ```
 
 # Installation steps
