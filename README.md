@@ -39,6 +39,19 @@ TBD
 kooplex.sh create_clusterrole
 ```
 
+## Image registry
+
+```bash
+kooplex.sh build registry
+kooplex.sh install registry
+kooplex.sh start registry
+```
+
+kubectl edit svc k8plex-test-registry -n image-registry
+add in spce section
+  externalIPs:
+  - 157.181.172.101
+
 
 ## Proxy
 
@@ -61,10 +74,10 @@ kooplex.sh init ldap
 # Uninstallation steps
 
 ```bash
+kooplex.sh uninstall registry
 kooplex.sh uninstall ldap 
 kooplex.sh uninstall proxy 
-kooplex.sh stop_helper
-kooplex.sh delete_service_pv
+kooplex.sh delete_clusterrole
 kooplex.sh remove
 ```
 

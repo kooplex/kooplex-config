@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-##REGISTRY##
+  labels:
+    pvl: ##REGISTRY_LABEL##
+spec:
+  capacity:
+    storage: 1Ti
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+#    - nfsvers=4.1
+  nfs:
+    server: ##NFS_SERVER_IMAGE##
+    path: ##NFS_FOLDER_IMAGE##

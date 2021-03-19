@@ -6,10 +6,10 @@ metadata:
 spec:
   selector:
     name: lbl-##PREFIX##-##MODULE_NAME##
+  externalIPs:
+    - ##EXTERNALIP##
   ports:
-    - name: ldap
-      port: 389
-      targetPort: 389
-    - name: ldaps
-      port: 636
-      targetPort: 636
+    - name: https
+      protocol: TCP
+      port: 5000
+      targetPort: 443

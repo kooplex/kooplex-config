@@ -41,6 +41,7 @@ case $VERB in
   "delete_clusterrole")
     echo "Delete cluster role" >&2
     kubectl delete clusterrole nfs-client-provisioner-runner-$PREFIX
+    DONE=1
     ;;
 
 
