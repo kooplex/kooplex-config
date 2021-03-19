@@ -1,6 +1,6 @@
 uid nslcd
 gid nslcd
-uri ldap://svc-##PREFIX##-ldap
+uri ldap://##PREFIX##-ldap.##NS_LDAP##
 base ##LDAPORG##
 binddn cn=admin,##LDAPORG##
 bindpw ##LDAP_ADMIN_PASSWORD##

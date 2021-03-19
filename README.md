@@ -57,7 +57,6 @@ kooplex.sh start proxy
 
 ## Ldap
 
-
 ```bash
 kooplex.sh build ldap
 kooplex.sh install ldap
@@ -65,12 +64,22 @@ kooplex.sh start ldap
 kooplex.sh init ldap
 ```
 
+## Hub
+
+```bash
+kooplex.sh build hub
+kooplex.sh install hub
+kooplex.sh start hub
+kooplex.sh init hub
+```
+
 # Uninstallation steps
 
 ```bash
-kooplex.sh uninstall registry
-kooplex.sh uninstall ldap 
+kooplex.sh uninstall hub 
 kooplex.sh uninstall proxy 
+kooplex.sh uninstall ldap 
+kooplex.sh uninstall registry
 kooplex.sh delete_clusterrole
 kooplex.sh remove
 ```

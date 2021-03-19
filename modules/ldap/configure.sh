@@ -58,6 +58,7 @@ case $VERB in
       echo "Initialization ${PREFIX}-${MODULE_NAME}" >&2
       kubectl cp -n $NS_LDAP $BUILDMOD_DIR/helper_init.sh ${PREFIX}-${MODULE_NAME}:/usr/local/ldap/init.sh
       kubectl cp -n $NS_LDAP $BUILDMOD_DIR/helper_adduser.sh ${PREFIX}-${MODULE_NAME}:/usr/local/ldap/adduser.sh
+      kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -n $NS_LDAP -- chmod +x /usr/local/ldap/init.sh /usr/local/ldap/adduser.sh
       kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -n $NS_LDAP -- /usr/local/ldap/init.sh
   ;;
     

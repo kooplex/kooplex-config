@@ -4,13 +4,8 @@
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
-      mkdir_svclog
-      mkdir_svcdata
-      mkdir_svcconf
-
-      mkdir_svcdata _hubcode_
-      HELPER_CODE_DIR=/data/hub/_hubcode_
-      kubectl exec -it helper -- bash -c "[ -d $HELPER_CODE_DIR/.git ] || git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git $HELPER_CODE_DIR"
+      kubectl create namespace $NS_HUB
+      nfs_provisioner $NS_HUB $NFS_SERVER $NFS_PATH
 
       sed -e s,##PREFIX##,${PREFIX}, \
           build/Dockerfile.hub-template > $BUILDMOD_DIR/Dockerfile.hub
@@ -22,10 +17,12 @@ case $VERB in
       docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hub
 
       sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_HUB, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
-	  build/hub-svcs.yaml-template > $BUILDMOD_DIR/hub-svcs.yaml
+	  build/svc-hub.yaml-template > $BUILDMOD_DIR/svc-hub.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_HUB, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
           -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##FQDN##,$FQDN, \
@@ -35,10 +32,10 @@ case $VERB in
           -e s,##HUBDB_USER##,$HUBUSER, \
           -e s,##HUBDB_PW##,$HUBUSER_PW, \
           -e s,##LDAP_ADMIN_PASSWORD##,$LDAP_ADMIN_PASSWORD, \
-	  build/hub-pods.yaml-template > $BUILDMOD_DIR/hub-pods.yaml
+	  build/pod-hub.yaml-template > $BUILDMOD_DIR/pod-hub.yaml
 
       sed -e s,##PREFIX##,${PREFIX}, \
-          -e s,##SERVICENODE##,${SERVICE_NODE}, \
+          -e s,##NFS_SERVER##,${NFS_SERVER_HUB}, \
           -e s,##HOME_DIR##,${HOME_DIR}, \
           -e s,##HOME_QUOTA##,${HOME_QUOTA}, \
           -e s,##GARBAGE_DIR##,${GARBAGE_DIR}, \
@@ -50,7 +47,13 @@ case $VERB in
           -e s,##CACHE_DIR##,${CACHE_DIRS}, \
           -e s,##CACHE_QUOTA##,${CACHE_QUOTA}, \
           build/pv-hub.yaml-template > $BUILDMOD_DIR/pv-hub.yaml
+
       sed -e s,##PREFIX##,${PREFIX}, \
+          -e s,##NS##,$NS_HUB, \
+          -e s,##MODULE_NAME##,$MODULE_NAME, \
+          -e s,##REQUEST_LOG##,$SERVICELOG_REQUEST, \
+          -e s,##REQUEST_CONF##,$SERVICECONF_REQUEST, \
+          -e s,##REQUEST_DATA##,$SERVICEDATA_REQUEST, \
           -e s,##HOME_USERQUOTA##,${HOME_USERQUOTA}, \
           -e s,##GARBAGE_QUOTA##,${GARBAGE_QUOTA}, \
           -e s,##PROJECT_PROJECTQUOTA##,${PROJECT_PROJECTQUOTA}, \
@@ -58,22 +61,24 @@ case $VERB in
           -e s,##CACHE_USERQUOTA##,${CACHE_USERQUOTA}, \
           build/pvc-hub.yaml-template > $BUILDMOD_DIR/pvc-hub.yaml
       kubectl apply -f $BUILDMOD_DIR/pv-hub.yaml
-      kubectl apply -f $BUILDMOD_DIR/pvc-hub.yaml
   ;;
 
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/hub-svcs.yaml
-      register_module_in_nginx
-      register_module_in_hydra
+      kubectl apply -f $BUILDMOD_DIR/pvc-hub.yaml
+      kubectl apply -f $BUILDMOD_DIR/svc-hub.yaml
+      #register_module_in_nginx
+      #register_module_in_hydra
       echo "Store default.conf in configmap" >&2
+      CLIENT=DUMMY
+      SECRET=DUMMY
       ( cat <<EOF1
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: $PREFIX-hub
-  namespace: default
+  namespace: $NS_HUB
 data:
   client: $CLIENT
   secret: $SECRET
@@ -85,25 +90,26 @@ EOF1
 
   "start")
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/hub-pods.yaml
+      kubectl apply -f $BUILDMOD_DIR/pod-hub.yaml
   ;;
 
   "init")
-	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -- python3 /kooplexhub/kooplexhub/manage.py makemigrations
-	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -- python3 /kooplexhub/kooplexhub/manage.py migrate
+	  kubectl wait --for=condition=Ready pod/${PREFIX}-${MODULE_NAME} -n $NS_HUB
+          kubectl exec -it ${PREFIX}-ldap -n $NS_LDAP -- /usr/local/ldap/adduser.sh hub $UID_HUB $GID_HUB
+	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -n $NS_HUB -- python3 /kooplexhub/kooplexhub/manage.py makemigrations
+	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -n $NS_HUB -- python3 /kooplexhub/kooplexhub/manage.py migrate
   ;;
 
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/hub-pods.yaml
+      kubectl delete -f $BUILDMOD_DIR/pod-hub.yaml
   ;;
 
   "uninstall")
-      deregister_module_in_nginx
-      deregister_module_in_hydra
+#      deregister_module_in_nginx
+#      deregister_module_in_hydra
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/hub-svcs.yaml || true
-      kubectl delete -f $BUILDMOD_DIR/pvc-hub.yaml || true
+      kubectl delete namespace $NS_HUB || true
       kubectl delete -f $BUILDMOD_DIR/pv-hub.yaml
   ;;
 

@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: svc-##PREFIX##-##MODULE_NAME##
+  namespace: ##NS##
 spec:
   selector:
     name: lbl-##PREFIX##-##MODULE_NAME##
@@ -15,6 +16,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: svc-##PREFIX##-##MODULE_NAME##-mysql
+  namespace: ##NS##
 spec:
   selector:
     name: lbl-##PREFIX##-##MODULE_NAME##-mysql

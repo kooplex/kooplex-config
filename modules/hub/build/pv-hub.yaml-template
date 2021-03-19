@@ -13,10 +13,10 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - hard
-    - nfsvers=4.1
+#    - nfsvers=4.1
   nfs:
     path: ##HOME_DIR##
-    server: ##SERVICENODE##
+    server: ##NFS_SERVER##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -33,10 +33,10 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - hard
-    - nfsvers=4.1
+#    - nfsvers=4.1
   nfs:
     path: ##GARBAGE_DIR##
-    server: ##SERVICENODE##
+    server: ##NFS_SERVER##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -53,10 +53,10 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - hard
-    - nfsvers=4.1
+#    - nfsvers=4.1
   nfs:
     path: ##PROJECT_DIR##
-    server: ##SERVICENODE##
+    server: ##NFS_SERVER##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -73,10 +73,10 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - hard
-    - nfsvers=4.1
+#    - nfsvers=4.1
   nfs:
     path: ##REPORT_DIR##
-    server: ##SERVICENODE##
+    server: ##NFS_SERVER##
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -93,8 +93,8 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - hard
-    - nfsvers=4.1
+#    - nfsvers=4.1
   nfs:
     path: ##CACHE_DIR##
-    server: ##SERVICENODE##
+    server: ##NFS_SERVER##
 ---

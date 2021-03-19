@@ -2,25 +2,33 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##
 spec:
+  initContainers:
+  - name: init-gitclone
+    image: ajeetraina/alpine-git
+    command: ['sh', '-c', "git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git /x || true"]
+    volumeMounts:
+      - mountPath: /x
+        name: svcdata
+        subPath: hub
   containers:
-  - image: ##MY_REGISTRY##/k8plex-hub
+  - image: ##MY_REGISTRY##/##PREFIX##-hub
     name: ##PREFIX##-##MODULE_NAME##
     ports:
       - containerPort: 80
         name: http
     volumeMounts:
       - mountPath: /kooplexhub
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/_hubcode_
+        name: svcdata
+        subPath: hub
       - mountPath: /var/log/hub
-        name: svclog-##PREFIX##-##MODULE_NAME##
+        name: svclog
         subPath: ##MODULE_NAME##/
       - mountPath: /etc/secrets
-        name: svcconf-##PREFIX##-##MODULE_NAME##
+        name: svcconf
         subPath: ##MODULE_NAME##/secrets
       - mountPath: /mnt/home
         name: pv-home-##PREFIX##
@@ -54,30 +62,18 @@ spec:
         value: "##HUBDB_PW##"
       - name: HUBLDAP_PW
         value: "##LDAP_ADMIN_PASSWORD##"
-##      - HUBPROXY_PW=##PROXYTOKEN##
-##      - DOCKER_VOLUME_DIR=##DOCKER_VOLUME_DIR##
-##      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-##      - HYDRA_OIDC_SECRET_HUB=##HYDRA_OIDC_SECRET_HUB##
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
-##    volumes:
-##      - ##PREFIX##-workdir:/mnt/.volumes/workdir:rw
-##      - ##PREFIX##-git:/mnt/.volumes/git:rw
-##      - ##PREFIX##-course:/mnt/.volumes/course:rw
-##      - ##PREFIX##-usercourse:/mnt/.volumes/usercourse:rw
-##      - ##PREFIX##-assignment:/mnt/.volumes/assignment:rw
-##      - /var/run/docker.sock:/var/run/docker.sock
-##      - ##PREFIX##-hub-log:/var/log/hub:rw
   volumes:
-    - name: svcconf-##PREFIX##-##MODULE_NAME##
+    - name: svcconf
       persistentVolumeClaim:
-        claimName: pvc-svcconf-##PREFIX##
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
+        claimName: pvc-svcconf
+    - name: svcdata
       persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
-    - name: svclog-##PREFIX##-##MODULE_NAME##
+        claimName: pvc-svcdata
+    - name: svclog
       persistentVolumeClaim:
-        claimName: pvc-svclog-##PREFIX##
+        claimName: pvc-svclog
     - name: pv-home-##PREFIX##
       persistentVolumeClaim:
         claimName: pvc-home-##PREFIX##
@@ -98,7 +94,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##-mysql
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##-mysql
 spec:
@@ -110,8 +106,8 @@ spec:
         name: mysql
     volumeMounts:
       - mountPath: /var/lib/mysql
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/mysql/
+        name: svcdata
+        subPath: mysql
 #      - /etc/localtime:/etc/localtime:ro
     env:
       - name: MYSQL_ROOT_PASSWORD
@@ -127,6 +123,6 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
+    - name: svcdata
       persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
+        claimName: pvc-svcdata
