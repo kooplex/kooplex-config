@@ -47,12 +47,6 @@ kooplex.sh install registry
 kooplex.sh start registry
 ```
 
-kubectl edit svc k8plex-test-registry -n image-registry
-add in spce section
-  externalIPs:
-  - 157.181.172.101
-
-
 ## Proxy
 
 ```bash
