@@ -1,10 +1,11 @@
 # Prerequisities
 
-An NFS server for persistent storage.
+Setup and configure an NFS server for persistent storage.
 
 At server side create the necessary folders and grant write access for kooplex services
 
-Example NFS service with a ZFS backend
+For example NFS service with a ZFS backend, you can create a volume and publish it to your kubernetes cluster nodes:
+
 ```bash
 zfs create pool/k8plex
 zfs set mountpoint=/srv/vols/k8plex pool/k8plex
@@ -12,11 +13,11 @@ zfs set quota=10G pool/k8plex
 zfs set sharenfs="rw=@FQDN_NODE1,insecure,no_root_squash,rw=@FQDN_NODE2,insecure,no_root_squash,..." pool/k8plex
 zfs set acltype=posixacl pool/k8plex
 ```
-One can configure k8plex services with separat volumes for different storage purposes, like one volume for service data, configuration and logs, and another volume for user data. For testing purposes a single volume setup recommended.
+One can configure k8plex services with separate volumes for different storage purposes, like one volume for service data, configuration and logs, and some other volumes for user data. For testing purposes a single volume setup recommended.
 
-Service data, configuration and log folders are provisioned dynamically by NFS client provisioners, folders for user data are mapped to several stand alone PVs. For those the necessary subfolders need to be created in advance, otherwise a POD may fail to start during mount phase, a nfs server raising a no such file or directory folder.
+Service data, configuration and log folders are provisioned dynamically by NFS client provisioners. Folders for user data are mapped to several stand alone PVs. For those latter PVs the necessary subfolders need to be created in advance, otherwise a POD may fail to start during the mount phase, because the nfs server should raise a no such file or directory folder.
 
-In our example with the single exported volume do the following:
+Following our example with the single exported volume case, do the following:
 
 ```bash
 mkdir -p /srv/vols/k8plex/users
