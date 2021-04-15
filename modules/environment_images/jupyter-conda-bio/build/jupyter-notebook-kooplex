@@ -1,0 +1,209 @@
+#!/usr/bin/env python
+"""Extend regular notebook server to be aware of multiuser things."""
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+from jinja2 import ChoiceLoader, FunctionLoader
+from notebook.notebookapp import NotebookApp
+
+contname="""
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" class="navbar-brand" style="color: black;"> <strong>{{ host_name }}</strong></a></li>
+    </ul>
+"""
+
+switch_lab = """
+    <span id="login_widget">
+        <a href="/notebook/{{ containername }}/lab"><img src=/notebook/{{ containername }}/static/base/images/jupyterlab.png" title="Switch to JupyterLab" width="35px"/></da>
+    </span>
+"""
+
+kooplex_logo = """
+    <a href="/hub" >
+       <img src="/notebook/{{ containername }}/static/base/images/kooplex-logo.png" height="32px" style="padding-right: 30px;">
+    </a>
+"""
+jupyter_logo = """
+    <a href="/notebook/{{ containername }}/tree">
+       <img src="/notebook/{{ containername }}/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f" alt="Jupyter Notebook" height="35px">
+    </a>
+"""
+
+edit_template = """
+{% extends "templates/edit.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+<span id="save_widget" class="pull-left save_widget">
+    <span class="filename"></span>
+    <span class="last_modified"></span>
+</span>
+
+""" + kooplex_logo + """
+""" + jupyter_logo + """
+
+""" + contname + """
+{% endblock %}
+{% block login_widget %}
+{% endblock %}
+
+"""
+
+terminal_template = """
+{% extends "templates/terminal.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+
+""" + kooplex_logo + """
+
+""" + jupyter_logo + """
+""" + contname + """
+
+{% endblock %}
+{% block login_widget %}
+{% endblock %}
+
+"""
+
+
+tree_template = """
+{% extends "templates/tree.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+
+""" + kooplex_logo + """
+
+""" + jupyter_logo + """
+""" + contname + """
+{% endblock %}
+
+{% block login_widget %}
+
+  {% endblock %}
+
+{% block script %}
+    {{super()}}
+
+<script type="text/javascript">
+  var node = document.createElement("LI");     
+  var link = document.createElement("a");     
+  link.href="/notebook/{{ containername }}/lab";
+  link.id = "switchlab";
+  var textnode = document.createTextNode('Switch to JupyterLab');
+  link.appendChild(textnode);
+  node.appendChild(link);
+  document.getElementById("tabs").appendChild(node);
+</script>
+<script type="text/javascript">    
+        $( "#switchlab" ).click(function(){
+      var url = $(this).attr('href');
+      $( location ).attr("href", url);
+
+    });
+</script>
+{% endblock %}
+
+"""
+
+notebook_template = """
+{% extends "templates/notebook.html" %}
+{% block meta %}
+<style>
+.navbar-header > a {
+    padding-right:30px;
+}
+</style>
+{% endblock %}
+{% block logo %}
+{% endblock %}
+  {% block headercontainer %}
+
+<span id="save_widget" class="save_widget">
+    <span id="notebook_name" class="filename"></span>
+    <span class="checkpoint_status"></span>
+    <span class="autosave_status" style="margin-right: 150px"></span>
+""" + kooplex_logo + """
+</span>
+
+<a href="#" class="navbar-brand" style="color: black;"> <strong>{{ host_name }}</strong></a>
+<span id="kernel_logo_widget">
+  {% block kernel_logo_widget %}
+  <img class="current_kernel_logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
+  {% endblock %}
+</span>
+
+  {% endblock %}
+{% block login_widget %}
+{% endblock %}
+
+"""
+
+
+class KooplexUserNotebookApp(NotebookApp):
+
+      def patch_templates(self):
+        import os
+
+        # let us point to some crasy urls with the buttons
+        # this illustrates the values of some internal url type strings
+        env = self.web_app.settings['jinja2_env']
+        env.globals['stop_link'] = 'http://www.google.com/'+self.base_url
+        env.globals['commit_link'] = 'http://www.google.com/'+self.connection_url
+        env.globals['host_name'] =  os.getenv("HOSTNAME")
+        env.globals['user_name'] = os.getenv("NB_USER")
+        env.globals['containername'] = os.getenv("HOSTNAME")
+
+
+        # patch jinja env loading to modify page template
+        def get_page(name):
+            if name == 'tree.html':
+                return tree_template
+            if name == 'notebook.html':
+                return notebook_template
+            if name == 'terminal.html':
+                return terminal_template
+            if name == 'edit.html':
+                return edit_template
+
+        orig_loader = env.loader
+        env.loader = ChoiceLoader([
+            FunctionLoader(get_page),
+            orig_loader,
+        ])
+
+     
+      def init_webapp(self):
+
+          super(KooplexUserNotebookApp,self).init_webapp()
+          self.patch_templates()
+
+def main(argv=None):
+    return KooplexUserNotebookApp.launch_instance(argv)
+
+
+if __name__ == "__main__":
+     main()

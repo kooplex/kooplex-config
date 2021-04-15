@@ -1,6 +1,8 @@
-FROM rocker/shiny-verse
+FROM rocker/shiny-verse:latest
 
-COPY build/shiny-customized.config-template /etc/shiny-server/shiny-server.conf
+RUN R -e "install.packages(c('shinydashboard','plotly','ggplot2','DT','rsconnect'),repos='http://cran.us.r-project.org')"
+
+COPY etc/shiny-customized.config-template /etc/shiny-server/shiny-server.conf
 #ADD index.html /srv/shiny-server/index.html
 
 #RUN adduser --no-create-home --uid 989 --disabled-password --home /srv shiny

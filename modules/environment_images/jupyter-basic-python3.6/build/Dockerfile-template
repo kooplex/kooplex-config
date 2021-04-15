@@ -32,13 +32,14 @@ RUN mkdir -p $CONDA_DIR
 # Install conda
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
-    ANACONDA="Anaconda3-2020.02-Linux-x86_64.sh" && \
+    ANACONDA="Anaconda3-2020.07-Linux-x86_64.sh" && \
     wget --quiet https://repo.anaconda.com/archive/${ANACONDA} && \
     #FIXME: check sum
     /bin/bash ${ANACONDA} -f -b -p $CONDA_DIR && \
     rm ${ANACONDA}
 
-RUN /opt/conda/bin/conda update -y conda
+RUN $CONDA_DIR/bin/conda install -c anaconda python=3.6
+RUN $CONDA_DIR/bin/conda update -y conda
 
 #RUN pip install jupyterlab-bokeh-server && jupyter labextension install jupyterlab-bokeh-server
 RUN  jupyter labextension install @pyviz/jupyterlab_pyviz jupyterlab-dash
@@ -47,7 +48,10 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && ec
    apt update && apt install yarn
 
 RUN apt install -y python3-dev libpq-dev
-RUN pip install psycopg2
+
+RUN $CONDA_DIR/bin/conda install -y -c bioconda lofreq=2.1.3.1
+RUN $CONDA_DIR/bin/conda install -y -c bioconda bowtie2 entrez-direct parallel-fastq-dump\
+	 fastqc trimmomatic samtools picard bcftools
 
 # basic
 ADD jupyter-notebook-kooplex /opt/conda/bin/jupyter-notebook-kooplex 
@@ -56,8 +60,8 @@ RUN chmod a+x /opt/conda/bin/jupyter-notebook-kooplex
 # Add local files as late as possible to avoid cache busting
 ADD start-notebook.sh /usr/local/bin/start-notebook.sh
 RUN chmod a+x /usr/local/bin/start-notebook.sh
-ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/kooplex-logo.png
-ADD kooplex-logo.png /opt/conda/lib/python3.7/site-packages/notebook/static/base/images/jupyterlab.png
+ADD kooplex-logo.png /opt/conda/lib/python3.8/site-packages/notebook/static/base/images/kooplex-logo.png
+ADD kooplex-logo.png /opt/conda/lib/python3.8/site-packages/notebook/static/base/images/jupyterlab.png
 
 RUN sed -i -e "s/^\(UMASK\).*/\1 0002/" /etc/login.defs
 

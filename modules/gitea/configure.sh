@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# TODO
+# To create admin user
+# gitea admin create-user --username giteaadmin --password pw --admin --email $email
 
 case $VERB in
   "build")
