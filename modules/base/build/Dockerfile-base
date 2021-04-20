@@ -28,8 +28,7 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.19.0/tini 
     chmod +x /usr/local/bin/tini
 
 # Install LDAP and setup authentication
-COPY nslcd.conf /etc/nslcd.conf
-RUN chmod 0600 /etc/nslcd.conf
+RUN mkdir /etc/mnt
 RUN sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf
 
 RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev
@@ -40,7 +39,7 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
 RUN apt install -y systemd
 
 RUN mkdir /init
-RUN echo "service nslcd start" > /init/01-nslcd
+ADD 01-nslcd /init/01-nslcd
 ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package

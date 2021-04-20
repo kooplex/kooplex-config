@@ -1,0 +1,9 @@
+#! /bin/bash
+
+if [ -f /etc/mnt/nslcd.conf ] ; then
+  cat /etc/mnt/nslcd.conf > /etc/nslcd.conf
+  chmod 0600 /etc/nslcd.conf
+fi
+
+service nslcd start
+
