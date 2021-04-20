@@ -2,19 +2,31 @@
 
 
 case $VERB in
-  "build")
-      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
-      kubectl create namespace $NS_HUB
-      nfs_provisioner $NS_HUB $NFS_SERVER $NFS_PATH
-
+   "buildimage")
+      echo "1. Build image ${PREFIX}-${MODULE_NAME}..." >&2
       sed -e s,##PREFIX##,${PREFIX}, \
           build/Dockerfile.hub-template > $BUILDMOD_DIR/Dockerfile.hub
 
       cp scripts/runserver.sh $BUILDMOD_DIR
-      cp $KUBE_CONFIG $BUILDMOD_DIR/kubeconfig
       docker $DOCKERARGS build -t ${PREFIX}-hub -f $BUILDMOD_DIR/Dockerfile.hub $BUILDMOD_DIR
       docker $DOCKERARGS tag ${PREFIX}-hub ${MY_REGISTRY}/${PREFIX}-hub
       docker $DOCKERARGS push ${MY_REGISTRY}/${PREFIX}-hub
+
+  ;;
+
+  "build")
+      echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
+      kubectl create namespace $NS_HUB || true
+      pv_local service $HUB_VOLUME_REQUEST $HUB_VOLUME_PATH $WORKER_NODES
+      pvc_local service ${NS_HUB} ${HUB_VOLUME_REQUEST} local-storage
+      pv_local userdata $USERDATA_VOLUME_REQUEST $USERDATA_VOLUME_PATH $WORKER_NODES
+      pvc_local userdata ${NS_HUB} ${USERDATA_VOLUME_REQUEST} local-storage
+      pv_local cache $USERCACHE_VOLUME_REQUEST $USERCACHE_VOLUME_PATH $WORKER_NODES
+      pvc_local cache ${NS_HUB} ${USERCACHE_VOLUME_REQUEST} local-storage
+      ingress service $NS_HUB hub ${PREFIX}-${MODULE_NAME} hub 80
+      configmap_ldap ${NS_HUB} "dc=$(echo $FQDN | sed s/\\\./,dc=/g)"
+
+      cp $KUBE_CONFIG $BUILDMOD_DIR/kubeconfig
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##NS##,$NS_HUB, \
@@ -34,58 +46,19 @@ case $VERB in
           -e s,##LDAP_ADMIN_PASSWORD##,$LDAP_ADMIN_PASSWORD, \
 	  build/pod-hub.yaml-template > $BUILDMOD_DIR/pod-hub.yaml
 
-      sed -e s,##PREFIX##,${PREFIX}, \
-          -e s,##NFS_SERVER##,${NFS_SERVER_HUB}, \
-          -e s,##HOME_DIR##,${HOME_DIR}, \
-          -e s,##HOME_QUOTA##,${HOME_QUOTA}, \
-          -e s,##GARBAGE_DIR##,${GARBAGE_DIR}, \
-          -e s,##GARBAGE_QUOTA##,${GARBAGE_QUOTA}, \
-          -e s,##PROJECT_DIR##,${PROJECT_DIR}, \
-          -e s,##PROJECT_QUOTA##,${PROJECT_QUOTA}, \
-          -e s,##REPORT_DIR##,${REPORT_DIR}, \
-          -e s,##REPORT_QUOTA##,${REPORT_QUOTA}, \
-          -e s,##CACHE_DIR##,${CACHE_DIRS}, \
-          -e s,##CACHE_QUOTA##,${CACHE_QUOTA}, \
-          build/pv-hub.yaml-template > $BUILDMOD_DIR/pv-hub.yaml
-
-      sed -e s,##PREFIX##,${PREFIX}, \
-          -e s,##NS##,$NS_HUB, \
-          -e s,##MODULE_NAME##,$MODULE_NAME, \
-          -e s,##REQUEST_LOG##,$SERVICELOG_REQUEST, \
-          -e s,##REQUEST_CONF##,$SERVICECONF_REQUEST, \
-          -e s,##REQUEST_DATA##,$SERVICEDATA_REQUEST, \
-          -e s,##HOME_USERQUOTA##,${HOME_USERQUOTA}, \
-          -e s,##GARBAGE_QUOTA##,${GARBAGE_QUOTA}, \
-          -e s,##PROJECT_PROJECTQUOTA##,${PROJECT_PROJECTQUOTA}, \
-          -e s,##REPORT_REPORTQUOTA##,${REPORT_REPORTQUOTA}, \
-          -e s,##CACHE_USERQUOTA##,${CACHE_USERQUOTA}, \
-          build/pvc-hub.yaml-template > $BUILDMOD_DIR/pvc-hub.yaml
-      kubectl apply -f $BUILDMOD_DIR/pv-hub.yaml
   ;;
 
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/pvc-hub.yaml
+      kubectl apply -f $BUILDMOD_DIR/pv-service.yaml
+      kubectl apply -f $BUILDMOD_DIR/pvc-service.yaml
+      kubectl apply -f $BUILDMOD_DIR/pv-userdata.yaml
+      kubectl apply -f $BUILDMOD_DIR/pvc-userdata.yaml
+      kubectl apply -f $BUILDMOD_DIR/pv-cache.yaml
+      kubectl apply -f $BUILDMOD_DIR/pvc-cache.yaml
       kubectl apply -f $BUILDMOD_DIR/svc-hub.yaml
-      #register_module_in_nginx
-      #register_module_in_hydra
-      echo "Store default.conf in configmap" >&2
-      CLIENT=DUMMY
-      SECRET=DUMMY
-      ( cat <<EOF1
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: $PREFIX-hub
-  namespace: $NS_HUB
-data:
-  client: $CLIENT
-  secret: $SECRET
-EOF1
-      ) \
-              > $BUILDMOD_DIR/confmap.yaml
-      kubectl apply -f $BUILDMOD_DIR/confmap.yaml
+      kubectl apply -f $BUILDMOD_DIR/ingress-service.yaml
+      kubectl apply -f $BUILDMOD_DIR/configmap-nslcd.yaml
   ;;
 
   "start")
@@ -94,10 +67,10 @@ EOF1
   ;;
 
   "init")
-	  kubectl wait --for=condition=Ready pod/${PREFIX}-${MODULE_NAME} -n $NS_HUB
-          kubectl exec -it ${PREFIX}-ldap -n $NS_LDAP -- /usr/local/ldap/adduser.sh hub $UID_HUB $GID_HUB
-	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -n $NS_HUB -- python3 /kooplexhub/kooplexhub/manage.py makemigrations
-	  kubectl exec -it ${PREFIX}-${MODULE_NAME} -n $NS_HUB -- python3 /kooplexhub/kooplexhub/manage.py migrate
+      kubectl wait --for=condition=Ready pod/${PREFIX}-${MODULE_NAME} -n $NS_HUB
+      kubectl exec -it ${PREFIX}-ldap -n $NS_LDAP -- /usr/local/ldap/adduser.sh hub $UID_HUB $GID_HUB
+      kubectl exec -it ${PREFIX}-${MODULE_NAME} -n $NS_HUB -- python3 /kooplexhub/kooplexhub/manage.py makemigrations
+      kubectl exec -it ${PREFIX}-${MODULE_NAME} -n $NS_HUB -- python3 /kooplexhub/kooplexhub/manage.py migrate
   ;;
 
   "stop")
@@ -106,11 +79,12 @@ EOF1
   ;;
 
   "uninstall")
-#      deregister_module_in_nginx
-#      deregister_module_in_hydra
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
+      kubectl delete -f $BUILDMOD_DIR/ingress-service.yaml || true
       kubectl delete namespace $NS_HUB || true
-      kubectl delete -f $BUILDMOD_DIR/pv-hub.yaml
+      kubectl delete -f $BUILDMOD_DIR/pv-service.yaml || true
+      kubectl delete -f $BUILDMOD_DIR/pv-userdata.yaml || true
+      kubectl delete -f $BUILDMOD_DIR/pv-cache.yaml || true
   ;;
 
   "remove")

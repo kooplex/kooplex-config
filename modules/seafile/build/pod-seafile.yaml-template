@@ -2,13 +2,12 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##
 spec:
   containers:
-#  - image: seafileltd/seafile-mc:7.1.5
-  - image: kooplex/seafile
+  - image: seafileltd/seafile-mc:8.0.4
     name: ##PREFIX##-##MODULE_NAME##
     ports:
       - containerPort: 80
@@ -17,8 +16,8 @@ spec:
         name: file
     volumeMounts:
       - mountPath: /shared
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/seafile
+        name: svc
+        subPath: data
     env:
       - name: DB_ROOT_PASSWD
         value: "##SEAFILE_MYSQL_ROOTPW##"
@@ -35,9 +34,9 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
+        claimName: pvc-service
 #    volumes:
 #      - /etc/localtime:/etc/localtime:ro
 #      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
@@ -46,7 +45,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##-mysql
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##-mysql
 spec:
@@ -58,8 +57,8 @@ spec:
         name: mysql
     volumeMounts:
       - mountPath: /var/lib/mysql
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/mysql/
+        name: svc
+        subPath: mysql
     env:
       - name: MYSQL_ROOT_PASSWORD
         value: "##SEAFILE_MYSQL_ROOTPW##"
@@ -68,15 +67,15 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
+        claimName: pvc-service
 ---
 apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##-memcached
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##-memcached
 spec:
@@ -91,25 +90,25 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
 ---
-apiVersion: v1
-kind: Pod
-metadata:
-  name: ##PREFIX##-##MODULE_NAME##-pwapi
-  namespace: default
-  labels:
-    name: lbl-##PREFIX##-##MODULE_NAME##-pwapi
-spec:
-  containers:
-  - image: kooplex/k8plex-seafile_pw
-    name: ##PREFIX##-##MODULE_NAME##-pwapi
-    ports:
-      - containerPort: 8000
-        name: http
-    env:
-      - name: MYSQL_ROOT_PASSWD
-        value: "##SEAFILE_MYSQL_ROOTPW##"
-      - name: MYSQL_HOST
-        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
-  nodeSelector:
-    kubernetes.io/hostname: ##SERVICENODE##
----
+#apiVersion: v1
+#kind: Pod
+#metadata:
+#  name: ##PREFIX##-##MODULE_NAME##-pwapi
+#  namespace: default
+#  labels:
+#    name: lbl-##PREFIX##-##MODULE_NAME##-pwapi
+#spec:
+#  containers:
+#  - image: kooplex/k8plex-seafile_pw
+#    name: ##PREFIX##-##MODULE_NAME##-pwapi
+#    ports:
+#      - containerPort: 8000
+#        name: http
+#    env:
+#      - name: MYSQL_ROOT_PASSWD
+#        value: "##SEAFILE_MYSQL_ROOTPW##"
+#      - name: MYSQL_HOST
+#        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+#  nodeSelector:
+#    kubernetes.io/hostname: ##SERVICENODE##
+#---

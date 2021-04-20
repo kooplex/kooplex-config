@@ -6,7 +6,8 @@ case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 
-      kubectl create namespace $NS_PROXY
+      kubectl create namespace $NS_PROXY || true
+      ingress service $NS_PROXY notebook ${PREFIX}-${MODULE_NAME} notebook 80
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##NS##,${NS_PROXY}, \
@@ -23,7 +24,7 @@ case $VERB in
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl apply -f $BUILDMOD_DIR/svc-proxy.yaml
-      #register_module_in_nginx
+      kubectl apply -f $BUILDMOD_DIR/ingress-service.yaml
   ;;
 
   "start")
@@ -38,9 +39,9 @@ case $VERB in
   ;;
 
   "uninstall")
-      #deregister_module_in_nginx
       echo "Deleting namespace ${NS_PROXY}" >&2
-      kubectl delete namespace $NS_PROXY
+      kubectl delete -f $BUILDMOD_DIR/ingress-service.yaml || true
+      kubectl delete namespace $NS_PROXY || true
   ;;
 
   "remove")

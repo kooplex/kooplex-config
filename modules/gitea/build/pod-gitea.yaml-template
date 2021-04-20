@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##
 spec:
@@ -16,8 +16,8 @@ spec:
         name: ssh
     volumeMounts:
       - mountPath: /data
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/gitea
+        name: svc
+        subPath: data 
     env:
       - name: USER_UID
         value: "1000"
@@ -26,7 +26,7 @@ spec:
       - name: DB_TYPE
         value: "mysql"
       - name: DB_HOST
-        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+        value: "##PREFIX##-##MODULE_NAME##-mysql"
       - name: DB_NAME
         value: "gitea"
       - name: DB_USER
@@ -40,15 +40,15 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
+        claimName: pvc-service
 ---
 apiVersion: v1
 kind: Pod
 metadata:
   name: ##PREFIX##-##MODULE_NAME##-mysql
-  namespace: default
+  namespace: ##NS##
   labels:
     name: lbl-##PREFIX##-##MODULE_NAME##-mysql
 spec:
@@ -60,8 +60,8 @@ spec:
         name: mysql
     volumeMounts:
       - mountPath: /var/lib/mysql
-        name: svcdata-##PREFIX##-##MODULE_NAME##
-        subPath: ##MODULE_NAME##/mysql/
+        name: svc
+        subPath: mysql
     env:
       - name: MYSQL_ROOT_PASSWORD
         value: "##GITEA_MYSQL_ROOTPW##"
@@ -76,6 +76,6 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcdata-##PREFIX##-##MODULE_NAME##
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svcdata-##PREFIX##
+        claimName: pvc-service

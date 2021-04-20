@@ -4,7 +4,7 @@
 _mkdir () {
     if [ ! -d $1 ] ; then
         mkdir -p $1
-        echo "Created folder $1"
+        echo "Created folder $1" >&2
     fi
 }
 
@@ -25,17 +25,160 @@ nfs_provisioner () {
 }
 
 # PVs across services
+pv_local () {
+    TARGET=$1
+    shift
+    CAPACITY=$1
+    shift
+    PVPATH=$1
+    _mkdir $PVPATH
+    shift
+    CONF_YAML=$BUILDMOD_DIR/pv-${TARGET}.yaml
+    echo "Creating pv descriptor $CONF_YAML..." >&2
+    cat > $CONF_YAML << EOF
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-${PREFIX}-${MODULE_NAME}-${TARGET}
+  labels:
+    pvl: pv-${PREFIX}-${MODULE_NAME}-${TARGET}
+spec:
+  capacity:
+    storage: ${CAPACITY}
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: ${PVPATH}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+EOF
+    for node in $@ ; do
+      cat >> $CONF_YAML << EOF
+          - $node
+EOF
+    done
+}
+
+pvc_local () {
+    TARGET=$1
+    shift
+    NS=$1
+    shift
+    CAPACITY=$1
+    shift
+    STORAGECLASS=$1
+    shift
+    CONF_YAML=$BUILDMOD_DIR/pvc-${TARGET}.yaml
+    echo "Creating pvc descriptor $CONF_YAML..." >&2
+    cat > $CONF_YAML << EOF
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-${TARGET}
+  namespace: ${NS}
+spec:
+  storageClassName: ${STORAGECLASS}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage:
+        ${CAPACITY}
+EOF
+}
+
+ingress () {
+    TARGET=$1
+    shift
+    NS=$1
+    shift
+    TARGET_PATH=$1
+    shift
+    SERVICE=$1
+    shift
+    SVC_PATH=$1
+    shift
+    SVC_PORT=$1
+    shift
+    CONF_YAML=$BUILDMOD_DIR/ingress-${TARGET}.yaml
+    echo "Creating ingress descriptor $CONF_YAML..." >&2
+    cat > $CONF_YAML << EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${NS}-${TARGET}
+  namespace: ${NS}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /${TARGET_PATH}
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /${SVC_PATH}
+        pathType: Prefix
+        backend:
+          service:
+            name: ${SERVICE}
+            port:
+              number: ${SVC_PORT}
+EOF
+}
+
+
+
+
+
+configmap_ldap () {
+    NS=$1
+    shift
+    DN=$1
+    shift
+    CONF_YAML=$BUILDMOD_DIR/configmap-nslcd.yaml
+    echo "Creating configmap descriptor $CONF_YAML..." >&2
+    cat > $CONF_YAML << EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nslcd
+  namespace: ${NS}
+data:
+  nslcd: |
+    uid nslcd
+    gid nslcd
+    uri ldap://${PREFIX}-ldap.${NS_LDAP}
+    base ${DN}
+    binddn cn=admin,${DN}
+    bindpw ${LDAP_ADMIN_PASSWORD}
+    tls_cacertfile /etc/ssl/certs/ca-certificates.crt
+EOF
+
+}
+
+
+
+
+
+
+
 pv_yaml () {
     CONF_YAML=$BUILDDIR/pv-service.yaml
     ( sed -e s,##PREFIX##,$PREFIX, \
         -e s,##SERVICELOG_DIR##,$SERVICELOG_DIR, \
-        -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
+        -e s,##SERVICELOG_REQUEST##,$SERVICELOG_REQUEST, \
         -e s,##NFS_SERVER_SVCLOG##,$NFS_SERVER_SVCLOG, \
         -e s,##SERVICECONF_DIR##,$SERVICECONF_DIR, \
-        -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
+        -e s,##SERVICECONF_REQUEST##,$SERVICECONF_REQUEST, \
         -e s,##NFS_SERVER_SVCCONF##,$NFS_SERVER_SVCCONF, \
         -e s,##SERVICEDATA_DIR##,$SERVICEDATA_DIR, \
-        -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
+        -e s,##SERVICEDATA_REQUEST##,$SERVICEDATA_REQUEST, \
         -e s,##NFS_SERVER_SVCDATA##,$NFS_SERVER_SVCDATA, \
         $CONFIGDIR/core/pv-service.yaml-template
     )    > $CONF_YAML
@@ -46,9 +189,9 @@ pvc_yaml () {
     CONF_YAML=$BUILDDIR/pvc-${1}-service.yaml
     ( sed -e s,##PREFIX##,$PREFIX, \
         -e s,##NS##,$1, \
-        -e s,##SERVICELOG_QUOTA##,$SERVICELOG_QUOTA, \
-        -e s,##SERVICECONF_QUOTA##,$SERVICECONF_QUOTA, \
-        -e s,##SERVICEDATA_QUOTA##,$SERVICEDATA_QUOTA, \
+        -e s,##SERVICELOG_REQUEST##,$SERVICELOG_REQUEST, \
+        -e s,##SERVICECONF_REQUEST##,$SERVICECONF_REQUEST, \
+        -e s,##SERVICEDATA_REQUEST##,$SERVICEDATA_REQUEST, \
         $CONFIGDIR/core/pvc-service.yaml-template
     )    > $CONF_YAML
 }
@@ -599,7 +742,7 @@ deregister_module_in_hydra () {
 #DEPRECATED#   setfacl -R -m d:u:$uid:rwx $SRV/home/$username
 #DEPRECATED# 
 #DEPRECATED#   # Set user quota
-#DEPRECATED# #  setquota -u $uid $USRQUOTA $USRQUOTA 0 0 $LOOPNO
+#DEPRECATED# #  setquota -u $uid $USRREQUEST $USRREQUEST 0 0 $LOOPNO
 #DEPRECATED#   
 #DEPRECATED#     # Create Data directory which can be accessed through ownCloud
 #DEPRECATED#   echo "Initializing OwnCloud folders for  $uid $username"

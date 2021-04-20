@@ -28,7 +28,7 @@ OFFLINE_MODE     = false
 [database]
 PATH     = /data/gitea/gitea.db
 DB_TYPE  = mysql
-HOST     = svc-##PREFIX##-gitea-mysql
+HOST     = ##PREFIX##-gitea-mysql
 NAME     = gitea
 USER     = ##GITEADB_USER##
 PASSWD   = ##GITEADB_PW##

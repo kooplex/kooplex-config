@@ -71,7 +71,7 @@ case $VERB in
     kubectl delete -f $CONF_YAML
     DONE=1
   ;;
-  "build"|"install"|"start"|"uninstall"|"init"|"stop"|"remove"|"purge")
+  "buildimage"|"build"|"install"|"start"|"uninstall"|"init"|"stop"|"remove"|"purge")
     set -e
   ;;
   "restart")

@@ -2,40 +2,44 @@ FQDN=
 EXTERNALIP=
 REWRITEPROTO=https
 SERVICE_NODE=
+WORKER_NODES=""
 PREFIX=k8plex
-KEYFILE=
-CERTFILE=
+KEYFILE=/root/certs/key.pem
+CERTFILE=/root/certs/cert.pem
 
-BUILDDIR=/srv/build/$PREFIX/
+BUILDDIR=/root/build/
 
-ROOT_DIR=/$PREFIX
+ROOT_DIR=/mnt/vol1/$PREFIX
 
 DUMMYPASS=
 
-# NFS provisioning
-NFS_SERVER=
-NFS_PATH=
-SERVICELOG_REQUEST=10Gi
-SERVICECONF_REQUEST=10Gi
-SERVICEDATA_REQUEST=10Gi
-
-
 # REGISTRY
-MY_REGISTRY=${FQDN}:5000
-NS_REGISTRY=image-registry
-NFS_SERVER_IMAGE=
-NFS_PATH_IMAGE=
+MY_REGISTRY=
+#NS_REGISTRY=image-registry
+#NFS_SERVER_IMAGE=
+#NFS_PATH_IMAGE=
 
 # PROXY
 NS_PROXY=${PREFIX}-proxy
 
 # LDAP
 NS_LDAP=${PREFIX}-ldap
+LDAP_VOLUME_REQUEST=10Gi
+LDAP_VOLUME_PATH=${ROOT_DIR}/ldap
 LDAP_ORGANISATION="kooplex organization"
 LDAP_ADMIN_PASSWORD=${DUMMYPASS}
+GID_USERS=1000
+UID_HUB=989
+GID_HUB=989
 
 # HUB
 NS_HUB=${PREFIX}-hub
+HUB_VOLUME_REQUEST=10Gi
+HUB_VOLUME_PATH=${ROOT_DIR}/hub
+USERDATA_VOLUME_REQUEST=500Gi
+USERDATA_VOLUME_PATH=${ROOT_DIR}/data
+USERCACHE_VOLUME_REQUEST=100Gi
+USERCACHE_VOLUME_PATH=${ROOT_DIR}/cache
 KUBE_CONFIG=/root/.kube/config
 HUB_MYSQL_ROOTPW=${DUMMYPASS}
 DJANGO_SECRET_KEY=
@@ -45,191 +49,28 @@ UID_HUB=989
 GID_HUB=989
 GID_USERS=1000
 
-NFS_SERVER_HUB=
-NFS_ROOT_DIR=
+# SEAFILE
+NS_SEAFILE=${PREFIX}-seafile
+SEAFILE_SECRET=
+SEAFILEDB_PW=${DUMMYPASS}
+SEAFILEADMIN=kooplex@elte.hu
+SEAFILEADMIN_PW=${DUMMYPASS}
+SEAFILE_VOLUME_REQUEST=10Gi
+SEAFILE_VOLUME_PATH=${ROOT_DIR}/seafile
 
-HOME_DIR=/$ROOT_DIR/users
-HOME_QUOTA=
-HOME_USERQUOTA=
-GARBAGE_DIR=/$ROOT_DIR/garbage
-GARBAGE_QUOTA=
-
-DATA_DIRS=/$ROOT_DIR/data
-PROJECT_DIR=$DATA_DIRS/project
-PROJECT_QUOTA=
-PROJECT_PROJECTQUOTA=
-REPORT_DIR=$DATA_DIRS/report
-REPORT_QUOTA=
-REPORT_REPORTQUOTA=
-
-CACHE_DIRS=/$ROOT_DIR/cache
-CACHE_QUOTA=
-CACHE_USERQUOTA=
-VERSIONCONTROL_DIR=$CACHE_DIRS/_git
-FILESYNC_DIR=$CACHE_DIRS/_fs
-REPORT_PREPARE_DIR=$CACHE_DIRS/report_prepare
+# GITEA
+NS_GITEA=${PREFIX}-gitea
+GITEA_VOLUME_REQUEST=10Gi
+GITEA_VOLUME_PATH=${ROOT_DIR}/gitea
+GITEADB_PW=${DUMMYPASS}
+GITEAUSER=gitea
+GITEAUSER_PW=${DUMMYPASS}
 
 #######################
 DOCKERARGS="-H unix:///var/run/docker.sock"
 #######################
 
 SYSMODULES=base
-MODULES="nginx hydra ldap proxy hub notebook"
-
-DUMMYPASS=
-
-#############
-## BACK END SERVICES
-#############
-
-# HYDRA
-HYDRACONSENT_MYSQL_ROOTPW=${DUMMYPASS}
-HYDRACONSENTDB_USER=hydraconsent
-HYDRACONSENTDB_PW=${DUMMYPASS}
-HYDRACONSENTDB=hydraconsent
-HYDRADB_USER=hydra
-HYDRA_POSTGRESQL_PW=${DUMMYPASS}
-HYDRADB=hydra
-HYDRA_ADMINPW=${DUMMYPASS}
-HYDRASYSTEM_SECRET=
-HYDRA_API_USER=
-HYDRA_API_PW=${DUMMYPASS}
-
-# LDAP
-LDAP_ORGANISATION="kooplex organization"
-LDAP_ADMIN_PASSWORD=${DUMMYPASS}
-GID_USERS=1000
-UID_HUB=989
-GID_HUB=989
-
-#############
-## FRONT END SERVICES
-#############
-
-# SEAFILE
-SEAFILE_SECRET=
-SEAFILEDB_PW=${DUMMYPASS}
-SEAFILEADMIN=
-SEAFILEADMIN_PW=${DUMMYPASS}
-DJANGO_SECRET_KEY=
-
-# GITEA
-GITEADB_PW=${DUMMYPASS}
-GITEAUSER=gitea
-GITEAUSER_PW=${DUMMYPASS}
-
-# HUB
-KUBE_CONFIG=/root/.kube/config
-HUB_MYSQL_ROOTPW=${DUMMYPASS}
-#DJANGO_SECRET_KEY=
-HUBUSER=hub
-HUBUSER_PW=${DUMMYPASS}
-
-
+MODULES="ldap proxy hub notebook seafile gitea"
 
 unset DUMMYPASS
-
-## CLEAN ## OUTERHOSTNAME="kooplex-test.elte.hu"
-## CLEAN ## OUTERHOST=$OUTERHOSTNAME
-## CLEAN ## 
-## CLEAN ## 
-## CLEAN ## 
-## CLEAN ## MAIL_SERVER_HOSTNAME=mail.elte.hu
-## CLEAN ## 
-## CLEAN ## #ORIGINAL_KEYS=/root/kooplex-test-keys/
-## CLEAN ## 
-## CLEAN ## DOCKERIP="/var/run/docker.sock"
-## CLEAN ## DOCKERPORT=""
-## CLEAN ## DOCKERPROTOCOL="unix"
-## CLEAN ## if [[ -z "${DOCKERPORT}" ]]; then
-## CLEAN ##  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP"
-## CLEAN ## else
-## CLEAN ##  DOCKERARGS="-H $DOCKERPROTOCOL://$DOCKERIP:$DOCKERPORT"
-## CLEAN ## fi
-## CLEAN ## 
-## CLEAN ## 
-## CLEAN ## # The directory where certificates are stored for external SSL
-## CLEAN ## FQDN_CERT=$CONF_DIR/fqdn_certs
-## CLEAN ## 
-## CLEAN ## # The directory where certificates are stored for internal SSL
-## CLEAN ## INTERNAL_CERT=$CONF_DIR/internal_certs
-## CLEAN ## 
-## CLEAN ## # Hydra client files, API will make this deprecate
-## CLEAN ## HYDRA_CONFIG=$CONF_DIR/hydra
-## CLEAN ## 
-## CLEAN ## # NGINX, API will make this deprecate 
-## CLEAN ## NGINX_DIR=$CONF_DIR/nginx
-## CLEAN ## 
-## CLEAN ## 
-## CLEAN ## #SUBNET="172.30.0.0/16"
-## CLEAN ## #SERVICESUBNET="172.33.0.0/16"
-## CLEAN ## #MONITORINGSUBNET="172.37.0.0/16"
-## CLEAN ## 
-## CLEAN ## LDAPDOMAIN=$OUTERHOST
-## CLEAN ## SMTP="smtp"
-## CLEAN ## SMTPPORT=25
-## CLEAN ## EMAIL_HOST=
-## CLEAN ## EMAIL_FROM=
-## CLEAN ## EMAIL_USER="No-reply"
-## CLEAN ## EMAIL_SUBJECT_PREFIX=
-## CLEAN ## 
-## CLEAN ## DUMMYPASS="ALMAFA321"
-## CLEAN ## HUBLDAP_PW=${DUMMYPASS}
-## CLEAN ## #HUBLDAP_ADMIN=
-## CLEAN ## HUBROXY_PW=${DUMMYPASS}
-## CLEAN ## PROXYTOKEN=${DUMMYPASS}
-## CLEAN ## 
-## CLEAN ## HUB_DEBUG=True
-## CLEAN ## 
-## CLEAN ## ERROR_LOG="error.log"
-## CLEAN ## CHECK_LOG="check.log"
-## CLEAN ## 
-## CLEAN ## #EXECUTABLES
-## CLEAN ## #DOCKER_COMPOSE="docker-compose"
-## CLEAN ## 
-## CLEAN ## # Notebook images can be pulled from a central registry, instead of always rebuilding them
-## CLEAN ## IMAGES_FROM_REGISTRY=True
-## CLEAN ## 
-## CLEAN ## ### INHERITED NAMES (or not )
-## CLEAN ## HUBDB=kooplexhub
-## CLEAN ## HUBDB_USER=hubuser
-## CLEAN ## HUBDB_PW=${DUMMYPASS}
-## CLEAN ## HUBDBROOT_PW=${DUMMYPASS}
-## CLEAN ## DJANGO_SECRET_KEY='n(bd1f1c%e8=_xad02x5qtfn%wgwpi492e$8_erx+d)!tpeoim'
-## CLEAN ## 
-## CLEAN ## # GITEA
-## CLEAN ## GITEAADMINPW=${DUMMYPASS}
-## CLEAN ## GITEADB=${PREFIX}_gitea
-## CLEAN ## GITEAUSER=gitea
-## CLEAN ## GITEADBPW=${DUMMYPASS}
-## CLEAN ## 
-## CLEAN ## # GITLAB
-## CLEAN ## GITLABDB=${PREFIX}_gitlabdb
-## CLEAN ## GITLABDBPW=${DUMMYPASS}
-## CLEAN ## GITLABADMIN=gitlabadmin
-## CLEAN ## GITLABADMINPW=${DUMMYPASS}
-## CLEAN ## 
-## CLEAN ## 
-## CLEAN ## 
-## CLEAN ## #OIDC SECRETS
-## CLEAN ## HYDRA_OIDC_SECRET_HUB="~.Nseet.Mi_o"
-## CLEAN ## 
-## CLEAN ## # SINGULARITY
-## CLEAN ## SINGULARITYDB_PW=almafa123
-## CLEAN ## SINGULARITY_SECRET=gfDF$%gh4htr31
-## CLEAN ## 
-## CLEAN ## # name of the directory in each module of the Docker extra lines when building the notebook images
-## CLEAN ## NOTEBOOK_DOCKER_EXTRA=notebook-ext
-## CLEAN ## 
-## CLEAN ## # Where should the docker volumes be created?
-## CLEAN ## #DOCKER_VOLUME_DIR=/data//_volume/
-## CLEAN ## 
-## CLEAN ## MINUID=10000
-## CLEAN ## 
-## CLEAN ## SECRETS=$CONF_DIR/.secrets_clean
-## CLEAN ## 
-## CLEAN ## # MOUNTPOINTS
-## CLEAN ## # where to find mounted storage and functional volumes
-## CLEAN ## 
-## CLEAN ## FUNCTIONAL_VOLUME_MOUNT_POINT=/vol
-## CLEAN ## STORAGE_VOLUME_MOUNT_POINT=/mnt

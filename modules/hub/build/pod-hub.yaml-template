@@ -12,8 +12,8 @@ spec:
     command: ['sh', '-c', "git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git /x || true"]
     volumeMounts:
       - mountPath: /x
-        name: svcdata
-        subPath: hub
+        name: svc
+        subPath: code
   containers:
   - image: ##MY_REGISTRY##/##PREFIX##-hub
     name: ##PREFIX##-##MODULE_NAME##
@@ -22,30 +22,37 @@ spec:
         name: http
     volumeMounts:
       - mountPath: /kooplexhub
-        name: svcdata
-        subPath: hub
+        name: svc
+        subPath: code
       - mountPath: /var/log/hub
-        name: svclog
-        subPath: ##MODULE_NAME##/
-      - mountPath: /etc/secrets
-        name: svcconf
-        subPath: ##MODULE_NAME##/secrets
+        name: svc
+        subPath: log
       - mountPath: /mnt/home
-        name: pv-home-##PREFIX##
+        name: userdata
+        subPath: home
       - mountPath: /mnt/garbage
-        name: pv-garbage-##PREFIX##
+        name: userdata
+        subPath: garbage
       - mountPath: /mnt/projects
-        name: pv-project-##PREFIX##
+        name: userdata
+        subPath: projects
       - mountPath: /mnt/reports
-        name: pv-report-##PREFIX##
+        name: userdata
+        subPath: reports
       - mountPath: /mnt/report_prepare
-        name: pv-cache-##PREFIX##
+        name: cache
         subPath: report_prepare
+      - mountPath: /etc/mnt
+        name: nslcd
+        readOnly: true
+#      - mountPath: /etc/secrets
+#        name: svcconf
+#        subPath: ##MODULE_NAME##/secrets
     env:
       - name: HUBDBROOT_PW
         value: "##HUB_MYSQL_ROOTPW##"
       - name: HUBDB_HOSTNAME
-        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+        value: "##PREFIX##-##MODULE_NAME##-mysql"
       - name: LANG
         value: "en_US.UTF-8"
       - name: DJANGO_SECRET_KEY
@@ -65,30 +72,21 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcconf
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svcconf
-    - name: svcdata
+        claimName: pvc-service
+    - name: userdata
       persistentVolumeClaim:
-        claimName: pvc-svcdata
-    - name: svclog
+        claimName: pvc-userdata
+    - name: cache
       persistentVolumeClaim:
-        claimName: pvc-svclog
-    - name: pv-home-##PREFIX##
-      persistentVolumeClaim:
-        claimName: pvc-home-##PREFIX##
-    - name: pv-garbage-##PREFIX##
-      persistentVolumeClaim:
-        claimName: pvc-garbage-##PREFIX##
-    - name: pv-project-##PREFIX##
-      persistentVolumeClaim:
-        claimName: pvc-project-##PREFIX##
-    - name: pv-report-##PREFIX##
-      persistentVolumeClaim:
-        claimName: pvc-report-##PREFIX##
-    - name: pv-cache-##PREFIX##
-      persistentVolumeClaim:
-        claimName: pvc-cache-##PREFIX##
+        claimName: pvc-cache
+    - name: nslcd
+      configMap:
+        name: nslcd
+        items:
+        - key: "nslcd"
+          path: "nslcd.conf"
 ---
 apiVersion: v1
 kind: Pod
@@ -106,7 +104,7 @@ spec:
         name: mysql
     volumeMounts:
       - mountPath: /var/lib/mysql
-        name: svcdata
+        name: svc
         subPath: mysql
 #      - /etc/localtime:/etc/localtime:ro
     env:
@@ -123,6 +121,6 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svcdata
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svcdata
+        claimName: pvc-service

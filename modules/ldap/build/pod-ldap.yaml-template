@@ -16,17 +16,17 @@ spec:
         name: ldaps
     volumeMounts:
       - mountPath: /var/log/ldap
-        name: svclog
-        subPath: ##MODULE_NAME##
+        name: svc
+        subPath: log
       - mountPath: /var/lib/ldap
-        name: svcdata
-        subPath: ##MODULE_NAME##/db
+        name: svc
+        subPath: db
       - mountPath: /usr/local/ldap
-        name: svcdata
-        subPath: ##MODULE_NAME##/helper
+        name: svc
+        subPath: scripts
       - mountPath: /etc/ldap/slapd.d
-        name: svcconf
-        subPath: ##MODULE_NAME##/
+        name: svc
+        subPath: conf
     env:
       - name: LDAP_ORGANISATION
         value: "##ORGANISATION##"
@@ -37,12 +37,6 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
-    - name: svclog
+    - name: svc
       persistentVolumeClaim:
-        claimName: pvc-svclog
-    - name: svcdata
-      persistentVolumeClaim:
-        claimName: pvc-svcdata
-    - name: svcconf
-      persistentVolumeClaim:
-        claimName: pvc-svcconf
+        claimName: ##CLAIMNAME##

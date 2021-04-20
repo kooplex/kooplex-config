@@ -4,26 +4,28 @@
 case $VERB in
   "build")
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
-#      mkdir_svcconf
-#      mkdir_svclog
-      mkdir_svcdata
+      kubectl create namespace $NS_GITEA || true
+      pv_local service $GITEA_VOLUME_REQUEST $GITEA_VOLUME_PATH $WORKER_NODES
+      pvc_local service ${NS_GITEA} ${GITEA_VOLUME_REQUEST} local-storage
+      ingress service $NS_GITEA gitea ${PREFIX}-${MODULE_NAME} gitea 3000
 
       ROOTURL=${REWRITEPROTO}://${FQDN}/gitea
       sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_GITEA, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
           -e s,##EXTERNALIP##,$EXTERNALIP, \
-          build/gitea-svcs.yaml-template > $BUILDMOD_DIR/gitea-svcs.yaml
+          build/svc-gitea.yaml-template > $BUILDMOD_DIR/svc-gitea.yaml
 
       sed -e s,##PREFIX##,$PREFIX, \
+          -e s,##NS##,$NS_GITEA, \
           -e s,##SERVICENODE##,${SERVICE_NODE}, \
           -e s,##ROOTURL##,$ROOTURL, \
           -e s,##MODULE_NAME##,$MODULE_NAME, \
 	  -e s,##GITEA_MYSQL_ROOTPW##,$GITEADB_PW, \
 	  -e s,##GITEADB_USER##,$GITEAUSER, \
 	  -e s,##GITEADB_PW##,$GITEAUSER_PW, \
-          build/gitea-pods.yaml-template > $BUILDMOD_DIR/gitea-pods.yaml
+          build/pod-gitea.yaml-template > $BUILDMOD_DIR/pod-gitea.yaml
 
-      mkdir_svcdata gitea/gitea/conf
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##FQDN##,$FQDN, \
           -e s,##ROOTURL##,$ROOTURL, \
@@ -32,47 +34,42 @@ case $VERB in
           -e s,##GITEADB_USER##,$GITEAUSER, \
           -e s,##GITEADB_PW##,$GITEAUSER_PW, \
 	  conf/app.ini-template > $BUILDMOD_DIR/app.ini
-       kubectl cp $BUILDMOD_DIR/app.ini helper:/data/gitea/gitea/gitea/conf/app.ini
-
-       kubectl exec -it helper -- mkdir -p /data/gitea/gitea/gitea/templates/
-       kubectl cp template/home.tmpl helper:/data/gitea/gitea/gitea/templates/
-       kubectl cp template/user helper:/data/gitea/gitea/gitea/templates/
   ;;
 
   "install")
       echo "Starting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/gitea-svcs.yaml
-      register_module_in_nginx
+      kubectl apply -f $BUILDMOD_DIR/pv-service.yaml
+      kubectl apply -f $BUILDMOD_DIR/pvc-service.yaml
+      kubectl apply -f $BUILDMOD_DIR/svc-gitea.yaml
+      kubectl apply -f $BUILDMOD_DIR/ingress-service.yaml
       ;;
 
   "start")
       echo "Starting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl apply -f $BUILDMOD_DIR/gitea-pods.yaml
+      kubectl apply -f $BUILDMOD_DIR/pod-gitea.yaml
   ;;
 
   "init")
       echo "Initiaizing services of ${PREFIX}-${MODULE_NAME}" >&2
-      STATE=$(kubectl get pods | awk "/^$PREFIX-gitea\s/ {print \$3}")
-      if [ "$STATE" = "Running" ] ; then
-          register_module_in_hydra
-          kubectl exec --stdin --tty ${PREFIX}-${MODULE_NAME} -- su git -c "gitea admin auth add-oauth --name ${CLIENT} --provider openidConnect --auto-discover-url ${REWRITEPROTO}://$FQDN/hydra/.well-known/openid-configuration --key ${PREFIX}-${MODULE_NAME} --secret ${SECRET}"
-	  $0 restart gitea
-      else
-          echo "Pod for $MODULE_NAME is not running" >&2
-      fi
+      kubectl wait --for=condition=Ready pod/${PREFIX}-${MODULE_NAME} -n $NS_GITEA
+      kubectl cp $BUILDMOD_DIR/app.ini -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/conf/app.ini
+      kubectl exec -n $NS_GITEA ${PREFIX}-${MODULE_NAME} -- mkdir -p /data/gitea/gitea/templates/
+      kubectl cp template/home.tmpl -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/gitea/templates/
+      kubectl cp template/user -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/gitea/templates/
+      echo "WARNING: restart manually!" >&2
   ;;
 
 
   "stop")
       echo "Deleting pods of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/gitea-pods.yaml
+      kubectl delete -f $BUILDMOD_DIR/pod-gitea.yaml
   ;;
 
   "uninstall")
-      deregister_module_in_nginx
-      deregister_module_in_hydra
       echo "Deleting services of ${PREFIX}-${MODULE_NAME}" >&2
-      kubectl delete -f $BUILDMOD_DIR/gitea-svcs.yaml
+      kubectl delete -f $BUILDMOD_DIR/ingress-service.yaml || true
+      kubectl delete namespace $NS_SEAFILE || true
+      kubectl delete -f $BUILDMOD_DIR/pv-service.yaml || true
   ;;
 
   "remove")
