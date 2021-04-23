@@ -7,7 +7,7 @@ DATABASES = {
         'NAME': 'seahub_db',
         'USER': 'root',
         'PASSWORD': '##SEAFILEDB_PW##',
-        'HOST': 'svc-##PREFIX##-seafile-mysql',
+        'HOST': '##PREFIX##-seafile-mysql',
         'PORT': '3306'
     }
 }
@@ -16,7 +16,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-        'LOCATION': 'svc-##PREFIX##-seafile-memcached:11211',
+        'LOCATION': '##PREFIX##-seafile-memcached:11211',
     },
     'locmem': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

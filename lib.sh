@@ -110,6 +110,7 @@ ingress () {
     shift
     CONF_YAML=$BUILDMOD_DIR/ingress-${TARGET}.yaml
     echo "Creating ingress descriptor $CONF_YAML..." >&2
+    kubectl create secret tls ${PREFIX}-tls --key ${KEYFILE} --cert ${CERTFILE} -n ${NS}
     cat > $CONF_YAML << EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -117,10 +118,16 @@ metadata:
   name: ${NS}-${TARGET}
   namespace: ${NS}
   annotations:
+    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /${TARGET_PATH}
 spec:
+  tls:
+  - hosts:
+     - ${FQDN}
+    secretName: ${PREFIX}-tls
   rules:
-  - http:
+  - host: ${FQDN}
+    http:
       paths:
       - path: /${SVC_PATH}
         pathType: Prefix

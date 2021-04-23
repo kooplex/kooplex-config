@@ -22,7 +22,7 @@ spec:
       - name: DB_ROOT_PASSWD
         value: "##SEAFILE_MYSQL_ROOTPW##"
       - name: DB_HOST
-        value: "svc-##PREFIX##-##MODULE_NAME##-mysql"
+        value: "##PREFIX##-##MODULE_NAME##-mysql"
       - name: SEAFILE_ADMIN_EMAIL
         value: "##SEAFILE_ADMIN##"
       - name: SEAFILE_ADMIN_PASSWORD

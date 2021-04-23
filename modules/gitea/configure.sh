@@ -53,9 +53,9 @@ case $VERB in
       echo "Initiaizing services of ${PREFIX}-${MODULE_NAME}" >&2
       kubectl wait --for=condition=Ready pod/${PREFIX}-${MODULE_NAME} -n $NS_GITEA
       kubectl cp $BUILDMOD_DIR/app.ini -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/conf/app.ini
-      kubectl exec -n $NS_GITEA ${PREFIX}-${MODULE_NAME} -- mkdir -p /data/gitea/gitea/templates/
-      kubectl cp template/home.tmpl -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/gitea/templates/
-      kubectl cp template/user -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/gitea/templates/
+      kubectl exec -n $NS_GITEA ${PREFIX}-${MODULE_NAME} -- mkdir -p /data/gitea/templates/
+      kubectl cp template/home.tmpl -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/templates/
+      kubectl cp template/user -n $NS_GITEA ${PREFIX}-${MODULE_NAME}:/data/gitea/templates/
       echo "WARNING: restart manually!" >&2
   ;;
 
