@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slurmctld
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-ctld
+  ports:
+    - name: ctld
+      protocol: TCP
+      port: 6817
+      targetPort: 6817
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-##PREFIX##-##MODULE_NAME##-mysql
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-mysql
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: slurmdbd
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-dbd
+  ports:
+    - name: dbd
+      protocol: TCP
+      port: 6819
+      targetPort: 6819
+---

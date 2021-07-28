@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slurm-cn
+spec:
+  selector:
+    name: lbl-##PREFIX##-##MODULE_NAME##-cn
+  ports:
+    - name: slurmd
+      protocol: TCP
+      port: 6818
+      targetPort: 6818

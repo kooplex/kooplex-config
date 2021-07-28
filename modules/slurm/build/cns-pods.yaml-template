@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slurm-cn 
+##  namespace: ##NS##
+  labels:
+    name: lbl-##PREFIX##-##MODULE_NAME##
+spec:
+  containers:
+  - image: ##MY_REGISTRY##/##PREFIX##-slurm
+    name: slurm-cn
+    ports:
+      - containerPort: 6818
+        name: slurmd
+#    command: ["slurmd"]
+    command: ["sh", "-c", "chown 0 /var/log/munge /run/munge /var/lib/munge /etc/munge/munge.key /etc/munge; munged; slurmd; sleep 100000"]
+    volumeMounts:
+#      - mountPath: /etc/mnt
+#        name: nslcd
+#        readOnly: true
+      - mountPath: /etc/slurm
+        name: slurmconf
+        readOnly: true
+#      - mountPath: /etc/munge
+#        name: munge
+#        readOnly: true
+#      - mountPath: /var/log/slurm
+#        name: svclog
+#        subPath: slurm/slurm
+      - mountPath: /v/visontai
+        name: userdata
+        subPath: home/visontai
+
+  nodeSelector:
+    kubernetes.io/hostname: ##SERVICENODE##
+  volumes:
+    - name: svclog
+      persistentVolumeClaim:
+        claimName: pvc-svclog-##PREFIX##
+    - name: slurmconf
+      configMap:
+        name: ##PREFIX##-##MODULE_NAME##
+        items:
+        - key: "slurm"
+          path: "slurm.conf"
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: nslcd
+          path: nslcd.conf
+        name: nslcd
+      name: nslcd
+    - name: userdata
+      persistentVolumeClaim:
+        claimName: pvc-userdata
+#        - key: "slurmdbd"
+#          path: "slurmdbd.conf"
+#    - name: munge
