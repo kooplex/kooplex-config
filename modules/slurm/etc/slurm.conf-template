@@ -8,6 +8,7 @@ ControlMachine=slurmctld
 ControlAddr=slurmctld
 #BackupController=
 #BackupAddr=
+LaunchParameters=enable_nss_slurm
 #
 SlurmUser=slurm
 #SlurmdUser=root
@@ -83,7 +84,8 @@ JobAcctGatherFrequency=30
 #
 #AccountingStorageType=accounting_storage/none
 AccountingStorageType=accounting_storage/slurmdbd
-AccountingStorageHost=slurmdbd
+#AccountingStorageHost=slurmdbd
+AccountingStorageHost=slurmctld
 AccountingStoragePort=6819
 AccountingStorageLoc=slurm_acct_db
 #AccountingStoragePass=
@@ -94,18 +96,9 @@ MailProg=/usr/bin/mailx
 CompleteWait=5
 
 # COMPUTE NODES
-#NodeName=c[1-2] RealMemory=1000 State=UNKNOWN
-#NodeName=kooplex-cn3 Procs=8 RealMemory=2000 State=UNKNOWN
-NodeName=kooplex-cn3 RealMemory=2000 CPUs=8 Sockets=1 CoresPerSocket=8 ThreadsPerCore=2  State=UNKNOWN
-NodeName=kooplex-cn16 RealMemory=230000 CPUs=48 Sockets=2 CoresPerSocket=24 ThreadsPerCore=1  State=UNKNOWN
-NodeName=c1 Procs=1 RealMemory=2000 State=UNKNOWN
-#
-### PARTITIONS
-###PartitionName=normal Default=yes Nodes=c[1-2] Priority=50 DefMemPerCPU=500 Shared=NO MaxNodes=1 MaxTime=5-00:00:00 DefaultTime=5-00:00:00 State=UP
-PartitionName=test2 Nodes=kooplex-cn3 Priority=50 DefMemPerCPU=500 Shared=NO MaxNodes=1 MaxTime=5-00:00:00 DefaultTime=5-00:00:00 State=UP
-PartitionName=normal Nodes=kooplex-cn16 Priority=50 Default=YES DefMemPerCPU=10000 Shared=NO MaxNodes=1 MaxTime=INFINITE DefaultTime=5-00:00:00 State=UP
-PartitionName=highmemory Nodes=kooplex-cn16 Priority=50 MaxTime=INFINITE State=UP DefaultTime=5-00:00:00
-#          
-#
+NodeName=slurm-cn RealMemory=23000 CPUs=8 Sockets=1 CoresPerSocket=8 ThreadsPerCore=1  State=UNKNOWN
+NodeName=slurm-cn-lts RealMemory=23000 CPUs=8 Sockets=1 CoresPerSocket=8 ThreadsPerCore=1  State=UNKNOWN
+
 # PARTITIONS
-PartitionName=normal Default=yes Nodes=c[1-2] Priority=50 DefMemPerCPU=500 Shared=NO MaxNodes=1 MaxTime=5-00:00:00 DefaultTime=5-00:00:00 State=UP
+PartitionName=normal Nodes=slurm-cn,slurm-cn-lts Priority=50 Default=YES DefMemPerCPU=10000 Shared=NO MaxNodes=1 MaxTime=INFINITE DefaultTime=5-00:00:00 State=UP
+PartitionName=highmemory Nodes=slurm-cn Priority=50 MaxTime=INFINITE State=UP DefaultTime=5-00:00:00
