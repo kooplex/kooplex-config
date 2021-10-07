@@ -4,28 +4,22 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
 		gcc cron \
 		gettext \
-		mysql-client libmysqlclient-dev \
-		postgresql-client libpq-dev \
+		libmysqlclient-dev \
                 vim less libssl-dev \
-                ssh git \
-		python3-pip python3-dev \
-                openssh-server openssh-sftp-server vim && \
+                ssh git mysql-client\
+		python3-pip python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
-ENV DJANGO_VERSION 1.11
+ENV DJANGO_VERSION 3.2.5
 
 RUN pip3 install --upgrade pip
 RUN pip3 install setuptools
-RUN pip3 install  mysqlclient psycopg2 docker-py django-threadlocals GitPython netaddr django=="$DJANGO_VERSION"\
-   ldap3  pwgen  "python-social-auth[django]" "social-auth-core[openidconnect]"\
-   django-tables2 django-bootstrap3 unidecode  PyGithub\
-   python-gitlab  social-auth-app-django==2.1.0 pyjwkest==1.4.0\
-   pandas django_pandas  python-seafile-api kubernetes
+RUN pip3 install mysqlclient netaddr ldap3 pwgen unidecode pandas kubernetes parse \
+   django-threadlocals django=="$DJANGO_VERSION" \
+   django-tables2 django-bootstrap-v5 django_pandas django-bootstrap5 \
+   "python-social-auth[django]" "social-auth-core[openidconnect]" social-auth-app-django social-auth-core
 
-RUN pip3 install social-auth-core==1.7.0  #separated otherwise install the newer one
-
-RUN pip3 install parse
-RUN pip3 install git+https://github.com/arount/pytea
+#RUN pip3 install git+https://github.com/arount/pytea
 
 #FIXME
 #COPY rootCA.crt /usr/local/share/ca-certificates/rootCA.crt

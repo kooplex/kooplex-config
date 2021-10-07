@@ -31,7 +31,12 @@ pv_local () {
     CAPACITY=$1
     shift
     PVPATH=$1
-    _mkdir $PVPATH
+    #TODO: _mkdir $PVPATH
+    echo >&2
+    echo WARNING >&2
+    echo dont forget to rum in fs server >&2
+    echo _mkdir $PVPATH >&2
+    echo >&2
     shift
     CONF_YAML=$BUILDMOD_DIR/pv-${TARGET}.yaml
     echo "Creating pv descriptor $CONF_YAML..." >&2
@@ -58,7 +63,7 @@ spec:
       - matchExpressions:
         - key: kubernetes.io/hostname
           operator: In
-          values:
+          values: #FIXME
 EOF
     for node in $@ ; do
       cat >> $CONF_YAML << EOF
@@ -95,22 +100,117 @@ spec:
 EOF
 }
 
-ingress () {
+
+pv_nfs () {
     TARGET=$1
     shift
     NS=$1
     shift
-    TARGET_PATH=$1
+    CAPACITY=$1
+    shift
+    PVPATH=$1
+    #TODO: _mkdir $PVPATH
+    echo >&2
+    echo WARNING >&2
+    echo dont forget to rum in fs server >&2
+    echo _mkdir $PVPATH >&2
+    echo >&2
+    shift
+    NFSSERVER=$1
+    shift
+    NODES=$@
+    CONF_YAML=$BUILDMOD_DIR/pv-${TARGET}.yaml
+    echo "Creating pv descriptor $CONF_YAML..." >&2
+    cat > $CONF_YAML << EOF
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-${PREFIX}-${MODULE_NAME}-${TARGET}
+  labels:
+    pvl: pv-${PREFIX}-${MODULE_NAME}-${TARGET}
+spec:
+  capacity:
+    storage: ${CAPACITY}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: ${PVPATH}
+    server: ${NFSSERVER}
+  #nodeAffinity:
+  #  required:
+  #    nodeSelectorTerms:
+  #    - matchExpressions:
+  #      - key: kubernetes.io/hostname
+  #        operator: In
+  #        values: #FIXME ${NODES}
+EOF
+}
+
+
+
+ingress_pass () {
+    TARGET=$1
+    shift
+    MATCH_PATH=$1
+    shift
+    NS=$1
     shift
     SERVICE=$1
-    shift
-    SVC_PATH=$1
     shift
     SVC_PORT=$1
     shift
     CONF_YAML=$BUILDMOD_DIR/ingress-${TARGET}.yaml
     echo "Creating ingress descriptor $CONF_YAML..." >&2
-    kubectl create secret tls ${PREFIX}-tls --key ${KEYFILE} --cert ${CERTFILE} -n ${NS}
+    kubectl create secret tls ${PREFIX}-tls --key ${KEYFILE} --cert ${CERTFILE} -n ${NS} || true
+    cat > $CONF_YAML << EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${NS}-${TARGET}
+  namespace: ${NS}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+     - ${FQDN}
+    secretName: ${PREFIX}-tls
+  rules:
+  - host: ${FQDN}
+    http:
+      paths:
+      - path: /${MATCH_PATH}
+        pathType: Prefix
+        backend:
+          service:
+            name: ${SERVICE}
+            port:
+              number: ${SVC_PORT}
+EOF
+}
+
+ingress_rewrite () {
+    TARGET=$1
+    shift
+    MATCH_PATH=$1
+    shift
+    NS=$1
+    shift
+    SERVICE=$1
+    shift
+    SVC_PORT=$1
+    shift
+    TARGET_PATH=$1
+    shift
+    CONF_YAML=$BUILDMOD_DIR/ingress-${TARGET}.yaml
+    echo "Creating ingress descriptor $CONF_YAML..." >&2
+    kubectl create secret tls ${PREFIX}-tls --key ${KEYFILE} --cert ${CERTFILE} -n ${NS} || true
     cat > $CONF_YAML << EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -129,7 +229,7 @@ spec:
   - host: ${FQDN}
     http:
       paths:
-      - path: /${SVC_PATH}
+      - path: /${MATCH_PATH}
         pathType: Prefix
         backend:
           service:
@@ -148,6 +248,8 @@ configmap_ldap () {
     shift
     DN=$1
     shift
+    LDAP_URI=$1
+    shift
     CONF_YAML=$BUILDMOD_DIR/configmap-nslcd.yaml
     echo "Creating configmap descriptor $CONF_YAML..." >&2
     cat > $CONF_YAML << EOF
@@ -160,7 +262,7 @@ data:
   nslcd: |
     uid nslcd
     gid nslcd
-    uri ldap://${PREFIX}-ldap.${NS_LDAP}
+    uri ${LDAP_URI}
     base ${DN}
     binddn cn=admin,${DN}
     bindpw ${LDAP_ADMIN_PASSWORD}

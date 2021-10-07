@@ -1,13 +1,15 @@
 # Prerequisities
 
-Setup and configure an NFS server for persistent storage.
+## Storage
+
+Setup and configure an Local storage or an NFS server for persistent storage.
 
 At server side create the necessary folders and grant write access for kooplex services
 
 For example NFS service with a ZFS backend, you can create a volume and publish it to your kubernetes cluster nodes:
 
 ```bash
-zfs create pool/k8plex
+zfs create pool/k8plex  
 zfs set mountpoint=/srv/vols/k8plex pool/k8plex
 zfs set quota=10G pool/k8plex
 zfs set sharenfs="rw=@FQDN_NODE1,insecure,no_root_squash,rw=@FQDN_NODE2,insecure,no_root_squash,..." pool/k8plex
@@ -28,6 +30,26 @@ mkdir -p /srv/vols/k8plex/cache/_fs
 mkdir -p /srv/vols/k8plex/cache/_git
 mkdir -p /srv/vols/k8plex/cache/report_prepare
 ```
+
+@veo2
+root@node1:~# mkdir -p /srv/vols/k8plex
+root@node1:~# mount nfsnode.int:/srv/vols/k8plex /srv/vols/k8plex
+
+
+
+## Certificate
+
+```bash
+DIR=/srv/build/k8plex/cert
+mkdir $DIR
+
+HOST=k8plex
+KEY_FILE=${DIR}/selfsigned-${HOST}.key
+CERT_FILE=${DIR}/selfsigned-${HOST}.crt
+HOST=${HOSTNAME}
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ${KEY_FILE} -out ${CERT_FILE} -subj "/C=HU/ST=BP/L=Budapest/O=EXAMPLE/CN=${HOSTNAME}"
+```
+
 
 # Installation steps
 
@@ -120,18 +142,9 @@ $SRV with the kooplex root directory on your host machine.
 
 ```bash
 #The url that will be accessible from a browser
-OUTERHOSTNAME="example.org"
-OUTERHOSTPORT="89"
-
-#The host name of a gateway or virtual host if there is any. If not use outerhost
-#INNERHOST=$OUTERHOSTNAME
-INNERHOST="192.168.1.15"
-#If you can communicate through only one port on the outerhost then you have
-#to create an extra nginx (e.g. in a container, because you will need to
-#have access to certain ports in your inner network
+FQDN="example.org"
 
 PREFIX="aprefix"
-PROJECT="projectname"
 
 #Access to docker 
 DOCKERIP="/var/run/docker.sock"
@@ -144,17 +157,8 @@ ROOT="/srv/"$PREFIX
 #and scripts needed for building images etc.
 BUILDDIR=$ROOT"/build"
 
-#Probably not needed
-DISKIMG="/home/jegesm/Data/diskimg"
-DISKSIZE_GB="20"
-LOOPNO="/dev/loop3"
-USRQUOTA=10G
-
-#This is the subnet where the containers for services will be
-SUBNET="172.20.0.0/16"
-
 #Domain in ldap
-LDAPDOMAIN=$OUTERHOSTNAME
+LDAPDOMAIN=$FQDN
 
 SMTP="smtp"
 SMTPPORT=25
@@ -163,9 +167,6 @@ EMAIL=
 #Password for many things
 DUMMYPASS=""
 
-#This is the web protocol: http or https
-REWRITEPROTO=http
-
 #Prints out debug information on "docker logs $PROJECT-hub"
 HUB_DEBUG=True
 
@@ -173,7 +174,6 @@ ERROR_LOG="error.log"
 CHECK_LOG="check.log"	
 
 #Executables
-DOCKER_COMPOSE="docker-compose"
 ```
 * For many of the following steps here you will need write access to the $ROOT and $BUILDDIR folders
 * Individual modules can be installed, started etc. by specifying the module name, e.g.
@@ -201,47 +201,6 @@ Recommended :)  Install sequence is the following:
 * sudo bash kooplex.sh init hub
 
 
-## Proxy configuration of the $OUTERHOST or $INNERHOST if there are two layers
-
-* add following lines to configuration file _default_ of nginx _host_ 
- 
-  (e.g. /etc/nginx/sites-available/default):
-
-```
-map $http_upgrade $connection_upgrade {
-	default upgrade;
-	'' close;
-}
-
-server {
-    listen $INNERHOST:80;
-    server_name $INNERHOSTNAME;
-    location / {
-    	proxy_set_header      Host $http_host;
-        proxy_pass http://$NGINXIP/;
-    }
-    
-    location ~* /(api/kernels/[^/]+/(channels|iopub|shell|stdin)|terminals/websocket)/? {
-        proxy_pass http://$NGINXIP;
-        proxy_set_header      Host $host;
-        # websocket support
-        proxy_http_version    1.1;
-        proxy_set_header      Upgrade $http_upgrade;
-        proxy_set_header      Connection $connection_upgrade;
-    }
-    
-    #In chrome the kernel stays busy, but if...
-    location ~* /(api/sessions)/? {
-        proxy_pass http://$NGINXIP;
-        proxy_set_header      Host $host;
-        # websocket support
-        proxy_http_version    1.1;
-        proxy_set_header      Upgrade $http_upgrade;
-        proxy_set_header      Connection $connection_upgrade;
-    }
-
-}
-```
 
 ## IMPORTANT NOTES
 * Check whether all the necessary ports are open (ufw allow etc) e.g. docker port, http port

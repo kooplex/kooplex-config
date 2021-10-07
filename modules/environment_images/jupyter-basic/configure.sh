@@ -20,10 +20,10 @@ case $VERB in
 
   "install")
       echo "Register in nginx ${PREFIX}-${MODULE_NAME}" >&2
-      register_module_in_nginx
+#      register_module_in_nginx
       IMAGE_NAME="$PREFIX-ei-$(basename ${MODULE_NAME})"
       echo "Register in hub ${IMAGE_NAME}" >&2
-      kubectl exec -it ${PREFIX}-hub -- python3 /kooplexhub/kooplexhub/manage.py manage_image --add ${IMAGE_NAME}
+      kubectl exec -it -n ${PREFIX}-hub ${PREFIX}-hub -- python3 /kooplexhub/kooplexhub/manage.py manage_image --add ${IMAGE_NAME}
   ;;
 
   "uninstall")

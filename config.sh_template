@@ -2,75 +2,104 @@ FQDN=
 EXTERNALIP=
 REWRITEPROTO=https
 SERVICE_NODE=
-WORKER_NODES=""
+WORKER_NODES="node1 node2"
 PREFIX=k8plex
-KEYFILE=/root/certs/key.pem
-CERTFILE=/root/certs/cert.pem
 
-BUILDDIR=/root/build/
+## Secret should be generated
+# KEYFILE=
+# CERTFILE=
 
-ROOT_DIR=/mnt/vol1/$PREFIX
+BUILDDIR=/srv/build/$PREFIX/
 
-DUMMYPASS=
+ROOT_DIR=/srv/vols/k8plex
 
-# REGISTRY
-MY_REGISTRY=
-#NS_REGISTRY=image-registry
-#NFS_SERVER_IMAGE=
-#NFS_PATH_IMAGE=
+DUMMYPASS=dummy123
 
-# PROXY
+NS=${PREFIX}
+
+### Persistent volumes
+## VOLUMES these are either ready to use or should be created (pv and pvc)
+## For services (hub-db, gitea-db, ldap etc...)
+PV_SERVICE=
+PVC_SERVICE=
+## For userdata (home, projects, reports etc...)
+PV_USERDATA=
+PVC_USERDATA=
+## For docker images that can be accessed from all nodes
+PV_REGISTRY=
+PVC_REGISTRY=
+
+### REGISTRY
+## Either define $PV_REGISTRY or
+MY_REGISTRY=registry:5000
+NS_REGISTRY=image-registry
+# NFS_SERVER_IMAGE=
+# NFS_PATH_IMAGE=/srv/vols/image_registry
+
+### PROXY
 NS_PROXY=${PREFIX}-proxy
 
-# LDAP
-NS_LDAP=${PREFIX}-ldap
+### LDAP
+LDAP_URI=""
+## or
+NS_LDAP=ldap
 LDAP_VOLUME_REQUEST=10Gi
 LDAP_VOLUME_PATH=${ROOT_DIR}/ldap
 LDAP_ORGANISATION="kooplex organization"
-LDAP_ADMIN_PASSWORD=${DUMMYPASS}
+LDAP_ADMIN_PASSWORD=dummy123
 GID_USERS=1000
 UID_HUB=989
 GID_HUB=989
 
-# HUB
+### HUB
 NS_HUB=${PREFIX}-hub
-HUB_VOLUME_REQUEST=10Gi
-HUB_VOLUME_PATH=${ROOT_DIR}/hub
-USERDATA_VOLUME_REQUEST=500Gi
-USERDATA_VOLUME_PATH=${ROOT_DIR}/data
-USERCACHE_VOLUME_REQUEST=100Gi
-USERCACHE_VOLUME_PATH=${ROOT_DIR}/cache
-KUBE_CONFIG=/root/.kube/config
+## Either define $PV_USERDATA and $PV_SERVICE or
+# PVC_HOME=pvc-home
+# PVC_EDU=pvc-edu
+# PVC_GARBAGE=pvc-garbage
+# PVC_PROJECT=pvc-project
+# PVC_REPORT=pvc-report
+# PVC_CACHE=pvc-cache
+# HUB_VOLUME_REQUEST=10Gi
+# HUB_VOLUME_PATH=${ROOT_DIR}/hub
+# USERDATA_VOLUME_REQUEST=500Gi
+# USERDATA_VOLUME_PATH=${ROOT_DIR}/data
+# USERCACHE_VOLUME_REQUEST=100Gi
+# USERCACHE_VOLUME_PATH=${ROOT_DIR}/cache
+## This is generated to restrict kubernetes access to user pods
+KUBE_CONFIG=
 HUB_MYSQL_ROOTPW=${DUMMYPASS}
-DJANGO_SECRET_KEY=
+HUB_DJANGO_SECRET_KEY=
 HUBUSER=hub
 HUBUSER_PW=${DUMMYPASS}
 UID_HUB=989
 GID_HUB=989
-GID_USERS=1000
+#FIXME GID_USERS=1000
 
-# SEAFILE
+
+### SEAFILE
 NS_SEAFILE=${PREFIX}-seafile
 SEAFILE_SECRET=
 SEAFILEDB_PW=${DUMMYPASS}
-SEAFILEADMIN=kooplex@elte.hu
+SEAFILEADMIN=kooplex@example.com
 SEAFILEADMIN_PW=${DUMMYPASS}
-SEAFILE_VOLUME_REQUEST=10Gi
-SEAFILE_VOLUME_PATH=${ROOT_DIR}/seafile
+# SEAFILE_VOLUME_REQUEST=10Gi
+# SEAFILE_VOLUME_PATH=${ROOT_DIR}/seafile
 
-# GITEA
+### GITEA
 NS_GITEA=${PREFIX}-gitea
-GITEA_VOLUME_REQUEST=10Gi
-GITEA_VOLUME_PATH=${ROOT_DIR}/gitea
 GITEADB_PW=${DUMMYPASS}
 GITEAUSER=gitea
 GITEAUSER_PW=${DUMMYPASS}
+# GITEA_VOLUME_REQUEST=10Gi
+# GITEA_VOLUME_PATH=${ROOT_DIR}/gitea
 
 #######################
 DOCKERARGS="-H unix:///var/run/docker.sock"
 #######################
 
 SYSMODULES=base
-MODULES="ldap proxy hub notebook seafile gitea"
+MODULES="ldap proxy hub notebook"
 
 unset DUMMYPASS
+

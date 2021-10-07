@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ##PREFIX##-##MODULE_NAME##
+  name: ##MODULE_NAME##
   namespace: ##NS##
 spec:
   selector:
-    name: lbl-##PREFIX##-##MODULE_NAME##
+    name: lbl-##MODULE_NAME##
   ports:
     - name: http
       protocol: TCP
@@ -15,11 +15,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ##PREFIX##-##MODULE_NAME##-mysql
+  name: ##MODULE_NAME##-mysql
   namespace: ##NS##
 spec:
   selector:
-    name: lbl-##PREFIX##-##MODULE_NAME##-mysql
+    name: lbl-##MODULE_NAME##-mysql
   ports:
     - name: mysql
       protocol: TCP

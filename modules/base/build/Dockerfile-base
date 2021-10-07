@@ -10,13 +10,15 @@ ENV DEBIAN_FRONTEND noninteractive
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
 # Install NFS client ACL manipulation
+
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
-    wget \
-    bzip2 \
-    ca-certificates \
-    sudo vim \
-    locales nfs-common acl nfs4-acl-tools tzdata
+      wget \
+      bzip2 \
+      ca-certificates \
+      sudo vim \
+      locales nfs-common acl nfs4-acl-tools tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
@@ -31,15 +33,21 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.19.0/tini 
 RUN mkdir /etc/mnt
 RUN sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf
 
-RUN apt-get install -q -y libnss-ldapd openldap-utils ldap-client libldap2-dev
+RUN apt-get update && \
+    apt-get install -yq --no-install-recommends \
+      libnss-ldapd \
+      openldap-utils \
+      ldap-client \
+      libldap2-dev \
+      systemd && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.a /usr/lib/
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/
 
-RUN apt install -y systemd
-
 RUN mkdir /init
 ADD 01-nslcd /init/01-nslcd
+RUN chmod +x /init/01-nslcd
 ADD entrypoint.sh /entrypoint.sh
 
 RUN pam-auth-update --package
@@ -47,8 +55,6 @@ RUN pam-auth-update --package
 RUN ln -sf  /usr/share/zoneinfo/Europe/Budapest  /etc/localtime
 RUN dpkg-reconfigure tzdata
 
-# we don't run apt-get clean, coz the apt-cache is useful when preparing new module volumes
-RUN rm -rf /var/lib/apt/lists/*
-
 ENTRYPOINT ["tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]
+

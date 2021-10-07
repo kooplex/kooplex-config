@@ -7,7 +7,7 @@ case $VERB in
       echo "1. Configuring ${PREFIX}-${MODULE_NAME}..." >&2
 
       kubectl create namespace $NS_PROXY || true
-      ingress service $NS_PROXY notebook ${PREFIX}-${MODULE_NAME} notebook 80
+      ingress_pass service notebook $NS_PROXY ${PREFIX}-${MODULE_NAME} 80
 
       sed -e s,##PREFIX##,$PREFIX, \
           -e s,##NS##,${NS_PROXY}, \

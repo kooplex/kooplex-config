@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ##PREFIX##-##MODULE_NAME##
+  name: hub
   namespace: ##NS##
   labels:
-    name: lbl-##PREFIX##-##MODULE_NAME##
+    name: lbl-##MODULE_NAME##
 spec:
   initContainers:
   - name: init-gitclone
@@ -16,11 +16,14 @@ spec:
         subPath: code
   containers:
   - image: ##MY_REGISTRY##/##PREFIX##-hub
-    name: ##PREFIX##-##MODULE_NAME##
+#    command: [ 'sleep', 'infinity' ]
+    name: hub
     ports:
       - containerPort: 80
         name: http
     volumeMounts:
+      - mountPath: /root/.kube
+        name: kubeconf
       - mountPath: /kooplexhub
         name: svc
         subPath: code
@@ -40,8 +43,17 @@ spec:
         name: userdata
         subPath: reports
       - mountPath: /mnt/report_prepare
-        name: cache
+        name: userdata
         subPath: report_prepare
+      - mountPath: /mnt/course
+        name: userdata
+        subPath: edu/course
+      - mountPath: /mnt/course_assignment
+        name: userdata
+        subPath: edu/course_assignment
+      - mountPath: /mnt/course_workdir
+        name: userdata
+        subPath: edu/course_workdir
       - mountPath: /etc/mnt
         name: nslcd
         readOnly: true
@@ -52,7 +64,7 @@ spec:
       - name: HUBDBROOT_PW
         value: "##HUB_MYSQL_ROOTPW##"
       - name: HUBDB_HOSTNAME
-        value: "##PREFIX##-##MODULE_NAME##-mysql"
+        value: "##MODULE_NAME##-mysql"
       - name: LANG
         value: "en_US.UTF-8"
       - name: DJANGO_SECRET_KEY
@@ -72,15 +84,18 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: ##SERVICENODE##
   volumes:
+    - name: kubeconf
+      configMap:
+        name: kubeconfig
+        items:
+        - key: "kubeconf"
+          path: "config"
     - name: svc
       persistentVolumeClaim:
-        claimName: pvc-service
+        claimName: ##PV_SERVICE##
     - name: userdata
       persistentVolumeClaim:
-        claimName: pvc-userdata
-    - name: cache
-      persistentVolumeClaim:
-        claimName: pvc-cache
+        claimName: ##PV_USERDATA##
     - name: nslcd
       configMap:
         name: nslcd
@@ -91,14 +106,14 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ##PREFIX##-##MODULE_NAME##-mysql
+  name: ##MODULE_NAME##-mysql
   namespace: ##NS##
   labels:
-    name: lbl-##PREFIX##-##MODULE_NAME##-mysql
+    name: lbl-##MODULE_NAME##-mysql
 spec:
   containers:
   - image: mariadb:10.5.4
-    name: ##PREFIX##-##MODULE_NAME##-mysql
+    name: ##MODULE_NAME##-mysql
     ports:
       - containerPort: 3306
         name: mysql
@@ -123,4 +138,4 @@ spec:
   volumes:
     - name: svc
       persistentVolumeClaim:
-        claimName: pvc-service
+        claimName: ##PV_SERVICE##
