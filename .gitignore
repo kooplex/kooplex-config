@@ -3,3 +3,4 @@ modules/plugins/
 certs
 adminpw
 DONTCOMMI*
+config.libsonnet
