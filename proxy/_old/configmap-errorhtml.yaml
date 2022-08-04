@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: errorhtml
-  namespace: k8plex-test
+  namespace: ##NS##
 data:
   error: |
     <META HTTP-EQUIV="refresh" CONTENT="5">

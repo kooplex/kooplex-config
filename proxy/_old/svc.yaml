@@ -1,0 +1,1 @@
+"\"apiVersion\": \"v1\"\n\"kind\": \"Service\"\n\"metadata\":\n  \"name\": \"proxy\"\n  \"namespace\": \"config-test\"\n\"spec\":\n  \"ports\":\n  - \"name\": \"http\"\n    \"port\": 8000\n    \"protocol\": \"TCP\"\n    \"targetPort\": 8000\n  - \"name\": \"api\"\n    \"port\": 8001\n    \"protocol\": \"TCP\"\n    \"targetPort\": 8001\n  \"selector\":\n    \"app\": \"proxy\""

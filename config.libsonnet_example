@@ -1,0 +1,70 @@
+{
+  fqdn: 'k8plex-test.hu',
+  ns: 'k8plex-test',
+  dbname: 'cbioportaldb',
+  dbuser: 'cbioportal',
+  dbpw: 'bddsbdf',
+  dbrootpw: 'brebbdf',
+  nfsvol: '/k8plex_test',
+  nfsserver: 'nfsprov',
+
+  hub: {
+    nodename: 'veo1',
+    appname: 'hub',
+    dbpw: 'fdsal',
+    dbrootpw: 'dfal',
+    image: 'hub-v4.0',
+
+  },
+
+  ldap: {
+    appname: 'ldap',
+    rootpw: 'dfbdsb',
+    pw: 'bdbdbdbdbbfohg7',
+  },
+
+
+  PV(name, ns=self.ns, cap='1G', path='/srv/vols', server=self.nfsserver): {
+    apiVersion: 'v1',
+    kind: 'PersistentVolume',
+    metadata: {
+      name: name,
+    },
+    spec: {
+      capacity: {
+        storage: cap,
+      },
+      volumeMode: 'Filesystem',
+      accessModes: [
+        'ReadWriteMany',
+      ],
+      persistentVolumeReclaimPolicy: 'Retain',
+      nfs: {
+        path: path,
+        server: server,
+      },
+    },
+  },
+
+  PVC(name, pvname, ns=self.ns, cap='1G'): {
+    apiVersion: 'v1',
+    kind: 'PersistentVolumeClaim',
+    metadata: {
+      name: name,
+      namespace: ns,
+    },
+    spec: {
+      accessModes: [
+        'ReadWriteMany',
+      ],
+      volumeMode: 'Filesystem',
+      resources: {
+        requests: {
+          storage: cap,
+        },
+      },
+      storageClassName: '',
+      volumeName: pvname,
+    },
+  },
+}
