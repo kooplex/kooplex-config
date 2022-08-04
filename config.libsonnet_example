@@ -19,8 +19,7 @@
 
   ldap: {
     appname: 'ldap',
-    rootpw: 'dfbdsb',
-    pw: 'bdbdbdbdbbfohg7',
+    pw: 'dfbdsb',
   },
 
 
