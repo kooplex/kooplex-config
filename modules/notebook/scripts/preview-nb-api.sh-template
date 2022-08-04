@@ -1,8 +1,0 @@
-echo "You can check the result under ##REWRITEPROTO##://##OUTERHOST##/${NB_URL}/report"
-
-if [ -z "$REPORT_PORT" ]; then
-        REPORT_PORT=9000
-        echo "serving report on $REPORT_PORT"
-fi
-
-jupyter-kernelgateway --KernelGatewayApp.port=$REPORT_PORT --KernelGatewayApp.api=notebook-http --KernelGatewayApp.ip=0.0.0.0 --KernelGatewayApp.allow_origin=* --KernelGatewayApp.seed_uri=$1 --KernelGatewayApp.base_url="/${NB_URL}/report"

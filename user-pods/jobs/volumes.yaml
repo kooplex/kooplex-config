@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: home-k8plex-testjobs
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/home
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k8plex-test-projectjobs
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/projects
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: home
+  namespace: k8plex-test-jobs
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: home-k8plex-testjobs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: project
+  namespace: k8plex-test-jobs
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: k8plex-test-projectjobs

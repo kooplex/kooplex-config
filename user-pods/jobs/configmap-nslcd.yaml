@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nslcd
+  namespace: k8plex-test-jobs
+data:
+  nslcd: |
+    uid nslcd
+    gid nslcd
+    uri ldap://ldap-test.k8plex-test ldap://ldap-test2.k8plex-test
+    base dc=k8plex-test,dc=vo,dc=elte,dc=hu
+    binddn cn=admin,dc=k8plex-test,dc=vo,dc=elte,dc=hu
+    bindpw pimPALA2021
+    tls_cacertfile /etc/ssl/certs/ca-certificates.crt

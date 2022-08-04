@@ -1,0 +1,18 @@
+# create new
+
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=001
+  provider=ldap://ldap-test.k8plex-test/
+  bindmethod=simple
+  binddn="cn=admin,dc=k8plex-test,dc=vo,dc=elte,dc=hu"
+  credentials=pimPALA2021
+  searchbase="dc=k8plex-test,dc=vo,dc=elte,dc=hu"
+  scope=sub
+  schemachecking=on
+  type=refreshAndPersist
+  retry="30 5 300 3"
+  interval=00:00:05:00
+
+

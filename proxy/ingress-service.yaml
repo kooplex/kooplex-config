@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proxy-service
+  namespace: k8plex-test
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+     - k8plex-test.vo.elte.hu
+    secretName: k8plex-test-tls
+  rules:
+  - host: k8plex-test.vo.elte.hu
+    http:
+      paths:
+      - path: /notebook
+        pathType: Prefix
+        backend:
+          service:
+            name: proxy
+            port:
+              number: 8000

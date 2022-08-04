@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: errorhtml
+  namespace: k8plex-test
+data:
+  error: |
+    <META HTTP-EQUIV="refresh" CONTENT="5">
+    <h3>Note: notebook server not yet ready</h3>
+    <p><strong>Please wait a bit, this page reloads every 5 seconds!</strong></p>
+    <p><span>Description:</span> the resources have been allocated for your environment, but the notebook server had not enough time to initialize. Usually this takes only a couple of seconds on an empty server and 1-2 minutes if it is heavily loaded.</p>  

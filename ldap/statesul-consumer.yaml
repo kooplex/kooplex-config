@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ldap2
+  namespace: k8plex-test
+spec:
+  serviceName: ldap-test2
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ldap-consumer
+  template:
+    metadata:
+      labels:
+        app:  ldap-consumer
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - atys
+      containers:
+      - image: osixia/openldap:1.5.0
+        name: ldap2
+        #command: [ 'sleep', 'infinity' ]
+        command: ["/container/tool/run", "--dont-touch-etc-hosts"]
+        ports:
+          - containerPort: 389
+            name: ldap
+        volumeMounts:
+          - mountPath: /var/log/ldap
+            name: svc
+            subPath: log
+          - mountPath: /var/lib/ldap
+            name: svc
+            subPath: db
+          - mountPath: /usr/local/ldap
+            name: svc
+            subPath: helper
+          - mountPath: /etc/ldap/slapd.d
+            name: svc
+            subPath: slapd.d
+        env:
+          - name: LDAP_ORGANISATION
+            value: "kooplex organization"
+          - name: LDAP_DOMAIN
+            value: "k8plex-test.vo.elte.hu"
+          - name: LDAP_ADMIN_PASSWORD
+            value: "pimPALA2021"
+      volumes:
+        - name: svc
+          persistentVolumeClaim:
+            claimName: ldap-data-slave

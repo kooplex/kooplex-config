@@ -1,2 +1,0 @@
-- should create a plugin library and build thing from there with
-bash kooplex.sh build plugin xyz

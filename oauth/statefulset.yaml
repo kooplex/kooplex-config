@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: oauth
+  namespace: k8plex-test
+spec:
+  serviceName: oauth
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth
+  template:
+    metadata:
+      labels:
+        app: oauth
+    spec:
+      initContainers:
+      - name: init-gitclone
+        image: ajeetraina/alpine-git
+        command: ['sh', '-c', "git clone https://github.com/kooplex/kooplex-oauth.git /x || true"]
+        volumeMounts:
+          - mountPath: /x
+            name: vol
+            subPath: _code_/
+      containers:
+      - image: image-registry.vo.elte.hu/k8plex-oauth
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[00\\;32m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\$ \\' >> /root/.bashrc"]
+              #command: ["/bin/sh", "-c", "echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[01\\;31m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\a\\\\$ \\' >> /root/.bashrc"]
+        name: oauth
+        ports:
+          - containerPort: 80
+            name: http
+        volumeMounts:
+          - mountPath: /srv
+            name: vol
+            subPath: _code_/
+          - mountPath: /var/log/oauth
+            name: vol
+            subPath: logs/
+        env:
+          - name: DBROOT_PW
+            value: "aePh2eph"
+          - name: DB_HOSTNAME
+            value: "oauth-db"
+          - name: LANG
+            value: "en_US.UTF-8"
+          - name: DJANGO_SECRET_KEY
+            value: "eiKahph7"
+          - name: DB
+            value: "oauth"
+          - name: DB_USER
+            value: "kooplex"
+          - name: DB_PW
+            value: "singaiB7"
+          - name: LDAP_PW
+            value: "pimPALA2021"
+          - name: LDAP_URL
+            value: "ldap-test"
+          - name: LDAP_BIND_DN
+            value: "cn=admin,dc=k8plex-test,dc=vo,dc=elte,dc=hu"
+          - name: LDAP_BASE_DN
+            value: "dc=k8plex-test,dc=vo,dc=elte,dc=hu"
+      nodeSelector:
+        kubernetes.io/hostname: veo1
+      volumes:
+        - name: vol
+          persistentVolumeClaim:
+            claimName: oauth-data
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: oauth-db
+  namespace: k8plex-test
+spec:
+  serviceName: oauth-db
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth-db
+  template:
+    metadata:
+      labels:
+        app: oauth-db
+    spec:
+      containers:
+      - image: mariadb:10.5.4
+        name: oauth-db
+        ports:
+          - containerPort: 3306
+            name: mysql
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: vol
+            subPath: db/
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "aePh2eph"
+          - name: MYSQL_USER
+            value: "kooplex"
+          - name: MYSQL_PASSWORD
+            value: "singaiB7"
+          - name: MYSQL_DATABASE
+            value: "oauth"
+          - name: MYSQL_LOG_CONSOLE
+            value: "true"
+      nodeSelector:
+        kubernetes.io/hostname: veo1
+      volumes:
+        - name: vol
+          persistentVolumeClaim:
+            claimName: oauth-data

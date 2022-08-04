@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: test-slurm-scratch
+  labels:
+    pvl: test-slurm-scratch
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - hard
+  nfs:
+    path: /srv/vols/slurm-scratch
+    server: veo1.int.vo.elte.hu

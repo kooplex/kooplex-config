@@ -1,3 +1,0 @@
-cluster_url: http://##PREFIX##-hydra:4444
-client_id: admin
-client_secret: ##HYDRA_ADMINPW##

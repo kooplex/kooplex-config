@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth
+  namespace: k8plex-test
+spec:
+  selector:
+    app: oauth
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth-db
+  namespace: k8plex-test
+spec:
+  selector:
+    app: oauth-db
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306

@@ -1,0 +1,210 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k8plex-test-hub
+spec:
+  capacity:
+    storage: 1G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/service/hub
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: garbage-k8plex-test
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/garbage
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: home-k8plex-test
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/home
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k8plex-test-project
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/projects
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k8plex-test-report
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/reports
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k8plex-test-edu
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/edu
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k8plex-test-scratch
+spec:
+  capacity:
+    storage: 100G
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /k8plex_test/scratch
+    server: veo1.krft
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hub
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1G
+  storageClassName: ""
+  volumeName: k8plex-test-hub
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: home
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: home-k8plex-test
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: garbage
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: garbage-k8plex-test
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: project
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: k8plex-test-project
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: report
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: k8plex-test-report
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: edu
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: k8plex-test-edu
+---  
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scratch
+  namespace: k8plex-test
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: ""
+  volumeName: k8plex-test-scratch

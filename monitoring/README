@@ -1,0 +1,250 @@
+#################################
+# fontos a kubeletek 10250-es és 9100-as portját ki kell egymás között nyitni!
+# https://github.com/prometheus-operator/kube-prometheus
+#################################
+
+
+# Finomhangolás
+
+@ veo1:
+zfs create -o mountpoint=/srv/vols/monitoring veo1pool0/monitoring
+zfs set sharenfs="rw=@atys.int.vo.elte.hu,insecure,no_root_squash,rw=@veo1.int.vo.elte.hu,insecure,no_root_squash,rw=@veo2.int.vo.elte.hu,insecure,no_root_squash,rw=@onco1.int.vo.elte.hu,insecure,no_root_squash" veo1pool0/monitoring
+zfs set acltype=posixacl veo1pool0/monitoring
+
+# NFS dynamic provisioning
+
+# https://stackoverflow.com/questions/65376314/kubernetes-nfs-provider-selflink-was-empty
+# https://github.com/kubernetes/enhancements/issues/1164
+# paraméterleírás: https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+edit /etc/kubernetes/manifest/kube-apiserver.yaml
+# include:     - --feature-gates=RemoveSelfLink=false
+
+
+
+kubectl create namespace monitoring
+kubectl apply -f nfs-provisioner.yaml 
+
+
+
+sudo apt install jsonnet
+sudo apt install golang-go
+GO111MODULE="on" go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+GO111MODULE="on" go get github.com/brancz/gojsontoyaml
+export PATH=$PATH:$(go env GOPATH)/bin
+
+mkdir my-kube-prometheus; cd my-kube-prometheus
+jb init
+# latest release as of 15 12. 2021
+jb install github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@release-0.9
+wget https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/release-0.9/example.jsonnet -O example.jsonnet
+wget https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/release-0.9/build.sh -O build.sh
+
+wget https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/examples/prometheus-pvc.jsonnet
+
+edit prometheus-pvc.jsonnet
+# retention: '1y'
+# storageClassName: 'nfs-monitoring',                                                                  
+
+
+
+
+################# selector: { matchLabels: { 'app.kubernetes.io/name': 'monitoring' } },                 
+
+###bash build.sh example.jsonnet
+bash build.sh prometheus-pvc.jsonnet
+
+# érdemes a namespace objektumot eldobni, mert azt már kézzel megcsináltuk
+rm manifests/setup/0namespace-namespace.yaml
+
+kubectl create -f manifests/setup
+# unable to recognize "manifests/setup/0namespace-prometheusRule.yaml": no matches for kind "PrometheusRule" in version "monitoring.coreos.com/v1"
+# unable to recognize "manifests/setup/prometheus-operator-prometheusRule.yaml": no matches for kind "PrometheusRule" in version "monitoring.coreos.com/v1"
+# wait for a sec
+kubectl create -f manifests/setup
+
+
+kubectl get servicemonitors --all-namespaces
+# No resources found...
+
+kubectl get pods -n monitoring
+# prometheus-operator-XXXXXXXXXX-XXXXX   2/2     Running   0          56s
+
+kubectl logs -n monitoring prometheus-operator-XXXXXXXXXX-XXXXX -c prometheus-operator
+# ...
+# level=info ts=2021-02-10T13:14:54.989280762Z caller=operator.go:279 component=alertmanageroperator msg="successfully synced all caches"
+
+kubectl logs -f -n monitoring prometheus-operator-XXXXXXXXXX-XXXXX -c kube-rbac-proxy
+# ...
+# I0210 14:54:57.554140       1 main.go:318] Listening securely on :8443
+
+
+kubectl create -f manifests/
+# minden ok
+
+kubectl get servicemonitors --all-namespaces
+##############
+# NAMESPACE    NAME                      AGE
+# monitoring   alertmanager              31s
+# monitoring   blackbox-exporter         31s
+# monitoring   coredns                   27s
+# monitoring   grafana                   29s
+# monitoring   kube-apiserver            27s
+# monitoring   kube-controller-manager   27s
+# monitoring   kube-scheduler            27s
+# monitoring   kube-state-metrics        29s
+# monitoring   kubelet                   27s
+# monitoring   node-exporter             29s
+# monitoring   prometheus                28s
+# monitoring   prometheus-adapter        28s
+# monitoring   prometheus-operator       28s
+##############
+
+kubectl get svc -n monitoring
+# NAME                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+# alertmanager-main       ClusterIP   10.106.233.220   <none>        9093/TCP                     2m2s
+# alertmanager-operated   ClusterIP   None             <none>        9093/TCP,9094/TCP,9094/UDP   2m2s
+# blackbox-exporter       ClusterIP   10.107.43.121    <none>        9115/TCP,19115/TCP           2m2s
+# grafana                 NodePort    10.110.242.211   <none>        3000:30177/TCP               2m
+# kube-state-metrics      ClusterIP   None             <none>        8443/TCP,9443/TCP            2m
+# node-exporter           ClusterIP   None             <none>        9100/TCP                     2m
+# prometheus-adapter      ClusterIP   10.106.206.99    <none>        443/TCP                      119s
+# prometheus-k8s          ClusterIP   10.108.122.160   <none>        9090/TCP                     118s
+# prometheus-operated     ClusterIP   None             <none>        9090/TCP,10901/TCP           118s
+# prometheus-operator     ClusterIP   None             <none>        8443/TCP                     7m16s
+
+kubectl get pods -n monitoring
+# alertmanager-main-0                    2/2     Running   0          88m
+# alertmanager-main-1                    2/2     Running   0          88m
+# alertmanager-main-2                    2/2     Running   0          88m
+# blackbox-exporter-556d889b47-x78hr     3/3     Running   0          88m
+# grafana-674b67dc58-qkxbq               1/1     Running   0          88m
+# kube-state-metrics-986b854-v57nq       3/3     Running   0          88m
+# node-exporter-5htlx                    2/2     Running   0          88m
+# node-exporter-m2fzn                    2/2     Running   0          88m
+# node-exporter-zk254                    2/2     Running   0          88m
+# prometheus-adapter-767f58977c-lnrmn    1/1     Running   0          88m
+# prometheus-k8s-0                       3/3     Running   1          88m
+# prometheus-k8s-1                       3/3     Running   1          88m
+# prometheus-operator-59976dc7d5-pqqkd   2/2     Running   0          91m
+
+kubectl top pods
+# NAME                                        CPU(cores)   MEMORY(bytes)
+# benedek-gapminderbokeh-report               0m           63Mi
+# ....
+# test-veo2                                   0m           1Mi
+
+kubectl top nodes
+# NAME             CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+# hpproliant       648m         8%     1406Mi          29%
+# veo1         2988m        3%     24752Mi         4%
+# veo2         1229m        1%     73913Mi         14%
+
+# prometheus:
+kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
+# amíg nincs ctrl-c megszakítva ssh -L 9999:127.0.0.1:9090 _veo böngészőből elérhető a prometheus
+
+# grafana:
+kubectl --namespace monitoring port-forward svc/grafana 3000
+# admin/admin login után jelszóváltás: +bx);&%3H}J-k2E[
+
+# alert monitor
+kubectl --namespace monitoring port-forward svc/alertmanager-main 9093
+# műxik
+
+
+# több konténeres pod esetnén a log olvasása:
+kubectl logs -n monitoring alertmanager-main-2 -c config-reloader
+
+
+##### ingress
+kubectl create secret tls tls-monitoring -n monitoring \
+  --cert=/lhome/fonok/certs/monitoring.vo.elte.hu/monitoring.vo.elte.hu.crt \
+  --key=/lhome/fonok/certs/monitoring.vo.elte.hu/monitoring.vo.elte.hu.key
+
+kubectl apply -f ingress.yaml
+
+
+#HACK
+
+kubectl apply -f grafana-claim.yaml
+kubectl apply -f grafana-deployment.yaml
+
+###
+https://stackoverflow.com/questions/61121046/ingress-routing-rules-to-access-prometheus-server
+# EZ SEM SEGÍT!!!!
+#kubectl edit statefulsets.apps -n monitoring prometheus-k8s
+#        - --web.route-prefix=/prometheus
+#        - --web.external-url="https://monitoring.vo.elte.hu/prometheus"
+
+
+
+
+
+
+
+
+# see also dashboard
+https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md
+https://github.com/kubernetes/dashboard/issues/4179
+dashboardban máris lehet listázni a dolgokat
+
+
+## For embedding it into another site
+https://github.com/grafana/grafana/issues/19729
+
+# set to true if you host Grafana behind HTTPS. default is false.
+cookie_secure = true
+# set cookie SameSite attribute. defaults to `lax`. can be set to "lax", "strict" and "none"
+cookie_samesite = none
+# set to true if you want to allow browsers to render Grafana in a <frame>, <iframe>, <embed> or <object>. default is false.
+allow_embedding = true
+
+# OAUTH TO WORK add these envs my-kube-prometheus/manifests/grafana-deployment.yaml
+        - name: "GF_SERVER_ROOT_URL"
+          value: "https://monitoring.vo.elte.hu/grafana"
+        - name: "GF_SERVER_SERVE_FROM_SUB_PATH"
+          value: "true"
+        - name: "GF_SECURITY_COOKIE_SECURE"
+          value: "true"
+        - name: "GF_SECURITY_COOKIE_SAMESITE"
+          value: "none"
+        - name: "GF_SECURITY_ALLOW_EMBEDDING"
+          value: "true"
+        - name: "GF_AUTH_ANONYMOUS_ENABLED"
+          value: "true"
+        - name: "GF_AUTH_ANONYMOUS_ORG_NAME"
+          value: "KRFT"
+        - name: "GF_AUTH_BASIC_ENABLED"
+          value: "false"
+        - name: "GF_AUTH_OAUTH_AUTO_LOGIN"
+          value: "true"
+          #        - name: "GF_AUTH_DISABLE_LOGIN_FORM"
+          #          value: "true"
+          #- name: "GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP"
+          #  value: "true"
+        - name: "GF_AUTH_GENERIC_OAUTH_ENABLED"
+          value: "true"
+        - name: "GF_AUTH_GENERIC_OAUTH_CLIENT_ID"
+          value: "SmWWpd7xvnTQgS9AIqeMdkGvNsWvuCef1rCChLXO"
+        - name: "GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET"
+          value: "Jn1jCJZdQxg5CMHIN702OXvJ5n2RNTcLhGNZGVKrcnWMn1OuWsHgGj1BIeIbalMXYsZpEA7WOITkJ9p4sybBl9m1IzKSYQq2YikPLXt5SQmEkBJEEpUp1yBSaktJB05S"
+        - name: "GF_AUTH_GENERIC_OAUTH_AUTH_URL"
+          value: "https://kooplex-auth.elte.hu/oauth/o/authorize/"
+        - name: "GF_AUTH_GENERIC_OAUTH_TOKEN_URL"
+          value: "https://kooplex-auth.elte.hu/oauth/o/token/"
+        - name: "GF_AUTH_GENERIC_OAUTH_SCOPES"
+          value: "read, write, profile, email, openid"
+        - name: "GF_AUTH_GENERIC_OAUTH_NAME"
+          value: "Kooplex Auth"
+          #- name: "GF_AUTH_GENERIC_OAUTH_EMAIL_ATTRIBUTE_NAME"
+          #  value: "email"
+        - name: "GF_AUTH_GENERIC_OAUTH_API_URL"
+          value: "https://kooplex-auth.elte.hu/oauth/profile/"
+          #        - name: "GF_AUTH_GENERIC_OAUTH_"
+          #          value: "true"
+        - name: "GF_LOG_FILTERS"
+          value: "oauth.generic_oauth:debug"
+        - name: "GF_AUTH_PROXY_AUTO_SIGN_UP"
+          value: "false"
+        - name: "GF_AUTH_PROXY_ENABLED"
+          value: "true"

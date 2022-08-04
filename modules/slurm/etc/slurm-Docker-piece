@@ -1,4 +1,0 @@
-
-ADD slurm.conf /etc/slurm-llnl/
-ADD munge.key /etc/munge/munge.key
-

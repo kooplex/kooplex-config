@@ -1,0 +1,202 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hub
+  namespace: k8plex-test
+spec:
+  serviceName: hub
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hub
+  template:
+    metadata:
+      labels:
+        app: hub
+    spec:
+      initContainers:
+      - name: init-gitclone
+        image: ajeetraina/alpine-git
+        command: ['sh', '-c', "git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git /x || true"]
+        volumeMounts:
+          - mountPath: /x
+            name: svc
+            subPath: code
+      containers:
+      - image: image-registry.vo.elte.hu/hub-v4.0
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "service ssh start; pip install debugpy==1.5.1; echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[00\\;32m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\$ \\' >> /root/.bashrc"]
+              #command: ["/bin/sh", "-c", "echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[01\\;31m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\a\\\\$ \\' >> /root/.bashrc"]
+        #command: [ 'sleep', 'infinity' ]
+        name: hub
+        ports:
+          - containerPort: 80
+            name: http
+          - containerPort: 3000
+            name: debug
+          - containerPort: 22
+            name: ssh
+        volumeMounts:
+          - mountPath: /root/.kube
+            name: kubeconf
+          - mountPath: /kooplexhub
+            name: svc
+            subPath: code
+          - mountPath: /var/log/hub
+            name: svc
+            subPath: log
+          - mountPath: /mnt/home
+            name: home
+          - mountPath: /mnt/garbage
+            name: garbage
+          - mountPath: /mnt/projects
+            name: project
+            subPath: projects
+          #- mountPath: /mnt/scratch
+          #  name: scratch
+          - mountPath: /mnt/reports
+            name: report
+          - mountPath: /mnt/report_prepare
+            name: project
+            subPath: report_prepare
+          - mountPath: /mnt/courses
+            name: edu
+          - mountPath: /etc/mnt
+            name: nslcd
+            readOnly: true
+          - mountPath: /root/_ssh
+            name: authorizedkeys 
+            readOnly: true
+          - mountPath: /init
+            name: init
+            readOnly: true
+    #      - mountPath: /etc/secrets
+    #        name: svcconf
+    #        subPath: hub/secrets
+        env:
+          - name: HUBDBROOT_PW
+            value: "almafa321"
+          - name: HUBDB_HOSTNAME
+            value: "hub-mysql"
+          - name: LANG
+            value: "en_US.UTF-8"
+          - name: DJANGO_SECRET_KEY
+            value: "oong6naex6Rae7kaawijaeQuohqu3ahf5teimu4sohmies7YauChohmiecaexah"
+          - name: PREFIX
+            value: "k8plex-test"
+          - name: DOMAIN
+            value: "k8plex-test.vo.elte.hu"
+          - name: HUBDB
+            value: hub
+          - name: HUBDB_USER
+            value: "hub"
+          - name: HUBDB_PW
+            value: "almafa321"
+          - name: HUBLDAP_PW
+            value: "cesaeG2taij5ohg7"
+      nodeSelector:
+        kubernetes.io/hostname: veo1
+      volumes:
+        - name: kubeconf
+          configMap:
+            name: kubeconfig
+            items:
+            - key: "kubeconfig"
+              path: "config"
+        - name: authorizedkeys 
+          configMap:
+            name: authorizedkeys
+            items:
+            - key: "authorizedkeys"
+              path: "authorized_keys"
+            defaultMode: 0600
+        - name: svc
+          persistentVolumeClaim:
+            claimName: hub
+        - name: edu
+          persistentVolumeClaim:
+            claimName: edu
+        - name: home
+          persistentVolumeClaim:
+            claimName: home
+        - name: garbage
+          persistentVolumeClaim:
+            claimName: garbage
+        - name: project
+          persistentVolumeClaim:
+            claimName: project
+        - name: report
+          persistentVolumeClaim:
+            claimName: report
+        #- name: scratch
+        #  persistentVolumeClaim:
+        #    claimName: scratch
+        - name: nslcd
+          configMap:
+            name: nslcd
+            items:
+            - key: "nslcd"
+              path: "nslcd.conf"
+        - name: init
+          configMap:
+            name: initscripts
+            items:
+            - key: "nsswitch"
+              path: "01-nsswitch.sh"
+            - key: "nslcd"
+              path: "02-nslcd.sh"
+            - key: "pip"
+              path: "11-pip.sh"
+            - key: "sshstart"
+              path: "21-ssh.sh"
+            - key: "runserver"
+              path: "99-runserver.sh"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hub-mysql
+  namespace: k8plex-test
+spec:
+  serviceName: hub-mysql
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hub-mysql
+  template:
+    metadata:
+      labels:
+        app: hub-mysql
+    spec:
+      containers:
+      - image: mariadb:10.5.4
+        name: hub-mysql
+        ports:
+          - containerPort: 3306
+            name: mysql
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: svc
+            subPath: mysql
+#          - /etc/localtime:/etc/localtime:ro
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "almafa321"
+          - name: MYSQL_USER
+            value: "hub"
+          - name: MYSQL_PASSWORD
+            value: "almafa321"
+          - name: MYSQL_DATABASE
+            value: "hub"
+          - name: MYSQL_LOG_CONSOLE
+            value: "true"
+      nodeSelector:
+        kubernetes.io/hostname: veo1
+      volumes:
+        - name: svc
+          persistentVolumeClaim:
+            claimName: hub

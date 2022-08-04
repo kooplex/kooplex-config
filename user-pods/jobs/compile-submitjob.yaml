@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compile-submitjobs
+  namespace: k8plex-test
+spec:
+  containers:
+  - image: image-registry.vo.elte.hu/jupyter-basic-v4.0
+    name: basic
+    command: [ "bash", "-c"]
+    args: 
+      - cd
+      - /opt/job-tools/ 
+      - "&&"
+      - python
+      - -m
+      - nuitka
+      - --static-libpython=no
+      - submit_job.py
+      - -o
+      - job-submit-3.8
+    volumeMounts:
+      - mountPath: /opt/job-tools
+        name: job-tools
+  volumes:
+   - name: job-tools
+     persistentVolumeClaim:
+       claimName: job-tools
+  nodeSelector:
+    kubernetes.io/hostname: future1

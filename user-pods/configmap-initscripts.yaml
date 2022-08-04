@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: initscripts
+  namespace: k8plex-test
+data:
+  #/init 11-ssh.sh
+  #  sshstart: |
+  #          service ssh start
+
+  nsswitch: |
+          sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf
+
+  #/init/01-nslcd.sh
+  nslcd: |
+          #! /bin/bash
+          
+          # We cannot mount this config file into /etc because it is not empty
+          if [ -f /etc/mnt/nslcd.conf ] ; then
+            cat /etc/mnt/nslcd.conf > /etc/nslcd.conf
+            chmod 0600 /etc/nslcd.conf
+          fi
+          
+          service nslcd start
+  #/init/02-usermod.sh
+  usermod: |
+          #!/bin/bash
+
+
+          # Change UID of NB_USER to NB_UID if it does not match 
+          if [ "$NB_UID" != $(id -u $NB_USER) ] ; then
+             usermod -u $NB_UID $NB_USER
+          fi
+
+          #  entrypoint: |
+          #          #!/bin/sh
+          #
+          #          for SCRIPT in /init/*
+          #          do
+          #              if [ -x $SCRIPT ] ; then
+          #                  echo "Running init script: $SCRIPT"
+          #                  $SCRIPT
+          #              elif [ -f $SCRIPT ] ; then
+          #                  echo "Sourcing init script: $SCRIPT"
+          #                  . $SCRIPT
+          #              else
+          #                  echo "Not a file $SCRIPT"
+          #              fi
+          #          done
+          #          
+          #          echo "Sleeping for infinity"
+          #          exec sleep infinity
+  jobtools: |
+          #!/bin/bash
+          
+          echo "PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/jobtools/" >> /etc/profile.d/02-jobtools.sh
+          chmod a+x /etc/profile.d/02-jobtools.sh
+
+  #/usr/local/bin/runjupyter.sh          
+  runjupyter: |
+          #!/bin/bash
+
+          id $NB_USER
+          
+          # Start the notebook server
+          
+          #if [ -z "$NEWGROUP" ] ; then
+            exec su $NB_USER -c "cd /v ; env PATH=$PATH jupyter notebook-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10 " #--EnvironmentKernelSpecManager.display_name_template=\" {}\" "
+            #else
+            #exec su $NB_USER -c "cd /v ; sg $NEWGROUP -c \"env PATH=$PATH jupyter notebook-kooplex $* --NotebookApp.iopub_data_rate_limit=1.0e10 \""
+            #fi
+
+  #/init/99-startnotebook.sh
+  startnotebook: |
+          #!/bin/bash
+        
+          #if [ -z "$REPORT_TYPE" ] ; then
+          #    echo "Starting notebook for $NB_USER..."
+          #    nice -n 19 /usr/local/bin/start-notebook.sh --config=/etc/jupyter_notebook_config.py --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN --EnvironmentKernelSpecManager.display_name_template=\" {}\"
+          #elif [ "${REPORT_TYPE}" == "bokeh" ]; then
+          #    echo "Starting Report Bokeh Server"
+          #    cd $REPORT_DIR
+          #    nice -n 19 /usr/local/sbin/preview-bokeh.sh $REPORT_INDEX
+          #elif [ "${REPORT_TYPE}" == "plotly_dash" ]; then
+          #    echo "Starting Report Plotly Dash"
+          #    cd $REPORT_DIR
+          #    nice -n 19 /bin/bash /usr/local/sbin/report-dash.sh $REPORT_INDEX
+          #elif [ "${REPORT_TYPE}" == "service" ]; then
+          #    echo "Starting Report KernelGateway Server"
+          #    cd $REPORT_DIR
+          #    nice -n 19 /usr/local/sbin/preview-nb-api.sh $REPORT_INDEX
+          
+          
+          #if [ "${REPORT_TYPE}" == "dynamic" ]; then
+          #    echo "Starting Notebook Server (report)"
+          #    cd $REPORT_DIR
+          #    echo "Trust notebook"
+          #    jupyter trust $REPORT_INDEX
+          #    nice -n 19 /usr/local/bin/runjupyter.sh --config=/etc/jupyter_report_config.py --NotebookApp.base_url="/${NB_URL}" --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN --notebook-dir=$REPORT_DIR
+          #else
+          echo "Starting notebook for $NB_USER..."
+          nice -n 19 /usr/local/bin/runjupyter.sh --config=/etc/jupyter_notebook_config.py --NotebookApp.base_url=$NB_URL --NotebookApp.port=$NB_PORT --NotebookApp.token=$NB_TOKEN ##--EnvironmentKernelSpecManager.display_name_template=\" {}\"
+          #fi
+  runrstudio: |
+          for SCRIPT in /init_scripts/*
+          do
+              if [ -x $SCRIPT ] ; then
+                  echo "Running init script: $SCRIPT"
+                  $SCRIPT
+              elif [ -f $SCRIPT ] ; then
+                  echo "Sourcing init script: $SCRIPT"
+                  . $SCRIPT
+              else
+                  echo "Not a file $SCRIPT"
+              fi
+          done
+
+          nohup nginx
+
+          #IDD=`id -u $NB_USER`
+          #usermod -u $IDD -o -d /v/ rstudio
+          
+          CONDA_DIR=/opt/conda
+          
+          export PATH=${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CONDA_DIR/bin
+          
+          sudo -u $NB_USER env -u 1000 -u 1000 /usr/lib/rstudio-server/bin/rserver --auth-none=1 --auth-validate-users=0  --auth-stay-signed-in-days=30
+          
+          sleep infinity
+

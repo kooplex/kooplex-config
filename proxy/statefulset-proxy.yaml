@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: proxy
+  namespace: k8plex-test
+spec:
+  serviceName: proxy
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+      - image: jupyterhub/configurable-http-proxy:4.2.1
+        name: proxy
+        command: ["node","/usr/local/bin/configurable-http-proxy", "--api-ip=0.0.0.0", "--error-path=/var/html"] 
+        #command: ["sh","-c","sleep infinity"]
+        ports:
+          - containerPort: 8000
+            name: http
+          - containerPort: 8001
+            name: api
+        volumeMounts:
+          - mountPath: /var/html
+            name: errorhtml
+      nodeSelector:
+        kubernetes.io/hostname: veo1
+      volumes:
+        - name: errorhtml
+          configMap:
+            name: errorhtml
+            items:
+            - key: "error"
+              path: "error.html"
+
