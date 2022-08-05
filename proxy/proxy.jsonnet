@@ -2,8 +2,8 @@ local Config = import '../config.libsonnet';
 local appname = 'proxy';
 local image = 'jupyterhub/configurable-http-proxy:4.2.1';
 local nodename = 'veo1';
-{
 
+{
   'service.yaml-raw': {
     apiVersion: 'v1',
     kind: 'Service',
@@ -120,7 +120,7 @@ local nodename = 'veo1';
           hosts: [
             Config.fqdn,
           ],
-          secretName: 'k8plex-test-tls',
+          secretName: Config.ns + '-tls',
         },
       ],
       rules: [
@@ -162,7 +162,7 @@ local nodename = 'veo1';
           hosts: [
             Config.fqdn,
           ],
-          secretName: 'k8plex-test-tls',
+          secretName: Config.ns + '-tls',
         },
       ],
       rules: [

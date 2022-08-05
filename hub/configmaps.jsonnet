@@ -17,7 +17,7 @@ local Config = import '../config.libsonnet';
             nsswitch: 'sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf\n',
             nslcd: '#! /bin/bash\n\n# We cannot mount this config file into /etc because it is not empty\nif [ -f /etc/mnt/nslcd.conf ] ; then\n  cat /etc/mnt/nslcd.conf > /etc/nslcd.conf\n  chmod 0600 /etc/nslcd.conf\nfi\n\nservice nslcd start\n',
             usermod: '#!/bin/bash\n\n\n# Change UID of NB_USER to NB_UID if it does not match \nif [ "$NB_UID" != $(id -u $NB_USER) ] ; then\n   usermod -u $NB_UID $NB_USER\nfi\n',
-            pip: 'pip install debugpy==1.5.1\n',
+            pip: 'pip install debugpy==1.5.1\nln -s /usr/local/bin/pip3.8 /usr/bin/pip3.8',
             sshstart: 'service ssh start\n',
             runserver: '#! /bin/bash\n\nexec 2> /var/log/hub/runserver.log\nexec 1>&2\n\n##FIXME: this is not nice\n#env > /var/spool/cron/crontabs/root\n#echo -e "*/1 * * * * /usr/bin/python3 /kooplexhub/kooplexhub/manage.py scheduler\\n" >> /var/spool/cron/crontabs/root\n#/etc/init.d/cron start\n\ncd /kooplexhub/kooplexhub/\n#git pull\n\n\nwhile (true) ; do\n  echo "Waiting for mysql server"\n  mysql -u $HUBDB_USER --password=$HUBDB_PW -h $HUBDB_HOSTNAME $HUBDB -e "SELECT 1"\n  [ $? = 0 ] && break\n  sleep 2\ndone\n\n/usr/bin/python3 manage.py runserver 0.0.0.0:80\n',
           },
