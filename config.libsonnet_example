@@ -23,7 +23,7 @@
   },
 
 
-  PV(name, ns=self.ns, cap='1G', path='/srv/vols', server=self.nfsserver): {
+  PV(name, cap='1G', path='/srv/vols', server=self.nfsserver): {
     apiVersion: 'v1',
     kind: 'PersistentVolume',
     metadata: {

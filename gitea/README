@@ -1,0 +1,7 @@
+# Create adminuser
+gitea admin user create --username giteaadmin --password pw --admin --email kooplex@email
+
+# Maybe needed to update the auth source:
+use $DB;
+
+update login_source set cfg='{"Provider":"openidConnect","ClientID":"gitea","ClientSecret":">secret?","OpenIDConnectAutoDiscoveryURL":"https://auth.hu/oauth/o/authorize/.well-known/openid-configuration","CustomURLMapping":{"AuthURL":"","TokenURL":"","ProfileURL":"","EmailURL":""}}';

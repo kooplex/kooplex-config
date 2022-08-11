@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea
+  namespace: gitea
+spec:
+  serviceName: gitea
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      containers:
+      - name: gitea
+        image: gitea/gitea:1.16.8
+        env:
+        - name: GITEA__database__DB_TYPE
+          value: "mysql"
+        - name: GITEA__database__HOST
+          value: "127.0.0.1:3306"
+        - name: GITEA__database__NAME
+          value: "gitea"
+        - name: GITEA__database__USER
+          value: "gitea"
+        - name: GITEA__database__PASSWD
+          value: "Oovoongi9akueQu5"
+        ports:
+        - containerPort: 3000
+          name: gitea
+        - containerPort: 22
+          name: git-ssh
+        volumeMounts:
+        - mountPath: /data
+          name: git-volume
+          subPath: data
+      volumes:
+      - name: git-volume
+        persistentVolumeClaim:
+          claimName: gitea-data
+          #initContainers:
+          #- name: init-gitclone
+          #  image: ajeetraina/alpine-git
+          #  command: ['sh', '-c', "git clone -b kubernetes https://gitgitea.com/kooplex/kooplex-gitea.git /x || true"]
+          #  volumeMounts:
+          #    - mountPath: /x
+          #      name: svc
+          #      subPath: code
+      nodeSelector:
+        kubernetes.io/hostname: future1
+      volumes:
+      - name: git-volume
+        persistentVolumeClaim:
+          claimName: gitea-data
+          #- name: nslcd
+          #  configMap:
+          #    name: nslcd
+          #    items:
+          #    - key: "nslcd"
+          #      path: "nslcd.conf"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea-mysql
+  namespace: gitea
+spec:
+  serviceName: gitea-mysql
+  podManagementPolicy: "Parallel"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea-mysql
+  template:
+    metadata:
+      labels:
+        app: gitea-mysql
+    spec:
+      containers:
+      - image: mariadb:10.5
+        name: gitea-mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "uuh4ohk6Eineayee"
+        - name: MYSQL_LOG_CONSOLE
+          value: "true"
+        - name: MYSQL_USER
+          value: "gitea"
+        - name: MYSQL_PASSWORD
+          value: "Oovoongi9akueQu5"
+        - name: MYSQL_DATABASE
+          value: "gitea"
+        volumeMounts:
+        - name: git-volume
+          mountPath: /var/lib/mysql/
+          subPath: db
+      nodeSelector:
+        kubernetes.io/hostname: future1
+      volumes:
+        - name: git-volume
+          persistentVolumeClaim:
+            claimName: gitea-data
