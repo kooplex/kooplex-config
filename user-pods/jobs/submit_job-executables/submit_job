@@ -1,7 +1,0 @@
-#!/bin/bash
-
-ver=`python -c "import sys; print(sys.version[:3])"`
-
-DIR=/v/wfct0p/
-EXE=$DIR/submit_job-executables/submit_job-${ver}
-$EXE

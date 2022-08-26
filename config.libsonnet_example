@@ -1,10 +1,7 @@
 {
+  local main = self,
   fqdn: 'k8plex-test.hu',
   ns: 'k8plex-test',
-  dbname: 'cbioportaldb',
-  dbuser: 'cbioportal',
-  dbpw: 'bddsbdf',
-  dbrootpw: 'brebbdf',
   nfsvol: '/k8plex_test',
   nfsserver: 'nfsprov',
 
@@ -26,6 +23,22 @@
     pw: 'dfbdsb',
   },
 
+  volumes: {
+    hub: main.ns + '-hub',
+    hubPath: main.nfsvol + '/service/hub',
+    garbage: main.ns + '-garbage',
+    garbagePath: main.nfsvol + '/garbage',
+    project: main.ns + '-project',
+    projectPath: main.nfsvol + '/projects',
+    edu: main.ns + '-edu',
+    eduPath: main.nfsvol + '/edu',
+    scratch: main.ns + '-scratch',
+    scratchPath: main.nfsvol + '/scratch',
+    report: main.ns + '-report',
+    reportPath: main.nfsvol + '/reports',
+    home: main.ns + '-home',
+    homePath: main.nfsvol + '/home',
+  },
 
   PV(name, cap='1G', path='/srv/vols', server=self.nfsserver): {
     apiVersion: 'v1',

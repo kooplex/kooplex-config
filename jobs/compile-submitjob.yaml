@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compile-submitjobs3p8
+  namespace: k8plex-test
+spec:
+  containers:
+  - image: image-registry.vo.elte.hu/jupyter-basic-v4.0
+    name: basic
+    command: [ "bash", "-c"]
+    args: 
+    #      - sleep 1000
+      - pip install nuitka && cd /opt/job-tools/ && python -m nuitka --static-libpython=no submit_job.py --output-dir=job3p8 -o job-submit-3.8
+        #      - /opt/job-tools/ 
+        #      - "&&"
+        #      - python
+        #      - -m
+        #      - nuitka
+        #      - --static-libpython=no
+        #      - submit_job.py
+        #      - -o
+        #      - job-submit-3.8
+    volumeMounts:
+      - mountPath: /opt/job-tools
+        name: job-tools
+  volumes:
+   - name: job-tools
+     persistentVolumeClaim:
+       claimName: job-tools
+  nodeSelector:
+    kubernetes.io/hostname: future1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compile-submitjobs3p9
+  namespace: k8plex-test
+spec:
+  containers:
+  - image: image-registry.vo.elte.hu/jupyter-siesta-v4.0
+    name: basic
+    command: [ "bash", "-c"]
+    args: 
+      - pip install nuitka && cd /opt/job-tools/ && python -m nuitka --static-libpython=no submit_job.py --output-dir=job3p9 -o job-submit-3.9
+    volumeMounts:
+      - mountPath: /opt/job-tools
+        name: job-tools
+  volumes:
+   - name: job-tools
+     persistentVolumeClaim:
+       claimName: job-tools
+  nodeSelector:
+    kubernetes.io/hostname: future1
