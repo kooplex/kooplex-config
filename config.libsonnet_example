@@ -2,11 +2,15 @@
   local main = self,
   fqdn: 'k8plex-test.hu',
   ns: 'k8plex-test',
+  nspods: self.ns,
+  nsjobs: self.ns,
   nfsvol: '/k8plex_test',
   nfsserver: 'nfsprov',
+  debug: true,  // debug mode for remote python debug module
+  ssh: true,  // for remote ssh connection
 
   hub: {
-    nodename: 'veo1',
+    nodename: 'n1',
     appname: 'hub',
     dbname: 'hub',
     dbuser: 'hub',
@@ -21,6 +25,11 @@
   ldap: {
     appname: 'ldap',
     pw: 'dfbdsb',
+    authns: main.ns,
+    pw: '',
+    base: '',
+    binddn: '',
+    basegroup: '',
   },
 
   volumes: {
