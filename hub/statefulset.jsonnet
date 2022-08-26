@@ -49,6 +49,29 @@ local Config = import '../config.libsonnet';
                 ],
                 containers: [
                   {
+                    image: 'bitnami/redis:latest',
+                    name: 'redis',
+                    ports: [
+                      {
+                        containerPort: 6379,
+                        name: 'redis',
+                      },
+                    ],
+                    volumeMounts: [
+                      {
+                        mountPath: '/kooplexhub',
+                        name: 'svc',
+                        subPath: 'redis',
+                      },
+                    ],
+                    env: [
+                      {
+                        name: 'REDIS_PASSWORD',
+                        value: Config.hub.redis_pw,
+                      },
+                    ],
+                  },
+                  {
                     image: Config.hub.image,
                     lifecycle: {
                       postStart: {
@@ -274,6 +297,14 @@ local Config = import '../config.libsonnet';
                         {
                           key: 'sshstart',
                           path: '21-ssh.sh',
+                        },
+                        {
+                          key: 'celery_worker',
+                          path: '98-celery_worker',
+                        },
+                        {
+                          key: 'celery_beat',
+                          path: '97-celery_beat',
                         },
                         {
                           key: 'runserver',

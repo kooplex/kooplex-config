@@ -4,3 +4,5 @@ certs
 adminpw
 DONTCOMMI*
 config.libsonnet
+_old/
+_/

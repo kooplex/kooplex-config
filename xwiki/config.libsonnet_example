@@ -1,33 +1,17 @@
 {
-  fqdn: 'k8plex-test.hu',
-  ns: 'k8plex-test',
-  dbname: 'cbioportaldb',
-  dbuser: 'cbioportal',
-  dbpw: 'bddsbdf',
-  dbrootpw: 'brebbdf',
-  nfsvol: '/k8plex_test',
-  nfsserver: 'nfsprov',
+  fqdn: 'xwiki.hu',
+  appname: 'xwiki',
+  ns: 'xwiki',
+  dbname: 'dbname',
+  dbuser: 'dbuser',
+  dbpw: 'apw',
+  nfsvol: '/xwiki',
+  nfsserver: 'server',
+  storagecapacity: '1G',
+  pvcname: 'data',
+  nodename: 'f1',
 
-  hub: {
-    nodename: 'veo1',
-    appname: 'hub',
-    dbname: 'hub',
-    dbuser: 'hub',
-    dbpw: 'fdsal',
-    dbrootpw: 'dfal',
-    image: 'hub-v4.0',
-    djangosecret: 'sdkgksjhgksa',
-    redis_pw: 'redpw',
-
-  },
-
-  ldap: {
-    appname: 'ldap',
-    pw: 'dfbdsb',
-  },
-
-
-  PV(name, cap='1G', path='/srv/vols', server=self.nfsserver): {
+  PV(name, cap=self.storagecapacity, path=self.nfsvol, server=self.nfsserver): {
     apiVersion: 'v1',
     kind: 'PersistentVolume',
     metadata: {
@@ -49,7 +33,7 @@
     },
   },
 
-  PVC(name, pvname, ns=self.ns, cap='1G'): {
+  PVC(name, pvname, ns=self.ns, cap=self.storagecapacity): {
     apiVersion: 'v1',
     kind: 'PersistentVolumeClaim',
     metadata: {
