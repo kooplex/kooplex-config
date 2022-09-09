@@ -6,3 +6,5 @@ DONTCOMMI*
 config.libsonnet
 _old/
 _/
+manifest/
+raw/

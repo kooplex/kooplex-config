@@ -6,6 +6,7 @@
   nsjobs: self.ns,
   nfsvol: '/k8plex_test',
   nfsserver: 'nfsprov',
+  storageCapacity: '10G',
   debug: true,  // debug mode for remote python debug module
   ssh: true,  // for remote ssh connection
 
@@ -24,29 +25,38 @@
 
   ldap: {
     appname: 'ldap',
-    pw: 'dfbdsb',
     authns: main.ns,
     pw: '',
-    base: '',
     binddn: '',
+    base: '',
     basegroup: '',
   },
 
   volumes: {
-    hub: main.ns + '-hub',
-    hubPath: main.nfsvol + '/service/hub',
+    service: main.ns + '-service',
+    servicePath: main.nfsvol + '/service',
+    serviceCapacity: main.storageCapacity,
+    //hub: main.ns + '-hub',
+    //hubPath: main.nfsvol + '/service/hub',
+    //hubCapacity: '3T',
     garbage: main.ns + '-garbage',
     garbagePath: main.nfsvol + '/garbage',
+    garbageCapacity: '1T',
     project: main.ns + '-project',
     projectPath: main.nfsvol + '/projects',
+    projectCapacity: '1T',
     edu: main.ns + '-edu',
     eduPath: main.nfsvol + '/edu',
+    eduCapacity: '8T',
     scratch: main.ns + '-scratch',
     scratchPath: main.nfsvol + '/scratch',
+    scratchCapacity: '1T',
     report: main.ns + '-report',
     reportPath: main.nfsvol + '/reports',
+    reportCapacity: '1T',
     home: main.ns + '-home',
     homePath: main.nfsvol + '/home',
+    homeCapacity: '1T',
   },
 
   PV(name, cap='1G', path='/srv/vols', server=self.nfsserver): {
