@@ -38,7 +38,6 @@ local nodename = 'veo1';
               volumeMounts: [
                 {
                   mountPath: '/srv/reports',
-                  subPath: 'static/',
                   name: 'staticreports',
                 },
                 {

@@ -79,7 +79,7 @@ local Config = import '../config.libsonnet';
                           command: [
                             '/bin/sh',
                             '-c',
-                            "cp /root/_ssh/authorized_keys /root/.ssh/authorized_keys; echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[00\\;32m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\$ \\' >> /root/.bashrc",
+                            Config.hub.command,
                           ],
                         },
                       },
@@ -89,14 +89,6 @@ local Config = import '../config.libsonnet';
                       {
                         containerPort: 80,
                         name: 'http',
-                      },
-                      {
-                        containerPort: 3000,
-                        name: 'debug',
-                      },
-                      {
-                        containerPort: 22,
-                        name: 'ssh',
                       },
                     ],
                     volumeMounts: [
@@ -146,14 +138,17 @@ local Config = import '../config.libsonnet';
                         readOnly: true,
                       },
                       {
-                        mountPath: '/root/_ssh',
-                        name: 'authorizedkeys',
-                        readOnly: true,
-                      },
-                      {
                         mountPath: '/.init_scripts',
                         name: 'init',
                         readOnly: true,
+                      },
+                      {
+                        mountPath: '/mnt/attachments',
+                        name: 'attachment',
+                      },
+                      {
+                        mountPath: '/mnt/scratch',
+                        name: 'scratch',
                       },
                     ],
                     env: [
@@ -175,7 +170,7 @@ local Config = import '../config.libsonnet';
                       },
                       {
                         name: 'PREFIX',
-                        value: 'k8plex-test',
+                        value: Config.ns,
                       },
                       {
                         name: 'DOMAIN',
@@ -197,6 +192,10 @@ local Config = import '../config.libsonnet';
                         name: 'HUBLDAP_PW',
                         value: Config.ldap.pw,
                       },
+                      {
+                        name: 'REDIS_PASSWORD',
+                        value: Config.hub.redis_pw,
+                      },
                     ],
                   },
                 ],
@@ -217,28 +216,9 @@ local Config = import '../config.libsonnet';
                     },
                   },
                   {
-                    name: 'authorizedkeys',
-                    configMap: {
-                      name: 'authorizedkeys',
-                      items: [
-                        {
-                          key: 'authorizedkeys',
-                          path: 'authorized_keys',
-                        },
-                      ],
-                      defaultMode: 384,
-                    },
-                  },
-                  {
                     name: 'svc',
                     persistentVolumeClaim: {
-                      claimName: Config.hub.appname,
-                    },
-                  },
-                  {
-                    name: 'edu',
-                    persistentVolumeClaim: {
-                      claimName: 'edu',
+                      claimName: 'service',
                     },
                   },
                   {
@@ -251,6 +231,18 @@ local Config = import '../config.libsonnet';
                     name: 'garbage',
                     persistentVolumeClaim: {
                       claimName: 'garbage',
+                    },
+                  },
+                  {
+                    name: 'scratch',
+                    persistentVolumeClaim: {
+                      claimName: 'scratch',
+                    },
+                  },
+                  {
+                    name: 'attachment',
+                    persistentVolumeClaim: {
+                      claimName: 'attachments',
                     },
                   },
                   {
@@ -389,7 +381,7 @@ local Config = import '../config.libsonnet';
                   {
                     name: 'svc',
                     persistentVolumeClaim: {
-                      claimName: Config.hub.appname,
+                      claimName: 'service',
                     },
                   },
                 ],

@@ -108,10 +108,11 @@ local nodename = 'veo1';
     apiVersion: 'networking.k8s.io/v1',
     kind: 'Ingress',
     metadata: {
-      name: appname,
+      name: appname + '-notebook',
       namespace: Config.ns,
       annotations: {
         'kubernetes.io/ingress.class': 'nginx',
+        'nginx.ingress.kubernetes.io/proxy-body-size': '0',
       },
     },
     spec: {
