@@ -107,4 +107,53 @@ local Config = import '../config.libsonnet';
       ],
     },
   },
+  'ingress_dynamic_report.yaml-raw': {
+    apiVersion: 'networking.k8s.io/v1',
+    kind: 'Ingress',
+    metadata: {
+      name: 'proxy-dynamic-report',
+      namespace: Config.ns,
+      annotations: {
+        'kubernetes.io/ingress.class': 'nginx',
+        'nginx.org/websocket-services': 'proxy',
+        'nginx.ingress.kubernetes.io/proxy-body-size': '0',
+        'nginx.ingress.kubernetes.io/proxy-buffer-size': '16k',
+        'nginx.ingress.kubernetes.io/client-header-buffers': '100k',
+        'nginx.ingress.kubernetes.io/large-client-header-buffers': '4 1000k',
+        'nginx.ingress.kubernetes.io/client-body-buffer-size': '10M',
+        'nginx.ingress.kubernetes.io/proxy-add-original-uri-header': 'false',
+      },
+    },
+    spec: {
+      tls: [
+        {
+          hosts: [
+            Config.fqdn,
+          ],
+          secretName: Config.ns + '-tls',
+        },
+      ],
+      rules: [
+        {
+          host: Config.fqdn,
+          http: {
+            paths: [
+              {
+                path: '/dreport',
+                pathType: 'Prefix',
+                backend: {
+                  service: {
+                    name: 'proxy',
+                    port: {
+                      number: 8000,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
 }

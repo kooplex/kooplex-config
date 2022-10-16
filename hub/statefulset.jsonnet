@@ -283,14 +283,6 @@ local Config = import '../config.libsonnet';
                           path: '02-nslcd.sh',
                         },
                         {
-                          key: 'pip',
-                          path: '11-pip.sh',
-                        },
-                        {
-                          key: 'sshstart',
-                          path: '21-ssh.sh',
-                        },
-                        {
                           key: 'celery_worker',
                           path: '98-celery_worker',
                         },
