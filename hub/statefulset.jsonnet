@@ -272,7 +272,7 @@ local Config = import '../config.libsonnet';
                   {
                     name: 'init',
                     configMap: {
-                      name: 'initscripts',
+                      name: 'startupscripts',
                       items: [
                         {
                           key: 'nsswitch',
