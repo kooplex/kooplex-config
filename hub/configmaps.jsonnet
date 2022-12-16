@@ -10,7 +10,7 @@ local Config = import '../config.libsonnet';
           apiVersion: 'v1',
           kind: 'ConfigMap',
           metadata: {
-            name: 'startupscripts',
+            name: 'hubstartupscripts',
             namespace: Config.ns,
           },
           data: {

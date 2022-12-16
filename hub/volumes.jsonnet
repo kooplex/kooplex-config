@@ -20,9 +20,9 @@ local Config = import '../config.libsonnet';
   'pv_edu.yaml-raw': Config.PV(name=Config.volumes.edu, cap='100G', path=Config.volumes.eduPath),
   'pvc_edu.yaml-raw': Config.PVC(name='edu', pvname=$['pv_edu.yaml-raw'].metadata.name, cap=$['pv_edu.yaml-raw'].spec.capacity.storage),
 
-  'pv_attachment.yaml-raw': Config.PV(name=Config.volumes.attachment, cap='100G', path=Config.volumes.attachmentPath),
-  'pvc_attachment.yaml-raw': Config.PVC(name='attachment', pvname=$['pv_attachment.yaml-raw'].metadata.name, cap=$['pv_attachment.yaml-raw'].spec.capacity.storage),
-
   'pv_scratch.yaml-raw': Config.PV(name=Config.volumes.scratch, cap='100G', path=Config.volumes.scratchPath),
   'pvc_scratch.yaml-raw': Config.PVC(name='scratch', pvname=$['pv_scratch.yaml-raw'].metadata.name, cap=$['pv_scratch.yaml-raw'].spec.capacity.storage),
+
+  'pv_attachment.yaml-raw': Config.PV(name=Config.volumes.attachment, cap='100G', path=Config.volumes.attachmentPath),
+  'pvc_attachment.yaml-raw': Config.PVC(name='attachment', pvname=$['pv_attachment.yaml-raw'].metadata.name, cap=$['pv_attachment.yaml-raw'].spec.capacity.storage),
 }
