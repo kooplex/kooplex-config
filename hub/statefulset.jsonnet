@@ -72,6 +72,23 @@ local Config = import '../config.libsonnet';
                     ],
                   },
                   {
+                    image: 'nginx',
+                    name: 'staticnginx',
+                    ports: [
+                      {
+                        containerPort: 80,
+                        name: 'http',
+                      },
+                    ],
+                    volumeMounts: [
+                      {
+                        mountPath: '/usr/share/nginx/html/',
+                        name: 'svc',
+                        subPath: 'code/static',
+                      },
+                    ],
+                  },
+                  {
                     image: Config.hub.image,
                     lifecycle: {
                       postStart: {
@@ -87,7 +104,7 @@ local Config = import '../config.libsonnet';
                     name: Config.hub.appname,
                     ports: [
                       {
-                        containerPort: 80,
+                        containerPort: 8080,
                         name: 'http',
                       },
                     ],
@@ -272,7 +289,7 @@ local Config = import '../config.libsonnet';
                   {
                     name: 'init',
                     configMap: {
-                      name: 'startupscripts',
+                      name: 'hubstartupscripts',
                       items: [
                         {
                           key: 'nsswitch',

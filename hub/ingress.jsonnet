@@ -37,7 +37,7 @@ local Config = import '../config.libsonnet';
                         service: {
                           name: 'hub',
                           port: {
-                            number: 80,
+                            number: 8080,
                           },
                         },
                       },
@@ -79,7 +79,7 @@ local Config = import '../config.libsonnet';
                         service: {
                           name: 'hub',
                           port: {
-                            number: 80,
+                            number: 8080,
                           },
                         },
                       },
@@ -122,7 +122,7 @@ local Config = import '../config.libsonnet';
                         service: {
                           name: 'hub',
                           port: {
-                            number: 80,
+                            number: 8080,
                           },
                         },
                       },
@@ -164,7 +164,7 @@ local Config = import '../config.libsonnet';
                         service: {
                           name: 'hub',
                           port: {
-                            number: 80,
+                            number: 8080,
                           },
                         },
                       },
@@ -183,6 +183,7 @@ local Config = import '../config.libsonnet';
             namespace: Config.ns,
             annotations: {
               'kubernetes.io/ingress.class': 'nginx',
+              'nginx.ingress.kubernetes.io/rewrite-target': '/$1',
             },
           },
           spec: {
@@ -200,7 +201,7 @@ local Config = import '../config.libsonnet';
                 http: {
                   paths: [
                     {
-                      path: '/static',
+                      path: '/static/(.*)',
                       pathType: 'Prefix',
                       backend: {
                         service: {
