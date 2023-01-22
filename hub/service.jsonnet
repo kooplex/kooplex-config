@@ -21,6 +21,12 @@ local Config = import '../config.libsonnet';
               {
                 name: 'http',
                 protocol: 'TCP',
+                port: 8080,
+                targetPort: 8080,
+              },
+              {
+                name: 'httpstatic',
+                protocol: 'TCP',
                 port: 80,
                 targetPort: 80,
               },

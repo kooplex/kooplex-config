@@ -32,6 +32,18 @@ rules:
 EOF
 
 cat <<EOF | kubectl apply -f -
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-reader
+  namespace: "*"
+rules:
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["pods","nodes"]
+  verbs: ["get", "list", "watch"]
+EOF
+
+cat <<EOF | kubectl apply -f -
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -45,6 +57,22 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: admin
+EOF
+
+cat <<EOF | kubectl apply -f -
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-cluster
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: ${K8S_USER}
+  namespace: ${NAMESPACE}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-reader
 EOF
 
 TOKEN=$(kubectl -n ${NAMESPACE} describe secret $(kubectl -n ${NAMESPACE} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}') | grep token: | awk '{print $2}')
