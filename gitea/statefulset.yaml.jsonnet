@@ -32,7 +32,7 @@ local Config = import 'config.libsonnet';
                 containers: [
                   {
                     name: 'gitea',
-                    image: 'gitea/gitea:1.16.8',
+                    image: 'gitea/gitea:1.18.3',
                     env: [
                       {
                         name: 'GITEA__database__DB_TYPE',
@@ -40,7 +40,7 @@ local Config = import 'config.libsonnet';
                       },
                       {
                         name: 'GITEA__database__HOST',
-                        value: '127.0.0.1:3306',
+                        value: 'gitea-mysql:3306',
                       },
                       {
                         name: 'GITEA__database__NAME',

@@ -1,3 +1,13 @@
+* gitea/templates
+* openid config
+* k8plex-auth: 
+  * issuer must be the same as token iss field
+  * if there is claim, then it should appear in userinfo as well
+  * we need a nickname field into userinfo as well
+
+# /files needs to be copied into the /data/gitea folder in the gitea container 
+# the substituted app.ini_template -> app.ini should be copied into conf/app.ini
+
 # Create adminuser
 gitea admin user create --username giteaadmin --password pw --admin --email kooplex@email
 
