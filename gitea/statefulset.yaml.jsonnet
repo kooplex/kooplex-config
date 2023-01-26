@@ -61,7 +61,7 @@ local Config = import 'config.libsonnet';
                         name: 'gitea',
                       },
                       {
-                        containerPort: 22,
+                        containerPort: 2222,
                         name: 'git-ssh',
                       },
                     ],

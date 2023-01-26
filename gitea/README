@@ -8,6 +8,13 @@
 # /files needs to be copied into the /data/gitea folder in the gitea container 
 # the substituted app.ini_template -> app.ini should be copied into conf/app.ini
 
+
+# Make SSH work:
+# Follow this: https://stackoverflow.com/questions/66367867/how-to-expose-port-22-via-nginx-ingress-controller
+* create a configmap: I'm not sure in which namespace should it be, my guess is that it should be in the ingress-nginx ns
+* edit ingress-nginx: make sure configmap names match
+* add a loadbalancer into the gitea namespace
+
 # Create adminuser
 gitea admin user create --username giteaadmin --password pw --admin --email kooplex@email
 

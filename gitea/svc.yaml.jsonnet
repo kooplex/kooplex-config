@@ -30,6 +30,28 @@ local Config = import 'config.libsonnet';
           apiVersion: 'v1',
           kind: 'Service',
           metadata: {
+            name: Config.appname + '-ssh',
+            namespace: Config.ns,
+          },
+          spec: {
+            ports: [
+              {
+                name: 'git-ssh',
+                port: 2222,
+                nodePort: 30576,
+                targetPort: 22,
+              },
+            ],
+            type: 'LoadBalancer',
+            selector: {
+              app: 'gitea',
+            },
+          },
+        },
+        {
+          apiVersion: 'v1',
+          kind: 'Service',
+          metadata: {
             name: Config.appname + '-mysql',
             namespace: Config.ns,
           },
