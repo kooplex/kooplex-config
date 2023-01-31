@@ -37,7 +37,7 @@ local Config = import 'config.libsonnet';
             ports: [
               {
                 name: 'git-ssh',
-                port: 2222,
+                port: 30576,
                 nodePort: 30576,
                 targetPort: 22,
               },

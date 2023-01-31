@@ -15,7 +15,7 @@ local Config = import 'config.libsonnet';
             namespace: 'ingress-nginx',
           },
           data: {
-            '2222': 'gitea/gitea-ssh:2222',
+            '30576': 'gitea/gitea-ssh:30576',
           },
         },
 
