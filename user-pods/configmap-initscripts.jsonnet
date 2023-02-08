@@ -20,6 +20,7 @@ local Config = import '../config.libsonnet';
             jobtools: '#!/bin/bash\n\necho "PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/jobtools/" >> /etc/profile.d/02-jobtools.sh\nchmod a+x /etc/profile.d/02-jobtools.sh\n',
             munge: 'groupmod munge -g 997; usermod munge -u 999; cp  /etc/munge_tmp/munge.key /etc/munge/munge.key; chown -R munge:munge /etc/munge; chown munge:munge /var/lib/munge; chown munge:munge -R /var/log/munge/; service munge start; ',
             teleport: 'teleport start -l $(hostname -i) --labels=teleport=${NB_USER} --roles=node    --token=$(printf "AUTH ${REDIS_PASSWORD}\\r\\nGET nodetoken\\r\\n" | nc -N redis.teleport 6379| tail -n1 | tr -dc \'[:alnum:]\') --ca-pin=sha256:7b2932827b1827cd309bb2b952a6062dd040341764a09f04c201afe9ee1e5f40     --auth-server=teleport.vo.elte.hu & unset REDIS_PASSWORD',
+            ssh: '#! /bin/bash\nif [ -z "$REPORT_TYPE" ] ; then\n        if [ -z "$SSH_AUTH_SOCK" ] ; then\n                export SSH_AUTH_SOCK=/tmp/$NB_USER\n        fi\n        exec su $NB_USER -c "ssh-agent -a $SSH_AUTH_SOCK"\n        echo "ssh-agent started"\necho "VMI"\nelse\n        echo "ssh-agent not started"\nfi',
           },
         },
         {
