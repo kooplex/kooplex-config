@@ -1,6 +1,6 @@
 export KUBERNETES_MASTER="k8s-controlplane:6443"
-export NAMESPACE_STOREMAP="k8plex-test"
-export NAMESPACE="k8plex-test"
+export NAMESPACE_STOREMAP=`grep " ns:" config.libsonnet_example`
+export NAMESPACE=`grep " nspods:" config.libsonnet_example`
 export K8S_USER="hub"
 export CONF_TARGET="etc/kube.conf"
 
