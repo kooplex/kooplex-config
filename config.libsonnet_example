@@ -44,7 +44,7 @@
     homePath: '/k8plex_home',
     homeCapacity: main.storageCapacity,
     project: main.ns + '-project',
-    projectPath: main.nfsvol + '-project',
+    projectPath: main.nfsvol + '/projects',
     projectCapacity: main.storageCapacity,
     edu: main.ns + '-edu',
     eduPath: main.nfsvol + '/edu',
@@ -56,7 +56,7 @@
     scratchPath: main.nfsvol + '/scratch',
     scratchCapacity: main.storageCapacity,
     report: main.ns + '-report',
-    reportPath: main.nfsvol + '-report',
+    reportPath: main.nfsvol + '/reports',
     reportCapacity: main.storageCapacity,
   },
 

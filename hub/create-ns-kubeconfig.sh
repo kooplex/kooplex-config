@@ -35,7 +35,7 @@ cat <<EOF | kubectl apply -f -
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: cluster-reader
+  name: cluster-reader-${NAMESPACE}
   namespace: "*"
 rules:
 - apiGroups: ["", "extensions", "apps"]
@@ -63,8 +63,8 @@ cat <<EOF | kubectl apply -f -
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: read-cluster
-  namespace: default
+  name: read-cluster-${NAMESPACE}
+  namespace: ${NAMESPACE}
 subjects:
 - kind: ServiceAccount
   name: ${K8S_USER}

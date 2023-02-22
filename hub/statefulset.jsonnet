@@ -251,6 +251,12 @@ local Config = import '../config.libsonnet';
                     },
                   },
                   {
+                    name: 'edu',
+                    persistentVolumeClaim: {
+                      claimName: 'edu',
+                    },
+                  },
+                  {
                     name: 'scratch',
                     persistentVolumeClaim: {
                       claimName: 'scratch',
