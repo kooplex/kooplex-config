@@ -121,7 +121,7 @@ local nodename = 'veo1';
           hosts: [
             Config.fqdn,
           ],
-          secretName: Config.ns + '-tls',
+          secretName: 'tls-kooplex',
         },
       ],
       rules: [
@@ -170,7 +170,7 @@ local nodename = 'veo1';
           hosts: [
             Config.fqdn,
           ],
-          secretName: Config.ns + '-tls',
+          secretName: 'tls-kooplex',
         },
       ],
       rules: [

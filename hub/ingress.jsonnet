@@ -22,7 +22,7 @@ local Config = import '../config.libsonnet';
                 hosts: [
                   Config.fqdn,
                 ],
-                secretName: 'k8plex-test-tls',
+                secretName: 'tls-kooplex',
               },
             ],
             rules: [
@@ -64,7 +64,7 @@ local Config = import '../config.libsonnet';
                 hosts: [
                   Config.fqdn,
                 ],
-                secretName: 'k8plex-test-tls',
+                secretName: 'tls-kooplex',
               },
             ],
             rules: [
@@ -107,7 +107,7 @@ local Config = import '../config.libsonnet';
                 hosts: [
                   Config.fqdn,
                 ],
-                secretName: 'k8plex-test-tls',
+                secretName: 'tls-kooplex',
               },
             ],
             rules: [
@@ -149,7 +149,7 @@ local Config = import '../config.libsonnet';
                 hosts: [
                   Config.fqdn,
                 ],
-                secretName: 'k8plex-test-tls',
+                secretName: 'tls-kooplex',
               },
             ],
             rules: [
@@ -192,7 +192,7 @@ local Config = import '../config.libsonnet';
                 hosts: [
                   Config.fqdn,
                 ],
-                secretName: 'k8plex-test-tls',
+                secretName: 'tls-kooplex',
               },
             ],
             rules: [

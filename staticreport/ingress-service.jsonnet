@@ -20,7 +20,7 @@ local Config = import '../config.libsonnet';
           hosts: [
             Config.fqdn,
           ],
-          secretName: Config.ns + '-tls',
+          secretName: 'tls-kooplex',
         },
       ],
       rules: [
@@ -81,7 +81,7 @@ local Config = import '../config.libsonnet';
           hosts: [
             Config.fqdn,
           ],
-          secretName: Config.ns + '-tls',
+          secretName: 'tls-kooplex',
         },
       ],
       rules: [
