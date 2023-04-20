@@ -229,6 +229,10 @@ local Config = import '../config.libsonnet';
                           key: 'kubeconfig',
                           path: 'config',
                         },
+                        {
+                          key: 'kubejobsconfig',
+                          path: 'jobsconfig',
+                        },
                       ],
                     },
                   },
