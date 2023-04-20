@@ -310,6 +310,10 @@ local Config = import '../config.libsonnet';
                           path: '02-nslcd.sh',
                         },
                         {
+                          key: 'aliases',
+                          path: '04-aliases.sh',
+                        },
+                        {
                           key: 'celery_worker',
                           path: '98-celery_worker',
                         },
