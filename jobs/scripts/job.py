@@ -278,12 +278,15 @@ if __name__ == '__main__':
             print(df[['node_name', 'avail_cpu', 'total_cpu', 'avail_gpu', 'avail_memory', 'total_gpu', 'total_memory']]) #.to_csv(index=False, sep="\t"))
         elif args.resource == 'jobs':
             d = pandas.DataFrame(r['jobs'])
-            mkint = lambda x: x if x else 0
-            for a in ['active', 'ready','failed']:
-               d[a] = d.status.apply(lambda x: mkint(x[a]))
-            d.rename(columns={'name':'jobs'}, inplace=True)
-            d.drop(columns=['status'], inplace=True)
-            print(d.to_csv(index=False, sep="\t"))
+            if not d.empty:
+                mkint = lambda x: x if x else 0
+                for a in ['active', 'ready','failed']:
+                   d[a] = d.status.apply(lambda x: mkint(x[a]))
+                d.rename(columns={'name':'jobs'}, inplace=True)
+                d.drop(columns=['status'], inplace=True)
+                print(d.to_csv(index=False, sep="\t"))
+            else:
+                print("You have no jobs")
         elif args.resource == 'images':
             # FIXME description?
             print("List of available images")
@@ -293,13 +296,18 @@ if __name__ == '__main__':
             print("List of available projects")
             for p in r['projects']:
                 print(f"{p['id']}\t{p['name']}")
+            else:
+                print("You have no projects.")
         elif args.resource == 'volumes':
-            # FIXME description?
-            print("List of available volumes")
-            for p in r['volumes']:
-                print(f"{p['id']}\tvolume\t{p['folder']}")
-            for p in r['attachments']:
-                print(f"{p['id']}\tattachment\t{p['folder']}")
+            if len(r['volumes']) + len(r['attachments']) == 0:
+                print("There are no volumes and/or attachments you can mount.")
+            else:
+                # FIXME description?
+                print("List of available volumes")
+                for p in r['volumes']:
+                    print(f"{p['id']}\tvolume\t{p['folder']}")
+                for p in r['attachments']:
+                    print(f"{p['id']}\tattachment\t{p['folder']}")
         else:
             print(r)
     elif command == 'submit':
@@ -319,27 +327,32 @@ if __name__ == '__main__':
                 f.write(str(r))
     elif command == 'info':
         r = get_job(args.name)
-        if r['pod_condition_messages']:
-            pcm = "\n  * " + "\n  * ".join(r['pod_condition_messages'])
-            print(f"Pod Condition Messages: {pcm}")
-        print("Status: ")
-        for k,v in r['status'].items(): 
-            if k=="uncounted_terminated_pods":
-                continue
-            if v:
-                print(f"  * {k}: {v}")
+        if 'pod_condition_messages' in r:
+            if r['pod_condition_messages']:
+                pcm = "\n  * " + "\n  * ".join(r['pod_condition_messages'])
+                print(f"Pod Condition Messages: {pcm}")
+            print("Status: ")
+            for k,v in r['status'].items(): 
+                if k=="uncounted_terminated_pods":
+                    continue
+                if v:
+                    print(f"  * {k}: {v}")
+        else:
+            print(f"You have no job named {args.name}.")
     elif command == 'kill':
         r = delete_job(args.name)
         if "Error" in r:
             print(f"Error:\t{r['message']}")
         else:
-            print(f"{r['response']}. Your job {args.name} is scheduled to be terminated")
+            print(f"{r['response']}. Your job {args.name} is scheduled to be terminated.")
     elif command == 'log':
         r = log_job(args.name)
         for i,l in enumerate(r['container_logs']):
             print(l)
             if i<len(r['container_logs'])-1:
                 print("* "*32)
+        else:
+            print(f"You have no job named {args.name}.")
     else:
         print (command)
         print (args)
