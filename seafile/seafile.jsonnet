@@ -163,6 +163,7 @@ local Config = import 'config.libsonnet';
             namespace: Config.ns,
             annotations: {
               'kubernetes.io/ingress.class': 'nginx',
+              'nginx.ingress.kubernetes.io/proxy-body-size': '0',
             },
           },
           spec: {

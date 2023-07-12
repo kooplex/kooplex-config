@@ -229,6 +229,10 @@ local Config = import '../config.libsonnet';
                           key: 'kubeconfig',
                           path: 'config',
                         },
+                        {
+                          key: 'kubejobsconfig',
+                          path: 'jobsconfig',
+                        },
                       ],
                     },
                   },
@@ -304,6 +308,10 @@ local Config = import '../config.libsonnet';
                         {
                           key: 'nslcd',
                           path: '02-nslcd.sh',
+                        },
+                        {
+                          key: 'aliases',
+                          path: '04-aliases.sh',
                         },
                         {
                           key: 'celery_worker',

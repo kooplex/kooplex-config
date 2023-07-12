@@ -22,5 +22,5 @@ local jobns = Config.ns + '-jobs';
   'pvc_scratch.yaml-raw': Config.PVC(name='scratch', ns=jobns, pvname=$['pv_scratch.yaml-raw'].metadata.name, cap=$['pv_scratch.yaml-raw'].spec.capacity.storage),
 
   'pv_attachment.yaml-raw': Config.PV(name=Config.volumes.attachment, cap='100G', path=Config.volumes.attachmentPath),
-  'pvc_attachment.yaml-raw': Config.PVC(name='attachment', ns=jobns, pvname=$['pv_attachment.yaml-raw'].metadata.name, cap=$['pv_attachment.yaml-raw'].spec.capacity.storage),
+  'pvc_attachment.yaml-raw': Config.PVC(name='attachments', ns=jobns, pvname=$['pv_attachment.yaml-raw'].metadata.name, cap=$['pv_attachment.yaml-raw'].spec.capacity.storage),
 }

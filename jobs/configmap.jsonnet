@@ -11,7 +11,7 @@ local Config = import '../config.libsonnet';
           kind: 'ConfigMap',
           metadata: {
             name: 'initscripts',
-            namespace: Config.ns,
+            namespace: Config.nsjobs,
           },
           data: {
             nsswitch: 'sed -i -e "s,passwd.*,passwd: ldap compat systemd," -e "s,group.*,group: ldap compat systemd," /etc/nsswitch.conf\n',
