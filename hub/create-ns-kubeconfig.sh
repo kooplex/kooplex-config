@@ -1,88 +1,106 @@
 export KUBERNETES_MASTER="k8s-controlplane:6443"
-export NAMESPACE_STOREMAP=`grep " ns:" config.libsonnet`
-export NAMESPACE=`grep " nspods:" config.libsonnet`
+export NAMESPACE_STOREMAP=`grep " ns:" ../config.libsonnet| awk '{print $2}' | sed -e "s/'//g" -e 's/,//'`
+export POD_NAMESPACE=$NAMESPACE_STOREMAP"-pods"
+export JOB_NAMESPACE=$NAMESPACE_STOREMAP"-jobs"
+echo $POD_NAMESPACE
+echo $JOB_NAMESPACE
 export K8S_USER="hub"
 export CONF_TARGET="etc/kube.conf"
 
-kubectl create namespace ${NAMESPACE}
+kubectl create namespace ${POD_NAMESPACE}
+kubectl create namespace ${JOB_NAMESPACE}
+
+export KUBERNETES_MASTER="k8s-controlplane:6443"
+export NAMESPACE_STOREMAP=`grep " ns:" ../config.libsonnet| awk '{print $2}' | sed -e "s/'//g" -e 's/,//'`
+export K8S_USER="hub"
+export ALLCONF_TARGET="etc/allkube.conf"
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: ${K8S_USER}
-  namespace: ${NAMESPACE}
-EOF
-
-cat <<EOF | kubectl apply -f -
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: admin
-  namespace: ${NAMESPACE}
-rules:
-- apiGroups: ["", "extensions", "apps"]
-  resources: ["*"]
-  verbs: ["*"]
-- apiGroups: ["batch"]
-  resources:
-  - jobs
-  - cronjobs
-  verbs: ["*"]
+  namespace: ${NAMESPACE_STOREMAP}
 EOF
 
 cat <<EOF | kubectl apply -f -
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: cluster-reader-${NAMESPACE}
-  namespace: "*"
+  name: cluster-reader-v1-${NAMESPACE_STOREMAP}
 rules:
-- apiGroups: ["", "extensions", "apps"]
-  resources: ["pods","nodes"]
+- apiGroups: ["", "extensions", "apps", "metrics.k8s.io"]
+  resources: ["pods","nodes", "secrets"]
   verbs: ["get", "list", "watch"]
-EOF
-
-cat <<EOF | kubectl apply -f -
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: admin-view
-  namespace: ${NAMESPACE}
-subjects:
-- kind: ServiceAccount
-  name: ${K8S_USER}
-  namespace: ${NAMESPACE}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: admin
 EOF
 
 cat <<EOF | kubectl apply -f -
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: read-cluster-${NAMESPACE}
-  namespace: ${NAMESPACE}
+  name: read-cluster-v1-${NAMESPACE_STOREMAP}
 subjects:
 - kind: ServiceAccount
   name: ${K8S_USER}
-  namespace: ${NAMESPACE}
+  namespace: ${NAMESPACE_STOREMAP}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-reader
+  name: cluster-reader-v1-${NAMESPACE_STOREMAP}
 EOF
 
-TOKEN=$(kubectl -n ${NAMESPACE} describe secret $(kubectl -n ${NAMESPACE} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}') | grep token: | awk '{print $2}')
-CERT=$(kubectl  -n ${NAMESPACE} get secret `kubectl -n ${NAMESPACE} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}'` -o "jsonpath={.data['ca\.crt']}")
+
+cat <<EOF | kubectl apply -f -
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-writer-v1-${NAMESPACE_STOREMAP}
+rules:
+- apiGroups: ["*", "extensions", "apps", "batch"]
+  resources: ["*"]
+  verbs: ["*"]
+EOF
+
+cat <<EOF | kubectl apply -f -
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: write-cluster-v1-${NAMESPACE_STOREMAP}
+  namespace: ${JOB_NAMESPACE}
+subjects:
+- kind: ServiceAccount
+  name: ${K8S_USER}
+  namespace: ${NAMESPACE_STOREMAP}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-writer-v1-${NAMESPACE_STOREMAP}
+EOF
+
+cat <<EOF | kubectl apply -f -
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: write-cluster-v1-${NAMESPACE_STOREMAP}
+  namespace: ${POD_NAMESPACE}
+subjects:
+- kind: ServiceAccount
+  name: ${K8S_USER}
+  namespace: ${NAMESPACE_STOREMAP}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-writer-v1-${NAMESPACE_STOREMAP}
+EOF
+
+TOKEN=$(kubectl -n ${NAMESPACE_STOREMAP} describe secret $(kubectl -n ${NAMESPACE_STOREMAP} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}') | grep token: | awk '{print $2}')
+CERT=$(kubectl  -n ${NAMESPACE_STOREMAP} get secret `kubectl -n ${NAMESPACE_STOREMAP} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}'` -o "jsonpath={.data['ca\.crt']}")
 CAD=$(grep certificate-authority-data ~/.kube/config | cut -f2 -d:)
 
 
 mkdir -p etc 
 
-cat > ${CONF_TARGET} << EOF
+cat > ${ALLCONF_TARGET} << EOF
 apiVersion: v1
 clusters:
 - cluster:
@@ -94,11 +112,11 @@ clusters:
 contexts:
 - context:
     cluster: kubernetes
-    namespace: ${NAMESPACE}
+    namespace: ${NAMESPACE_STOREMAP}
     user: ${K8S_USER}
-  name: ${NAMESPACE}
+  name: ${NAMESPACE_STOREMAP}
 
-current-context: ${NAMESPACE}
+current-context: ${NAMESPACE_STOREMAP}
 kind: Config
 preferences: {}
 
@@ -110,4 +128,6 @@ users:
     client-key-data: $CERT
 EOF
 
-kubectl create configmap kubeconfig -n ${NAMESPACE_STOREMAP} --from-file=kubeconfig=${CONF_TARGET}
+kubectl create configmap kubeconfig -n ${NAMESPACE_STOREMAP} --from-file=kubeconfig=${ALLCONF_TARGET}
+
+

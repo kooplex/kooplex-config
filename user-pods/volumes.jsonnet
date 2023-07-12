@@ -1,7 +1,7 @@
 local Config = import '../config.libsonnet';
 
 //local podns = Config.ns + '-pods';
-local podns = Config.ns;
+local podns = Config.nspods;
 
 {
   'pv_garbage.yaml-raw': Config.PV(name=Config.volumes.garbage + '-pods', cap='100G', path=Config.volumes.garbagePath),
@@ -23,5 +23,5 @@ local podns = Config.ns;
   'pvc_scratch.yaml-raw': Config.PVC(name='scratch', ns=podns, pvname=$['pv_scratch.yaml-raw'].metadata.name, cap=$['pv_scratch.yaml-raw'].spec.capacity.storage),
 
   'pv_attachment.yaml-raw': Config.PV(name=Config.volumes.attachment + '-pods', cap='100G', path=Config.volumes.attachmentPath),
-  'pvc_attachment.yaml-raw': Config.PVC(name='attachment', ns=podns, pvname=$['pv_attachment.yaml-raw'].metadata.name, cap=$['pv_attachment.yaml-raw'].spec.capacity.storage),
+  'pvc_attachment.yaml-raw': Config.PVC(name='attachments', ns=podns, pvname=$['pv_attachment.yaml-raw'].metadata.name, cap=$['pv_attachment.yaml-raw'].spec.capacity.storage),
 }
