@@ -145,10 +145,10 @@ local Config = import '../config.libsonnet';
                         name: 'project',
                         subPath: 'report_prepare',
                       },
-                      {
-                        mountPath: '/mnt/courses',
-                        name: 'edu',
-                      },
+                      //                      {
+                      //                        mountPath: '/mnt/courses',
+                      //                        name: 'edu',
+                      //                      },
                       {
                         mountPath: '/etc/mnt',
                         name: 'nslcd',
@@ -229,10 +229,10 @@ local Config = import '../config.libsonnet';
                           key: 'kubeconfig',
                           path: 'config',
                         },
-                        {
-                          key: 'kubejobsconfig',
-                          path: 'jobsconfig',
-                        },
+                        //                        {
+                        //                          key: 'kubejobsconfig',
+                        //                          path: 'jobsconfig',
+                        //                        },
                       ],
                     },
                   },
@@ -254,12 +254,12 @@ local Config = import '../config.libsonnet';
                       claimName: 'garbage',
                     },
                   },
-                  {
-                    name: 'edu',
-                    persistentVolumeClaim: {
-                      claimName: 'edu',
-                    },
-                  },
+                  //                  {
+                  //                    name: 'edu',
+                  //                    persistentVolumeClaim: {
+                  //                      claimName: 'edu',
+                  //                    },
+                  //                  },
                   {
                     name: 'scratch',
                     persistentVolumeClaim: {
