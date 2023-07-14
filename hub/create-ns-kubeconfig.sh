@@ -15,7 +15,9 @@ export NAMESPACE_STOREMAP=`grep " ns:" ../config.libsonnet| awk '{print $2}' | s
 export K8S_USER="hub"
 export ALLCONF_TARGET="etc/allkube.conf"
 
-cat <<EOF | kubectl apply -f -
+mkdir -p manifest
+
+cat << EOF > manifest/hub_kubeconfig.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -23,7 +25,8 @@ metadata:
   namespace: ${NAMESPACE_STOREMAP}
 EOF
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF >> manifest/hub_kubeconfig.yaml
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -34,7 +37,8 @@ rules:
   verbs: ["get", "list", "watch"]
 EOF
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF >> manifest/hub_kubeconfig.yaml
+---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -50,7 +54,8 @@ roleRef:
 EOF
 
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF >> manifest/hub_kubeconfig.yaml
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -61,7 +66,8 @@ rules:
   verbs: ["*"]
 EOF
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF >> manifest/hub_kubeconfig.yaml
+---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -77,7 +83,8 @@ roleRef:
   name: cluster-writer-v1-${NAMESPACE_STOREMAP}
 EOF
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF  >> manifest/hub_kubeconfig.yaml
+---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -92,6 +99,9 @@ roleRef:
   kind: ClusterRole
   name: cluster-writer-v1-${NAMESPACE_STOREMAP}
 EOF
+
+
+kubectl apply -f manifest/hub_kubeconfig.yaml
 
 TOKEN=$(kubectl -n ${NAMESPACE_STOREMAP} describe secret $(kubectl -n ${NAMESPACE_STOREMAP} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}') | grep token: | awk '{print $2}')
 CERT=$(kubectl  -n ${NAMESPACE_STOREMAP} get secret `kubectl -n ${NAMESPACE_STOREMAP} get secret | (grep ${K8S_USER} || echo "$_") | awk '{print $1}'` -o "jsonpath={.data['ca\.crt']}")
@@ -128,6 +138,7 @@ users:
     client-key-data: $CERT
 EOF
 
+kubectl delete configmap kubeconfig -n ${NAMESPACE_STOREMAP}
 kubectl create configmap kubeconfig -n ${NAMESPACE_STOREMAP} --from-file=kubeconfig=${ALLCONF_TARGET}
 
 
