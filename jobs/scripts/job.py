@@ -82,6 +82,8 @@ def post_submit(args):
         'gpu': args.gpu,
         'nodename': args.nodename,
         'scratch': args.scratch,
+        'parallelism': args.parallelism,
+        'completions': args.completions
     }
 
     # Get Current working directory
