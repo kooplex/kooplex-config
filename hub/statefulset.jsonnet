@@ -145,10 +145,10 @@ local Config = import '../config.libsonnet';
                         name: 'project',
                         subPath: 'report_prepare',
                       },
-                      //                      {
-                      //                        mountPath: '/mnt/courses',
-                      //                        name: 'edu',
-                      //                      },
+                      {
+                        mountPath: '/mnt/courses',
+                        name: 'edu',
+                      },
                       {
                         mountPath: '/etc/mnt',
                         name: 'nslcd',
@@ -213,6 +213,10 @@ local Config = import '../config.libsonnet';
                         name: 'REDIS_PASSWORD',
                         value: Config.hub.redis_pw,
                       },
+                      {
+                        name: 'REDIS_TELEPORT',
+                        value: Config.hub.redis_teleport,
+                      },
                     ],
                   },
                 ],
@@ -254,12 +258,12 @@ local Config = import '../config.libsonnet';
                       claimName: 'garbage',
                     },
                   },
-                  //                  {
-                  //                    name: 'edu',
-                  //                    persistentVolumeClaim: {
-                  //                      claimName: 'edu',
-                  //                    },
-                  //                  },
+                  {
+                    name: 'edu',
+                    persistentVolumeClaim: {
+                      claimName: 'edu',
+                    },
+                  },
                   {
                     name: 'scratch',
                     persistentVolumeClaim: {
@@ -314,12 +318,20 @@ local Config = import '../config.libsonnet';
                           path: '04-aliases.sh',
                         },
                         {
-                          key: 'celery_worker',
-                          path: '98-celery_worker',
+                          key: 'teleport',
+                          path: '05-teleport.sh',
                         },
+                        //                        {
+                        //                          key: 'celery_worker',
+                        //                          path: '98-celery_worker',
+                        //                        },
+                        //                        {
+                        //                          key: 'celery_beat',
+                        //                          path: '97-celery_beat',
+                        //                        },
                         {
-                          key: 'celery_beat',
-                          path: '97-celery_beat',
+                          key: 'runqueue',
+                          path: '98-runqueue.sh',
                         },
                         {
                           key: 'runserver',
