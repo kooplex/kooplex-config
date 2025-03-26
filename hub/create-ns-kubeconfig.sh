@@ -33,7 +33,7 @@ metadata:
   name: cluster-reader-v1-${NAMESPACE_STOREMAP}
 rules:
 - apiGroups: ["", "extensions", "apps", "metrics.k8s.io"]
-  resources: ["pods","nodes", "secrets"]
+  resources: ["pods","nodes", "secrets", "daemonsets"]
   verbs: ["get", "list", "watch"]
 EOF
 
