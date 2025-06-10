@@ -124,7 +124,31 @@ local Config = import '../config.libsonnet';
                      {
                        "name": "LDAP_BASE_DN",
                        "value": Config.ldap.base
-                     }
+                     },
+                     {
+                       "name": "FQDN",
+                       "value": Config.fqdn
+                     },
+                     {
+                       "name": "APP_NAME",
+                       "value": Config.oauth.appname
+                     },
+                     {
+                       "name": "ADMIN_EMAIL",
+                       "value": Config.admin_email
+                     },
+                     {
+                       "name": "EMAIL_HOST",
+                       "value": Config.email_host
+                     },
+                     {
+                       "name": "SAML_IDP_URL",
+                       "value": Config.saml.url
+                     },
+                     {
+                       "name": "SAML_INSTANCE_NAME",
+                       "value": Config.saml.name
+                     },
                    ]
                  }
                ],

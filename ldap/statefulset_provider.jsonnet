@@ -80,7 +80,7 @@ local Config = import '../config.libsonnet';
             {
               name: 'svc',
               persistentVolumeClaim: {
-                claimName: 'ldap-data',
+                claimName: Config.nfsvol,
               },
             },
           ],
