@@ -42,7 +42,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/x',
                         name: 'svc',
-                        subPath: 'code',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/code',
                       },
                     ],
                   },
@@ -61,7 +61,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/kooplexhub',
                         name: 'svc',
-                        subPath: 'redis',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/redis',
                       },
                     ],
                     env: [
@@ -84,7 +84,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/usr/share/nginx/html/',
                         name: 'svc',
-                        subPath: 'code/static',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/code/static',
                       },
                     ],
                   },
@@ -116,38 +116,42 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/kooplexhub',
                         name: 'svc',
-                        subPath: 'code',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/code',
                       },
                       {
                         mountPath: '/var/log/hub',
                         name: 'svc',
-                        subPath: 'log',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/log',
                       },
                       {
                         mountPath: '/mnt/home',
-                        name: 'home',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/home',
                       },
                       {
                         mountPath: '/mnt/garbage',
-                        name: 'garbage',
+                        name:  'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/garbage',
                       },
                       {
                         mountPath: '/mnt/projects',
-                        name: 'project',
-                        subPath: 'projects',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/projects',
                       },
                       {
                         mountPath: '/mnt/reports',
-                        name: 'report',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/report',
                       },
                       {
                         mountPath: '/mnt/report_prepare',
-                        name: 'project',
-                        subPath: 'report_prepare',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/report_prepare',
                       },
                       {
                         mountPath: '/mnt/courses',
-                        name: 'edu',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/edu',
                       },
                       {
                         mountPath: '/etc/mnt',
@@ -161,11 +165,13 @@ local Config = import '../config.libsonnet';
                       },
                       {
                         mountPath: '/mnt/attachments',
-                        name: 'attachment',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/attachment',
                       },
                       {
                         mountPath: '/mnt/scratch',
-                        name: 'scratch',
+                        name: 'svc',
+                        subPath: Config.instance_subpath+Config.hub.appname + '/scratch',
                       },
                     ],
                     env: [
@@ -220,9 +226,9 @@ local Config = import '../config.libsonnet';
                     ],
                   },
                 ],
-                nodeSelector: {
-                  'kubernetes.io/hostname': Config.hub.nodename,
-                },
+#                nodeSelector: {
+#                  'kubernetes.io/hostname': Config.hub.nodename,
+#                },
                 volumes: [
                   {
                     name: 'kubeconf',
@@ -243,51 +249,51 @@ local Config = import '../config.libsonnet';
                   {
                     name: 'svc',
                     persistentVolumeClaim: {
-                      claimName: 'service',
+                     claimName: Config.nfsvol
                     },
                   },
-                  {
-                    name: 'home',
-                    persistentVolumeClaim: {
-                      claimName: 'home',
-                    },
-                  },
-                  {
-                    name: 'garbage',
-                    persistentVolumeClaim: {
-                      claimName: 'garbage',
-                    },
-                  },
-                  {
-                    name: 'edu',
-                    persistentVolumeClaim: {
-                      claimName: 'edu',
-                    },
-                  },
-                  {
-                    name: 'scratch',
-                    persistentVolumeClaim: {
-                      claimName: 'scratch',
-                    },
-                  },
-                  {
-                    name: 'attachment',
-                    persistentVolumeClaim: {
-                      claimName: 'attachments',
-                    },
-                  },
-                  {
-                    name: 'project',
-                    persistentVolumeClaim: {
-                      claimName: 'project',
-                    },
-                  },
-                  {
-                    name: 'report',
-                    persistentVolumeClaim: {
-                      claimName: 'report',
-                    },
-                  },
+#                  {
+#                    name: 'home',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
+#                  {
+#                    name: 'garbage',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
+#                  {
+#                    name: 'edu',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
+#                  {
+#                    name: 'scratch',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
+#                  {
+#                    name: 'attachment',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
+#                  {
+#                    name: 'project',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
+#                  {
+#                    name: 'report',
+#                    persistentVolumeClaim: {
+#                     claimName: Config.nfsvol
+#                    },
+#                  },
                   {
                     name: 'nslcd',
                     configMap: {
@@ -317,18 +323,10 @@ local Config = import '../config.libsonnet';
                           key: 'aliases',
                           path: '04-aliases.sh',
                         },
-                        {
-                          key: 'teleport',
-                          path: '05-teleport.sh',
-                        },
-                        //                        {
-                        //                          key: 'celery_worker',
-                        //                          path: '98-celery_worker',
-                        //                        },
-                        //                        {
-                        //                          key: 'celery_beat',
-                        //                          path: '97-celery_beat',
-                        //                        },
+#                        {
+#                          key: 'teleport',
+#                          path: '05-teleport.sh',
+#                        },
                         {
                           key: 'runqueue',
                           path: '98-runqueue.sh',
@@ -382,7 +380,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/var/lib/mysql',
                         name: 'svc',
-                        subPath: 'mysql',
+                        subPath: Config.instance_subpath + Config.hub.appname + '-mysql/mysql',
                       },
                     ],
                     env: [
@@ -409,14 +407,14 @@ local Config = import '../config.libsonnet';
                     ],
                   },
                 ],
-                nodeSelector: {
-                  'kubernetes.io/hostname': Config.hub.nodename,
-                },
+#                nodeSelector: {
+#                  'kubernetes.io/hostname': Config.hub.nodename,
+#                },
                 volumes: [
                   {
                     name: 'svc',
                     persistentVolumeClaim: {
-                      claimName: 'service',
+                      claimName: Config.nfsvol,
                     },
                   },
                 ],

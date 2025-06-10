@@ -37,6 +37,27 @@ local Config = import '../config.libsonnet';
           apiVersion: 'v1',
           kind: 'Service',
           metadata: {
+            name: 'hub-mysql',
+            namespace: Config.ns,
+          },
+          spec: {
+            selector: {
+              app: 'hub-mysql',
+            },
+            ports: [
+              {
+                name: 'mysql',
+                protocol: 'TCP',
+                port: 3306,
+                targetPort: 3306,
+              },
+            ],
+          },
+        },
+        {
+          apiVersion: 'v1',
+          kind: 'Service',
+          metadata: {
             name: 'hub-debug',
             namespace: Config.ns,
           },

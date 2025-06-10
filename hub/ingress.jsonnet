@@ -13,7 +13,9 @@ local Config = import '../config.libsonnet';
             name: 'account',
             namespace: Config.ns,
             annotations: {
-              'kubernetes.io/ingress.class': 'nginx',
+#              'spec.ingressClassName': 'nginx',
+    	      'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+   	      'traefik.ingress.kubernetes.io/router.middlewares': 'kube-system-redirect-to-https@kubernetescrd'
             },
           },
           spec: {
@@ -55,7 +57,9 @@ local Config = import '../config.libsonnet';
             name: 'admin',
             namespace: Config.ns,
             annotations: {
-              'kubernetes.io/ingress.class': 'nginx',
+#              'spec.ingressClassName': 'nginx',
+    	      'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+   	      'traefik.ingress.kubernetes.io/router.middlewares': 'kube-system-redirect-to-https@kubernetescrd'
             },
           },
           spec: {
@@ -97,7 +101,9 @@ local Config = import '../config.libsonnet';
             name: 'root',
             namespace: Config.ns,
             annotations: {
-              'kubernetes.io/ingress.class': 'nginx',
+#              'spec.ingressClassName': 'nginx',
+    	      'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+   	      'traefik.ingress.kubernetes.io/router.middlewares': 'kube-system-redirect-to-https@kubernetescrd',
               'nginx.ingress.kubernetes.io/rewrite-target': '/hub',
             },
           },
@@ -140,7 +146,9 @@ local Config = import '../config.libsonnet';
             name: 'service',
             namespace: Config.ns,
             annotations: {
-              'kubernetes.io/ingress.class': 'nginx',
+#              'spec.ingressClassName': 'nginx',
+    	      'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+   	      'traefik.ingress.kubernetes.io/router.middlewares': 'kube-system-redirect-to-https@kubernetescrd'
             },
           },
           spec: {
@@ -182,8 +190,10 @@ local Config = import '../config.libsonnet';
             name: 'static',
             namespace: Config.ns,
             annotations: {
-              'kubernetes.io/ingress.class': 'nginx',
               'nginx.ingress.kubernetes.io/rewrite-target': '/$1',
+#              'spec.ingressClassName': 'nginx',
+    	      'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+   	      'traefik.ingress.kubernetes.io/router.middlewares': 'kube-system-redirect-to-https@kubernetescrd'
             },
           },
           spec: {
