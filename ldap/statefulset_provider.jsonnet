@@ -42,22 +42,22 @@ local Config = import '../config.libsonnet';
                 {
                   mountPath: '/var/log/ldap',
                   name: 'svc',
-                  subPath: 'log',
+                  subPath: Config.instance_subpath+Config.ldap.appname+'/log',
                 },
                 {
                   mountPath: '/var/lib/ldap',
                   name: 'svc',
-                  subPath: 'db',
+                  subPath: Config.instance_subpath+Config.ldap.appname+'/db',
                 },
                 {
                   mountPath: '/usr/local/ldap',
                   name: 'svc',
-                  subPath: 'helper',
+                  subPath: Config.instance_subpath+Config.ldap.appname+'/helper',
                 },
                 {
                   mountPath: '/etc/ldap/slapd.d',
                   name: 'svc',
-                  subPath: 'slapd.d',
+                  subPath: Config.instance_subpath+Config.ldap.appname+'/slapd.d',
                 },
               ],
               env: [
@@ -67,7 +67,7 @@ local Config = import '../config.libsonnet';
                 },
                 {
                   name: 'LDAP_DOMAIN',
-                  value: Config.fqdn,
+                  value: "kooplex",
                 },
                 {
                   name: 'LDAP_ADMIN_PASSWORD',

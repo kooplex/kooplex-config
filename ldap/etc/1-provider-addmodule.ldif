@@ -1,9 +1,0 @@
-# create new
-
-dn: cn=module,cn=config
-objectClass: olcModuleList
-cn: module
-olcModulePath: /usr/lib/ldap
-olcModuleLoad: syncprov.la
-
-
