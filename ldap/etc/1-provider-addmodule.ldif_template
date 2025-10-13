@@ -1,0 +1,20 @@
+# create new
+
+a=$(grep -A 1 ldap ../../config.libsonnet|grep appname | awk '{print $2}')
+LDAPHOST=${a:1:-2}
+LDAPPORT=389
+a=$(grep -A 5 ldap ../../config.libsonnet|grep base: | awk '{print $2}')
+LDAPORG=${a:1:-2}
+a=$(grep -A 3 ldap ../../config.libsonnet|grep pw | awk '{print $2}')
+SLAPD_PASSWORD=${a:1:-2}
+
+
+cat << EOF  
+ldapadd -h $LDAPHOST -p $LDAPPORT -D cn=admin,$LDAPORG -w "$SLAPD_PASSWORD"
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: /usr/lib/ldap
+olcModuleLoad: syncprov.la
+EOF
+

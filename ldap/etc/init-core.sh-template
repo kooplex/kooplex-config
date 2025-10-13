@@ -1,0 +1,35 @@
+a=$(grep -A 1 ldap ../../config.libsonnet|grep appname | awk '{print $2}')
+LDAPHOST=${a:1:-2}
+LDAPPORT=389
+a=$(grep -A 5 ldap ../../config.libsonnet|grep base: | awk '{print $2}')
+LDAPORG=${a:1:-2}
+a=$(grep -A 3 ldap ../../config.libsonnet|grep pw | awk '{print $2}')
+SLAPD_PASSWORD=${a:1:-2}
+
+cat << EOF 
+ldapadd -h $LDAPHOST -p $LDAPPORT -D cn=admin,$LDAPORG -w "$SLAPD_PASSWORD"
+dn: uid=reportreader,$LDAPORG
+objectClass: simpleSecurityObject
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+sn: sysuser
+givenName: reportreader
+cn: reportreader
+displayName: reportreader
+uidNumber: 9990
+gidNumber: 9990
+loginShell: /bin/bash
+homeDirectory: /mnt/.volumes/report
+mail: report@kooplex
+userPassword: nopass
+shadowExpire: -1
+shadowFlag: 0
+shadowWarning: 7
+shadowMin: 8
+shadowMax: 999999
+shadowLastChange: 10877
+EOF

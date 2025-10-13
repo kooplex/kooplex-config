@@ -1,19 +1,16 @@
 local Config = import '../config.libsonnet';
-local appname = 'proxy';
-local image = 'jupyterhub/configurable-http-proxy:4.2.1';
-local nodename = 'veo1';
 
 {
   'service.yaml-raw': {
     apiVersion: 'v1',
     kind: 'Service',
     metadata: {
-      name: appname,
+      name: Config.proxy.appname,
       namespace: Config.ns,
     },
     spec: {
       selector: {
-        app: appname,
+        app: Config.proxy.appname,
       },
       ports: [
         {
@@ -35,11 +32,11 @@ local nodename = 'veo1';
     apiVersion: 'apps/v1',
     kind: 'StatefulSet',
     metadata: {
-      name: appname,
+      name: Config.proxy.appname,
       namespace: Config.ns,
     },
     spec: {
-      serviceName: appname,
+      serviceName: Config.proxy.appname,
       podManagementPolicy: 'Parallel',
       replicas: 1,
       selector: {
@@ -50,14 +47,14 @@ local nodename = 'veo1';
       template: {
         metadata: {
           labels: {
-            app: appname,
+            app: Config.proxy.appname,
           },
         },
         spec: {
           containers: [
             {
-              image: image,
-              name: appname,
+              image: Config.proxy.image,
+              name: Config.proxy.appname,
               command: [
                 'node',
                 '/usr/local/bin/configurable-http-proxy',
@@ -124,11 +121,13 @@ local nodename = 'veo1';
     apiVersion: 'networking.k8s.io/v1',
     kind: 'Ingress',
     metadata: {
-      name: appname + '-notebook',
+      name: Config.proxy.appname + '-notebook',
       namespace: Config.ns,
       annotations: {
-        'kubernetes.io/ingress.class': 'nginx',
+#        'kubernetes.io/ingress.class': 'nginx',
         'nginx.ingress.kubernetes.io/proxy-body-size': '0',
+    	'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+   	'traefik.ingress.kubernetes.io/router.middlewares': 'kube-system-redirect-to-https@kubernetescrd'
       },
     },
     spec: {
@@ -137,7 +136,7 @@ local nodename = 'veo1';
           hosts: [
             Config.fqdn,
           ],
-          secretName: 'tls-kooplex',
+          secretName: Config.secretName,
         },
       ],
       rules: [
@@ -147,55 +146,6 @@ local nodename = 'veo1';
             paths: [
               {
                 path: '/notebook',
-                pathType: 'Prefix',
-                backend: {
-                  service: {
-                    name: 'proxy',
-                    port: {
-                      number: 8000,
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        },
-      ],
-    },
-  },
-  'ingress_dynamic_report.yaml-raw': {
-    apiVersion: 'networking.k8s.io/v1',
-    kind: 'Ingress',
-    metadata: {
-      name: appname + '-dynamic-report',
-      namespace: Config.ns,
-      annotations: {
-        'kubernetes.io/ingress.class': 'nginx',
-        'nginx.org/websocket-services': appname,
-        'nginx.ingress.kubernetes.io/proxy-body-size': '0',
-        'nginx.ingress.kubernetes.io/proxy-buffer-size': '16k',
-        'nginx.ingress.kubernetes.io/client-header-buffers': '100k',
-        'nginx.ingress.kubernetes.io/large-client-header-buffers': '4 1000k',
-        'nginx.ingress.kubernetes.io/client-body-buffer-size': '10M',
-        'nginx.ingress.kubernetes.io/proxy-add-original-uri-header': 'false',
-      },
-    },
-    spec: {
-      tls: [
-        {
-          hosts: [
-            Config.fqdn,
-          ],
-          secretName: 'tls-kooplex',
-        },
-      ],
-      rules: [
-        {
-          host: Config.fqdn,
-          http: {
-            paths: [
-              {
-                path: '/dreport',
                 pathType: 'Prefix',
                 backend: {
                   service: {
