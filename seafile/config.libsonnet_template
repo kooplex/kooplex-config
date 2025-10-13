@@ -3,6 +3,7 @@
   ns: 'seafile',
   appname: 'seafile',
   adminpw: '',
+  adminemail: '',
   dbpw: '',
   dbrootpw: '',
   nfsvol: '/',

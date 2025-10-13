@@ -48,7 +48,7 @@ local Config = import 'config.libsonnet';
                     env: [
                       {
                         name: 'MYSQL_ROOT_PASSWORD',
-                        value: Config.seafile.dbrootpw,
+                        value: Config.dbrootpw,
                       },
                       {
                         name: 'MYSQL_LOG_CONSOLE',
@@ -110,7 +110,7 @@ local Config = import 'config.libsonnet';
                       },
                       {
                         name: 'DB_ROOT_PASSWD',
-                        value: Config.seafile.dbrootpw,
+                        value: Config.dbrootpw,
                       },
                       {
                         name: 'SEAFILE_ADMIN_EMAIL',
