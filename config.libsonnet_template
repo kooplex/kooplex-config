@@ -22,6 +22,12 @@
     redis_pw: 'redpw',
     command: echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[00\\;32m\\\\]\\\\h-platform\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\$ \\' >> /root/.bashrc",
 
+  oauth: {
+    djangosecret: '',
+    djangodbname: '',
+    djangodbrootpw: '',
+    djangodbpw: '',
+    djangodbuser: '',
   },
 
   ldap: {
