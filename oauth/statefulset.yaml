@@ -15,14 +15,14 @@ spec:
       labels:
         app: oauth
     spec:
-      initContainers:
-      - name: init-gitclone
-        image: ajeetraina/alpine-git
-        command: ['sh', '-c', "git clone https://github.com/kooplex/kooplex-oauth.git /x || true"]
-        volumeMounts:
-          - mountPath: /x
-            name: vol
-            subPath: _code_/
+      #      initContainers:
+      #      - name: init-gitclone
+      #        image: ajeetraina/alpine-git
+      #        command: ['sh', '-c', "git clone https://github.com/kooplex/kooplex-oauth.git /x || true"]
+      #        volumeMounts:
+      #          - mountPath: /x
+      #            name: vol
+      #            subPath: _code_/
       containers:
       - image: image-registry.vo.elte.hu/k8plex-oauth
         lifecycle:
@@ -31,6 +31,24 @@ spec:
               command: ["/bin/sh", "-c", "echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[00\\;32m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\$ \\' >> /root/.bashrc"]
               #command: ["/bin/sh", "-c", "echo PS1=\\'\\\\[\\\\033\\[01\\;36m\\\\]\\\\u\\\\[\\\\033\\[00m\\\\]@\\\\[\\\\033\\[01\\;31m\\\\]\\\\h-dev\\\\[\\\\033\\[00m\\\\]: \\\\[\\\\033\\[01\\;33m\\\\]\\\\w\\\\[\\\\033\\[00m\\\\]\\\\a\\\\$ \\' >> /root/.bashrc"]
         name: oauth
+          #        livenessProbe:
+          #      failureThreshold: 3
+          #      httpGet:
+          #        path: notebook/wfct0p-testcontainerwfct0p
+          #        port: 8000
+          #        scheme: HTTP
+          #      initialDelaySeconds: 120
+          #      periodSeconds: 120
+          #      successThreshold: 1
+          #      timeoutSeconds: 5
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: "200m"
+        memory: 300Mi
+
         ports:
           - containerPort: 80
             name: http
@@ -43,29 +61,27 @@ spec:
             subPath: logs/
         env:
           - name: DBROOT_PW
-            value: "aePh2eph"
+            value: Config.oauth.djangodbrootpw
           - name: DB_HOSTNAME
-            value: "oauth-db"
+            value: Config.oauth.djangodbname
           - name: LANG
             value: "en_US.UTF-8"
           - name: DJANGO_SECRET_KEY
-            value: "eiKahph7"
+            value: Config.oauth.djangosecret
           - name: DB
-            value: "oauth"
+            value: Config.oauth.djangodbname
           - name: DB_USER
-            value: "kooplex"
+            value: Config.oauth.djangodbuser
           - name: DB_PW
-            value: "singaiB7"
+            value: Config.ldap.djangodbpw
           - name: LDAP_PW
-            value: "pimPALA2021"
+            value: Config.ldap.pw
           - name: LDAP_URL
-            value: "ldap-test"
+            value: Config.ldap.name
           - name: LDAP_BIND_DN
-            value: "cn=admin,dc=k8plex-test,dc=vo,dc=elte,dc=hu"
+            value: Config.ldap.binddn
           - name: LDAP_BASE_DN
-            value: "dc=k8plex-test,dc=vo,dc=elte,dc=hu"
-      nodeSelector:
-        kubernetes.io/hostname: veo1
+            value: Config.ldap.base
       volumes:
         - name: vol
           persistentVolumeClaim:
@@ -100,17 +116,15 @@ spec:
             subPath: db/
         env:
           - name: MYSQL_ROOT_PASSWORD
-            value: "aePh2eph"
+            value: Config.oauth.djangodbrootpw
           - name: MYSQL_USER
-            value: "kooplex"
+            value: Config.oauth.djangodbuser
           - name: MYSQL_PASSWORD
-            value: "singaiB7"
+            value: Config.oauth.djangodbpw
           - name: MYSQL_DATABASE
-            value: "oauth"
+            value: Config.oauth.djangodbname
           - name: MYSQL_LOG_CONSOLE
             value: "true"
-      nodeSelector:
-        kubernetes.io/hostname: veo1
       volumes:
         - name: vol
           persistentVolumeClaim:

@@ -1,0 +1,2 @@
+kubectl create cm -n k8plex-test-pods slurmconf --from-file=slurmconf=./slurm.conf
+kubectl delete cm -n k8plex-test-pods slurmconf 

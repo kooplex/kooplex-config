@@ -29,24 +29,24 @@ local Config = import '../config.libsonnet';
                 },
               },
               spec: {
-                initContainers: [
-                  {
-                    name: 'init-gitclone',
-                    image: 'ajeetraina/alpine-git',
-                    command: [
-                      'sh',
-                      '-c',
-                      'git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git /x || true',
-                    ],
-                    volumeMounts: [
-                      {
-                        mountPath: '/x',
-                        name: 'svc',
-                        subPath: 'code',
-                      },
-                    ],
-                  },
-                ],
+                //                initContainers: [
+                //                  {
+                //                    name: 'init-gitclone',
+                //                    image: 'ajeetraina/alpine-git',
+                //                    command: [
+                //                      'sh',
+                //                      '-c',
+                //                      'git clone -b kubernetes https://github.com/kooplex/kooplex-hub.git /x || true',
+                //                    ],
+                //                    volumeMounts: [
+                //                      {
+                //                        mountPath: '/x',
+                //                        name: 'svc',
+                //                        subPath: 'code',
+                //                      },
+                //                    ],
+                //                  },
+                //                ],
                 containers: [
                   {
                     image: 'bitnami/redis:latest',
@@ -80,6 +80,16 @@ local Config = import '../config.libsonnet';
                         name: 'http',
                       },
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '300m',
+                        memory: '200Mi',
+                      },
+                      limits: {
+                        cpu: '1',
+                        memory: '4Gi',
+                      },
+                    },
                     volumeMounts: [
                       {
                         mountPath: '/usr/share/nginx/html/',
@@ -108,6 +118,16 @@ local Config = import '../config.libsonnet';
                         name: 'http',
                       },
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '1',
+                        memory: '400Mi',
+                      },
+                      limits: {
+                        cpu: '2',
+                        memory: '4Gi',
+                      },
+                    },
                     volumeMounts: [
                       {
                         mountPath: '/root/.kube',
@@ -220,9 +240,9 @@ local Config = import '../config.libsonnet';
                     ],
                   },
                 ],
-                nodeSelector: {
-                  'kubernetes.io/hostname': Config.hub.nodename,
-                },
+                //nodeSelector: {
+                //  'kubernetes.io/hostname': Config.hub.nodename,
+                //},
                 volumes: [
                   {
                     name: 'kubeconf',
@@ -385,6 +405,16 @@ local Config = import '../config.libsonnet';
                         subPath: 'mysql',
                       },
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '200m',
+                        memory: '400Mi',
+                      },
+                      limits: {
+                        cpu: '2',
+                        memory: '4Gi',
+                      },
+                    },
                     env: [
                       {
                         name: 'MYSQL_ROOT_PASSWORD',
@@ -409,9 +439,9 @@ local Config = import '../config.libsonnet';
                     ],
                   },
                 ],
-                nodeSelector: {
-                  'kubernetes.io/hostname': Config.hub.nodename,
-                },
+                //nodeSelector: {
+                //  'kubernetes.io/hostname': Config.hub.nodename,
+                //},
                 volumes: [
                   {
                     name: 'svc',

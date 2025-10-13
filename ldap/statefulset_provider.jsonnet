@@ -38,6 +38,16 @@ local Config = import '../config.libsonnet';
                   name: 'ldap',
                 },
               ],
+              resources: {
+                requests: {
+                  cpu: '200m',
+                  memory: '200Mi',
+                },
+                limits: {
+                  cpu: '1',
+                  memory: '1Gi',
+                },
+              },
               volumeMounts: [
                 {
                   mountPath: '/var/log/ldap',

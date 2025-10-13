@@ -48,13 +48,23 @@ local Config = import 'config.libsonnet';
                     env: [
                       {
                         name: 'MYSQL_ROOT_PASSWORD',
-                        value: Config.dbrootpw,
+                        value: Config.seafile.dbrootpw,
                       },
                       {
                         name: 'MYSQL_LOG_CONSOLE',
                         value: 'true',
                       },
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '400m',
+                        memory: '400Mi',
+                      },
+                      limits: {
+                        cpu: '1',
+                        memory: '4Gi',
+                      },
+                    },
                     volumeMounts: [
                       {
                         name: 'seafile-data',
@@ -83,6 +93,16 @@ local Config = import 'config.libsonnet';
                     args: [
                       'pip install requests_oauthlib; /sbin/my_init -- /scripts/enterpoint.sh',
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '200m',
+                        memory: '400Mi',
+                      },
+                      limits: {
+                        cpu: '1',
+                        memory: '1Gi',
+                      },
+                    },
                     env: [
                       {
                         name: 'DB_HOST',
@@ -90,15 +110,15 @@ local Config = import 'config.libsonnet';
                       },
                       {
                         name: 'DB_ROOT_PASSWD',
-                        value: Config.dbrootpw,
+                        value: Config.seafile.dbrootpw,
                       },
                       {
                         name: 'SEAFILE_ADMIN_EMAIL',
-                        value: 'kooplex@elte.hu',
+                        value: Config.adminemail,
                       },
                       {
                         name: 'SEAFILE_ADMIN_PASSWORD',
-                        value: Config.adminpw,
+                        value: Config.dbrootpw,
                       },
                       {
                         name: 'SEAFILE_SERVER_LETSENCRYPT',

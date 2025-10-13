@@ -64,6 +64,16 @@ local nodename = 'veo1';
                 '--api-ip=0.0.0.0',
                 '--error-path=/var/html',
               ],
+                    resources: {
+                      requests: {
+                        cpu: '100m',
+                        memory: '40Mi',
+                      },
+                      limits: {
+                        cpu: '200m',
+                        memory: '100Mi',
+                      },
+                    },
               ports: [
                 {
                   containerPort: 8000,
@@ -74,6 +84,12 @@ local nodename = 'veo1';
                   name: 'api',
                 },
               ],
+              resources: {
+                requests: {
+                  cpu: '300m',
+                  memory: '200Mi',
+                },
+              },
               volumeMounts: [
                 {
                   mountPath: '/var/html',
@@ -82,9 +98,9 @@ local nodename = 'veo1';
               ],
             },
           ],
-          nodeSelector: {
-            'kubernetes.io/hostname': nodename,
-          },
+          //nodeSelector: {
+          //  'kubernetes.io/hostname': nodename,
+          //},
           volumes: [
             {
               name: 'errorhtml',

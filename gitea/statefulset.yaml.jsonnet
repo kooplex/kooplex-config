@@ -72,6 +72,16 @@ local Config = import 'config.libsonnet';
                         subPath: 'data',
                       },
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '1',
+                        memory: '400Mi',
+                      },
+                      limits: {
+                        cpu: '2',
+                        memory: '4Gi',
+                      },
+                    },
                   },
                 ],
                 volumes: [

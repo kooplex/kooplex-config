@@ -45,11 +45,33 @@ local nodename = 'veo1';
                   name: 'siteconf',
                 },
               ],
+              livenessProbe: {
+                failureThreshold: 3,
+                httpGet: {
+                  path: '/',
+                  port: 80,
+                  scheme: 'HTTP',
+                },
+                initialDelaySeconds: 120,
+                periodSeconds: 120,
+                successThreshold: 1,
+                timeoutSeconds: 5,
+              },
+              resources: {
+                limits: {
+                  cpu: '1',
+                  memory: '4Gi',
+                },
+                requests: {
+                  cpu: '200m',
+                  memory: '1Gi',
+                },
+              },
             },
           ],
-          nodeSelector: {
-            'kubernetes.io/hostname': nodename,
-          },
+          //nodeSelector: {
+          //  'kubernetes.io/hostname': nodename,
+          //},
           volumes: [
             {
               name: 'staticreports',

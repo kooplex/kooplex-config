@@ -39,6 +39,16 @@ local Config = import 'config.libsonnet';
                         name: 'http',
                       },
                     ],
+                    resources: {
+                      requests: {
+                        cpu: '300m',
+                        memory: '400Mi',
+                      },
+                      limits: {
+                        cpu: '2',
+                        memory: '4Gi',
+                      },
+                    },
                     volumeMounts: [
                       {
                         mountPath: '/wiki/data/repo/',
