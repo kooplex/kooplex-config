@@ -388,7 +388,7 @@ local Config = import '../config.libsonnet';
               spec: {
                 containers: [
                   {
-                    image: 'mariadb:10.5.4',
+                    image: 'mariadb:11.2',
                     name: Config.hub.appname + '-mysql',
                     ports: [
                       {
