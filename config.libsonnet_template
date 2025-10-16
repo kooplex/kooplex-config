@@ -21,7 +21,7 @@
     dbuser: 'hub',
     dbpw: '',
     dbrootpw: '',
-    image: 'image-registry/hub-uwsgi-v8',
+    image: 'image-registry.vo.elte.hu/hub-uwsgi-v8',
     djangosecret: '',
     redis_pw: '',
     redis_teleport: '',
