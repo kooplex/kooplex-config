@@ -61,7 +61,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/kooplexhub',
                         name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/redis',
+                        subPath: Config.hub.appname + '/redis',
                       },
                     ],
                     env: [
@@ -94,7 +94,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/usr/share/nginx/html/',
                         name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/code/static',
+                        subPath: Config.hub.appname + '/code/static',
                       },
                     ],
                   },
@@ -136,42 +136,42 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/kooplexhub',
                         name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/code',
+                        subPath: Config.hub.appname + '/code',
                       },
                       {
                         mountPath: '/var/log/hub',
                         name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/log',
+                        subPath: Config.hub.appname + '/log',
                       },
                       {
                         mountPath: '/mnt/home',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/home',
+                        name: 'home',
+                        //                        subPath: Config.hub.appname + '/home',
                       },
                       {
                         mountPath: '/mnt/garbage',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/garbage',
+                        name: 'garbage',
+                        //                        subPath: Config.hub.appname + '/garbage',
                       },
                       {
                         mountPath: '/mnt/projects',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/projects',
+                        name: 'project',
+                        //                        subPath: Config.hub.appname + '/projects',
                       },
                       {
                         mountPath: '/mnt/reports',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/report',
+                        name: 'report',
+                        subPath: 'reports',
                       },
                       {
                         mountPath: '/mnt/report_prepare',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/report_prepare',
+                        name: 'report',
+                        subPath: 'report_prepare',
                       },
                       {
                         mountPath: '/mnt/courses',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/edu',
+                        name: 'edu',
+                        //                        subPath: Config.hub.appname + '/edu',
                       },
                       {
                         mountPath: '/etc/mnt',
@@ -185,13 +185,13 @@ local Config = import '../config.libsonnet';
                       },
                       {
                         mountPath: '/mnt/attachments',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/attachment',
+                        name: 'attachments',
+                        //                        subPath: Config.hub.appname + '/attachment',
                       },
                       {
                         mountPath: '/mnt/scratch',
-                        name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '/scratch',
+                        name: 'scratch',
+                        //                        subPath:  Config.hub.appname + '/scratch',
                       },
                     ],
                     env: [
@@ -388,7 +388,7 @@ local Config = import '../config.libsonnet';
               spec: {
                 containers: [
                   {
-                    image: 'mariadb:10.5.4',
+                    image: 'mariadb:11.2.6',
                     name: Config.hub.appname + '-mysql',
                     ports: [
                       {
@@ -400,7 +400,7 @@ local Config = import '../config.libsonnet';
                       {
                         mountPath: '/var/lib/mysql',
                         name: 'svc',
-                        subPath: Config.instance_subpath + Config.hub.appname + '-mysql/mysql',
+                        subPath: Config.hub.appname + '-mysql',
                       },
                     ],
                     resources: {
