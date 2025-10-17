@@ -22,7 +22,8 @@ local Config = import '../config.libsonnet';
             sshstart: 'service ssh start\n',
             //runqueue: '#! /bin/bash\nexec 2> /var/log/hub/queue.log\nexec 1>&2\ncd /kooplexhub/kooplexhub\n. /opt/python-packages/bin/activate && python3 manage.py djangohuey --queue container &;\n/opt/python-packages/bin/activate && python3 manage.py djangohuey --queue course &;\n/opt/python-packages/bin/activate && python3 manage.py djangohuey --queue hub & #sleep 10000',
             runqueue: '#! /bin/bash\nexec 2> /var/log/hub/queue.log\nexec 1>&2\ncd /kooplexhub/kooplexhub\n. /opt/python-packages/bin/activate\ndeclare -a q_list=("container" "hub" "volume" "course")\ntmux new-session -d -s queues\nfor q in "${q_list[@]}"\ndo  \n       tmux new-window -d -n $q  "python3 manage.py djangohuey --queue $q & tee /var/log/hub/${q}-tmux.log" \ndone\n  #sleep 10000',
-            runserver: '#! /bin/bash\nexec 2> /var/log/hub/runserver.log\nexec 1>&2\ncd /kooplexhub/kooplexhub\n. /opt/python-packages/bin/activate && uwsgi -s /tmp/uwsgi.sock --uid 107 --gid 106 --wsgi-file kooplexhub/wsgi.py --daemonize\n #sleep 10000',
+            //            runserver: '#! /bin/bash\nexec 2> /var/log/hub/runserver.log\nexec 1>&2\ncd /kooplexhub/kooplexhub\n. /opt/python-packages/bin/activate && uwsgi -s /tmp/uwsgi.sock --uid 107 --gid 106 --wsgi-file kooplexhub/wsgi.py --daemonize\n #sleep 10000',
+            runserver: '#! /bin/bash\nexec 2> /var/log/hub/runserver.log\nexec 1>&2\ncd /kooplexhub/kooplexhub\n. /opt/python-packages/bin/activate && python manage.py runserver 0.0.0.0:8080\n #sleep 10000',
           },
         },
 
