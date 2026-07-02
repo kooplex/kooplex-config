@@ -36,3 +36,9 @@ All the modules are templated and it needs to be manifested into yaml format. Th
 ## IMPORTANT NOTES
 * Check whether all the necessary ports are open (ufw allow etc) e.g. docker port, http port
 
+## The project was funded by DOKK 
+Development of Digital Educational Method Competency Center
+
+![](static/cropped-Dokk_logo.png)
+
+**Project id**: 2022-1.1.1-KK-2022-00003
